@@ -1,5 +1,6 @@
 package co.com.icesi.tallerjpa.model;
 
+import com.sun.istack.NotNull;
 import lombok.Data;
 
 import javax.persistence.*;
@@ -18,6 +19,8 @@ public class IcesiUser {
     private String phoneNumber;
     @OneToMany(mappedBy = "user")
     private List<Account> accounts;
+
+    @NotNull
     @ManyToOne
     @JoinColumn(name = "role_role_id")
     private Role role;
