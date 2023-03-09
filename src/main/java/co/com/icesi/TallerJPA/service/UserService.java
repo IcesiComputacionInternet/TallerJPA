@@ -17,11 +17,11 @@ public class UserService {
     private final UserMapper userMapper;
 
     public IcesiUser save(UserCreateDTO user)  throws Exception{
-        if (findUsersByEmail(user) && findUsersByPhoneNumber(user)) {
+        if (userRepository.findByEmail(user.getEmail()) && userRepository.findByPhoneNumber(user.getPhoneNumber())) {
             throw new Exception("Ambos campos ya existen");
-        } else if (findUsersByEmail(user)) {
+        } else if (userRepository.findByEmail(user.getEmail())) {
             throw new Exception("El correo ya existe");
-        } else if (findUsersByPhoneNumber(user)) {
+        } else if (userRepository.findByPhoneNumber(user.getPhoneNumber())) {
             throw new Exception("El numero de telefono ya existe");
         } else {
             IcesiUser icesiUser = userMapper.fromIcesiUserDTO(user);
@@ -30,6 +30,7 @@ public class UserService {
         }
     }
 
+    /*
     private boolean findUsersByEmail(UserCreateDTO user) {
         List<String> emails = userRepository.findByEmail();
         return emails.stream().anyMatch(user.getEmail()::equals);
@@ -39,4 +40,5 @@ public class UserService {
         List<String> emails = userRepository.findByPhoneNumber();
         return emails.stream().anyMatch(user.getPhoneNumber()::equals);
     }
+     */
 }

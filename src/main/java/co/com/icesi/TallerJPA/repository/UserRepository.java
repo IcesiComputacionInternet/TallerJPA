@@ -11,9 +11,11 @@ import java.util.UUID;
 @Repository
 public interface UserRepository extends JpaRepository<IcesiUser, UUID> {
 
-    @Query(value = "select u.email from IcesiUser u")
-    List<String> findByEmail();
+    @Query(value = "SELECT CASE WHEN(COUNT(*) > 0) THEN true ELSE false END FROM IcesiUser u WHERE u.email = :email")
+    boolean findByEmail(String email);
 
-    @Query(value = "select u.phoneNumber from IcesiUser u")
-    List<String> findByPhoneNumber();
+    @Query(value = "SELECT CASE WHEN(COUNT(*) > 0) THEN true ELSE false END FROM IcesiUser u WHERE u.phoneNumber = :phoneNumber")
+    boolean findByPhoneNumber(String phoneNumber);
+
+
 }
