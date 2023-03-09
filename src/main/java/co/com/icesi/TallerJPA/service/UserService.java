@@ -1,6 +1,7 @@
 package co.com.icesi.TallerJPA.service;
 
 import co.com.icesi.TallerJPA.dto.UserCreateDTO;
+import co.com.icesi.TallerJPA.exception.MissingArgumentsException;
 import co.com.icesi.TallerJPA.mapper.UserMapper;
 import co.com.icesi.TallerJPA.model.IcesiUser;
 import co.com.icesi.TallerJPA.repository.UserRepository;
@@ -16,18 +17,22 @@ public class UserService {
     private final UserRepository userRepository;
     private final UserMapper userMapper;
 
-    public IcesiUser save(UserCreateDTO user)  throws Exception{
-        if (userRepository.findByEmail(user.getEmail()) && userRepository.findByPhoneNumber(user.getPhoneNumber())) {
-            throw new Exception("Ambos campos ya existen");
-        } else if (userRepository.findByEmail(user.getEmail())) {
-            throw new Exception("El correo ya existe");
-        } else if (userRepository.findByPhoneNumber(user.getPhoneNumber())) {
-            throw new Exception("El numero de telefono ya existe");
-        } else {
-            IcesiUser icesiUser = userMapper.fromIcesiUserDTO(user);
-            icesiUser.setUserId(UUID.randomUUID());
-            return userRepository.save(icesiUser);
+    public void save(UserCreateDTO user) {
+
+        boolean email = userRepository.findByEmail(user.getEmail());
+        boolean phoneNumber = userRepository.findByPhoneNumber(user.getPhoneNumber());
+
+        if(email && phoneNumber){
+            throw new MissingArgumentsException("Email and phone number already exist");
+        }else if (email) {
+            throw new MissingArgumentsException("Email already exist");
+        }else if (phoneNumber) {
+            throw new MissingArgumentsException("Phone number already exist");
         }
+
+        IcesiUser icesiUser = userMapper.fromIcesiUserDTO(user);
+        icesiUser.setUserId(UUID.randomUUID());
+        userRepository.save(icesiUser);
     }
 
     /*
