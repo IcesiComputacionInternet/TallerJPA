@@ -16,9 +16,9 @@ import org.springframework.web.bind.annotation.RestController;
 public class UserController {
     private final UserService userService;
 
-    @PostMapping("/users")
-    public void createIcesiUser(@RequestBody UserCreateDTO user) {
-        userService.save(user);
+    @PostMapping("/addUser")
+    public IcesiUser createIcesiUser(@RequestBody UserCreateDTO user) {
+        return userService.save(user);
     }
 
 

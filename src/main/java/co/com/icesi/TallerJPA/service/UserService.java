@@ -17,7 +17,7 @@ public class UserService {
     private final UserRepository userRepository;
     private final UserMapper userMapper;
 
-    public void save(UserCreateDTO user) {
+    public IcesiUser save(UserCreateDTO user) {
 
         boolean email = userRepository.findByEmail(user.getEmail());
         boolean phoneNumber = userRepository.findByPhoneNumber(user.getPhoneNumber());
@@ -32,7 +32,7 @@ public class UserService {
 
         IcesiUser icesiUser = userMapper.fromIcesiUserDTO(user);
         icesiUser.setUserId(UUID.randomUUID());
-        userRepository.save(icesiUser);
+        return userRepository.save(icesiUser);
     }
 
     /*
