@@ -2,8 +2,8 @@ package co.com.icesi.TallerJPA.model;
 
 import lombok.Data;
 
-import javax.persistence.Entity;
-import javax.persistence.Id;
+import javax.persistence.*;
+import java.util.List;
 import java.util.UUID;
 
 @Data
@@ -16,4 +16,16 @@ public class IcesiUser {
     private String email;
     private String phoneNumber;
     private String password;
+
+    //Un usuario tiene multiples cuentas
+    @OneToMany(mappedBy = "user")
+    private List<IcesiAccount> accounts;
+
+    //Los usuarios tienen un rol
+    @ManyToOne
+    @JoinColumn(name = "icesi_role_role_id")
+    private IcesiRole role;
+
+
+
 }

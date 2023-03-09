@@ -2,8 +2,7 @@ package co.com.icesi.TallerJPA.model;
 
 import lombok.Data;
 
-import javax.persistence.Entity;
-import javax.persistence.Id;
+import javax.persistence.*;
 import java.util.UUID;
 
 @Data
@@ -15,4 +14,12 @@ public class IcesiAccount {
     private long balance;
     private String type;
     private boolean active;
+
+    //Muchas cuentas pertenecen a un solo usuario
+    @ManyToOne
+    @JoinColumn(name = "icesi_user_user_id")
+    private IcesiUser user;
+
+
+
 }
