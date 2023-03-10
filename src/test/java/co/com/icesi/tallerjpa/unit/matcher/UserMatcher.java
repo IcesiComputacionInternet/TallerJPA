@@ -9,15 +9,15 @@ import java.util.Objects;
 @AllArgsConstructor
 public class UserMatcher implements ArgumentMatcher<IcesiUser> {
 
-    private IcesiUser icesiUserLeft;
+    private IcesiUser UserLeft;
 
     @Override
-    public boolean matches(IcesiUser icesiUserRight) {
-        return icesiUserRight.getUserId() != null &&
-                Objects.equals(icesiUserRight.getFirstName(), icesiUserLeft.getFirstName()) &&
-                Objects.equals(icesiUserRight.getLastName(), icesiUserLeft.getLastName()) &&
-                Objects.equals(icesiUserRight.getPassword(), icesiUserLeft.getPassword()) &&
-                Objects.equals(icesiUserRight.getEmail(), icesiUserLeft.getEmail()) &&
-                Objects.equals(icesiUserRight.getPhoneNumber(), icesiUserLeft.getPhoneNumber());
+    public boolean matches(IcesiUser UserRight) {
+        return UserRight.getUserId() != null && UserRight.getRole() != null &&
+                Objects.equals(UserRight.getFirstName(), UserLeft.getFirstName()) &&
+                Objects.equals(UserRight.getLastName(), UserLeft.getLastName()) &&
+                Objects.equals(UserRight.getPassword(), UserLeft.getPassword()) &&
+                Objects.equals(UserRight.getEmail(), UserLeft.getEmail()) &&
+                Objects.equals(UserRight.getPhoneNumber(), UserLeft.getPhoneNumber());
     }
 }

@@ -3,7 +3,6 @@ package co.com.icesi.tallerjpa.service;
 import co.com.icesi.tallerjpa.dto.RoleDTO;
 import co.com.icesi.tallerjpa.exception.ExistsException;
 import co.com.icesi.tallerjpa.mapper.RoleMapper;
-import co.com.icesi.tallerjpa.model.IcesiUser;
 import co.com.icesi.tallerjpa.model.Role;
 import co.com.icesi.tallerjpa.repository.RoleRepository;
 import lombok.AllArgsConstructor;

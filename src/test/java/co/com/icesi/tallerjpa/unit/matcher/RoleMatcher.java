@@ -1,6 +1,5 @@
 package co.com.icesi.tallerjpa.unit.matcher;
 
-import co.com.icesi.tallerjpa.model.IcesiUser;
 import co.com.icesi.tallerjpa.model.Role;
 import lombok.AllArgsConstructor;
 import org.mockito.ArgumentMatcher;
