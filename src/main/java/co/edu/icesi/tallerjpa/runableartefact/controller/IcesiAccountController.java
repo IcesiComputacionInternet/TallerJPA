@@ -17,4 +17,14 @@ public class IcesiAccountController {
     public String createAccount(@RequestBody IcesiAccountDTO icesiAccountDTO) {
         return icesiAccountService.saveNewAccount(icesiAccountDTO);
     }
+
+    @PostMapping("/account/activate")
+    public String activateAccount(@RequestBody String accountNumber) {
+        return icesiAccountService.activateAccount(accountNumber);
+    }
+
+    @PostMapping("/account/deactivate")
+    public String deactivateAccount(@RequestBody String accountNumber) {
+        return icesiAccountService.deactivateAccount(accountNumber);
+    }
 }

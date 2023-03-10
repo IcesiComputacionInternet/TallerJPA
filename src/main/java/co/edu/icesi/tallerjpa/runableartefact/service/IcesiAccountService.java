@@ -8,7 +8,6 @@ import lombok.AllArgsConstructor;
 import org.springframework.stereotype.Service;
 
 import java.util.*;
-import java.util.stream.Collectors;
 
 @Service
 @AllArgsConstructor
@@ -23,6 +22,28 @@ public class IcesiAccountService {
         icesiAccount.setAccountId(UUID.randomUUID());
         icesiAccount.setAccountNumber(generateAccountNumberThatDontExist());
         return "Account saved";
+    }
+
+    public String activateAccount(String accountNumber) {
+        Optional<IcesiAccount> icesiAccount = icesiAccountRepository.findByAccountNumber(accountNumber);
+        if (icesiAccount.isPresent()) {
+            icesiAccount.get().setActive(true);
+            return "Account activated";
+        }
+        return "Account not found";
+    }
+
+    public String deactivateAccount(String accountNumber){
+        Optional<IcesiAccount> icesiAccount = icesiAccountRepository.findByAccountNumber(accountNumber);
+        if (icesiAccount.isPresent() && validateAccountBalance(icesiAccount.get())) {
+            icesiAccount.get().setActive(false);
+            return "Account deactivated";
+        }
+        return "Account not found";
+    }
+
+    private boolean validateAccountBalance(IcesiAccount icesiAccount) {
+        return icesiAccount.getBalance() >= 0;
     }
 
     private String generateAccountNumberThatDontExist() {

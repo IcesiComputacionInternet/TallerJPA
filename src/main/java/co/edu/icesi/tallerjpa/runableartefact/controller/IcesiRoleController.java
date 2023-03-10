@@ -1,8 +1,7 @@
 package co.edu.icesi.tallerjpa.runableartefact.controller;
 
 import co.edu.icesi.tallerjpa.runableartefact.dto.IcesiRoleDTO;
-import co.edu.icesi.tallerjpa.runableartefact.dto.IcesiUserDTO;
-import co.edu.icesi.tallerjpa.runableartefact.exception.DataAlreadyExist;
+import co.edu.icesi.tallerjpa.runableartefact.exception.implementation.DataAlreadyExist;
 import co.edu.icesi.tallerjpa.runableartefact.mapper.IcesiRoleMapper;
 import co.edu.icesi.tallerjpa.runableartefact.service.IcesiRoleService;
 import lombok.AllArgsConstructor;

@@ -1,4 +1,4 @@
-package co.edu.icesi.tallerjpa.runableartefact.exception;
+package co.edu.icesi.tallerjpa.runableartefact.exception.implementation;
 
 
 public class DataAlreadyExist extends RuntimeException {

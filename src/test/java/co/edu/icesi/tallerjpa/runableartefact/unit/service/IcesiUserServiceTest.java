@@ -25,7 +25,7 @@ public class IcesiUserServiceTest {
     private void init(){
         icesiUserRepository = mock(IcesiUserRepository.class);
         icesiUserMapper = spy(IcesiUserMapperImpl.class);
-        icesiUserService = new IcesiUserService(icesiUserRepository, icesiUserMapper);
+        //icesiUserService = new IcesiUserService(icesiUserRepository, icesiUserMapper);
     }
 
     @Test
