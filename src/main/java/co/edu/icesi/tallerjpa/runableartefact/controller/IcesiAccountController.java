@@ -27,4 +27,20 @@ public class IcesiAccountController {
     public String deactivateAccount(@RequestBody String accountNumber) {
         return icesiAccountService.deactivateAccount(accountNumber);
     }
+
+    @PostMapping("/account/withdrawal")
+    public String withdrawal(@RequestBody String accountNumber, Long amount) {
+        return icesiAccountService.withdrawal(accountNumber, amount);
+    }
+
+    @PostMapping("/account/deposit")
+    public String deposit(@RequestBody String accountNumber, Long amount) {
+        return icesiAccountService.deposit(accountNumber, amount);
+    }
+
+    @PostMapping("/account/transfer")
+    public String transfer(@RequestBody String accountNumberOrigin, String accountNumberDestination, Long amount) {
+        return icesiAccountService.transfer(accountNumberOrigin, accountNumberDestination, amount);
+    }
+
 }

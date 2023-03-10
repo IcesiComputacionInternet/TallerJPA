@@ -35,15 +35,53 @@ public class IcesiAccountService {
 
     public String deactivateAccount(String accountNumber){
         Optional<IcesiAccount> icesiAccount = icesiAccountRepository.findByAccountNumber(accountNumber);
-        if (icesiAccount.isPresent() && validateAccountBalance(icesiAccount.get())) {
+        if (icesiAccount.isPresent() && validateAccountBalanceToDeactivate(icesiAccount.get())) {
             icesiAccount.get().setActive(false);
             return "Account deactivated";
         }
         return "Account not found";
     }
 
-    private boolean validateAccountBalance(IcesiAccount icesiAccount) {
-        return icesiAccount.getBalance() >= 0;
+    public String withdrawal(String accountNumber, Long amount) {
+        Optional<IcesiAccount> icesiAccount = icesiAccountRepository.findByAccountNumber(accountNumber);
+        if (icesiAccount.isPresent()
+                && validateAccountBalanceToWithdrawal(icesiAccount.get())
+                && icesiAccount.get().getBalance() >= amount) {
+            icesiAccount.get().setBalance(icesiAccount.get().getBalance() - amount);
+            return "Withdrawal successful";
+        }
+        return "Account not found";
+    }
+
+    public String transfer(String accountNumberOrigin, String accountNumberDestination, Long amount) {
+        Optional<IcesiAccount> icesiAccountOrigin = icesiAccountRepository.findByAccountNumber(accountNumberOrigin);
+        Optional<IcesiAccount> icesiAccountDestination = icesiAccountRepository.findByAccountNumber(accountNumberDestination);
+        if (icesiAccountOrigin.isPresent()
+                && icesiAccountDestination.isPresent()
+                && validateAccountBalanceToWithdrawal(icesiAccountOrigin.get())
+                && icesiAccountOrigin.get().getBalance() >= amount) {
+            icesiAccountOrigin.get().setBalance(icesiAccountOrigin.get().getBalance() - amount);
+            icesiAccountDestination.get().setBalance(icesiAccountDestination.get().getBalance() + amount);
+            return "Transfer successful";
+        }
+        return "Account not found";
+    }
+
+
+    public String deposit(String accountNumber, Long amount) {
+        Optional<IcesiAccount> icesiAccount = icesiAccountRepository.findByAccountNumber(accountNumber);
+        if (icesiAccount.isPresent()) {
+            icesiAccount.get().setBalance(icesiAccount.get().getBalance() + amount);
+            return "Deposit successful";
+        }
+        return "Account not found";
+    }
+
+    private boolean validateAccountBalanceToDeactivate(IcesiAccount icesiAccount) {
+        return icesiAccount.getBalance() == 0;
+    }
+    private boolean validateAccountBalanceToWithdrawal(IcesiAccount icesiAccount) {
+        return icesiAccount.getBalance() > 0;
     }
 
     private String generateAccountNumberThatDontExist() {
