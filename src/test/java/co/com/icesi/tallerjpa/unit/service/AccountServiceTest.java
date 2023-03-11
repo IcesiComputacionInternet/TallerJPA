@@ -1,14 +1,20 @@
 package co.com.icesi.tallerjpa.unit.service;
 
 import co.com.icesi.tallerjpa.dto.AccountDTO;
+import co.com.icesi.tallerjpa.enums.TypeAccount;
 import co.com.icesi.tallerjpa.mapper.AccountMapper;
 import co.com.icesi.tallerjpa.mapper.AccountMapperImpl;
 import co.com.icesi.tallerjpa.model.Account;
 import co.com.icesi.tallerjpa.repository.AccountRepository;
+import co.com.icesi.tallerjpa.repository.UserRepository;
 import co.com.icesi.tallerjpa.service.AccountService;
+import co.com.icesi.tallerjpa.strategy.accounts.interfaces.TypeAccountStrategy;
 import co.com.icesi.tallerjpa.unit.matcher.AccountMatcher;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
+
+import java.util.List;
+import java.util.Map;
 
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.argThat;
@@ -21,11 +27,18 @@ public class AccountServiceTest {
     private AccountRepository accountRepository;
     private AccountMapper accountMapper;
 
+    private UserRepository userRepository;
+    private List<TypeAccountStrategy> typeAccountStrategies;
+
+
     @BeforeEach
     public void setup() {
         accountRepository = mock(AccountRepository.class);
         accountMapper = spy(AccountMapperImpl.class);
-        accountService = new AccountService(accountRepository, accountMapper);
+        userRepository = mock(UserRepository.class);
+        typeAccountStrategies = mock(List.class);
+
+        accountService = new AccountService(accountRepository, accountMapper, userRepository, typeAccountStrategies);
     }
 
     @Test
@@ -39,7 +52,7 @@ public class AccountServiceTest {
     private AccountDTO defaultAccountDTO() {
         return AccountDTO.builder()
                 .balance(100L)
-                .type("type")
+                .type(TypeAccount.DEPOSIT_ONLY)
                 .active(true)
                 .build();
     }
@@ -47,7 +60,7 @@ public class AccountServiceTest {
     private Account defaultAccount() {
         return Account.builder()
                 .balance(100L)
-                .type("type")
+                .type(TypeAccount.DEPOSIT_ONLY)
                 .active(true)
                 .build();
     }

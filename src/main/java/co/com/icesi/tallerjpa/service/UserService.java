@@ -4,11 +4,15 @@ import co.com.icesi.tallerjpa.dto.UserDTO;
 import co.com.icesi.tallerjpa.exception.ExistsException;
 import co.com.icesi.tallerjpa.mapper.UserMapper;
 import co.com.icesi.tallerjpa.model.IcesiUser;
+import co.com.icesi.tallerjpa.repository.RoleRepository;
 import co.com.icesi.tallerjpa.repository.UserRepository;
 import lombok.AllArgsConstructor;
+import lombok.NoArgsConstructor;
 import lombok.SneakyThrows;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
+import java.util.List;
 import java.util.UUID;
 
 @Service
@@ -16,7 +20,8 @@ import java.util.UUID;
 public class UserService {
 
     private final UserRepository userRepository;
-    private final UserMapper icesiUserMapper;
+    private final UserMapper userMapper;
+    private final RoleRepository roleRepository;
 
     @SneakyThrows
     public IcesiUser save(UserDTO userDTO){
@@ -29,7 +34,8 @@ public class UserService {
         if (phoneExists){ throw new ExistsException("Phone number already exists");}
 
         userDTO.setUserId(UUID.randomUUID());
-        return userRepository.save(icesiUserMapper.fromUserDTO(userDTO));
+        userDTO.setRole(roleRepository.findByName(userDTO.getRole().getName()));
+        return userRepository.save(userMapper.fromUserDTO(userDTO));
 
     }
 }

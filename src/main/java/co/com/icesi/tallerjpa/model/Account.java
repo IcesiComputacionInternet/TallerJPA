@@ -1,5 +1,6 @@
 package co.com.icesi.tallerjpa.model;
 
+import co.com.icesi.tallerjpa.enums.TypeAccount;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
@@ -21,7 +22,7 @@ public class Account {
     private UUID accountId;
     private String accountNumber;
     private Long balance;
-    private String type;
+    private TypeAccount type;
     private boolean active;
     @ManyToOne
     @JoinColumn(name = "icesi_user_user_id")

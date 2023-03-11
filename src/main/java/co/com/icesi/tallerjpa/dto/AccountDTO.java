@@ -1,5 +1,7 @@
 package co.com.icesi.tallerjpa.dto;
 
+import co.com.icesi.tallerjpa.enums.TypeAccount;
+import co.com.icesi.tallerjpa.model.IcesiUser;
 import lombok.Builder;
 import lombok.Data;
 
@@ -11,6 +13,8 @@ public class AccountDTO {
     private UUID accountId;
     private String accountNumber;
     private Long balance;
-    private String type;
+    private TypeAccount type;
     private boolean active;
+
+    private IcesiUser user;
 }
