@@ -112,6 +112,7 @@ public class UserServiceTest {
         return IcesiRole.builder()
                 .roleId(UUID.randomUUID())
                 .name("Admin")
+                .description("Admin")
                 .build();
     }
 

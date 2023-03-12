@@ -4,10 +4,7 @@ import com.fasterxml.jackson.annotation.JsonBackReference;
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonManagedReference;
 import com.sun.istack.NotNull;
-import lombok.AllArgsConstructor;
-import lombok.Builder;
-import lombok.Data;
-import lombok.NoArgsConstructor;
+import lombok.*;
 
 import javax.persistence.*;
 import java.util.List;
@@ -35,6 +32,7 @@ public class IcesiUser {
     @NotNull
     @ManyToOne
     @JoinColumn(name = "icesi_role_role_id")
+    @ToString.Exclude
     private IcesiRole role;
 
 

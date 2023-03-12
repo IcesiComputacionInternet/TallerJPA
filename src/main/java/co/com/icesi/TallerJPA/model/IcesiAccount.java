@@ -1,9 +1,6 @@
 package co.com.icesi.TallerJPA.model;
 
-import lombok.AllArgsConstructor;
-import lombok.Builder;
-import lombok.Data;
-import lombok.NoArgsConstructor;
+import lombok.*;
 
 import javax.persistence.*;
 import java.util.UUID;
@@ -24,6 +21,7 @@ public class IcesiAccount {
     //Muchas cuentas pertenecen a un solo usuario
     @ManyToOne
     @JoinColumn(name = "icesi_user_user_id")
+    @ToString.Exclude
     private IcesiUser user;
 
 
