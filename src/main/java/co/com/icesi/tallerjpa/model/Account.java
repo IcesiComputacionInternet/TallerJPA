@@ -1,10 +1,7 @@
 package co.com.icesi.tallerjpa.model;
 
 import co.com.icesi.tallerjpa.enums.TypeAccount;
-import lombok.AllArgsConstructor;
-import lombok.Builder;
-import lombok.Data;
-import lombok.NoArgsConstructor;
+import lombok.*;
 
 import javax.persistence.Entity;
 import javax.persistence.Id;
@@ -26,5 +23,6 @@ public class Account {
     private boolean active;
     @ManyToOne
     @JoinColumn(name = "icesi_user_user_id")
+    @ToString.Exclude
     private IcesiUser user;
 }

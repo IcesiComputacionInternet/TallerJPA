@@ -1,10 +1,7 @@
 package co.com.icesi.tallerjpa.model;
 
 import com.sun.istack.NotNull;
-import lombok.AllArgsConstructor;
-import lombok.Builder;
-import lombok.Data;
-import lombok.NoArgsConstructor;
+import lombok.*;
 
 import javax.persistence.*;
 import java.util.List;
@@ -29,6 +26,7 @@ public class IcesiUser {
     @NotNull
     @ManyToOne
     @JoinColumn(name = "role_role_id")
+    @ToString.Exclude
     private Role role;
 
 }
