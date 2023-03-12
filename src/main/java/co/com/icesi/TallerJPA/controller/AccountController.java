@@ -17,17 +17,17 @@ public class AccountController {
     }
 
     @PatchMapping("/changeState/{accountNumber}")
-    public IcesiAccount changeState(@PathVariable String accountNumber) {
+    public String changeState(@PathVariable String accountNumber) {
         return accountService.changeState(accountNumber);
     }
 
     @PatchMapping("/withdraw/{accountNumber}")
-    public IcesiAccount withdraw(@PathVariable String accountNumber, @RequestBody Long amount) {
+    public String withdraw(@PathVariable String accountNumber, @RequestBody Long amount) {
         return accountService.withdraw(accountNumber, amount);
     }
 
     @PatchMapping("/deposit/{accountNumber}")
-    public IcesiAccount deposit(@PathVariable String accountNumber, @RequestBody Long amount) {
+    public String deposit(@PathVariable String accountNumber, @RequestBody Long amount) {
         return accountService.deposit(accountNumber, amount);
     }
 

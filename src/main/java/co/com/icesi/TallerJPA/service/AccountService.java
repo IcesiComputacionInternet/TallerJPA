@@ -35,7 +35,7 @@ public class AccountService {
         icesiAccount.setAccountId(UUID.randomUUID());
         return accountRepository.save(icesiAccount);
     }
-    private String generateAccountNumber(){
+    public String generateAccountNumber(){
         Random random = new Random();
         IntStream stream = random.ints(11,0, 10);
         String formattedStream = stream.mapToObj(String::valueOf).collect(Collectors.joining());
@@ -45,7 +45,7 @@ public class AccountService {
 
         boolean exist = accountRepository.findByAccountNumber(account);
         if (exist){
-            generateAccountNumber();
+            return generateAccountNumber();
         }
         return account;
     }
@@ -56,36 +56,41 @@ public class AccountService {
         }
     }
 
-    private IcesiAccount findAccountByAccountNumber(String accountNumber){
+    public IcesiAccount findAccountByAccountNumber(String accountNumber){
         return accountRepository.findAccount(accountNumber).orElseThrow(()-> new RuntimeException("Account not found"));
     }
 
-    public IcesiAccount changeState(String accountNumber){
+    public String changeState(String accountNumber){
         IcesiAccount account = findAccountByAccountNumber(accountNumber);
         if (account.getBalance()==0){
             account.setActive(!account.isActive());
+        }else{
+            return "The account can't be deactivated because it has money";
         }
-        return accountRepository.save(account);
+        return "Account state changed";
     }
 
-    public IcesiAccount withdraw(String accountNumber, long amount){
+    public String withdraw(String accountNumber, long amount){
         IcesiAccount account = findAccountByAccountNumber(accountNumber);
         if ( account.isActive() && account.getBalance()>=amount){
             account.setBalance(account.getBalance()-amount);
-            return accountRepository.save(account);
+            return "Withdrawal successful";
+        }else if (!account.isActive()){
+            throw new ArgumentsException("Account must be active to withdraw money");
+
         }else{
             throw new ArgumentsException("Insufficient funds");
         }
     }
 
-    public IcesiAccount deposit(String accountNumber, long amount){
+    public String deposit(String accountNumber, long amount){
         IcesiAccount account = findAccountByAccountNumber(accountNumber);
         if (account.isActive()){
             account.setBalance(account.getBalance()+amount);
         }else{
             throw new ArgumentsException("Account must be active to deposit money");
         }
-        return accountRepository.save(account);
+        return "Deposit successful";
     }
 
     public String transferMoney(String accountNumberOrigin, String accountNumberDestination, long amount){
