@@ -1,6 +1,7 @@
 package co.com.icesi.TallerJPA.service;
 
 import co.com.icesi.TallerJPA.dto.RoleCreateDTO;
+import co.com.icesi.TallerJPA.exception.ArgumentsException;
 import co.com.icesi.TallerJPA.mapper.RoleMapper;
 import co.com.icesi.TallerJPA.model.IcesiRole;
 import co.com.icesi.TallerJPA.repository.RoleRepository;
@@ -18,7 +19,7 @@ public class RoleService {
     public IcesiRole save(RoleCreateDTO role) {
         boolean name = roleRepository.findByName(role.getName());
         if (name) {
-            throw new IllegalArgumentException("Role name already exist");
+            throw new ArgumentsException("Role name already exist");
         }
         IcesiRole icesiRole = roleMapper.fromIcesiRoleDTO(role);
         icesiRole.setRoleId(UUID.randomUUID());
