@@ -40,7 +40,7 @@ public class UserService {
         }
 
 
-        user.setRole(roleRepository.returnRole(user.getRole().getName()).orElseThrow(()-> new RuntimeException("Role does not exist")));
+        user.setRole(roleRepository.returnRole(user.getRole().getName()));
         IcesiUser icesiUser = userMapper.fromIcesiUserDTO(user);
         icesiUser.setUserId(UUID.randomUUID());
         return userRepository.save(icesiUser);
