@@ -1,9 +1,11 @@
 package co.com.icesi.TallerJPA.model;
 
+
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
+
 
 import javax.persistence.*;
 import java.util.List;
@@ -25,6 +27,8 @@ public class IcesiUser {
     private String phoneNumber;
 
     private String password;
+
+    private String email;
 
     @OneToMany(mappedBy = "user")
     private List<IcesiAccount> accounts;
