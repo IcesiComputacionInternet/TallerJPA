@@ -11,9 +11,10 @@ public class AccountMatcher implements ArgumentMatcher<Account> {
 
         @Override
         public boolean matches(Account accountRight) {
-            return accountRight.getAccountId() != null &&
+            return accountRight.getAccountId() != null && accountRight.getAccountNumber() != null &&
                     accountRight.getBalance().equals(accountLeft.getBalance()) &&
                     accountRight.getType().equals(accountLeft.getType()) &&
-                    accountRight.isActive() == accountLeft.isActive();
+                    accountRight.isActive() == accountLeft.isActive() &&
+                    accountRight.getUser().getUserId().equals(accountLeft.getUser().getUserId());
         }
 }

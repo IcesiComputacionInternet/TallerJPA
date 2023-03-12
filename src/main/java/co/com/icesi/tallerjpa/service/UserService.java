@@ -7,12 +7,9 @@ import co.com.icesi.tallerjpa.model.IcesiUser;
 import co.com.icesi.tallerjpa.repository.RoleRepository;
 import co.com.icesi.tallerjpa.repository.UserRepository;
 import lombok.AllArgsConstructor;
-import lombok.NoArgsConstructor;
 import lombok.SneakyThrows;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
-import java.util.List;
 import java.util.UUID;
 
 @Service

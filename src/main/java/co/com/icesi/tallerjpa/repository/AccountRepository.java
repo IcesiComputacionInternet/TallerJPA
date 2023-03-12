@@ -1,7 +1,6 @@
 package co.com.icesi.tallerjpa.repository;
 
 import co.com.icesi.tallerjpa.model.Account;
-import co.com.icesi.tallerjpa.model.IcesiUser;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Modifying;
 import org.springframework.data.jpa.repository.Query;
