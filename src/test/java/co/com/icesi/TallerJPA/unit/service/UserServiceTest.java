@@ -47,7 +47,7 @@ public class UserServiceTest {
         when(userRepository.findByPhoneNumber(any())).thenReturn(false);
         when(roleRepository.findByName(any())).thenReturn(true);
         when(roleRepository.returnRole(any())).thenReturn(Optional.of(defaultRole()));
-        when(userRepository.save(any())).thenReturn(new IcesiUser());
+        when(userRepository.save(any())).thenReturn(defaultIcesiUser());
         when(userResponseMapper.fromICesiUSer(any())).thenReturn(defaultUserResponseDTO());
         userService.save(defaultUserCreateDTO());
         verify(userRepository,times(1)).save(any());

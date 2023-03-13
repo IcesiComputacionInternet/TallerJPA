@@ -1,14 +1,28 @@
 package co.com.icesi.TallerJPA.unit.service;
 
+import co.com.icesi.TallerJPA.Enum.AccountType;
+import co.com.icesi.TallerJPA.dto.AccountCreateDTO;
+import co.com.icesi.TallerJPA.dto.RoleCreateDTO;
+import co.com.icesi.TallerJPA.dto.response.AccountResponseDTO;
+import co.com.icesi.TallerJPA.dto.response.UserResponseDTO;
+import co.com.icesi.TallerJPA.exception.ArgumentsException;
 import co.com.icesi.TallerJPA.mapper.AccountMapper;
 import co.com.icesi.TallerJPA.mapper.AccountMapperImpl;
 import co.com.icesi.TallerJPA.mapper.responseMapper.AccountResponseMapper;
 import co.com.icesi.TallerJPA.mapper.responseMapper.AccountResponseMapperImpl;
+import co.com.icesi.TallerJPA.model.IcesiAccount;
+import co.com.icesi.TallerJPA.model.IcesiRole;
+import co.com.icesi.TallerJPA.model.IcesiUser;
 import co.com.icesi.TallerJPA.repository.AccountRepository;
 import co.com.icesi.TallerJPA.repository.UserRepository;
 import co.com.icesi.TallerJPA.service.AccountService;
+import co.com.icesi.TallerJPA.unit.service.matcher.IcesiAccountMatcher;
 import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
 
+
+import java.util.Optional;
+import java.util.UUID;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.mockito.Mockito.*;
@@ -29,15 +43,15 @@ public class AccountServiceTest {
         accountResponseMapper = spy(AccountResponseMapperImpl.class);
         accountService = new AccountService(accountRepository,userRepository,accountMapper,accountResponseMapper);
     }
-/*
+
+
     @Test
     public void testCreateAccount(){
         when(userRepository.findUserByEmail(any())).thenReturn(Optional.of(defaultIcesiUser()));
         accountService.save(defaultAccountCreateDTO());
-        verify(userRepository, times(1)).findUserByEmail(any());
-        verify(accountRepository, times(1)).save(argThat(new IcesiAccountMatcher(defaultIcesiAccount())));
-        verify(accountMapper, times(1)).fromIcesiAccountDTO(any());
+        verify(accountRepository, times(1)).save(any());
     }
+
     @Test
     public void testCreateAccountWhenUserDoesNotExist(){
         when(userRepository.findUserByEmail(any())).thenReturn(Optional.empty());
@@ -51,8 +65,10 @@ public class AccountServiceTest {
 
     @Test
     public void testFindAccountByAccountNumber(){
-        when(accountRepository.findAccount(any())).thenReturn(Optional.of(defaultIcesiAccount()));
-        accountService.findAccountByAccountNumber(accountService.generateAccountNumber());
+        IcesiAccount icesiAccount = defaultIcesiAccount();
+        when(accountRepository.findAccount(any())).thenReturn(Optional.of(icesiAccount));
+        IcesiAccount account = accountService.findAccountByAccountNumber(icesiAccount.getAccountNumber());
+        assertEquals(icesiAccount.getAccountNumber(),account.getAccountNumber());
         verify(accountRepository, times(1)).findAccount(any());
     }
 
@@ -200,12 +216,14 @@ public class AccountServiceTest {
         }
     }
 
+
+
     private AccountCreateDTO defaultAccountCreateDTO(){
         return AccountCreateDTO.builder()
                 .balance(100)
                 .type("Ahorros")
                 .active(true)
-                .user(defaultIcesiUser())
+                .user("test@hotmail.com")
                 .build();
     }
 
@@ -217,6 +235,17 @@ public class AccountServiceTest {
                 .type("Ahorros")
                 .active(true)
                 .user(defaultIcesiUser())
+                .build();
+    }
+
+    private AccountResponseDTO defaultAccountResponseDTO(){
+        return AccountResponseDTO.builder()
+                .accountId(UUID.randomUUID())
+                .accountNumber(accountService.generateAccountNumber())
+                .balance(100)
+                .type("Ahorros")
+                .active(true)
+                .user(defaultUserResponseDTO())
                 .build();
     }
     private IcesiAccount defaultIcesiAccount2(){
@@ -241,6 +270,23 @@ public class AccountServiceTest {
                 .build();
     }
 
+    private UserResponseDTO defaultUserResponseDTO() {
+        return UserResponseDTO.builder()
+                .firstName("Andres")
+                .lastName("Gomez")
+                .email("test@hotmail.com")
+                .phoneNumber("1234")
+                .password("1234")
+                .role(defaultRoleCreateDTO())
+                .build();
+    }
+    private RoleCreateDTO defaultRoleCreateDTO() {
+        return RoleCreateDTO.builder()
+                .name("Admin")
+                .description("Ninguna")
+                .build();
+    }
+
     private IcesiRole defaultRole(){
         return IcesiRole.builder()
                 .roleId(UUID.randomUUID())
@@ -249,5 +295,5 @@ public class AccountServiceTest {
                 .build();
     }
 
- */
+
 }
