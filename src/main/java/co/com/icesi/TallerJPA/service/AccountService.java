@@ -2,10 +2,10 @@ package co.com.icesi.TallerJPA.service;
 
 import co.com.icesi.TallerJPA.Enum.AccountType;
 import co.com.icesi.TallerJPA.dto.AccountCreateDTO;
-import co.com.icesi.TallerJPA.dto.AccountResponseDTO;
+import co.com.icesi.TallerJPA.dto.response.AccountResponseDTO;
 import co.com.icesi.TallerJPA.exception.ArgumentsException;
 import co.com.icesi.TallerJPA.mapper.AccountMapper;
-import co.com.icesi.TallerJPA.mapper.AccountResponseMapper;
+import co.com.icesi.TallerJPA.mapper.responseMapper.AccountResponseMapper;
 import co.com.icesi.TallerJPA.model.IcesiAccount;
 import co.com.icesi.TallerJPA.repository.AccountRepository;
 import co.com.icesi.TallerJPA.repository.UserRepository;

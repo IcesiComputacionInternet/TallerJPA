@@ -1,6 +1,6 @@
-package co.com.icesi.TallerJPA.mapper;
+package co.com.icesi.TallerJPA.mapper.responseMapper;
 
-import co.com.icesi.TallerJPA.dto.AccountResponseDTO;
+import co.com.icesi.TallerJPA.dto.response.AccountResponseDTO;
 import co.com.icesi.TallerJPA.model.IcesiAccount;
 import org.mapstruct.Mapper;
 

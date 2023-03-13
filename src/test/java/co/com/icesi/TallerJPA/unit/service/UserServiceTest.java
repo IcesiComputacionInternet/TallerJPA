@@ -1,11 +1,13 @@
 package co.com.icesi.TallerJPA.unit.service;
 
-import co.com.icesi.TallerJPA.dto.UserCreateDTO;
+import co.com.icesi.TallerJPA.dto.RoleCreateDTO;
+import co.com.icesi.TallerJPA.dto.response.UserResponseDTO;
 import co.com.icesi.TallerJPA.exception.ArgumentsException;
+import co.com.icesi.TallerJPA.dto.UserCreateDTO;
 import co.com.icesi.TallerJPA.mapper.UserMapper;
 import co.com.icesi.TallerJPA.mapper.UserMapperImpl;
-import co.com.icesi.TallerJPA.mapper.UserResponseMapper;
-import co.com.icesi.TallerJPA.mapper.UserResponseMapperImpl;
+import co.com.icesi.TallerJPA.mapper.responseMapper.UserResponseMapper;
+import co.com.icesi.TallerJPA.mapper.responseMapper.UserResponseMapperImpl;
 import co.com.icesi.TallerJPA.model.IcesiRole;
 import co.com.icesi.TallerJPA.model.IcesiUser;
 import co.com.icesi.TallerJPA.repository.RoleRepository;
@@ -38,18 +40,17 @@ public class UserServiceTest {
         userResponseMapper = spy(UserResponseMapperImpl.class);
         userService = new UserService(userRepository,roleRepository,userMapper,userResponseMapper);
     }
-/*
-
 
     @Test
-    public void testCreateUser() {
+    public void testCreateUser(){
+        when(userRepository.findByEmail(any())).thenReturn(false);
+        when(userRepository.findByPhoneNumber(any())).thenReturn(false);
         when(roleRepository.findByName(any())).thenReturn(true);
-        when(roleRepository.returnRole(any())).thenReturn(defaultRole());
+        when(roleRepository.returnRole(any())).thenReturn(Optional.of(defaultRole()));
+        when(userRepository.save(any())).thenReturn(new IcesiUser());
+        when(userResponseMapper.fromICesiUSer(any())).thenReturn(defaultUserResponseDTO());
         userService.save(defaultUserCreateDTO());
-        verify(roleRepository, times(1)).returnRole(any());
-        verify(userRepository, times(1)).save(argThat(new IcesiUserMatcher(defaultIcesiUser())));
-        verify(userMapper, times(1)).fromIcesiUserDTO(any());
-
+        verify(userRepository,times(1)).save(any());
     }
 
     @Test
@@ -80,7 +81,7 @@ public class UserServiceTest {
     @Test
     public void testCreateUserWhenRoleNotExist(){
         UserCreateDTO userCreateDTO = defaultUserCreateDTO();
-        userCreateDTO.getRole().setName("Student");
+        userCreateDTO.setRole("Student");
         when(roleRepository.findByName(any())).thenReturn(false);
         try{
             userService.save(userCreateDTO);
@@ -91,6 +92,7 @@ public class UserServiceTest {
         //assertThrows(ArgumentsException.class,() -> userService.save(userCreateDTO));
     }
 
+
     private UserCreateDTO defaultUserCreateDTO(){
         return UserCreateDTO.builder()
                 .firstName("Andres")
@@ -98,7 +100,7 @@ public class UserServiceTest {
                 .email("test@hotmail.com")
                 .phoneNumber("1234")
                 .password("1234")
-                .role(defaultRole())
+                .role("Admin")
                 .build();
     }
 
@@ -113,6 +115,24 @@ public class UserServiceTest {
                 .build();
     }
 
+    private UserResponseDTO defaultUserResponseDTO() {
+        return UserResponseDTO.builder()
+                .firstName("Andres")
+                .lastName("Gomez")
+                .email("test@hotmail.com")
+                .phoneNumber("1234")
+                .password("1234")
+                .role(defaultRoleCreateDTO())
+                .build();
+    }
+
+    private RoleCreateDTO defaultRoleCreateDTO() {
+        return RoleCreateDTO.builder()
+                .name("Admin")
+                .description("Ninguna")
+                .build();
+    }
+
     private IcesiRole defaultRole(){
         return IcesiRole.builder()
                 .roleId(UUID.randomUUID())
@@ -120,6 +140,5 @@ public class UserServiceTest {
                 .description("Admin")
                 .build();
     }
-*/
 
 }

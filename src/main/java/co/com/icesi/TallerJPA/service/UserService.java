@@ -1,20 +1,16 @@
 package co.com.icesi.TallerJPA.service;
 
-import co.com.icesi.TallerJPA.dto.RoleCreateDTO;
 import co.com.icesi.TallerJPA.dto.UserCreateDTO;
-import co.com.icesi.TallerJPA.dto.UserResponseDTO;
+import co.com.icesi.TallerJPA.dto.response.UserResponseDTO;
 import co.com.icesi.TallerJPA.exception.ArgumentsException;
-import co.com.icesi.TallerJPA.mapper.RoleMapper;
 import co.com.icesi.TallerJPA.mapper.UserMapper;
-import co.com.icesi.TallerJPA.mapper.UserResponseMapper;
-import co.com.icesi.TallerJPA.model.IcesiRole;
+import co.com.icesi.TallerJPA.mapper.responseMapper.UserResponseMapper;
 import co.com.icesi.TallerJPA.model.IcesiUser;
 import co.com.icesi.TallerJPA.repository.RoleRepository;
 import co.com.icesi.TallerJPA.repository.UserRepository;
 import lombok.AllArgsConstructor;
 import org.springframework.stereotype.Service;
 
-import java.util.Optional;
 import java.util.UUID;
 
 @Service
@@ -46,6 +42,7 @@ public class UserService {
         IcesiUser icesiUser = userMapper.fromIcesiUserDTO(user);
         icesiUser.setRole(roleRepository.returnRole(user.getRole()).orElseThrow(() -> new RuntimeException("Role not found")));
         icesiUser.setUserId(UUID.randomUUID());
+        //userResponseMapper.fromICesiUSer(userRepository.save(userMapper.fromIcesiUserDTO(user)));
         UserResponseDTO userResponseDTO = userResponseMapper.fromICesiUSer(userRepository.save(icesiUser));
         userResponseDTO.setUserId(icesiUser.getUserId());
 

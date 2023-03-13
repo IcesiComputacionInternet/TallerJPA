@@ -1,5 +1,6 @@
-package co.com.icesi.TallerJPA.dto;
+package co.com.icesi.TallerJPA.dto.response;
 
+import co.com.icesi.TallerJPA.dto.RoleCreateDTO;
 import lombok.Builder;
 import lombok.Data;
 
