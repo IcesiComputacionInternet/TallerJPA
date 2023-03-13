@@ -21,7 +21,6 @@ public class IcesiAccount {
     //Muchas cuentas pertenecen a un solo usuario
     @ManyToOne
     @JoinColumn(name = "icesi_user_user_id")
-    @ToString.Exclude
     private IcesiUser user;
 
 

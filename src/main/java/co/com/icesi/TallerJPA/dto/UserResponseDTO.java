@@ -1,19 +1,19 @@
 package co.com.icesi.TallerJPA.dto;
 
-import co.com.icesi.TallerJPA.model.IcesiRole;
-import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
-import lombok.NoArgsConstructor;
+
+import java.util.UUID;
 
 @Data
 @Builder
-public class UserCreateDTO {
+public class UserResponseDTO {
+    private UUID userId;
     private String firstName;
     private String lastName;
     private String email;
     private String phoneNumber;
     private String password;
 
-    private String role;
+    private RoleCreateDTO role;
 }

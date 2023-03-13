@@ -29,8 +29,8 @@ public class IcesiUser {
     private List<IcesiAccount> accounts;
 
     //Los usuarios tienen un rol
-    @NotNull
-    @ManyToOne
+
+    @ManyToOne(optional = false)
     @JoinColumn(name = "icesi_role_role_id")
     private IcesiRole role;
 

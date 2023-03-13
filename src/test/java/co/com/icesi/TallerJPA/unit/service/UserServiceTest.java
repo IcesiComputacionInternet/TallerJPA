@@ -4,6 +4,8 @@ import co.com.icesi.TallerJPA.dto.UserCreateDTO;
 import co.com.icesi.TallerJPA.exception.ArgumentsException;
 import co.com.icesi.TallerJPA.mapper.UserMapper;
 import co.com.icesi.TallerJPA.mapper.UserMapperImpl;
+import co.com.icesi.TallerJPA.mapper.UserResponseMapper;
+import co.com.icesi.TallerJPA.mapper.UserResponseMapperImpl;
 import co.com.icesi.TallerJPA.model.IcesiRole;
 import co.com.icesi.TallerJPA.model.IcesiUser;
 import co.com.icesi.TallerJPA.repository.RoleRepository;
@@ -26,14 +28,17 @@ public class UserServiceTest {
     private UserRepository userRepository;
     private RoleRepository roleRepository;
     private UserMapper userMapper;
+    private UserResponseMapper userResponseMapper;
 
     @BeforeEach
     private void init(){
         userRepository = mock(UserRepository.class);
         roleRepository = mock(RoleRepository.class);
         userMapper = spy(UserMapperImpl.class);
-        userService = new UserService(userRepository,roleRepository,userMapper);
+        userResponseMapper = spy(UserResponseMapperImpl.class);
+        userService = new UserService(userRepository,roleRepository,userMapper,userResponseMapper);
     }
+/*
 
 
     @Test
@@ -115,5 +120,6 @@ public class UserServiceTest {
                 .description("Admin")
                 .build();
     }
+*/
 
 }

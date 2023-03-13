@@ -1,6 +1,7 @@
 package co.com.icesi.TallerJPA.controller;
 
 import co.com.icesi.TallerJPA.dto.UserCreateDTO;
+import co.com.icesi.TallerJPA.dto.UserResponseDTO;
 import co.com.icesi.TallerJPA.model.IcesiUser;
 import co.com.icesi.TallerJPA.service.UserService;
 import lombok.AllArgsConstructor;
@@ -17,7 +18,7 @@ public class UserController {
     private final UserService userService;
 
     @PostMapping("/addUser")
-    public IcesiUser createIcesiUser(@RequestBody UserCreateDTO user) {
+    public UserResponseDTO createIcesiUser(@RequestBody UserCreateDTO user) {
         return userService.save(user);
     }
 

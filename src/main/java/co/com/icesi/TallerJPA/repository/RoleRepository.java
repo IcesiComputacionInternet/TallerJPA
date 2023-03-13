@@ -6,6 +6,7 @@ import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
 import org.springframework.stereotype.Repository;
 
+import javax.swing.text.html.Option;
 import java.util.Optional;
 import java.util.UUID;
 
@@ -16,5 +17,5 @@ public interface RoleRepository extends JpaRepository<IcesiRole, UUID> {
     boolean findByName(String name);
 
     @Query(value = "SELECT r FROM IcesiRole r WHERE r.name = :name")
-    IcesiRole returnRole(String name);
+    Optional<IcesiRole> returnRole(String name);
 }

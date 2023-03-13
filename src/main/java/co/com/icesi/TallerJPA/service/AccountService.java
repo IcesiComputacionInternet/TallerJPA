@@ -2,15 +2,17 @@ package co.com.icesi.TallerJPA.service;
 
 import co.com.icesi.TallerJPA.Enum.AccountType;
 import co.com.icesi.TallerJPA.dto.AccountCreateDTO;
+import co.com.icesi.TallerJPA.dto.AccountResponseDTO;
 import co.com.icesi.TallerJPA.exception.ArgumentsException;
 import co.com.icesi.TallerJPA.mapper.AccountMapper;
+import co.com.icesi.TallerJPA.mapper.AccountResponseMapper;
 import co.com.icesi.TallerJPA.model.IcesiAccount;
 import co.com.icesi.TallerJPA.repository.AccountRepository;
 import co.com.icesi.TallerJPA.repository.UserRepository;
 import lombok.AllArgsConstructor;
 import org.springframework.stereotype.Service;
 
-import java.util.Optional;
+
 import java.util.Random;
 import java.util.UUID;
 import java.util.stream.Collectors;
@@ -22,18 +24,20 @@ public class AccountService {
     private final AccountRepository accountRepository;
     private final UserRepository userRepository;
     private final AccountMapper accountMapper;
+    private final AccountResponseMapper accountResponseMapper;
 
-    public IcesiAccount save(AccountCreateDTO account){
+    public AccountResponseDTO save(AccountCreateDTO account){
         String accountNumber = generateAccountNumber();
         if (account.getBalance()<0){
             throw new ArgumentsException("Balance can't be negative");
         }
         setAccountType(account);
-        account.setUser(userRepository.findUserByEmail(account.getUser().getEmail()).orElseThrow(() -> new RuntimeException("User not found")));
         IcesiAccount icesiAccount = accountMapper.fromIcesiAccountDTO(account);
+        icesiAccount.setUser(userRepository.findUserByEmail(account.getUser()).orElseThrow(() -> new RuntimeException("User not found")));
         icesiAccount.setAccountNumber(accountNumber);
         icesiAccount.setAccountId(UUID.randomUUID());
-        return accountRepository.save(icesiAccount);
+        return accountResponseMapper.fromIcesiAccount(accountRepository.save(icesiAccount));
+
     }
     public String generateAccountNumber(){
         Random random = new Random();

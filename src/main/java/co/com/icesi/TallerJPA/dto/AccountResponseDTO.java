@@ -1,15 +1,17 @@
 package co.com.icesi.TallerJPA.dto;
 
-import co.com.icesi.TallerJPA.model.IcesiUser;
 import lombok.Builder;
 import lombok.Data;
 
+import java.util.UUID;
 @Data
 @Builder
-public class AccountCreateDTO {
-    //private String accountNumber;
+public class AccountResponseDTO {
+    private UUID accountId;
+    private String accountNumber;
     private long balance;
     private String type;
     private boolean active;
-    private String user;
+    private UserResponseDTO user;
+
 }
