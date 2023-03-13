@@ -4,6 +4,8 @@ import lombok.Data;
 
 import javax.persistence.Entity;
 import javax.persistence.Id;
+import javax.persistence.JoinColumn;
+import javax.persistence.ManyToOne;
 import java.util.UUID;
 
 @Data
@@ -19,6 +21,9 @@ public class IcesiAccount {
 
     private String type;
 
-
     private boolean active;
+
+    @ManyToOne
+    @JoinColumn(name="icesi_user_user_id", nullable = false)
+    private IcesiUser user;
 }
