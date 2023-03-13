@@ -32,7 +32,6 @@ public class IcesiUser {
     @NotNull
     @ManyToOne
     @JoinColumn(name = "icesi_role_role_id")
-    @ToString.Exclude
     private IcesiRole role;
 
 

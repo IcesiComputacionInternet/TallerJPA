@@ -24,7 +24,7 @@ public class IcesiRole {
     private String name;
 
     //Un rol puede pertenecer a varios usuarios
-    @OneToMany(mappedBy = "role")
+    @OneToMany(mappedBy = "role", fetch = FetchType.LAZY)
     private List<IcesiUser> users;
 
 
