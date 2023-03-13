@@ -1,6 +1,7 @@
 package co.com.icesi.tallerjpa.service;
 
-import co.com.icesi.tallerjpa.dto.AccountDTO;
+import co.com.icesi.tallerjpa.dto.CreatedAccountDTO;
+import co.com.icesi.tallerjpa.dto.SendAccountDTO;
 import co.com.icesi.tallerjpa.mapper.AccountMapper;
 import co.com.icesi.tallerjpa.model.Account;
 import co.com.icesi.tallerjpa.repository.AccountRepository;
@@ -25,14 +26,16 @@ public class AccountService {
     private final UserRepository userRepository;
     private final List<TypeAccountStrategy> typeAccountStrategies;
 
-    public void save(AccountDTO account) {
+    public SendAccountDTO save(CreatedAccountDTO accountDTO) {
+        Account account = accountMapper.fromAccountDTO(accountDTO);
+
         account.setAccountId(UUID.randomUUID());
         account.setAccountNumber(validateAccountNumber(generateAccountNumber()));
         account.setActive(true);
-        account.setUser(userRepository.findByEmail(account.getUser().getEmail())
+        account.setUser(userRepository.findByEmail(accountDTO.getUser())
                 .orElseThrow(() -> new RuntimeException("User not found")));
 
-        accountRepository.save(accountMapper.fromAccountDTO(account));
+        return accountMapper.fromAccountToSendAccountDTO(accountRepository.save(account));
     }
 
     public Account getAccountByAccountNumber(String accountNumber){

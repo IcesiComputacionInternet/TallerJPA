@@ -23,8 +23,7 @@ public class IcesiUser {
     @OneToMany(mappedBy = "user")
     private List<Account> accounts;
 
-    @NotNull
-    @ManyToOne
+    @ManyToOne(optional = false)
     @JoinColumn(name = "role_role_id")
     @ToString.Exclude
     private Role role;

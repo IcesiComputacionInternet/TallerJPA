@@ -1,6 +1,7 @@
 package co.com.icesi.tallerjpa.controller;
 
-import co.com.icesi.tallerjpa.dto.AccountDTO;
+import co.com.icesi.tallerjpa.dto.CreatedAccountDTO;
+import co.com.icesi.tallerjpa.dto.SendAccountDTO;
 import co.com.icesi.tallerjpa.service.AccountService;
 import lombok.AllArgsConstructor;
 import org.springframework.web.bind.annotation.*;
@@ -12,8 +13,8 @@ public class AccountController {
     private final AccountService accountService;
 
     @PostMapping("/add/account")
-    public void save(@RequestBody AccountDTO account){
-        accountService.save(account);
+    public SendAccountDTO save(@RequestBody CreatedAccountDTO account){
+       return accountService.save(account);
     }
 
     @PatchMapping("/withdraw/{accountNumber}")

@@ -1,6 +1,7 @@
 package co.com.icesi.tallerjpa.service;
 
-import co.com.icesi.tallerjpa.dto.UserDTO;
+import co.com.icesi.tallerjpa.dto.CreatedUserDTO;
+import co.com.icesi.tallerjpa.dto.SendUserDTO;
 import co.com.icesi.tallerjpa.exception.ExistsException;
 import co.com.icesi.tallerjpa.mapper.UserMapper;
 import co.com.icesi.tallerjpa.model.IcesiUser;
@@ -21,7 +22,7 @@ public class UserService {
     private final RoleRepository roleRepository;
 
     @SneakyThrows
-    public IcesiUser save(UserDTO userDTO){
+    public SendUserDTO save(CreatedUserDTO userDTO){
 
         boolean emailExists = userRepository.existsByEmail(userDTO.getEmail());
         boolean phoneExists = userRepository.existsByPhoneNumber(userDTO.getPhoneNumber());
@@ -30,9 +31,11 @@ public class UserService {
         if (emailExists){ throw new ExistsException("Email already exists");}
         if (phoneExists){ throw new ExistsException("Phone number already exists");}
 
-        userDTO.setUserId(UUID.randomUUID());
-        userDTO.setRole(roleRepository.findByName(userDTO.getRole().getName()));
-        return userRepository.save(userMapper.fromUserDTO(userDTO));
+        IcesiUser user = userMapper.fromUserDTO(userDTO);
+        user.setUserId(UUID.randomUUID());
+        user.setRole(roleRepository.findByName(userDTO.getRole()));
+
+        return userMapper.fromUserToSendUserDTO(userRepository.save(user));
 
     }
 }

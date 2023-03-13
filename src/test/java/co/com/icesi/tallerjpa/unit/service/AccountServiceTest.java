@@ -1,6 +1,6 @@
 package co.com.icesi.tallerjpa.unit.service;
 
-import co.com.icesi.tallerjpa.dto.AccountDTO;
+import co.com.icesi.tallerjpa.dto.CreatedAccountDTO;
 import co.com.icesi.tallerjpa.enums.TypeAccount;
 import co.com.icesi.tallerjpa.mapper.AccountMapper;
 import co.com.icesi.tallerjpa.mapper.AccountMapperImpl;
@@ -63,7 +63,7 @@ public class AccountServiceTest {
         }
 
         verify(userRepository, times(1)).findByEmail(any());
-        verify(accountMapper, times(0)).fromAccountDTO(any());
+        verify(accountMapper, times(1)).fromAccountDTO(any());
         verify(accountRepository, times(0)).save(argThat(new AccountMatcher(defaultAccount())));
     }
 
@@ -221,11 +221,11 @@ public class AccountServiceTest {
         verify(accountRepository, times(1)).isActive(any());
     }
 
-    private AccountDTO defaultAccountDTO() {
-        return AccountDTO.builder()
+    private CreatedAccountDTO defaultAccountDTO() {
+        return CreatedAccountDTO.builder()
                 .balance(100L)
                 .type(TypeAccount.DEPOSIT_ONLY)
-                .user(defaultIcesiUser())
+                .user("prueba@gmail.com")
                 .build();
     }
 
