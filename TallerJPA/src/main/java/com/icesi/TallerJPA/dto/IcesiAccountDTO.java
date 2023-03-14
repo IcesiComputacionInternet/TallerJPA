@@ -1,25 +1,16 @@
-package com.icesi.TallerJPA.model;
+package com.icesi.TallerJPA.dto;
 
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
-import javax.persistence.Entity;
-import javax.persistence.Id;
-import java.util.UUID;
-
-@Entity
 @Data
 @Builder
 @NoArgsConstructor
 @AllArgsConstructor
-public class IcesiAccount {
+public class IcesiAccountDTO {
 
-    @Id
-    private UUID accountId;
-
-    private String accountNumber;
     private long balance;
     private String type;
     private Boolean active;
