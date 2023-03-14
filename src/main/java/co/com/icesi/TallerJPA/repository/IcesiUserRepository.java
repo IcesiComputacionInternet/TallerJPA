@@ -16,4 +16,9 @@ public interface IcesiUserRepository extends JpaRepository<IcesiUser, UUID> {
     @Query(value = "SELECT u FROM IcesiUser u where u.phoneNumber= :phone")
     Optional<IcesiUser> findByPhoneNumber(String phone);
 
+    @Query(value = "SELECT u FROM IcesiUser u where u.firstName= :name")
+    Optional<IcesiUser> findbyName(String name);
+
+
+
 }

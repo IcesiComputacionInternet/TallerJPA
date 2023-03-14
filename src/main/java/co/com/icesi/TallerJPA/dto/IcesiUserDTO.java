@@ -17,5 +17,5 @@ public class IcesiUserDTO {
     private String password;
     private String email;
 
-    private IcesiRole role;
+    private IcesiRoleDTO role;
 }

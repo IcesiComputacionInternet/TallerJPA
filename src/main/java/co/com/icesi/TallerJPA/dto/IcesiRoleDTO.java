@@ -10,6 +10,7 @@ import lombok.NoArgsConstructor;
 @AllArgsConstructor
 @NoArgsConstructor
 public class IcesiRoleDTO {
-    private String description;
     private String name;
+    private String description;
+
 }

@@ -1,11 +1,11 @@
 package co.com.icesi.TallerJPA.controller;
 
 import co.com.icesi.TallerJPA.dto.IcesiAccountDTO;
-import co.com.icesi.TallerJPA.model.IcesiAccount;
 import co.com.icesi.TallerJPA.service.IcesiAccountService;
 import lombok.AllArgsConstructor;
 import org.springframework.web.bind.annotation.*;
 
+import java.util.List;
 import java.util.Map;
 
 @RestController
@@ -15,8 +15,13 @@ public class IcesiAccountController {
     private final IcesiAccountService service;
 
     @PostMapping
-    public IcesiAccount createAccount(@RequestBody IcesiAccountDTO dto){
-        return service.save(dto);
+    public String createAccount(@RequestBody IcesiAccountDTO dto){
+        return service.save(dto) ?  "Account created successfully" : "";
+    }
+
+    @GetMapping
+    public List<IcesiAccountDTO> getAccount(){
+        return service.getAccounts();
     }
 
     /**
@@ -25,7 +30,7 @@ public class IcesiAccountController {
      */
     @PatchMapping("/enable")
     public String enableAccount(@RequestBody Map<String,String> data){
-        return service.manageAccount(data.get("id"),"enable") ? "Account enabled" :"Something went wrong, please check the id";
+        return service.manageAccount(data.get("id"),"enable") ? "Account enabled" :"Something went wrong, please check the id or if the account was already disabled";
 
     }
 
@@ -36,13 +41,13 @@ public class IcesiAccountController {
 
     @PatchMapping("/disable")
     public String disableAccount(@RequestBody Map<String,String> data){
-        return service.manageAccount(data.get("id"),"disable") ? "Account disabled" :"Something went wrong, please check the id";
+        return service.manageAccount(data.get("id"),"disable") ? "Account disabled" :"Something went wrong, please check the id or make sure the balance of the account is  0";
 
     }
 
     /**
      * The map must use de following keys
-     * account: The account where the money will be given
+     * account: The account number where the money will be given
      * amount: The amount of money that will be transferred
      */
     @PatchMapping("/withdrawal")
@@ -64,7 +69,7 @@ public class IcesiAccountController {
     /**
      * The map must use de following keys
      * source: The account number where the money will be taken
-     * destiny: The account where the money will be taken
+     * destiny: The account number where the money will be taken
      * amount: The amount of money that will be transferred
      */
 

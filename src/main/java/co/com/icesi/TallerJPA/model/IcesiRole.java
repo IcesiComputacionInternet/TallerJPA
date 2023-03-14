@@ -21,9 +21,8 @@ public class IcesiRole {
     @Id
     private UUID roleId;
 
-    private String description;
-
     private String name;
+    private String description;
 
     @OneToMany(mappedBy = "role")
     private List<IcesiUser> users;

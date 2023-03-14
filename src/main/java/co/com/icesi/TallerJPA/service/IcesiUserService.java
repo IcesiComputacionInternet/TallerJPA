@@ -1,7 +1,6 @@
 package co.com.icesi.TallerJPA.service;
 
 import co.com.icesi.TallerJPA.dto.IcesiUserDTO;
-import co.com.icesi.TallerJPA.mapper.IcesiRoleMapper;
 import co.com.icesi.TallerJPA.mapper.IcesiUserMapper;
 import co.com.icesi.TallerJPA.model.IcesiRole;
 import co.com.icesi.TallerJPA.model.IcesiUser;
@@ -10,20 +9,22 @@ import co.com.icesi.TallerJPA.repository.IcesiUserRepository;
 import lombok.AllArgsConstructor;
 import org.springframework.stereotype.Service;
 
-import java.util.Optional;
+import java.util.ArrayList;
+import java.util.List;
 import java.util.UUID;
+import java.util.stream.Collectors;
 
 @Service
 @AllArgsConstructor
 public class IcesiUserService {
     private final IcesiUserRepository mainRepository;
     private final IcesiRoleRepository roleRepository;
-    private final IcesiUserMapper mainMapper;
+    private final IcesiUserMapper mapper;
 
 
-    //TODO: implement all the necessary methods
+    //TODO: CHECK THE IMPLEMENTATION FOR GET
 
-    public IcesiUser save(IcesiUserDTO dto){
+    public boolean save(IcesiUserDTO dto){
 
         if(mainRepository.findByEmail(dto.getEmail()).isPresent() && mainRepository.findByPhoneNumber(dto.getPhoneNumber()).isPresent()){
            throw new RuntimeException("This email and phone  already exist");
@@ -32,17 +33,26 @@ public class IcesiUserService {
         }else if(mainRepository.findByPhoneNumber(dto.getPhoneNumber()).isPresent()){
             throw new RuntimeException("Phone already exist");
         }else{
-            IcesiUser user = mainMapper.fromUserDto(dto);
+            IcesiUser user = mapper.fromUserDto(dto);
             user.setUserID(UUID.randomUUID());
+            user.setAccounts(new ArrayList<>());
 
-            Optional<IcesiRole> role = Optional.of(user.getRole());
-            if (roleRepository.findByName(role.get().getName()).isPresent()) {
-                return mainRepository.save(user);
+            if (roleRepository.findByName(user.getRole().getName()).isPresent()) {
+                IcesiRole relation  = roleRepository.findByName(user.getRole().getName()).get();
+                relation.getUsers().add(user);
+                user.setRole(relation);
+                mainRepository.save(user);
+                roleRepository.save(relation);
+                return true;
             } else {
                 throw new RuntimeException("This role doesn't exist");
             }
 
         }
+    }
+
+    public List<IcesiUserDTO> getUsers(){
+        return mainRepository.findAll().stream().map(mapper::fromIcesiUser).collect(Collectors.toList());
     }
 
 

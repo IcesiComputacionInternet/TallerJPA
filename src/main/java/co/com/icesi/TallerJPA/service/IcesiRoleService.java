@@ -7,7 +7,10 @@ import co.com.icesi.TallerJPA.repository.IcesiRoleRepository;
 import lombok.AllArgsConstructor;
 import org.springframework.stereotype.Service;
 
+import java.util.ArrayList;
+import java.util.List;
 import java.util.UUID;
+import java.util.stream.Collectors;
 
 @Service
 @AllArgsConstructor
@@ -22,10 +25,15 @@ public class IcesiRoleService {
         }else{
             IcesiRole role = mapper.fromRoleDTO(dto);
             role.setRoleId(UUID.randomUUID());
+            role.setUsers(new ArrayList<>());
             return  repository.save(role);
         }
 
 
 
+    }
+
+    public List<IcesiRoleDTO> getRoles(){
+        return repository.findAll().stream().map(mapper::fromIcesiRole).collect(Collectors.toList());
     }
 }

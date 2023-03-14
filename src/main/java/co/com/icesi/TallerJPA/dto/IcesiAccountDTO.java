@@ -1,5 +1,6 @@
 package co.com.icesi.TallerJPA.dto;
 
+import co.com.icesi.TallerJPA.model.IcesiUser;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
@@ -10,12 +11,11 @@ import lombok.NoArgsConstructor;
 @AllArgsConstructor
 @NoArgsConstructor
 public class IcesiAccountDTO {
-    private String accountNumber;
-
     private Long balance;
 
     private String type;
 
-    public  boolean active;
+    private IcesiUserDTO user;
+
 
 }
