@@ -1,11 +1,9 @@
 package com.example.jpa.model;
 
-import lombok.AllArgsConstructor;
-import lombok.Builder;
-import lombok.Data;
-import lombok.NoArgsConstructor;
+import lombok.*;
 
 import javax.persistence.*;
+import java.util.List;
 import java.util.UUID;
 
 @Data
@@ -24,8 +22,17 @@ public class IcesiUser {
 
     private String password;
 
+    @Column(nullable = false, unique = true)
     private String email;
 
+    @Column(nullable = false, unique = true)
     private String phoneNumber;
+
+    @OneToMany(mappedBy = "user")
+    private List<IcesiAccount> icesiAccountList;
+
+    @ManyToOne(optional = false)
+    @JoinColumn(name = "icesi_role_role_id")
+    private IcesiRole icesiRole;
 
 }
