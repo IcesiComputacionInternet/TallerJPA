@@ -11,6 +11,7 @@ import co.com.icesi.TallerJPA.repository.AccountRepository;
 import co.com.icesi.TallerJPA.repository.UserRepository;
 import lombok.AllArgsConstructor;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 
 import java.util.Random;
@@ -64,22 +65,23 @@ public class AccountService {
         return accountRepository.findAccount(accountNumber).orElseThrow(()-> new RuntimeException("Account not found"));
     }
 
+    @Transactional
     public String changeState(String accountNumber){
         IcesiAccount account = findAccountByAccountNumber(accountNumber);
         if (account.getBalance()==0){
-            account.setActive(!account.isActive());
-            accountRepository.save(account);
+            accountRepository.updateState(accountNumber);
         }else{
             return "The account can't be deactivated because it has money";
         }
         return "Account state changed";
     }
 
+    @Transactional
     public String withdraw(String accountNumber, long amount){
         IcesiAccount account = findAccountByAccountNumber(accountNumber);
         if ( account.isActive() && account.getBalance()>=amount){
-            account.setBalance(account.getBalance()-amount);
-            accountRepository.save(account);
+            //account.setBalance(account.getBalance()-amount);
+            accountRepository.updateAccount(accountNumber, account.getBalance()-amount);
             return "Withdrawal successful";
         }else if (!account.isActive()){
             throw new ArgumentsException("Account must be active to withdraw money");
@@ -89,17 +91,19 @@ public class AccountService {
         }
     }
 
+    @Transactional
     public String deposit(String accountNumber, long amount){
         IcesiAccount account = findAccountByAccountNumber(accountNumber);
         if (account.isActive()){
-            account.setBalance(account.getBalance()+amount);
-            accountRepository.save(account);
+            //account.setBalance(account.getBalance()+amount);
+            accountRepository.updateAccount(accountNumber, account.getBalance()+amount);
         }else{
             throw new ArgumentsException("Account must be active to deposit money");
         }
         return "Deposit successful";
     }
 
+    @Transactional
     public String transferMoney(String accountNumberOrigin, String accountNumberDestination, long amount){
         IcesiAccount accountOrigin = findAccountByAccountNumber(accountNumberOrigin);
         IcesiAccount accountDestination = findAccountByAccountNumber(accountNumberDestination);
@@ -113,10 +117,10 @@ public class AccountService {
 
 
         if (accountOrigin.getBalance()>=amount){
-            accountOrigin.setBalance(accountOrigin.getBalance()-amount);
-            accountDestination.setBalance(accountDestination.getBalance()+amount);
-            accountRepository.save(accountOrigin);
-            accountRepository.save(accountDestination);
+            //accountOrigin.setBalance(accountOrigin.getBalance()-amount);
+            //accountDestination.setBalance(accountDestination.getBalance()+amount);
+            accountRepository.updateAccount(accountNumberOrigin, accountOrigin.getBalance()-amount);
+            accountRepository.updateAccount(accountNumberDestination, accountDestination.getBalance()+amount);
             return "Transfer successful";
         }else{
             throw new ArgumentsException("Insufficient funds");
