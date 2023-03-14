@@ -14,4 +14,6 @@ public interface IcesiUserRepository extends JpaRepository<IcesiUser, UUID> {
     @Query("SELECT CASE WHEN COUNT(*) > 0 THEN true ELSE false END FROM IcesiUser u WHERE u.phoneNumber = ?1")
     boolean existsByPhoneNumber(String phoneNumber);
 
+    Optional<IcesiUser> findByEmail(String email);
+
 }

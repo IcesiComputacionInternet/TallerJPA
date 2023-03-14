@@ -23,13 +23,14 @@ public class IcesiUserService {
 
     public String saveNewUser(IcesiUserDTO icesiUserDTO) throws DataAlreadyExist, ParameterRequired {
         IcesiUser icesiUser = icesiUserMapper.toIcesiUser(icesiUserDTO);
+        icesiUser.setRole(icesiRoleRepository.findByName(icesiUserDTO.getRoleName()).get());
+
         validateUserEmail(icesiUser);
         validatePhoneNumber(icesiUser);
         validateEmailAndPhoneNumber(icesiUser);
         validateRole(icesiUser);
 
         icesiUser.setUserId(UUID.randomUUID());
-        icesiUser.setRole(icesiRoleRepository.findByName(icesiUserDTO.getRoleName()).get());
         icesiUserRepository.save(icesiUser);
         return "User saved";
     }

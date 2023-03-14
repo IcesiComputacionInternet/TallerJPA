@@ -1,9 +1,11 @@
 package co.edu.icesi.tallerjpa.runableartefact.service;
 
 import co.edu.icesi.tallerjpa.runableartefact.dto.IcesiAccountDTO;
+import co.edu.icesi.tallerjpa.runableartefact.exception.implementation.ParameterRequired;
 import co.edu.icesi.tallerjpa.runableartefact.mapper.IcesiAccountMapper;
 import co.edu.icesi.tallerjpa.runableartefact.model.IcesiAccount;
 import co.edu.icesi.tallerjpa.runableartefact.repository.IcesiAccountRepository;
+import co.edu.icesi.tallerjpa.runableartefact.repository.IcesiUserRepository;
 import lombok.AllArgsConstructor;
 import org.springframework.stereotype.Service;
 
@@ -14,6 +16,7 @@ import java.util.*;
 public class IcesiAccountService {
 
     private final IcesiAccountRepository icesiAccountRepository;
+    private final IcesiUserRepository icesiUserRepository;
 
     private final IcesiAccountMapper icesiAccountMapper;
 
@@ -21,13 +24,23 @@ public class IcesiAccountService {
         IcesiAccount icesiAccount = icesiAccountMapper.toIcesiAccount(icesiAccountDTO);
         icesiAccount.setAccountId(UUID.randomUUID());
         icesiAccount.setAccountNumber(generateAccountNumberThatDontExist());
+        setIcesiUserToIcesiAccount(icesiAccountDTO, icesiAccount);
+        icesiAccountRepository.saveAndFlush(icesiAccount);
         return "Account saved";
+    }
+
+    private void setIcesiUserToIcesiAccount(IcesiAccountDTO icesiAccountDTO, IcesiAccount icesiAccount) {
+        if(icesiUserRepository.findByEmail(icesiAccountDTO.getIcesiUserEmail()).isEmpty()){
+            throw new ParameterRequired("User not found");
+        }
+        icesiAccount.setUser(icesiUserRepository.findByEmail(icesiAccount.getUser().getEmail()).get());
     }
 
     public String activateAccount(String accountNumber) {
         Optional<IcesiAccount> icesiAccount = icesiAccountRepository.findByAccountNumber(accountNumber);
         if (icesiAccount.isPresent()) {
             icesiAccount.get().setActive(true);
+            icesiAccountRepository.saveAndFlush(icesiAccount.get());
             return "Account activated";
         }
         return "Account not found";
@@ -37,6 +50,7 @@ public class IcesiAccountService {
         Optional<IcesiAccount> icesiAccount = icesiAccountRepository.findByAccountNumber(accountNumber);
         if (icesiAccount.isPresent() && validateAccountBalanceToDeactivate(icesiAccount.get())) {
             icesiAccount.get().setActive(false);
+            icesiAccountRepository.saveAndFlush(icesiAccount.get());
             return "Account deactivated";
         }
         return "Account not found";
@@ -48,6 +62,7 @@ public class IcesiAccountService {
                 && validateAccountBalanceToWithdrawal(icesiAccount.get())
                 && icesiAccount.get().getBalance() >= amount) {
             icesiAccount.get().setBalance(icesiAccount.get().getBalance() - amount);
+            icesiAccountRepository.saveAndFlush(icesiAccount.get());
             return "Withdrawal successful";
         }
         return "Account not found";
@@ -62,6 +77,8 @@ public class IcesiAccountService {
                 && icesiAccountOrigin.get().getBalance() >= amount) {
             icesiAccountOrigin.get().setBalance(icesiAccountOrigin.get().getBalance() - amount);
             icesiAccountDestination.get().setBalance(icesiAccountDestination.get().getBalance() + amount);
+            icesiAccountRepository.saveAndFlush(icesiAccountOrigin.get());
+            icesiAccountRepository.saveAndFlush(icesiAccountDestination.get());
             return "Transfer successful";
         }
         return "Account not found";
@@ -72,6 +89,7 @@ public class IcesiAccountService {
         Optional<IcesiAccount> icesiAccount = icesiAccountRepository.findByAccountNumber(accountNumber);
         if (icesiAccount.isPresent()) {
             icesiAccount.get().setBalance(icesiAccount.get().getBalance() + amount);
+            icesiAccountRepository.saveAndFlush(icesiAccount.get());
             return "Deposit successful";
         }
         return "Account not found";

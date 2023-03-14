@@ -1,6 +1,7 @@
 package co.edu.icesi.tallerjpa.runableartefact.repository;
 
 import co.edu.icesi.tallerjpa.runableartefact.model.IcesiAccount;
+import org.hibernate.annotations.SQLUpdate;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
 

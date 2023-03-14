@@ -12,4 +12,6 @@ public class IcesiAccountDTO {
     private String type;
 
     private boolean active;
+
+    private String icesiUserEmail;
 }
