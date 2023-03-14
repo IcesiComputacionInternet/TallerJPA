@@ -22,4 +22,6 @@ public class IcesiAccount {
     private long balance;
     private String type;
     private String active;
+
+
 }
