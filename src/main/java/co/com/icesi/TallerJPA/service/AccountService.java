@@ -68,6 +68,7 @@ public class AccountService {
         IcesiAccount account = findAccountByAccountNumber(accountNumber);
         if (account.getBalance()==0){
             account.setActive(!account.isActive());
+            accountRepository.save(account);
         }else{
             return "The account can't be deactivated because it has money";
         }
@@ -78,6 +79,7 @@ public class AccountService {
         IcesiAccount account = findAccountByAccountNumber(accountNumber);
         if ( account.isActive() && account.getBalance()>=amount){
             account.setBalance(account.getBalance()-amount);
+            accountRepository.save(account);
             return "Withdrawal successful";
         }else if (!account.isActive()){
             throw new ArgumentsException("Account must be active to withdraw money");
@@ -91,6 +93,7 @@ public class AccountService {
         IcesiAccount account = findAccountByAccountNumber(accountNumber);
         if (account.isActive()){
             account.setBalance(account.getBalance()+amount);
+            accountRepository.save(account);
         }else{
             throw new ArgumentsException("Account must be active to deposit money");
         }
