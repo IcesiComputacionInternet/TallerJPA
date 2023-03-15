@@ -25,7 +25,7 @@ public class IcesiAccountService {
         icesiAccount.setAccountId(UUID.randomUUID());
         icesiAccount.setAccountNumber(generateAccountNumberThatDontExist());
         setIcesiUserToIcesiAccount(icesiAccountDTO, icesiAccount);
-        icesiAccountRepository.saveAndFlush(icesiAccount);
+        icesiAccountRepository.save(icesiAccount);
         return "Account saved";
     }
 
@@ -40,7 +40,7 @@ public class IcesiAccountService {
         Optional<IcesiAccount> icesiAccount = icesiAccountRepository.findByAccountNumber(accountNumber);
         if (icesiAccount.isPresent()) {
             icesiAccount.get().setActive(true);
-            icesiAccountRepository.saveAndFlush(icesiAccount.get());
+            icesiAccountRepository.save(icesiAccount.get());
             return "Account activated";
         }
         return "Account not found";
@@ -50,7 +50,7 @@ public class IcesiAccountService {
         Optional<IcesiAccount> icesiAccount = icesiAccountRepository.findByAccountNumber(accountNumber);
         if (icesiAccount.isPresent() && validateAccountBalanceToDeactivate(icesiAccount.get())) {
             icesiAccount.get().setActive(false);
-            icesiAccountRepository.saveAndFlush(icesiAccount.get());
+            icesiAccountRepository.save(icesiAccount.get());
             return "Account deactivated";
         }
         return "Account not found";
@@ -62,7 +62,7 @@ public class IcesiAccountService {
                 && validateAccountBalanceToWithdrawal(icesiAccount.get())
                 && icesiAccount.get().getBalance() >= amount) {
             icesiAccount.get().setBalance(icesiAccount.get().getBalance() - amount);
-            icesiAccountRepository.saveAndFlush(icesiAccount.get());
+            icesiAccountRepository.save(icesiAccount.get());
             return "Withdrawal successful";
         }
         return "Account not found";
@@ -77,8 +77,8 @@ public class IcesiAccountService {
                 && icesiAccountOrigin.get().getBalance() >= amount) {
             icesiAccountOrigin.get().setBalance(icesiAccountOrigin.get().getBalance() - amount);
             icesiAccountDestination.get().setBalance(icesiAccountDestination.get().getBalance() + amount);
-            icesiAccountRepository.saveAndFlush(icesiAccountOrigin.get());
-            icesiAccountRepository.saveAndFlush(icesiAccountDestination.get());
+            icesiAccountRepository.save(icesiAccountOrigin.get());
+            icesiAccountRepository.save(icesiAccountDestination.get());
             return "Transfer successful";
         }
         return "Account not found";
@@ -89,7 +89,7 @@ public class IcesiAccountService {
         Optional<IcesiAccount> icesiAccount = icesiAccountRepository.findByAccountNumber(accountNumber);
         if (icesiAccount.isPresent()) {
             icesiAccount.get().setBalance(icesiAccount.get().getBalance() + amount);
-            icesiAccountRepository.saveAndFlush(icesiAccount.get());
+            icesiAccountRepository.save(icesiAccount.get());
             return "Deposit successful";
         }
         return "Account not found";

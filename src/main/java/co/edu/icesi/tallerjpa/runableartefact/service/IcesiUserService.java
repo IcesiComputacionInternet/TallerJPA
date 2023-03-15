@@ -10,6 +10,7 @@ import co.edu.icesi.tallerjpa.runableartefact.repository.IcesiUserRepository;
 import lombok.AllArgsConstructor;
 import org.springframework.stereotype.Service;
 
+import java.util.Optional;
 import java.util.UUID;
 
 @Service
@@ -23,12 +24,13 @@ public class IcesiUserService {
 
     public String saveNewUser(IcesiUserDTO icesiUserDTO) throws DataAlreadyExist, ParameterRequired {
         IcesiUser icesiUser = icesiUserMapper.toIcesiUser(icesiUserDTO);
-        icesiUser.setRole(icesiRoleRepository.findByName(icesiUserDTO.getRoleName()).get());
 
+        validateEmailAndPhoneNumber(icesiUser);
         validateUserEmail(icesiUser);
         validatePhoneNumber(icesiUser);
-        validateEmailAndPhoneNumber(icesiUser);
-        validateRole(icesiUser);
+        validateRole(icesiUserDTO);
+
+        icesiUser.setRole(icesiRoleRepository.findByName(icesiUserDTO.getRoleName()).get());
 
         icesiUser.setUserId(UUID.randomUUID());
         icesiUserRepository.save(icesiUser);
@@ -48,9 +50,9 @@ public class IcesiUserService {
         boolean phoneAlreadyExist = icesiUserRepository.existsByPhoneNumber(icesiUser.getPhoneNumber());
         if(emailAlreadyExist && phoneAlreadyExist) {throw new DataAlreadyExist("Email and phone number already exists");}
     }
-    private void validateRole(IcesiUser icesiUser) throws ParameterRequired{
-        boolean roleAlreadyExist = icesiUser.getRole() == null;
-        if(roleAlreadyExist) {throw new ParameterRequired("Role is required");}
+    private void validateRole(IcesiUserDTO icesiUserDTO) throws ParameterRequired{
+        boolean roleAlreadyExist = icesiRoleRepository.existsByName(icesiUserDTO.getRoleName()) ;
+        if(!roleAlreadyExist) {throw new ParameterRequired("Role is required");}
     }
 
 

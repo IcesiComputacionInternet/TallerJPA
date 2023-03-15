@@ -19,6 +19,6 @@ public class IcesiRoleController {
 
     @PostMapping("/icesirole/create")
     public String createNewRole(@RequestBody IcesiRoleDTO icesiRole) throws DataAlreadyExist {
-        return icesiRoleService.saveNewRole(icesiRoleMapper.toIcesiRole(icesiRole));
+        return icesiRoleService.saveNewRole(icesiRole);
     }
 }
