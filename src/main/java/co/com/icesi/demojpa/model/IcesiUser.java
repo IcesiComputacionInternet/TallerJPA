@@ -26,7 +26,7 @@ public class IcesiUser {
 
     private String email;
 
-    private Boolean isActive;
+    private String phone;
 
     private String password;
 

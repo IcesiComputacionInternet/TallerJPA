@@ -13,7 +13,7 @@ public class UserCreateDTO {
 
     private String email;
 
-    private Boolean isActive;
+    private String phone;
 
     private String password;
 

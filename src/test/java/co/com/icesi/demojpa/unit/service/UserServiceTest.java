@@ -55,7 +55,7 @@ public class UserServiceTest {
              .email("5")
              .firstName("John")
              .lastname("Doe")
-             .isActive(true)
+             .phone("123")
              .password("123")
              .build();
     }
@@ -65,7 +65,7 @@ public class UserServiceTest {
                 .email("5")
                 .firstName("John")
                 .lastname("Doe")
-                .isActive(true)
+                .phone("123")
                 .password("123")
                 .build();
     }

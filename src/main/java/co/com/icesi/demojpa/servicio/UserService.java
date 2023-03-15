@@ -21,8 +21,15 @@ public class UserService {
     }
 
     public IcesiUser save(UserCreateDTO user){
-        if(userRepository.findByEmail(user.getEmail()).isPresent()){
-            throw new RuntimeException("User already exists");
+        if(userRepository.findByEmail(user.getEmail()).isPresent() && userRepository.findByPhone(user.getPhone()).isPresent()){
+            throw new RuntimeException("Ya hay un usuario con este email y celular");
+        } else if (userRepository.findByEmail(user.getEmail()).isPresent()) {
+            throw new RuntimeException("Ya hay un usuario con este email");
+        } else if (userRepository.findByPhone(user.getPhone()).isPresent()) {
+            throw new RuntimeException("Ya hay un usuario con este celular");
+        } else if (true) {
+            //TODO
+            //aca falta verificar que el usuario tenga un rol, tengo que darle un rol al DTO y de ahí queda facil pero en este momento no se como
         }
         IcesiUser icesiUser = userMapper.fromIcesiUserDTO(user);
         icesiUser.setUserId(UUID.randomUUID());
@@ -31,6 +38,10 @@ public class UserService {
 
     public Optional<IcesiUser> findById(UUID fromString){
         return userRepository.findById(fromString);
+    }
+
+    public Optional<IcesiUser> findByPhone(String fromString){
+        return userRepository.findByPhone(fromString);
     }
 
     public Optional<IcesiUser> findByEmail(String fromString){

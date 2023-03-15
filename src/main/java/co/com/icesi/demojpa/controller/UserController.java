@@ -20,7 +20,6 @@ public class UserController {
     @PostMapping("/users")
     public IcesiUser createIcesiUser(@RequestBody UserCreateDTO user){
         return userService.save(user);
-        //return user;
     }
 
     @GetMapping("/users/{id}")
