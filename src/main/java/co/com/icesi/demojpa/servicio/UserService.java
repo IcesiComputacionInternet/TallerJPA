@@ -27,9 +27,9 @@ public class UserService {
             throw new RuntimeException("Ya hay un usuario con este email");
         } else if (userRepository.findByPhone(user.getPhone()).isPresent()) {
             throw new RuntimeException("Ya hay un usuario con este celular");
-        } else if (true) {
-            //TODO
-            //aca falta verificar que el usuario tenga un rol, tengo que darle un rol al DTO y de ahí queda facil pero en este momento no se como
+        } else if (user.getRole()==null) {
+            throw new RuntimeException("El usuario no tiene rol");
+            //TODO verificar que esto funcione porque no me fio la verdad
         }
         IcesiUser icesiUser = userMapper.fromIcesiUserDTO(user);
         icesiUser.setUserId(UUID.randomUUID());

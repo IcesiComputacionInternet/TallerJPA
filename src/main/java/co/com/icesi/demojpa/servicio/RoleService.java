@@ -21,13 +21,11 @@ public class RoleService {
         this.roleMapper = roleMapper;
     }
 
-    //TODO
-    //Verificar que el nombre sea unico
-
-    //TODO
-    //generar una UUID desde aca
-
     public IcesiRole save(RoleCreateDTO role){
+        if(roleRepository.findByName(role.getName()).isPresent()){
+            throw new RuntimeException("Ya existe un rol con este nombre");
+        }
+
         IcesiRole icesiRole = roleMapper.fromIcesiRoleDTO(role);
         icesiRole.setRoleId(UUID.randomUUID());
         return roleRepository.save(icesiRole);
