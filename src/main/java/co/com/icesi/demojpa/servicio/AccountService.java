@@ -26,13 +26,10 @@ public class AccountService {
         if(account.getBalance()<0){
             throw new RuntimeException("El balance no puede ser menor a 0");
         }
-        String number="";
-        do{
-            //TODO esto se deberia hacer con streams pero no se como, ahora más tarde le pregunto a dani
-            number= genNumber()+""+genNumber()+""+genNumber()+
-                    "-"+genNumber()+""+genNumber()+""+genNumber()+""+genNumber()+""+genNumber()+""+genNumber()+
-                    "-"+genNumber();
-        }while(accountRepository.findByNumber(number).isPresent());
+        String number=genNumber();
+        while(accountRepository.findByNumber(number).isPresent()){
+            number=genNumber();
+        }
 
         IcesiAccount icesiAccount = accountMapper.fromIcesiAccountDTO(account);
         icesiAccount.setAccountNumber(number);
@@ -40,8 +37,11 @@ public class AccountService {
         return accountRepository.save(icesiAccount);
     }
 
-    private int genNumber(){
-        return rand.nextInt(10);
+    private String genNumber(){
+
+        return rand.ints(3,0,10)+"-"+
+                rand.ints(6,0,10)+"-"+
+                rand.ints(2,0,10);
     }
 
     //TODO disable account
