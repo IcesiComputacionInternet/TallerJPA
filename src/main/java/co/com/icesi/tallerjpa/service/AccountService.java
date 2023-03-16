@@ -57,7 +57,7 @@ public class AccountService {
         account.getType().getStrategy().deposit(amount, account);
 
         accountRepository.updateBalance(account.getBalance(), accountNumber);
-        enableOrDisableAccount(accountNumber);
+        enableAccount(accountNumber);
         return "The deposit was successful";
     }
 
@@ -71,14 +71,20 @@ public class AccountService {
 
         accountRepository.updateBalance(accountOrigin.getBalance(), accountNumberOrigin);
         accountRepository.updateBalance(accountDestination.getBalance(), accountNumberDestination);
-        enableOrDisableAccount(accountNumberDestination);
+        enableAccount(accountNumberDestination);
         return "The transfer was successful";
     }
 
     @Transactional
-    public String enableOrDisableAccount(String accountNumber){
-        accountRepository.enableOrDisableAccount(accountNumber);
-        return accountRepository.isActive(accountNumber) ? "The account was enabled" : "The account was disabled";
+    public String enableAccount(String accountNumber){
+        accountRepository.enableAccount(accountNumber);
+        return accountRepository.isActive(accountNumber) ? "The account was enabled" : "The account can't be enabled";
+    }
+
+    @Transactional
+    public String disableAccount(String accountNumber){
+        accountRepository.disableAccount(accountNumber);
+        return accountRepository.isActive(accountNumber) ? "The account can't be disabled" : "The account was disabled";
     }
 
     private String validateAccountNumber(String accountNumber){

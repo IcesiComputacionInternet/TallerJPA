@@ -20,8 +20,11 @@ public interface AccountRepository extends JpaRepository<Account, UUID> {
     @Query("UPDATE Account a SET a.balance = :balance WHERE a.accountNumber = :accountNumber")
     void updateBalance(Long balance, String accountNumber);
     @Modifying
-    @Query("UPDATE Account a SET a.active = CASE WHEN a.balance > 0 THEN true ELSE false END WHERE (a.accountNumber = :accountNumber)")
-    void enableOrDisableAccount(String accountNumber);
+    @Query("UPDATE Account a SET a.active = CASE WHEN a.balance > 0 THEN true END WHERE (a.accountNumber = :accountNumber)")
+    void enableAccount(String accountNumber);
+    @Modifying
+    @Query("UPDATE Account a SET a.active = CASE WHEN a.balance = 0 THEN false END WHERE (a.accountNumber = :accountNumber)")
+    void disableAccount(String accountNumber);
     @Query("SELECT a.active FROM Account a WHERE a.accountNumber = :accountNumber")
     boolean isActive(String accountNumber);
 

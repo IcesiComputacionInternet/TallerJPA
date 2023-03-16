@@ -212,13 +212,58 @@ public class AccountServiceTest {
     }
 
     @Test
-    public void testEnableOrDisableAccount() {
-        Account account = defaultAccount();
-        accountService.enableOrDisableAccount("12345");
+    public void testDisableAccountCantBeDisabled() {
+        when(accountRepository.isActive(any())).thenReturn(true);
+        String msg = accountService.disableAccount(any());
 
-        assertTrue(account.isActive());
-        verify(accountRepository, times(1)).enableOrDisableAccount(any());
+        assertEquals("The account can't be disabled", msg);
+        verify(accountRepository, times(1)).disableAccount(any());
         verify(accountRepository, times(1)).isActive(any());
+    }
+
+    @Test
+    public void testDisableAccount() {
+        when(accountRepository.isActive(any())).thenReturn(false);
+        String msg = accountService.disableAccount(any());
+
+        assertEquals("The account was disabled", msg);
+        verify(accountRepository, times(1)).disableAccount(any());
+        verify(accountRepository, times(1)).isActive(any());
+    }
+
+    @Test
+    public void testEnableAccountCantBeEnabled() {
+        when(accountRepository.isActive(any())).thenReturn(false);
+        String msg = accountService.enableAccount(any());
+
+        assertEquals("The account can't be enabled", msg);
+        verify(accountRepository, times(1)).enableAccount(any());
+        verify(accountRepository, times(1)).isActive(any());
+    }
+
+    @Test
+    public void testEnableAccount() {
+        when(accountRepository.isActive(any())).thenReturn(true);
+        String msg = accountService.enableAccount(any());
+
+        assertEquals("The account was enabled", msg);
+        verify(accountRepository, times(1)).enableAccount(any());
+        verify(accountRepository, times(1)).isActive(any());
+    }
+
+    @Test
+    public void testGenerateAccountNumber() {
+        when(userRepository.findByEmail(any())).thenReturn(java.util.Optional.of(defaultIcesiUser()));
+        accountService.save(defaultAccountDTO());
+        verify(accountRepository, times(1)).existsByAccountNumber(any());
+    }
+
+    @Test
+    public void testGenerateAccountNumberAlreadyExists() {
+        when(userRepository.findByEmail(any())).thenReturn(java.util.Optional.of(defaultIcesiUser()));
+        when(accountRepository.existsByAccountNumber(any())).thenReturn(true, false);
+        accountService.save(defaultAccountDTO());
+        verify(accountRepository, times(2)).existsByAccountNumber(any());
     }
 
     private RequestAccountDTO defaultAccountDTO() {

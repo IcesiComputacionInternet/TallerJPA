@@ -4,8 +4,6 @@ import co.com.icesi.tallerjpa.enums.TypeAccount;
 import lombok.Builder;
 import lombok.Data;
 
-import java.util.UUID;
-
 @Data
 @Builder
 public class RequestAccountDTO {

@@ -32,11 +32,13 @@ public class AccountController {
         return accountService.transfer(amount, accountNumberOrigin, accountNumberDestination);
     }
 
-    @PatchMapping("/activeAccount/{accountNumber}")
-    public String activeAccount(@PathVariable String accountNumber){
-        return accountService.enableOrDisableAccount(accountNumber);
+    @PatchMapping("/enableAccount/{accountNumber}")
+    public String enableAccount(@PathVariable String accountNumber){
+        return accountService.enableAccount(accountNumber);
     }
 
-
-
+    @PatchMapping("/disableAccount/{accountNumber}")
+    public String disableAccount(@PathVariable String accountNumber){
+        return accountService.disableAccount(accountNumber);
+    }
 }
