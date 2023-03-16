@@ -1,5 +1,6 @@
 package com.example.TallerJPA.model;
 
+import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
 
@@ -12,6 +13,7 @@ import java.util.UUID;
 @Entity
 @Data
 @Builder
+@AllArgsConstructor
 public class IcesiRole {
     @Id
     private UUID roleId;
@@ -19,4 +21,6 @@ public class IcesiRole {
     private String name;
     @OneToMany(mappedBy = "role")
     private List<IcesiUser> users;
+
+    public IcesiRole() {}
 }
