@@ -1,16 +1,19 @@
 package com.example.TallerJPA.model;
 
-import lombok.Builder;
-import lombok.Data;
+import lombok.*;
 
 import javax.persistence.*;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.UUID;
 
-@Data
 @Builder
+@Data
 @Entity
+@AllArgsConstructor
 public class IcesiUser {
+
+
     @Id
     private UUID userId;
     private String firstName;
