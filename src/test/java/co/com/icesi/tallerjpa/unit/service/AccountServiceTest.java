@@ -10,13 +10,10 @@ import co.com.icesi.tallerjpa.model.Role;
 import co.com.icesi.tallerjpa.repository.AccountRepository;
 import co.com.icesi.tallerjpa.repository.UserRepository;
 import co.com.icesi.tallerjpa.service.AccountService;
-import co.com.icesi.tallerjpa.strategy.accounts.AccountDepositOnly;
-import co.com.icesi.tallerjpa.strategy.accounts.interfaces.TypeAccountStrategy;
 import co.com.icesi.tallerjpa.unit.matcher.AccountMatcher;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 
-import java.util.List;
 import java.util.UUID;
 
 import static org.junit.jupiter.api.Assertions.*;
@@ -31,16 +28,14 @@ public class AccountServiceTest {
     private AccountRepository accountRepository;
     private AccountMapper accountMapper;
     private UserRepository userRepository;
-    private List<TypeAccountStrategy> typeAccountStrategies;
 
     @BeforeEach
     public void setup() {
         accountRepository = mock(AccountRepository.class);
         accountMapper = spy(AccountMapperImpl.class);
         userRepository = mock(UserRepository.class);
-        typeAccountStrategies = List.of(spy(AccountDepositOnly.class));
 
-        accountService = new AccountService(accountRepository, accountMapper, userRepository, typeAccountStrategies);
+        accountService = new AccountService(accountRepository, accountMapper, userRepository);
     }
 
     @Test
@@ -98,7 +93,6 @@ public class AccountServiceTest {
 
         assertEquals(95L, account.getBalance());
         verify(accountRepository, times(1)).findByAccountNumber(any());
-        verify(typeAccountStrategies.get(0), times(1)).withdraw(any(), any());
         verify(accountRepository, times(1)).updateBalance(any(), any());
     }
 
@@ -113,25 +107,7 @@ public class AccountServiceTest {
         }
 
         verify(accountRepository, times(1)).findByAccountNumber(any());
-        verify(typeAccountStrategies.get(0), times(0)).withdraw(any(), any());
-        verify(accountRepository, times(0)).updateBalance(any(), any());
-    }
 
-    @Test
-    public void testWithdrawAmountNegative() {
-        Account account = defaultAccount();
-        when(accountRepository.findByAccountNumber(any())).thenReturn(java.util.Optional.of(account));
-
-        try {
-            accountService.withdraw(-5L,"12345");
-        } catch (RuntimeException e) {
-            assertEquals("The amount must be greater than 0", e.getMessage());
-        }
-
-        assertEquals(100L, account.getBalance());
-        verify(accountRepository, times(1)).findByAccountNumber(any());
-        verify(typeAccountStrategies.get(0), times(1)).withdraw(any(), any());
-        verify(accountRepository, times(0)).updateBalance(any(), any());
     }
 
     @Test
@@ -147,8 +123,6 @@ public class AccountServiceTest {
 
         assertEquals(100L, account.getBalance());
         verify(accountRepository, times(1)).findByAccountNumber(any());
-        verify(typeAccountStrategies.get(0), times(1)).withdraw(any(), any());
-        verify(accountRepository, times(0)).updateBalance(any(), any());
     }
 
     @Test
@@ -160,7 +134,6 @@ public class AccountServiceTest {
 
         assertEquals(105L, account.getBalance());
         verify(accountRepository, times(1)).findByAccountNumber(any());
-        verify(typeAccountStrategies.get(0), times(1)).deposit(any(), any());
         verify(accountRepository, times(1)).updateBalance(any(), any());
     }
 
@@ -175,24 +148,50 @@ public class AccountServiceTest {
         }
 
         verify(accountRepository, times(1)).findByAccountNumber(any());
-        verify(typeAccountStrategies.get(0), times(0)).deposit(any(), any());
-        verify(accountRepository, times(0)).updateBalance(any(), any());
     }
 
     @Test
-    public void testDepositAmountNegative() {
+    public void testTransfer() {
         Account account = defaultAccount();
-        when(accountRepository.findByAccountNumber(any())).thenReturn(java.util.Optional.of(account));
+        account.setType(TypeAccount.ACCOUNT_NORMAL);
+        Account account2 = Account.builder()
+                .balance(100L)
+                .type(TypeAccount.ACCOUNT_NORMAL)
+                .accountNumber("54321")
+                .build();
+
+        when(accountRepository.findByAccountNumber("12345")).thenReturn(java.util.Optional.of(account));
+        when(accountRepository.findByAccountNumber("54321")).thenReturn(java.util.Optional.of(account2));
+
+        accountService.transfer(5L,"12345", "54321");
+
+        assertEquals(95L, account.getBalance());
+        assertEquals(105L, account2.getBalance());
+        verify(accountRepository, times(2)).findByAccountNumber(any());
+        verify(accountRepository, times(2)).updateBalance(any(), any());
+    }
+
+    @Test
+    public void testTransferAccount2IsNotReceiver(){
+        Account account = defaultAccount();
+        account.setType(TypeAccount.ACCOUNT_NORMAL);
+        Account account2 = Account.builder()
+                .balance(100L)
+                .type(TypeAccount.DEPOSIT_ONLY)
+                .accountNumber("54321")
+                .build();
+
+        when(accountRepository.findByAccountNumber("12345")).thenReturn(java.util.Optional.of(account));
+        when(accountRepository.findByAccountNumber("54321")).thenReturn(java.util.Optional.of(account2));
 
         try {
-            accountService.deposit(-5L,"12345");
+            accountService.transfer(5L,"12345", "54321");
         } catch (RuntimeException e) {
-            assertEquals("The amount must be greater than 0", e.getMessage());
+            assertEquals("The account type does not allow transfers", e.getMessage());
         }
 
-        assertEquals(100L, account.getBalance());
-        verify(accountRepository, times(1)).findByAccountNumber(any());
-        verify(typeAccountStrategies.get(0), times(1)).deposit(any(), any());
+        assertEquals(account.getBalance(), account.getBalance());
+        verify(accountRepository, times(2)).findByAccountNumber(any());
         verify(accountRepository, times(0)).updateBalance(any(), any());
     }
 
@@ -206,6 +205,7 @@ public class AccountServiceTest {
         } catch (UnsupportedOperationException e) {
             assertEquals("This account type does not transfer", e.getMessage());
         }
+
         assertEquals(account.getBalance(), account.getBalance());
         verify(accountRepository, times(2)).findByAccountNumber(any());
         verify(accountRepository, times(0)).updateBalance(any(), any());
@@ -231,6 +231,7 @@ public class AccountServiceTest {
 
     private Account defaultAccount() {
         return Account.builder()
+                .accountNumber("12345")
                 .balance(100L)
                 .type(TypeAccount.DEPOSIT_ONLY)
                 .active(true)

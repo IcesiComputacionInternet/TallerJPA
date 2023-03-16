@@ -9,10 +9,7 @@ import java.util.UUID;
 @Data
 @Builder
 public class RequestAccountDTO {
-    private UUID accountId;
-    private String accountNumber;
     private Long balance;
     private TypeAccount type;
-    private boolean active;
     private String user;
 }

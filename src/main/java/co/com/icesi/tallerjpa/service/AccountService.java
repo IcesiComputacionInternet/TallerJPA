@@ -6,12 +6,10 @@ import co.com.icesi.tallerjpa.mapper.AccountMapper;
 import co.com.icesi.tallerjpa.model.Account;
 import co.com.icesi.tallerjpa.repository.AccountRepository;
 import co.com.icesi.tallerjpa.repository.UserRepository;
-import co.com.icesi.tallerjpa.strategy.accounts.interfaces.TypeAccountStrategy;
 import lombok.AllArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
-import java.util.List;
 import java.util.Random;
 import java.util.UUID;
 import java.util.stream.Collectors;
@@ -24,7 +22,6 @@ public class AccountService {
     private final AccountRepository accountRepository;
     private final AccountMapper accountMapper;
     private final UserRepository userRepository;
-    private final List<TypeAccountStrategy> typeAccountStrategies;
 
     public ResponseAccountDTO save(RequestAccountDTO accountDTO) {
         Account account = accountMapper.fromAccountDTO(accountDTO);
@@ -47,7 +44,7 @@ public class AccountService {
     public String withdraw(Long amount, String accountNumber) {
         Account account = getAccountByAccountNumber(accountNumber);
 
-        getTypeAccountStrategy(account).withdraw(amount, account);
+        account.getType().getStrategy().withdraw(amount, account);
 
         accountRepository.updateBalance(account.getBalance(), accountNumber);
         return "The withdrawal was successful";
@@ -57,7 +54,7 @@ public class AccountService {
     public String deposit(Long amount, String accountNumber) {
         Account account = getAccountByAccountNumber(accountNumber);
 
-        getTypeAccountStrategy(account).deposit(amount, account);
+        account.getType().getStrategy().deposit(amount, account);
 
         accountRepository.updateBalance(account.getBalance(), accountNumber);
         enableOrDisableAccount(accountNumber);
@@ -69,8 +66,8 @@ public class AccountService {
         Account accountOrigin = getAccountByAccountNumber(accountNumberOrigin);
         Account accountDestination = getAccountByAccountNumber(accountNumberDestination);
 
-        boolean isReceiverAccountValid = getTypeAccountStrategy(accountDestination).isReceiverAccountValid();
-        getTypeAccountStrategy(accountOrigin).transfer(amount, accountOrigin, accountDestination, isReceiverAccountValid);
+        boolean isReceiverAccountValid = accountDestination.getType().getStrategy().isReceiverAccountValid();
+        accountOrigin.getType().getStrategy().transfer(amount, accountOrigin, accountDestination, isReceiverAccountValid);
 
         accountRepository.updateBalance(accountOrigin.getBalance(), accountNumberOrigin);
         accountRepository.updateBalance(accountDestination.getBalance(), accountNumberDestination);
@@ -82,13 +79,6 @@ public class AccountService {
     public String enableOrDisableAccount(String accountNumber){
         accountRepository.enableOrDisableAccount(accountNumber);
         return accountRepository.isActive(accountNumber) ? "The account was enabled" : "The account was disabled";
-    }
-
-    private TypeAccountStrategy getTypeAccountStrategy(Account account){
-        return typeAccountStrategies.stream()
-                .filter(typeAccountStrategy -> typeAccountStrategy.getType().equals(account.getType()))
-                .findFirst()
-                .orElseThrow(() -> new RuntimeException("Account type not found"));
     }
 
     private String validateAccountNumber(String accountNumber){

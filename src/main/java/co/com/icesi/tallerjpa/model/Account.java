@@ -23,6 +23,5 @@ public class Account {
     private boolean active;
     @ManyToOne
     @JoinColumn(name = "icesi_user_user_id")
-    @ToString.Exclude
     private IcesiUser user;
 }

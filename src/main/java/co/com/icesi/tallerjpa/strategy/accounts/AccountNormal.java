@@ -4,12 +4,11 @@ import co.com.icesi.tallerjpa.enums.TypeAccount;
 import co.com.icesi.tallerjpa.model.Account;
 import co.com.icesi.tallerjpa.strategy.accounts.interfaces.TypeAccountStrategy;
 
-public class AccountDepositOnly implements TypeAccountStrategy {
-
+public class AccountNormal implements TypeAccountStrategy {
 
     @Override
     public TypeAccount getType() {
-        return TypeAccount.DEPOSIT_ONLY;
+        return TypeAccount.ACCOUNT_NORMAL;
     }
 
     @Override
@@ -17,22 +16,27 @@ public class AccountDepositOnly implements TypeAccountStrategy {
         if (amount < 0) { throw new RuntimeException("The amount must be greater than 0"); }
         if(account.getBalance() < amount) { throw new RuntimeException("Insufficient funds"); }
         account.setBalance(account.getBalance() - amount);
+
     }
 
     @Override
     public void transfer(Long amount, Account accountOrigin, Account accountDestination, boolean isReceiverAccountValid) {
-        throw new UnsupportedOperationException("This account type does not transfer");
+        if(!isReceiverAccountValid) { throw new RuntimeException("The account type does not allow transfers"); }
+        if (amount < 0) { throw new RuntimeException("The amount must be greater than 0"); }
+        if(accountOrigin.getBalance() < amount) { throw new RuntimeException("Insufficient funds"); }
+        accountOrigin.setBalance(accountOrigin.getBalance() - amount);
+        accountDestination.setBalance(accountDestination.getBalance() + amount);
     }
 
     @Override
     public boolean isReceiverAccountValid() {
-        return false;
+        return true;
     }
 
     @Override
     public void deposit(Long amount, Account account) {
         if (amount < 0) { throw new RuntimeException("The amount must be greater than 0"); }
         account.setBalance(account.getBalance() + amount);
-    }
 
+    }
 }

@@ -1,14 +1,18 @@
 package co.com.icesi.tallerjpa.enums;
 
-import java.util.Arrays;
+import co.com.icesi.tallerjpa.strategy.accounts.AccountDepositOnly;
+import co.com.icesi.tallerjpa.strategy.accounts.AccountNormal;
+import co.com.icesi.tallerjpa.strategy.accounts.interfaces.TypeAccountStrategy;
 
 public enum TypeAccount {
-    DEPOSIT_ONLY;
+    DEPOSIT_ONLY(new AccountDepositOnly()), ACCOUNT_NORMAL(new AccountNormal());
+    private final TypeAccountStrategy strategy;
 
-    public static TypeAccount fromString(String text) {
-        return Arrays.stream(TypeAccount.values())
-                .filter(typeAccount -> typeAccount.name().compareToIgnoreCase(text) == 0)
-                .findFirst()
-                .orElseThrow(() -> new RuntimeException("Invalid type account"));
+    TypeAccount(TypeAccountStrategy strategy) {
+        this.strategy = strategy;
+    }
+
+    public TypeAccountStrategy getStrategy() {
+        return strategy;
     }
 }
