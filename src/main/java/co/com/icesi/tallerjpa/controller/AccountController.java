@@ -1,7 +1,7 @@
 package co.com.icesi.tallerjpa.controller;
 
-import co.com.icesi.tallerjpa.dto.CreatedAccountDTO;
-import co.com.icesi.tallerjpa.dto.SendAccountDTO;
+import co.com.icesi.tallerjpa.dto.RequestAccountDTO;
+import co.com.icesi.tallerjpa.dto.ResponseAccountDTO;
 import co.com.icesi.tallerjpa.service.AccountService;
 import lombok.AllArgsConstructor;
 import org.springframework.web.bind.annotation.*;
@@ -13,7 +13,7 @@ public class AccountController {
     private final AccountService accountService;
 
     @PostMapping("/add/account")
-    public SendAccountDTO save(@RequestBody CreatedAccountDTO account){
+    public ResponseAccountDTO save(@RequestBody RequestAccountDTO account){
        return accountService.save(account);
     }
 

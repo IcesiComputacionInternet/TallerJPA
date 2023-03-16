@@ -1,6 +1,5 @@
 package co.com.icesi.tallerjpa.model;
 
-import com.sun.istack.NotNull;
 import lombok.*;
 
 import javax.persistence.*;

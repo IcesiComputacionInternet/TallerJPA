@@ -7,12 +7,13 @@ import java.util.UUID;
 
 @Data
 @Builder
-public class SendUserDTO {
+public class RequestUserDTO {
+
     private UUID userId;
     private String firstName;
     private String lastName;
     private String email;
     private String password;
     private String phoneNumber;
-    private RoleDTO role;
+    private String role;
 }

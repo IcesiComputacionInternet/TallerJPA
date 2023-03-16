@@ -1,7 +1,7 @@
 package co.com.icesi.tallerjpa.controller;
 
-import co.com.icesi.tallerjpa.dto.CreatedUserDTO;
-import co.com.icesi.tallerjpa.dto.SendUserDTO;
+import co.com.icesi.tallerjpa.dto.RequestUserDTO;
+import co.com.icesi.tallerjpa.dto.ResponseUserDTO;
 import co.com.icesi.tallerjpa.service.UserService;
 import lombok.AllArgsConstructor;
 import org.springframework.web.bind.annotation.*;
@@ -13,7 +13,7 @@ public class UserController {
     private final UserService userService;
 
     @PostMapping("/add/user")
-    public SendUserDTO createUser(@RequestBody CreatedUserDTO user){
+    public ResponseUserDTO createUser(@RequestBody RequestUserDTO user){
         return userService.save(user);
     }
 

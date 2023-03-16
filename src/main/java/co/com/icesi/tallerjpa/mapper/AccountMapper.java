@@ -1,7 +1,7 @@
 package co.com.icesi.tallerjpa.mapper;
 
-import co.com.icesi.tallerjpa.dto.CreatedAccountDTO;
-import co.com.icesi.tallerjpa.dto.SendAccountDTO;
+import co.com.icesi.tallerjpa.dto.RequestAccountDTO;
+import co.com.icesi.tallerjpa.dto.ResponseAccountDTO;
 import co.com.icesi.tallerjpa.model.Account;
 import org.mapstruct.Mapper;
 import org.mapstruct.Mapping;
@@ -10,8 +10,8 @@ import org.mapstruct.Mapping;
 public interface AccountMapper {
 
     @Mapping(target = "user", source = "user",ignore=true)
-    Account fromAccountDTO(CreatedAccountDTO createdAccountDTO);
+    Account fromAccountDTO(RequestAccountDTO createdAccountDTO);
     @Mapping(target = "user", source = "user",ignore=true)
-    CreatedAccountDTO fromAccount(Account account);
-    SendAccountDTO fromAccountToSendAccountDTO(Account account);
+    RequestAccountDTO fromAccount(Account account);
+    ResponseAccountDTO fromAccountToSendAccountDTO(Account account);
 }

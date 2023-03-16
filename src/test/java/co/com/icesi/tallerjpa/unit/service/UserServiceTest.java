@@ -1,6 +1,6 @@
 package co.com.icesi.tallerjpa.unit.service;
 
-import co.com.icesi.tallerjpa.dto.CreatedUserDTO;
+import co.com.icesi.tallerjpa.dto.RequestUserDTO;
 import co.com.icesi.tallerjpa.exception.ExistsException;
 import co.com.icesi.tallerjpa.mapper.UserMapper;
 import co.com.icesi.tallerjpa.mapper.UserMapperImpl;
@@ -80,8 +80,8 @@ public class UserServiceTest {
 
     }
 
-    private CreatedUserDTO defaultUserDTO(){
-        return CreatedUserDTO.builder()
+    private RequestUserDTO defaultUserDTO(){
+        return RequestUserDTO.builder()
                 .firstName("Arturo")
                 .lastName("Diaz")
                 .email("prueba@gmail.com")

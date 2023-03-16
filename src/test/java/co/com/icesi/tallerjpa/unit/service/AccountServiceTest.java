@@ -1,6 +1,6 @@
 package co.com.icesi.tallerjpa.unit.service;
 
-import co.com.icesi.tallerjpa.dto.CreatedAccountDTO;
+import co.com.icesi.tallerjpa.dto.RequestAccountDTO;
 import co.com.icesi.tallerjpa.enums.TypeAccount;
 import co.com.icesi.tallerjpa.mapper.AccountMapper;
 import co.com.icesi.tallerjpa.mapper.AccountMapperImpl;
@@ -221,8 +221,8 @@ public class AccountServiceTest {
         verify(accountRepository, times(1)).isActive(any());
     }
 
-    private CreatedAccountDTO defaultAccountDTO() {
-        return CreatedAccountDTO.builder()
+    private RequestAccountDTO defaultAccountDTO() {
+        return RequestAccountDTO.builder()
                 .balance(100L)
                 .type(TypeAccount.DEPOSIT_ONLY)
                 .user("prueba@gmail.com")

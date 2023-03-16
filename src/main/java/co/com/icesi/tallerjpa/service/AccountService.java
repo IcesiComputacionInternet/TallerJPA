@@ -1,7 +1,7 @@
 package co.com.icesi.tallerjpa.service;
 
-import co.com.icesi.tallerjpa.dto.CreatedAccountDTO;
-import co.com.icesi.tallerjpa.dto.SendAccountDTO;
+import co.com.icesi.tallerjpa.dto.RequestAccountDTO;
+import co.com.icesi.tallerjpa.dto.ResponseAccountDTO;
 import co.com.icesi.tallerjpa.mapper.AccountMapper;
 import co.com.icesi.tallerjpa.model.Account;
 import co.com.icesi.tallerjpa.repository.AccountRepository;
@@ -26,7 +26,7 @@ public class AccountService {
     private final UserRepository userRepository;
     private final List<TypeAccountStrategy> typeAccountStrategies;
 
-    public SendAccountDTO save(CreatedAccountDTO accountDTO) {
+    public ResponseAccountDTO save(RequestAccountDTO accountDTO) {
         Account account = accountMapper.fromAccountDTO(accountDTO);
 
         account.setAccountId(UUID.randomUUID());

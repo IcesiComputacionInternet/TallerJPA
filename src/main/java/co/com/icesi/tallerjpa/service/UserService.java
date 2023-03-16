@@ -1,7 +1,7 @@
 package co.com.icesi.tallerjpa.service;
 
-import co.com.icesi.tallerjpa.dto.CreatedUserDTO;
-import co.com.icesi.tallerjpa.dto.SendUserDTO;
+import co.com.icesi.tallerjpa.dto.RequestUserDTO;
+import co.com.icesi.tallerjpa.dto.ResponseUserDTO;
 import co.com.icesi.tallerjpa.exception.ExistsException;
 import co.com.icesi.tallerjpa.mapper.UserMapper;
 import co.com.icesi.tallerjpa.model.IcesiUser;
@@ -22,7 +22,7 @@ public class UserService {
     private final RoleRepository roleRepository;
 
     @SneakyThrows
-    public SendUserDTO save(CreatedUserDTO userDTO){
+    public ResponseUserDTO save(RequestUserDTO userDTO){
 
         boolean emailExists = userRepository.existsByEmail(userDTO.getEmail());
         boolean phoneExists = userRepository.existsByPhoneNumber(userDTO.getPhoneNumber());
