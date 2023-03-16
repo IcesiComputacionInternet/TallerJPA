@@ -1,7 +1,7 @@
 package co.edu.icesi.tallerjpa.service;
 
-import co.edu.icesi.tallerjpa.dto.CreateIcesiAccountDTO;
-import co.edu.icesi.tallerjpa.dto.ShowIcesiAccountDTO;
+import co.edu.icesi.tallerjpa.dto.IcesiAccountCreateDTO;
+import co.edu.icesi.tallerjpa.dto.IcesiAccountShowDTO;
 import co.edu.icesi.tallerjpa.mapper.IcesiAccountMapper;
 import co.edu.icesi.tallerjpa.model.IcesiAccount;
 import co.edu.icesi.tallerjpa.repository.IcesiAccountRepository;
@@ -17,20 +17,20 @@ public class IcesiAccountService {
 
     private final IcesiAccountRepository icesiAccountRepository;
     private final IcesiAccountMapper icesiAccountMapper;
-    public ShowIcesiAccountDTO save(CreateIcesiAccountDTO createIcesiAccountDTO){
-        checkConditionsToCreateAccount(createIcesiAccountDTO);
-        IcesiAccount icesiAccount = icesiAccountMapper.fromCreateIcesiAccountDTO(createIcesiAccountDTO);
+    public IcesiAccountShowDTO save(IcesiAccountCreateDTO icesiAccountCreateDTO){
+        checkConditionsToCreateAccount(icesiAccountCreateDTO);
+        IcesiAccount icesiAccount = icesiAccountMapper.fromCreateIcesiAccountDTO(icesiAccountCreateDTO);
         icesiAccount.setAccountNumber(createAccountNumber()
                 .orElseThrow(() -> new RuntimeException("There were problems creating the account number")));
         icesiAccount.setAccountId(UUID.randomUUID());
         return icesiAccountMapper.fromIcesiAccountToShowDTO(icesiAccountRepository.save(icesiAccount));
     }
 
-    private void checkConditionsToCreateAccount(CreateIcesiAccountDTO createIcesiAccountDTO){
-        if(createIcesiAccountDTO.getBalance() < 0){
+    private void checkConditionsToCreateAccount(IcesiAccountCreateDTO icesiAccountCreateDTO){
+        if(icesiAccountCreateDTO.getBalance() < 0){
             throw new RuntimeException("Accounts balance can't be below 0.");
         }
-        if(!createIcesiAccountDTO.isActive() && createIcesiAccountDTO.getBalance() != 0){
+        if(!icesiAccountCreateDTO.isActive() && icesiAccountCreateDTO.getBalance() != 0){
             throw new RuntimeException("Account can only be disabled if the balance is 0.");
         }
     }

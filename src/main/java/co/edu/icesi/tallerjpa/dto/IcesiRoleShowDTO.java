@@ -8,9 +8,9 @@ import java.util.UUID;
 
 @Data
 @Builder
-public class ShowIcesiRoleDTO {
+public class IcesiRoleShowDTO {
     private UUID roleId;
     private String description;
     private String name;
-    private List<ShowIcesiUserDTO> icesiUsers;
+    private List<IcesiUserShowDTO> icesiUsers;
 }

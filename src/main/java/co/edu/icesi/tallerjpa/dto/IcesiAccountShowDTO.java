@@ -7,11 +7,11 @@ import java.util.UUID;
 
 @Data
 @Builder
-public class ShowIcesiAccountDTO {
+public class IcesiAccountShowDTO {
     private UUID accountId;
     private String accountNumber;
     private long balance;
     private String type;
     private boolean active;
-    private CreateIcesiUserDTO icesiUserDTO;
+    private IcesiUserCreateDTO icesiUserDTO;
 }
