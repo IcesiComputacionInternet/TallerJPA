@@ -68,7 +68,7 @@ public class AccountServiceTest {
 
         Account account = accountService.getAccountByAccountNumber("12345");
 
-        assertEquals(defaultAccount(), account);
+        assertEquals(defaultAccount().getAccountNumber(), account.getAccountNumber());
         verify(accountRepository, times(1)).findByAccountNumber(any());
     }
     @Test

@@ -8,8 +8,9 @@ import javax.persistence.OneToMany;
 import java.util.List;
 import java.util.UUID;
 
-@Data
 @Entity
+@Getter
+@Setter
 @Builder
 @AllArgsConstructor
 @NoArgsConstructor

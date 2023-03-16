@@ -9,8 +9,9 @@ import javax.persistence.JoinColumn;
 import javax.persistence.ManyToOne;
 import java.util.UUID;
 
-@Data
 @Entity
+@Getter
+@Setter
 @Builder
 @AllArgsConstructor
 @NoArgsConstructor

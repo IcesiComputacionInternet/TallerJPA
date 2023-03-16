@@ -15,7 +15,7 @@ public class RoleController {
     private RoleService roleService;
 
     @PostMapping("/add/role")
-    public Role createUser(@RequestBody RoleDTO role){
+    public RoleDTO createUser(@RequestBody RoleDTO role){
         return roleService.save(role);
     }
 }

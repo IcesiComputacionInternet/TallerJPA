@@ -1,13 +1,13 @@
 package co.com.icesi.tallerjpa.model;
-
 import lombok.*;
 
 import javax.persistence.*;
 import java.util.List;
 import java.util.UUID;
 
-@Data
 @Entity
+@Getter
+@Setter
 @Builder
 @AllArgsConstructor
 @NoArgsConstructor
