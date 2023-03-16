@@ -1,6 +1,7 @@
 package com.icesi.TallerJPA.controller;
 
 import com.icesi.TallerJPA.dto.IcesiUserDTO;
+import com.icesi.TallerJPA.dto.IcesiUserResponseDTO;
 import com.icesi.TallerJPA.model.IcesiUser;
 import lombok.AllArgsConstructor;
 import org.springframework.web.bind.annotation.PostMapping;
@@ -15,7 +16,7 @@ public class IcesiUserController {
     private final UserService userService;
 
     @PostMapping("/user")
-    public IcesiUser createIcesiUser(@RequestBody IcesiUserDTO user){
+    public IcesiUserResponseDTO createIcesiUser(@RequestBody IcesiUserDTO user){
         return userService.save(user);
     }
 

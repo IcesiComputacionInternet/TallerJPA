@@ -5,8 +5,7 @@ import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
-import javax.persistence.Entity;
-import javax.persistence.Id;
+import javax.persistence.*;
 import java.util.UUID;
 
 @Entity
@@ -23,4 +22,8 @@ public class IcesiAccount {
     private long balance;
     private String type;
     private Boolean active;
+
+    @ManyToOne
+    @JoinColumn(name = "icesi_user_id")
+    private IcesiUser icesiUser;
 }
