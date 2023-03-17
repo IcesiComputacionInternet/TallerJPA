@@ -18,4 +18,5 @@ public class UserCreateDTO {
     private String phoneNumber;
 
     private String password;
+
 }

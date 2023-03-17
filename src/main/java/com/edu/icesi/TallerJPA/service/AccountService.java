@@ -35,7 +35,7 @@ public class AccountService {
         IcesiAccount icesiAccount = accountMapper.fromIcesiAccountDTO(accountCreateDTO);
         icesiAccount.setAccountId(UUID.randomUUID());
 
-        return icesiAccount;
+        return accountRepository.save(icesiAccount);
     }
 
     public String generateNumberAccount() {

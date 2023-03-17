@@ -29,8 +29,6 @@ public class UserService {
         }else if(userRepository.findByPhoneNumber(userCreateDTO.getPhoneNumber()).isPresent()){
             throw new RuntimeException("User with this phone number already exists");
         }
-
-
         IcesiUser icesiUser = userMapper.fromIcesiUserDTO(userCreateDTO);
         icesiUser.setUserId(UUID.randomUUID());
 
