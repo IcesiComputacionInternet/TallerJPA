@@ -66,11 +66,12 @@ public class UserServiceTest {
         assertThrows(RuntimeException.class,() -> userService.save(defaultUserCreateDTO()));
     }
     @Test
-    public void testCreateUserWhenRoleIsNull(){
+    public void testCreateUserWhenRoleIsNotFound(){
         UserCreateDTO userCreateDTO = defaultUserCreateDTO();
         userCreateDTO.setRoleName("Seguridad");
         assertThrows(RuntimeException.class,() -> userService.save(userCreateDTO));
     }
+
 
 
     private IcesiUser defaultIcesiUser() {

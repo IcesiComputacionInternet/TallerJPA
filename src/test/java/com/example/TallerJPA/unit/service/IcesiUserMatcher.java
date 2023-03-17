@@ -4,6 +4,8 @@ import com.example.TallerJPA.model.IcesiUser;
 import lombok.AllArgsConstructor;
 import org.mockito.ArgumentMatcher;
 
+import java.util.Objects;
+
 @AllArgsConstructor
 public class IcesiUserMatcher implements ArgumentMatcher<IcesiUser> {
 
@@ -12,11 +14,11 @@ public class IcesiUserMatcher implements ArgumentMatcher<IcesiUser> {
     @Override
     public boolean matches(IcesiUser icesiUserRight) {
         return icesiUserRight.getUserId() != null &&
-                icesiUserRight.getFirstName().equals(icesiUserLeft.getFirstName()) &&
-                icesiUserRight.getLastName().equals(icesiUserLeft.getLastName()) &&
-                icesiUserRight.getPassword().equals(icesiUserLeft.getPassword()) &&
-                icesiUserRight.getEmail().equals(icesiUserLeft.getEmail()) &&
-                icesiUserRight.getPhoneNumber().equals(icesiUserLeft.getPhoneNumber()) &&
-                icesiUserRight.getRole().equals(icesiUserLeft.getRole());
+                Objects.equals(icesiUserRight.getFirstName(), icesiUserLeft.getFirstName()) &&
+                Objects.equals(icesiUserRight.getLastName(), icesiUserLeft.getLastName()) &&
+                Objects.equals(icesiUserRight.getPassword(), icesiUserLeft.getPassword()) &&
+                Objects.equals(icesiUserRight.getEmail(), icesiUserLeft.getEmail()) &&
+                Objects.equals(icesiUserRight.getRole(), icesiUserLeft.getRole()) &&
+                Objects.equals(icesiUserRight.getPhoneNumber(), icesiUserLeft.getPhoneNumber());
     }
 }

@@ -35,13 +35,13 @@ public class AccountService {
         }
     }
 
-    public void changeStatus(IcesiAccount account){
+    public IcesiAccount changeStatus(IcesiAccount account){
         if(account.getBalance() != 0){
             throw new RuntimeException("Account can't be closed because it has reamining balance");
         }else{
             account.setActive(false);
         }
-        accountRepository.save(account);
+        return accountRepository.save(account);
     }
 
     public void withdraw(IcesiAccount account, long amount){
