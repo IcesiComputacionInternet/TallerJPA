@@ -63,7 +63,7 @@ public class UserServiceTest {
     }
 
     @Test
-    public void testCreateUserSinDTO(){
+    public void testCreateUserSinRol(){
 
         try{
             userService.save(defaultUserCreateDTOSinRol());

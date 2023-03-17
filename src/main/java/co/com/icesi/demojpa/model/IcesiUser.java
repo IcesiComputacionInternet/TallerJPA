@@ -38,9 +38,12 @@ public class IcesiUser {
     @ManyToOne
     @JoinColumn(name="icesi_role_role_id", nullable=false)
     private IcesiRole role;
-
+    //TODO desdocumentar esto
+/*
     @OneToMany(mappedBy = "account")
     private List<IcesiAccount> accounts;
+   */
+
 /*
     @OneToMany(mappedBy = "user")
     private List<IcesiBlogPost> post;

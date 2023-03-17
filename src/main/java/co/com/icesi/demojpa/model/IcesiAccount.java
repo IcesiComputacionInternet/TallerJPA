@@ -14,7 +14,6 @@ import java.util.UUID;
 @Builder
 @AllArgsConstructor
 @NoArgsConstructor
-@Table(name="ICESIACCOUNT")
 public class IcesiAccount {
 
     @Id
@@ -27,9 +26,9 @@ public class IcesiAccount {
     private String type;
 
     private boolean active;
-
+/* //TODO desdocumentar esto
     @ManyToOne
     @JoinColumn(name="icesi_user_user_id", nullable=false)
     private IcesiUser account;
-
+*/
 }

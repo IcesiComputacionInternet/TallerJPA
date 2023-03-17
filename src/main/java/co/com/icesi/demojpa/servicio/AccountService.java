@@ -6,8 +6,11 @@ import co.com.icesi.demojpa.model.IcesiAccount;
 import co.com.icesi.demojpa.repository.AccountRepository;
 import org.springframework.stereotype.Service;
 
+import javax.transaction.Transactional;
 import java.util.Random;
 import java.util.UUID;
+import java.util.stream.Collectors;
+import java.util.stream.IntStream;
 
 @Service
 public class AccountService {
@@ -26,29 +29,31 @@ public class AccountService {
         if(account.getBalance()<0){
             throw new RuntimeException("El balance no puede ser menor a 0");
         }
+        /*
         String number=genNumber();
-        while(accountRepository.findByNumber(number).isPresent()){
+        while(accountRepository.findByAccountNumber(number).isPresent()){
             number=genNumber();
-        }
-
+        }*/
         IcesiAccount icesiAccount = accountMapper.fromIcesiAccountDTO(account);
-        icesiAccount.setAccountNumber(number);
+        icesiAccount.setAccountNumber(genNumber());
         icesiAccount.setAccountId(UUID.randomUUID());
         return accountRepository.save(icesiAccount);
     }
 
-    private String genNumber(){
-
-        return rand.ints(3,0,10)+"-"+
-                rand.ints(6,0,10)+"-"+
-                rand.ints(2,0,10);
+    public String genNumber(){
+        IntStream nums = rand.ints(11,0,10);
+        String number= nums.boxed().map(i->String.valueOf(i)).collect(Collectors.joining());
+        return String.format("%s-%s-%s",number.substring(0,3),number.substring(3,9),number.substring(9,11));
     }
 
     //TODO disable account
+    @Transactional
     public void disableAccount(String accountNumber){
-        if(accountRepository.findByNumber(accountNumber).isPresent() && accountRepository.findByNumber(accountNumber).get().getBalance()==0){
+        if(accountRepository.findByAccountNumber(accountNumber).isPresent() && accountRepository.findByAccountNumber(accountNumber).get().getBalance()==0){
+            System.out.println("llega a donde debe");
             accountRepository.disableAccount(accountNumber);
-        }else if(accountRepository.findByNumber(accountNumber).isEmpty()) {
+            System.out.println(accountRepository.findByAccountNumber(accountNumber).get());
+        }else if(accountRepository.findByAccountNumber(accountNumber).isEmpty()) {
             throw new RuntimeException("No existe una cuenta con este numero");
         }else{
             throw new RuntimeException("El balance de esta cuenta no es 0");
@@ -58,9 +63,9 @@ public class AccountService {
 
     //TODO enable account
     public void enableAccount(String accountNumber){
-        if(accountRepository.findByNumber(accountNumber).isPresent() && accountRepository.findByNumber(accountNumber).get().isActive()==false){
+        if(accountRepository.findByAccountNumber(accountNumber).isPresent() && accountRepository.findByAccountNumber(accountNumber).get().isActive()==false){
             accountRepository.enableAccount(accountNumber);
-        }else if(!accountRepository.findByNumber(accountNumber).isPresent()) {
+        }else if(!accountRepository.findByAccountNumber(accountNumber).isPresent()) {
             throw new RuntimeException("No existe una cuenta con este numero");
         }else{
             throw new RuntimeException("La cuenta ya esta activada");
@@ -69,15 +74,15 @@ public class AccountService {
 
     //TODO withdrawal
     public void withdrawal(String accountNumber, long withdrawalAmount){
-        if(accountRepository.findByNumber(accountNumber).isPresent() &&
-                accountRepository.findByNumber(accountNumber).get().getBalance()>=withdrawalAmount &&
-                accountRepository.findByNumber(accountNumber).get().isActive() &&withdrawalAmount>0){
+        if(accountRepository.findByAccountNumber(accountNumber).isPresent() &&
+                accountRepository.findByAccountNumber(accountNumber).get().getBalance()>=withdrawalAmount &&
+                accountRepository.findByAccountNumber(accountNumber).get().isActive() &&withdrawalAmount>0){
 
-            accountRepository.updateBalance(accountNumber,accountRepository.findByNumber(accountNumber).get().getBalance()-withdrawalAmount);
+            accountRepository.updateBalance(accountNumber,accountRepository.findByAccountNumber(accountNumber).get().getBalance()-withdrawalAmount);
 
-        }else if(!accountRepository.findByNumber(accountNumber).isPresent()) {
+        }else if(!accountRepository.findByAccountNumber(accountNumber).isPresent()) {
             throw new RuntimeException("No existe una cuenta con este numero");
-        } else if (!accountRepository.findByNumber(accountNumber).get().isActive()) {
+        } else if (!accountRepository.findByAccountNumber(accountNumber).get().isActive()) {
             throw new RuntimeException("La cuenta no esta activa");
         } else if (withdrawalAmount<=0) {
             throw new RuntimeException("La cantidad de dinero que se quiere sacar debe ser mayor que 0");
@@ -89,12 +94,12 @@ public class AccountService {
 
     //TODO deposit
     public void deposit(String accountNumber, long depositAmount){
-        if(accountRepository.findByNumber(accountNumber).isPresent() &&
-                accountRepository.findByNumber(accountNumber).get().isActive()){
+        if(accountRepository.findByAccountNumber(accountNumber).isPresent() &&
+                accountRepository.findByAccountNumber(accountNumber).get().isActive()){
 
-            accountRepository.updateBalance(accountNumber,accountRepository.findByNumber(accountNumber).get().getBalance()+depositAmount);
+            accountRepository.updateBalance(accountNumber,accountRepository.findByAccountNumber(accountNumber).get().getBalance()+depositAmount);
 
-        }else if(!accountRepository.findByNumber(accountNumber).isPresent()) {
+        }else if(!accountRepository.findByAccountNumber(accountNumber).isPresent()) {
             throw new RuntimeException("No existe una cuenta con este numero");
         } else if (depositAmount<=0) {
             throw new RuntimeException("La cantidad de dinero que se quiere depositar debe ser mayor que 0");
@@ -105,10 +110,10 @@ public class AccountService {
 
     //TODO transfer
     public void transfer(String sendAccNum, String receiveAccNum, long sendValue){
-        if(accountRepository.findByNumber(sendAccNum).isPresent() &&
-                accountRepository.findByNumber(receiveAccNum).isPresent()){
-            IcesiAccount send = accountRepository.findByNumber(sendAccNum).get();
-            IcesiAccount receive = accountRepository.findByNumber(receiveAccNum).get();
+        if(accountRepository.findByAccountNumber(sendAccNum).isPresent() &&
+                accountRepository.findByAccountNumber(receiveAccNum).isPresent()){
+            IcesiAccount send = accountRepository.findByAccountNumber(sendAccNum).get();
+            IcesiAccount receive = accountRepository.findByAccountNumber(receiveAccNum).get();
             if(send.isActive() && receive.isActive() && send.getBalance()>=sendValue &&
                     !checkType(sendAccNum) && !checkType(receiveAccNum)){
                 accountRepository.updateBalance(sendAccNum,send.getBalance()-sendValue);
@@ -124,7 +129,7 @@ public class AccountService {
             } else{
                 throw new RuntimeException("La cuenta que manda el dinero no tiene balance suficiente ");
             }
-        }else if(accountRepository.findByNumber(sendAccNum).isEmpty()) {
+        }else if(accountRepository.findByAccountNumber(sendAccNum).isEmpty()) {
             throw new RuntimeException("La cuenta que manda el dinero no existe");
         } else if (sendValue<=0) {
             throw new RuntimeException("La cantidad de dinero que se quiere enviar debe ser mayor que 0");
@@ -134,7 +139,7 @@ public class AccountService {
     }
 
     private boolean checkType(String accountNumber){
-        if(accountRepository.findByNumber(accountNumber).get().getType().toLowerCase().equals("deposit only")){
+        if(accountRepository.findByAccountNumber(accountNumber).get().getType().toLowerCase().equals("deposit only")){
             return true;
         }
         return false;
