@@ -1,5 +1,6 @@
 package com.icesi.TallerJPA.service;
 
+import com.icesi.TallerJPA.dto.IcesiAccountResponseDTO;
 import com.icesi.TallerJPA.dto.IcesiUserDTO;
 import com.icesi.TallerJPA.dto.IcesiUserResponseDTO;
 import com.icesi.TallerJPA.mapper.UserMapper;
@@ -16,14 +17,28 @@ import java.util.UUID;
 public class UserService {
 
     private final UserMapper userMapper;
+
     private final UserRespository userRespository;
 
     private final RoleRepository roleRepository;
+
     public IcesiUserResponseDTO save(IcesiUserDTO user) {
+
+        Boolean existEmail = userRespository.existsByEmail(user.getEmail());
+        Boolean existPhone = userRespository.existsByPhoneNumber(user.getPhoneNumber());
+
+        if(existEmail && existPhone){throw new RuntimeException("Email and Phone is repeated");}
+        if(existEmail){throw new RuntimeException("Email is repeated");}
+        if(existPhone){throw new RuntimeException("Phone is repeated");}
+
+        return createUser(user);
+    }
+
+    public IcesiUserResponseDTO createUser(IcesiUserDTO user){
         IcesiUser icesiUser = userMapper.fromIcesiUser(user);
         icesiUser.setUserId(UUID.randomUUID());
         icesiUser.setIcesiRole(roleRepository.findIcesiRoleByName(
-                user.getRolName()).orElseThrow(()-> new RuntimeException("No se encontró el Rol")));
+                user.getRolName()).orElseThrow(()-> new RuntimeException("Role not found")));
         return userMapper.toResponse(userRespository.save(icesiUser));
     }
 }
