@@ -21,7 +21,7 @@ public class UserService {
     public IcesiUser save(UserCreateDTO user) {
         Optional<IcesiUser> userFoundByEmail = userRepository.findByEmail(user.getEmail());
         Optional<IcesiUser> userFoundByPhoneNumber = userRepository.findByPhoneNumber(user.getPhoneNumber());
-        if(userFoundByEmail.isPresent() || userFoundByPhoneNumber.isPresent() || user.getRole() == null){
+        if(userFoundByEmail.isPresent() || userFoundByPhoneNumber.isPresent() || user.getRoleName() == null){
             if(userFoundByEmail.isPresent()){
                 throw new RuntimeException("User already exists with email: " + user.getEmail());
             }else if(userFoundByPhoneNumber.isPresent()){
@@ -30,7 +30,7 @@ public class UserService {
                 throw new RuntimeException("User role is null");
             }
         }else{
-            Optional<IcesiRole> roleFound = roleService.findRoleByName(user.getRole());
+            Optional<IcesiRole> roleFound = roleService.findRoleByName(user.getRoleName());
             if(roleFound.isEmpty()){
                 throw new RuntimeException("Role not found");
             }

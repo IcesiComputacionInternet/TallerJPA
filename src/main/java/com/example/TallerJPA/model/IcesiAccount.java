@@ -1,7 +1,9 @@
 package com.example.TallerJPA.model;
 
+import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
+import org.springframework.beans.factory.annotation.Value;
 
 import javax.persistence.Entity;
 import javax.persistence.Id;
@@ -12,6 +14,7 @@ import java.util.UUID;
 @Data
 @Entity
 @Builder
+@AllArgsConstructor
 public class IcesiAccount {
     @Id
     private UUID accountId;
@@ -22,4 +25,7 @@ public class IcesiAccount {
     @ManyToOne
     @JoinColumn(name = "icesi_user_user_id")
     private IcesiUser user;
+
+    public IcesiAccount() {
+    }
 }
