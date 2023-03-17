@@ -29,11 +29,11 @@ public class AccountService {
         if(account.getBalance()<0){
             throw new RuntimeException("El balance no puede ser menor a 0");
         }
-        /*
+
         String number=genNumber();
         while(accountRepository.findByAccountNumber(number).isPresent()){
             number=genNumber();
-        }*/
+        }
         IcesiAccount icesiAccount = accountMapper.fromIcesiAccountDTO(account);
         icesiAccount.setAccountNumber(genNumber());
         icesiAccount.setAccountId(UUID.randomUUID());
@@ -50,9 +50,7 @@ public class AccountService {
     @Transactional
     public void disableAccount(String accountNumber){
         if(accountRepository.findByAccountNumber(accountNumber).isPresent() && accountRepository.findByAccountNumber(accountNumber).get().getBalance()==0){
-            System.out.println("llega a donde debe");
             accountRepository.disableAccount(accountNumber);
-            System.out.println(accountRepository.findByAccountNumber(accountNumber).get());
         }else if(accountRepository.findByAccountNumber(accountNumber).isEmpty()) {
             throw new RuntimeException("No existe una cuenta con este numero");
         }else{
@@ -76,7 +74,7 @@ public class AccountService {
     public void withdrawal(String accountNumber, long withdrawalAmount){
         if(accountRepository.findByAccountNumber(accountNumber).isPresent() &&
                 accountRepository.findByAccountNumber(accountNumber).get().getBalance()>=withdrawalAmount &&
-                accountRepository.findByAccountNumber(accountNumber).get().isActive() &&withdrawalAmount>0){
+                accountRepository.findByAccountNumber(accountNumber).get().isActive() && withdrawalAmount>0){
 
             accountRepository.updateBalance(accountNumber,accountRepository.findByAccountNumber(accountNumber).get().getBalance()-withdrawalAmount);
 
@@ -95,7 +93,8 @@ public class AccountService {
     //TODO deposit
     public void deposit(String accountNumber, long depositAmount){
         if(accountRepository.findByAccountNumber(accountNumber).isPresent() &&
-                accountRepository.findByAccountNumber(accountNumber).get().isActive()){
+                accountRepository.findByAccountNumber(accountNumber).get().isActive() &&
+                accountRepository.findByAccountNumber(accountNumber).get().isActive() && depositAmount>0){
 
             accountRepository.updateBalance(accountNumber,accountRepository.findByAccountNumber(accountNumber).get().getBalance()+depositAmount);
 
@@ -112,12 +111,16 @@ public class AccountService {
     public void transfer(String sendAccNum, String receiveAccNum, long sendValue){
         if(accountRepository.findByAccountNumber(sendAccNum).isPresent() &&
                 accountRepository.findByAccountNumber(receiveAccNum).isPresent()){
+
             IcesiAccount send = accountRepository.findByAccountNumber(sendAccNum).get();
             IcesiAccount receive = accountRepository.findByAccountNumber(receiveAccNum).get();
+
             if(send.isActive() && receive.isActive() && send.getBalance()>=sendValue &&
                     !checkType(sendAccNum) && !checkType(receiveAccNum)){
+
                 accountRepository.updateBalance(sendAccNum,send.getBalance()-sendValue);
                 accountRepository.updateBalance(receiveAccNum, receive.getBalance()+sendValue);
+
             }else if (!send.isActive()){
                 throw new RuntimeException("La cuenta que manda el dinero no esta activa");
             }else if(!receive.isActive()){

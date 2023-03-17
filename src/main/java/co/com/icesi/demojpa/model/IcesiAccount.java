@@ -26,9 +26,9 @@ public class IcesiAccount {
     private String type;
 
     private boolean active;
-/* //TODO desdocumentar esto
+    //TODO desdocumentar esto
     @ManyToOne
     @JoinColumn(name="icesi_user_user_id", nullable=false)
     private IcesiUser account;
-*/
+
 }
