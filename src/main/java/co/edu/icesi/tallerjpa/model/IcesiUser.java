@@ -6,6 +6,7 @@ import lombok.Data;
 import lombok.NoArgsConstructor;
 
 import javax.persistence.*;
+import javax.validation.constraints.NotNull;
 import java.util.List;
 import java.util.UUID;
 
@@ -22,6 +23,7 @@ public class IcesiUser {
     private String email;
     private String phoneNumber;
     private String password;
+    @NotNull(message = "The icesi role can not be null")
     @ManyToOne
     @JoinColumn(name = "IcesiRole_roleId", nullable = false)
     private IcesiRole icesiRole;

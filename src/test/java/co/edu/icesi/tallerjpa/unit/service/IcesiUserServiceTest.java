@@ -1,9 +1,7 @@
 package co.edu.icesi.tallerjpa.unit.service;
 
 import co.edu.icesi.tallerjpa.dto.IcesiRoleCreateDTO;
-import co.edu.icesi.tallerjpa.dto.IcesiRoleShowForUserDTO;
 import co.edu.icesi.tallerjpa.dto.IcesiUserCreateDTO;
-import co.edu.icesi.tallerjpa.dto.IcesiUserShowDTO;
 import co.edu.icesi.tallerjpa.mapper.IcesiUserMapper;
 import co.edu.icesi.tallerjpa.mapper.IcesiUserMapperImpl;
 import co.edu.icesi.tallerjpa.model.IcesiRole;
@@ -15,8 +13,8 @@ import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 
 import java.util.Optional;
-import java.util.UUID;
 
+import static org.junit.jupiter.api.Assertions.*;
 import static org.mockito.Mockito.*;
 
 public class IcesiUserServiceTest {
@@ -48,12 +46,6 @@ public class IcesiUserServiceTest {
                 .build();
 
     }
-    private IcesiRoleShowForUserDTO defaultIcesiRoleShowForUserDTO(){
-        return IcesiRoleShowForUserDTO.builder()
-                .description("Manage the system")
-                .name("Admin")
-                .build();
-    }
     private IcesiUserCreateDTO defaultIcesiUserCreateDTO(){
         return IcesiUserCreateDTO.builder()
                 .firstName("Pepito")
@@ -62,6 +54,19 @@ public class IcesiUserServiceTest {
                 .phoneNumber("3125551223")
                 .password("password")
                 .icesiRoleCreateDTO(defaultIcesiRoleCreateDTO())
+                .build();
+    }
+
+    private IcesiUser defaultIcesiUser(){
+        return IcesiUser.builder()
+                .userId(null)
+                .firstName("Pepito")
+                .lastName("Perez")
+                .email("pepitoperez@gmail.com")
+                .phoneNumber("3125551223")
+                .password("password")
+                .icesiRole(defaultIcesiRole())
+                .icesiAccounts(null)
                 .build();
     }
 
@@ -81,5 +86,44 @@ public class IcesiUserServiceTest {
         verify(icesiUserRepository, times(1)).save(argThat(new IcesiUserMatcher(icesiUser1)));
     }
 
+    @Test
+    public void testCreateUserWhenEmailAlreadyExists() {
+        when(icesiUserRepository.findByEmail(any())).thenReturn(Optional.of(defaultIcesiUser()));
+        IcesiUserCreateDTO icesiUserCreateDTO = defaultIcesiUserCreateDTO();
+        Exception exception = assertThrows(RuntimeException.class, () -> icesiUserService.save(icesiUserCreateDTO));
+        assertEquals("There is already a user with the email " + defaultIcesiUserCreateDTO().getEmail() + "\n", exception.getMessage());
+    }
 
+    @Test
+    public void testCreateUserWhenPhoneNumberAlreadyExists() {
+        when(icesiUserRepository.findByPhoneNumber(any())).thenReturn(Optional.of(defaultIcesiUser()));
+        IcesiUserCreateDTO icesiUserCreateDTO = defaultIcesiUserCreateDTO();
+        Exception exception = assertThrows(RuntimeException.class, () -> icesiUserService.save(icesiUserCreateDTO));
+        assertEquals("There is already a user with the phone number " + defaultIcesiUserCreateDTO().getPhoneNumber() + "\n", exception.getMessage());
+    }
+
+    @Test
+    public void testCreateUserWhenEmailAndPhoneNumberAlreadyExists() {
+        when(icesiUserRepository.findByEmail(any())).thenReturn(Optional.of(defaultIcesiUser()));
+        when(icesiUserRepository.findByPhoneNumber(any())).thenReturn(Optional.of(defaultIcesiUser()));
+        IcesiUserCreateDTO icesiUserCreateDTO = defaultIcesiUserCreateDTO();
+        Exception exception = assertThrows(RuntimeException.class, () -> icesiUserService.save(icesiUserCreateDTO));
+        String exceptionMessage = "There is already a user with the email " + defaultIcesiUserCreateDTO().getEmail() + "\n";
+        exceptionMessage += "There is already a user with the phone number " + defaultIcesiUserCreateDTO().getPhoneNumber() + "\n";
+        assertEquals(exceptionMessage, exception.getMessage());
+    }
+
+    @Test
+    public void testCreateIcesiUserWithNullIcesiRole(){
+        when(icesiRoleRepository.findByName(any())).thenReturn(Optional.ofNullable((null)));
+        Exception exception = assertThrows(RuntimeException.class, () -> icesiUserService.save(defaultIcesiUserCreateDTO()));
+        assertEquals("There is no role with that name", exception.getMessage());
+    }
+
+    @Test
+    public void testGenerateUUID(){
+        when(icesiRoleRepository.findByName(any())).thenReturn(Optional.of(defaultIcesiRole()));
+        icesiUserService.save(defaultIcesiUserCreateDTO());
+        verify(icesiUserRepository, times(1)).save(argThat(x -> x.getUserId() != null));
+    }
 }
