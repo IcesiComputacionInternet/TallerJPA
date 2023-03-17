@@ -2,6 +2,7 @@ package co.edu.icesi.demo.model;
 
 import lombok.Data;
 
+import javax.persistence.Column;
 import javax.persistence.Entity;
 import javax.persistence.Id;
 import javax.persistence.OneToMany;
@@ -17,6 +18,7 @@ public class IcesiRole {
 
     private String description;
 
+    @Column(unique=true)
     private String name;
 
     @OneToMany(mappedBy = "role")
