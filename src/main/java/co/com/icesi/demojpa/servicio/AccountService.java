@@ -42,7 +42,7 @@ public class AccountService {
 
     public String genNumber(){
         IntStream nums = rand.ints(11,0,10);
-        String number= nums.boxed().map(i->String.valueOf(i)).collect(Collectors.joining());
+        String number= nums.boxed().map(String::valueOf).collect(Collectors.joining());
         return String.format("%s-%s-%s",number.substring(0,3),number.substring(3,9),number.substring(9,11));
     }
 
@@ -61,9 +61,9 @@ public class AccountService {
 
     //TODO enable account
     public void enableAccount(String accountNumber){
-        if(accountRepository.findByAccountNumber(accountNumber).isPresent() && accountRepository.findByAccountNumber(accountNumber).get().isActive()==false){
+        if(accountRepository.findByAccountNumber(accountNumber).isPresent() && !accountRepository.findByAccountNumber(accountNumber).get().isActive()){
             accountRepository.enableAccount(accountNumber);
-        }else if(!accountRepository.findByAccountNumber(accountNumber).isPresent()) {
+        }else if(accountRepository.findByAccountNumber(accountNumber).isEmpty()) {
             throw new RuntimeException("No existe una cuenta con este numero");
         }else{
             throw new RuntimeException("La cuenta ya esta activada");
@@ -78,7 +78,7 @@ public class AccountService {
 
             accountRepository.updateBalance(accountNumber,accountRepository.findByAccountNumber(accountNumber).get().getBalance()-withdrawalAmount);
 
-        }else if(!accountRepository.findByAccountNumber(accountNumber).isPresent()) {
+        }else if(accountRepository.findByAccountNumber(accountNumber).isEmpty()) {
             throw new RuntimeException("No existe una cuenta con este numero");
         } else if (!accountRepository.findByAccountNumber(accountNumber).get().isActive()) {
             throw new RuntimeException("La cuenta no esta activa");
@@ -98,7 +98,7 @@ public class AccountService {
 
             accountRepository.updateBalance(accountNumber,accountRepository.findByAccountNumber(accountNumber).get().getBalance()+depositAmount);
 
-        }else if(!accountRepository.findByAccountNumber(accountNumber).isPresent()) {
+        }else if(accountRepository.findByAccountNumber(accountNumber).isEmpty()) {
             throw new RuntimeException("No existe una cuenta con este numero");
         } else if (depositAmount<=0) {
             throw new RuntimeException("La cantidad de dinero que se quiere depositar debe ser mayor que 0");
@@ -110,7 +110,8 @@ public class AccountService {
     //TODO transfer
     public void transfer(String sendAccNum, String receiveAccNum, long sendValue){
         if(accountRepository.findByAccountNumber(sendAccNum).isPresent() &&
-                accountRepository.findByAccountNumber(receiveAccNum).isPresent()){
+                accountRepository.findByAccountNumber(receiveAccNum).isPresent() &&
+                sendValue>0){
 
             IcesiAccount send = accountRepository.findByAccountNumber(sendAccNum).get();
             IcesiAccount receive = accountRepository.findByAccountNumber(receiveAccNum).get();
@@ -142,9 +143,6 @@ public class AccountService {
     }
 
     private boolean checkType(String accountNumber){
-        if(accountRepository.findByAccountNumber(accountNumber).get().getType().toLowerCase().equals("deposit only")){
-            return true;
-        }
-        return false;
+        return accountRepository.findByAccountNumber(accountNumber).get().getType().equalsIgnoreCase("deposit only");
     }
 }
