@@ -30,7 +30,7 @@ public class IcesiUser {
     @OneToMany(mappedBy = "user")
     private List<IcesiAccount> icesiAccountList;
 
-    @ManyToOne(optional = false)
+    @ManyToOne(optional = false) //The user role can't be null.
     @JoinColumn(name = "icesi_role_role_id")
     private IcesiRole icesiRole;
 
