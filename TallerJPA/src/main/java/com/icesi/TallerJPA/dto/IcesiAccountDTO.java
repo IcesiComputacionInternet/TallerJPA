@@ -14,4 +14,5 @@ public class IcesiAccountDTO {
     private long balance;
     private String type;
     private Boolean active;
+    private String emailUser;
 }
