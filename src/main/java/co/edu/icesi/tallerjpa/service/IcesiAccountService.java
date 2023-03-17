@@ -4,7 +4,9 @@ import co.edu.icesi.tallerjpa.dto.IcesiAccountCreateDTO;
 import co.edu.icesi.tallerjpa.dto.IcesiAccountShowDTO;
 import co.edu.icesi.tallerjpa.mapper.IcesiAccountMapper;
 import co.edu.icesi.tallerjpa.model.IcesiAccount;
+import co.edu.icesi.tallerjpa.model.IcesiUser;
 import co.edu.icesi.tallerjpa.repository.IcesiAccountRepository;
+import co.edu.icesi.tallerjpa.repository.IcesiUserRepository;
 import lombok.AllArgsConstructor;
 import org.springframework.stereotype.Service;
 
@@ -17,11 +19,15 @@ public class IcesiAccountService {
 
     private final IcesiAccountRepository icesiAccountRepository;
     private final IcesiAccountMapper icesiAccountMapper;
+    private final IcesiUserRepository icesiUserRepository;
     public IcesiAccountShowDTO save(IcesiAccountCreateDTO icesiAccountCreateDTO){
         checkConditionsToCreateAccount(icesiAccountCreateDTO);
         IcesiAccount icesiAccount = icesiAccountMapper.fromCreateIcesiAccountDTO(icesiAccountCreateDTO);
+        IcesiUser icesiUser = icesiUserRepository.findByEmail(icesiAccountCreateDTO.getIcesiUserDTO().getEmail())
+                .orElseThrow(() -> new RuntimeException("There is no user"));
+        icesiAccount.setIcesiUser(icesiUser);
         icesiAccount.setAccountNumber(createAccountNumber()
-                .orElseThrow(() -> new RuntimeException("There were problems creating the account number")));
+                .orElseThrow(() -> new RuntimeException("The user entered does not exist")));
         icesiAccount.setAccountId(UUID.randomUUID());
         return icesiAccountMapper.fromIcesiAccountToShowDTO(icesiAccountRepository.save(icesiAccount));
     }
@@ -86,25 +92,26 @@ public class IcesiAccountService {
         return newBalance;
     }
 
-    public long transferMoneyTo(String fromAccountId, String toAccountId, long moneyToTransfer){
-        checkConditionsToTransfer(fromAccountId, toAccountId, moneyToTransfer);
-        long fromAccountNewBalance = getAccountById(fromAccountId).getBalance() - moneyToTransfer;
-        long toAccountNewBalance = getAccountById(toAccountId).getBalance() + moneyToTransfer;
-        icesiAccountRepository.updateBalance(fromAccountNewBalance, fromAccountId);
-        icesiAccountRepository.updateBalance(toAccountNewBalance, toAccountId);
+    public long transferMoney(String senderAccountId, String receiverAccountId, long moneyToTransfer){
+        checkConditionsToTransfer(senderAccountId, receiverAccountId, moneyToTransfer);
+        long fromAccountNewBalance = getAccountById(senderAccountId).getBalance() - moneyToTransfer;
+        long toAccountNewBalance = getAccountById(receiverAccountId).getBalance() + moneyToTransfer;
+        icesiAccountRepository.updateBalance(fromAccountNewBalance, senderAccountId);
+        icesiAccountRepository.updateBalance(toAccountNewBalance, receiverAccountId);
         return fromAccountNewBalance;
     }
 
-    private void checkConditionsToTransfer(String fromAccountId, String toAccountId, long moneyToTransfer){
-        IcesiAccount fromIcesiAccount = getAccountById(fromAccountId);
-        if(fromIcesiAccount.isMarkedAsDepositOnly()){
-            throw new RuntimeException("The account with id " + fromIcesiAccount + " is marked as deposit only so it can't transfers money");
+    private void checkConditionsToTransfer(String senderAccountId, String receiverAccountId, long moneyToTransfer){
+        IcesiAccount senderIcesiAccount = getAccountById(senderAccountId);
+        if(senderIcesiAccount.isMarkedAsDepositOnly()){
+            throw new RuntimeException("The account with id " + senderIcesiAccount.getAccountId() + " is marked as deposit only so it can't transfers money");
         }
-        if(fromIcesiAccount.isThereEnoughMoney(moneyToTransfer)){
-            throw new RuntimeException("Not enough money to transfer. At most you can transfer: " + fromIcesiAccount.getBalance());
+        if(!senderIcesiAccount.isThereEnoughMoney(moneyToTransfer)){
+            throw new RuntimeException("Not enough money to transfer. At most you can transfer: " + senderIcesiAccount.getBalance());
         }
-        if(getAccountById(toAccountId).isMarkedAsDepositOnly()){
-            throw new RuntimeException("The account with id " + fromIcesiAccount + " is marked as deposit only so no money can be transferred");
+        IcesiAccount receiverIcesiAccount = getAccountById(receiverAccountId);
+        if(getAccountById(receiverAccountId).isMarkedAsDepositOnly()){
+            throw new RuntimeException("The account with id " + receiverIcesiAccount.getAccountId() + " is marked as deposit only so no money can be transferred");
         }
     }
 }
