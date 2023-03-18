@@ -16,7 +16,7 @@ import java.util.UUID;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertThrows;
-import static org.mockito.Mockito.*;
+import static org.mockito.Mockito.when;
 
 public class UserServiceTest {
     @Mock
@@ -55,7 +55,7 @@ public class UserServiceTest {
     }
 
     @Test
-    void emailAlreadyExists() {
+    public void emailAlreadyExists() {
         // Test case 2: email already exists
         UUID userId = UUID.randomUUID();
         IcesiUserDTO userDTO = IcesiUserDTO.builder()
@@ -74,7 +74,7 @@ public class UserServiceTest {
     }
 
     @Test
-    void phoneNumberAlreadyExists() {
+    public void phoneNumberAlreadyExists() {
         // Test case 3: number phone already exist
         UUID userId = UUID.randomUUID();
         IcesiUserDTO userDTO = IcesiUserDTO.builder()

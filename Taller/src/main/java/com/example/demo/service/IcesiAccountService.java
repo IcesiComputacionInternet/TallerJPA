@@ -25,16 +25,15 @@ public class IcesiAccountService {
 
     private final IcesiAccountMapper accountMapper;
 
-    public final IcesiAccount createIcesiAccount(IcesiAccountDTO accountDTO){
-
+    public IcesiAccount createIcesiAccount(IcesiAccountDTO accountDTO) {
         // Account verifier
         String accountNumber = generateAccountNumber();
         if (accountRepository.findByAccountNumber(accountNumber) != null) {
             throw new DuplicateKeyException("Account number already exists");
         }
         //Balance verifier
-        if(accountDTO.getBalance() < 0){
-            throw new IllegalArgumentException("invalid funds");
+        if (accountDTO.getBalance() < 0) {
+            throw new IllegalArgumentException("invalid balance");
         }
         accountDTO.setAccountNumber(accountNumber);
         accountDTO.setAccountId(UUID.randomUUID());
@@ -59,7 +58,7 @@ public class IcesiAccountService {
         Optional<IcesiAccount> optionalAccount = accountRepository.findById(accountId);
         if (optionalAccount.isPresent()) {
             IcesiAccount account = optionalAccount.get();
-            if(account.getBalance() == 0 && !enabled) {
+            if (account.getBalance() == 0 && !enabled) {
                 account.setActive(false);
             } else {
                 account.setActive(true);

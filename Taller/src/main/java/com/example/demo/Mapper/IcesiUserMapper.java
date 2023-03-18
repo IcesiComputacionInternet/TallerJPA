@@ -10,6 +10,7 @@ public interface IcesiUserMapper {
 
     @Mapping(source = "icesiRole.roleId", target = "icesiRoleId")
     IcesiUserDTO fromIcesiUser(IcesiUser icesiUser);
+
     @Mapping(target = "icesiRole", ignore = true)
     IcesiUser fromIcesiUserDTO(IcesiUserDTO icesiUserDTO);
 }

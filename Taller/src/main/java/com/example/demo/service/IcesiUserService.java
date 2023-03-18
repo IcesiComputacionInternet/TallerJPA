@@ -18,11 +18,12 @@ public class IcesiUserService {
     @Autowired
     private final IcesiUserRepository userRepository;
     private final IcesiUserMapper userMapper;
-    public IcesiUser createUser(IcesiUserDTO user) throws DuplicateKeyException {
+
+    public IcesiUser createUser(IcesiUserDTO user) {
 
         //Role validation
 
-        if (user.getIcesiRoleId()== null) {
+        if (user.getIcesiRoleId() == null) {
             throw new IllegalArgumentException("user role can't be null");
         }
 

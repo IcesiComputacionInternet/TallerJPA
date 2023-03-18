@@ -11,17 +11,17 @@ import java.util.UUID;
 public class IcesiUserController {
     private final IcesiUserService userService;
 
-    public IcesiUserController(IcesiUserService userService){
+    public IcesiUserController(IcesiUserService userService) {
         this.userService = userService;
     }
 
     @PostMapping("/users")
-    public IcesiUser createIcesiUser(@RequestBody IcesiUserDTO user){
+    public IcesiUser createIcesiUser(@RequestBody IcesiUserDTO user) {
         return userService.createUser(user);
     }
 
     @GetMapping("/users/{id}")
-    public IcesiUser getUserById(@PathVariable String id){
+    public IcesiUser getUserById(@PathVariable String id) {
         return userService.findById(UUID.fromString(id)).orElseThrow();
     }
 }

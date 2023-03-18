@@ -10,7 +10,8 @@ import java.util.UUID;
 
 @Builder
 @Entity
-@Getter @Setter
+@Getter
+@Setter
 public class IcesiUser {
 
     @Id
