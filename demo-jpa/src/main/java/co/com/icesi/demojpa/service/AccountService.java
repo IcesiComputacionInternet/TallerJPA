@@ -91,6 +91,41 @@ public class AccountService {
         accountRepository.save(targetAccountOptional.get());
     }
 
+    public void withdraw(String accountNumber, long amount){
+        Optional<IcesiAccount> accountOptional = accountRepository.findByNumber(accountNumber);
+
+        if (accountOptional.isEmpty()) {
+            throw new RuntimeException("Account does not exist");
+        } else if (!accountOptional.get().isActive()) {
+            throw new RuntimeException("Account is disabled");
+        } else if (amount < 0) {
+            throw new RuntimeException("Amount must be greater than 0");
+        } else if (accountOptional.get().getBalance() < amount) {
+            throw new RuntimeException("Account must have balance greater than the amount to withdraw");
+        } else {
+            IcesiAccount account = accountOptional.get();
+            account.setBalance(account.getBalance() - amount);
+            accountRepository.save(account);
+        }
+
+    }
+
+    public void deposit(String accountNumber, long amount){
+        Optional<IcesiAccount> accountOptional = accountRepository.findByNumber(accountNumber);
+
+        if (accountOptional.isEmpty()) {
+            throw new RuntimeException("Account does not exist");
+        } else if (!accountOptional.get().isActive()) {
+            throw new RuntimeException("Account is disabled");
+        } else if (amount < 0) {
+            throw new RuntimeException("Amount must be greater than 0");
+        } else {
+            IcesiAccount account = accountOptional.get();
+            account.setBalance(account.getBalance() + amount);
+            accountRepository.save(account);
+        }
+    }
+
     public String generateAccountNumber() {
         Random rand = new Random();
         String accountNumber = IntStream.generate(() -> rand.nextInt(10))
