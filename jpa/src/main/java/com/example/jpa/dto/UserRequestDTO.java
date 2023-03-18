@@ -17,5 +17,5 @@ public class UserRequestDTO {
 
     private String phoneNumber;
 
-    private String role;
+    private RoleDTO role;
 }

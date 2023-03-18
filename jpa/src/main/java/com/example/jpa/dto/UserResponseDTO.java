@@ -17,5 +17,5 @@ public class UserResponseDTO {
 
     private String phoneNumber;
 
-    private RoleDTO roleDTO;
+    private RoleDTO role;
 }

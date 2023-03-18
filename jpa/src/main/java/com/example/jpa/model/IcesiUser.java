@@ -32,6 +32,6 @@ public class IcesiUser {
 
     @ManyToOne(optional = false) //The user role can't be null.
     @JoinColumn(name = "icesi_role_role_id")
-    private IcesiRole icesiRole;
+    private IcesiRole role;
 
 }

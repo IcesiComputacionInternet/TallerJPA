@@ -11,5 +11,5 @@ public class AccountRequestDTO {
 
     private String type;
 
-    private String icesiUser;
+    private String user;
 }
