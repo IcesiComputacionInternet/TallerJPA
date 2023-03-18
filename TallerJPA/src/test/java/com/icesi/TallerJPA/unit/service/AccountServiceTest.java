@@ -334,4 +334,50 @@ public class AccountServiceTest {
             assertEquals("Deposit Origin Account or inactive", message);
         }
     }
+
+    @Test
+    public void testTransferWithErrorinWithdrawal(){
+        IcesiAccount icesiAccountOrigin = defaultAccount();
+        icesiAccountOrigin.setType(IcesiAccountType.valueOf("DEFAULT"));
+        IcesiAccount icesiAccountDestination = defaultAccount();
+        icesiAccountDestination.setAccountNumber("123-123456-12");
+        icesiAccountDestination.setType(IcesiAccountType.valueOf("DEFAULT"));
+
+        try {
+            when(accountRepository.getTypeofAccount(icesiAccountOrigin.getAccountNumber())).thenReturn(Optional.of(icesiAccountOrigin));
+            when(accountRepository.getTypeofAccount(icesiAccountDestination.getAccountNumber())).thenReturn(Optional.of(icesiAccountDestination));
+            doThrow(DataIntegrityViolationException.class).when(accountRepository).withdrawalAccount(icesiAccountOrigin.getAccountNumber(), 100L);
+            accountService.transfer(icesiAccountOrigin.getAccountNumber(), icesiAccountDestination.getAccountNumber(), 100L);
+            verify(accountRepository, times(1)).getTypeofAccount(icesiAccountOrigin.getAccountNumber());
+            verify(accountRepository, times(1)).getTypeofAccount(icesiAccountDestination.getAccountNumber());
+            verify(accountRepository, times(1)).withdrawalAccount(icesiAccountOrigin.getAccountNumber(), 100L);
+            fail();
+        } catch (DataIntegrityViolationException e){
+            String message = e.getMessage();
+            assertEquals("You don't have the amount necessary", message);
+        }
+    }
+
+    @Test
+    public void testTransferWithErrorInDeposit(){
+        IcesiAccount icesiAccountOrigin = defaultAccount();
+        icesiAccountOrigin.setType(IcesiAccountType.valueOf("DEFAULT"));
+        IcesiAccount icesiAccountDestination = defaultAccount();
+        icesiAccountDestination.setAccountNumber("123-123456-12");
+        icesiAccountDestination.setType(IcesiAccountType.valueOf("DEFAULT"));
+
+        try {
+            when(accountRepository.getTypeofAccount(icesiAccountOrigin.getAccountNumber())).thenReturn(Optional.of(icesiAccountOrigin));
+            when(accountRepository.getTypeofAccount(icesiAccountDestination.getAccountNumber())).thenReturn(Optional.of(icesiAccountDestination));
+            doNothing().when(accountRepository).depositAccount(icesiAccountOrigin.getAccountNumber(), -100L);
+            accountService.transfer(icesiAccountOrigin.getAccountNumber(), icesiAccountDestination.getAccountNumber(), -100L);
+            verify(accountRepository, times(1)).getTypeofAccount(icesiAccountOrigin.getAccountNumber());
+            verify(accountRepository, times(1)).getTypeofAccount(icesiAccountDestination.getAccountNumber());
+            verify(accountRepository, times(1)).depositAccount(icesiAccountDestination.getAccountNumber(), 100L);
+            fail();
+        } catch (RuntimeException e){
+            String message = e.getMessage();
+            assertEquals("Don't deposit a negative amount", message);
+        }
+    }
 }
