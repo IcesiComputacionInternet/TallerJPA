@@ -33,4 +33,7 @@ public interface AccountRepository extends JpaRepository<IcesiAccount, UUID> {
     @Query("UPDATE IcesiAccount a SET a.balance = a.balance + :deposit WHERE a.accountNumber = :accountNumber")
     void depositAccount(@Param("accountNumber") String accountNumber, @Param("deposit") Long deposit);
 
+    @Query("SELECT a FROM IcesiAccount a WHERE a.accountNumber = :accountNumber AND a.type <> 0 AND a.active = true")
+    Optional<IcesiAccount> getTypeofAccount(@Param("accountNumber") String accountNumber);
+
 }

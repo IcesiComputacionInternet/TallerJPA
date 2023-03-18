@@ -35,4 +35,9 @@ public class IcesiAccountController {
     public String depositAccount(@PathVariable String accountNumber, @RequestBody Long value){
         return accountService.deposit(accountNumber, value);
     }
+
+    @PatchMapping("/account/transfer/{accountNumberOrigin}/{accountNumberDestination}")
+    public String transferAccount(@PathVariable String accountNumberOrigin, @PathVariable String accountNumberDestination, @RequestBody Long value){
+        return accountService.transfer(accountNumberOrigin, accountNumberDestination, value);
+    }
 }

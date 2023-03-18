@@ -105,5 +105,18 @@ public class AccountService {
         }
     }
 
+    @Transactional
+    public String transfer(String accountNumberOrigin, String accountNumberDestination, Long value){
+
+        accountRepository.getTypeofAccount(
+                accountNumberOrigin).orElseThrow(()-> new RuntimeException("Deposit Origin Account or inactive"));
+        accountRepository.getTypeofAccount(
+                accountNumberDestination).orElseThrow(()->new RuntimeException("Deposit Destination Account or inactive"));
+
+        withdrawal(accountNumberOrigin, value);
+        deposit(accountNumberDestination, value);
+
+        return "The transaction was successful";
+    }
 
 }
