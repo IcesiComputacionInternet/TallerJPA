@@ -37,7 +37,7 @@ public class AccountService {
         IcesiAccount icesiAccount = accountMapper.fromIcesiAccountDTO(account);
         account.setAccountId(UUID.randomUUID());
         account.setAccountNumber(generateAccountNumber());
-        userOptional.get().getAccounts().add(icesiAccount);
+        //userOptional.get().getAccounts().add(icesiAccount);
         return accountRepository.save(icesiAccount);
     }
 
@@ -133,9 +133,9 @@ public class AccountService {
                 .mapToObj(Integer::toString)
                 .collect(Collectors.joining(""));
         accountNumber.replaceFirst("(\\d{3})(\\d{6})(\\d{2})", "$1-$2-$3");
-        if(accountRepository.findByNumber(accountNumber).isPresent()){
+        /*if(accountRepository.findByNumber(accountNumber).isPresent()){
             generateAccountNumber();
-        }
+        }*/
         return accountNumber;
     }
 

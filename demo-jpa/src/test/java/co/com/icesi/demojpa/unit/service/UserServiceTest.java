@@ -117,6 +117,7 @@ public class UserServiceTest {
         }
     }
 
+
     private IcesiUser defaultCreateUser(){
         return IcesiUser.builder()
                 .userId(UUID.randomUUID())
