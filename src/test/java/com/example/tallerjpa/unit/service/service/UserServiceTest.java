@@ -92,16 +92,6 @@ public class UserServiceTest {
         }
     }
 
-    private UserDTO defaultUserDTO(){
-        return UserDTO.builder()
-                .firstName("Juan")
-                .lastName("Osorio")
-                .email("juanosorio@hotmail.com")
-                .phoneNumber("12345678")
-                .password("password")
-                .role("Student")
-                .build();
-    }
 
     private IcesiUser defaultUser(){
         return IcesiUser.builder()
@@ -114,6 +104,16 @@ public class UserServiceTest {
                 .build();
     }
 
+    private UserDTO defaultUserDTO(){
+        return UserDTO.builder()
+                .firstName("Juan")
+                .lastName("Osorio")
+                .email("juanosorio@hotmail.com")
+                .phoneNumber("12345678")
+                .password("password")
+                .role("Student")
+                .build();
+    }
 
     private IcesiRole defaultRole(){
         return IcesiRole.builder()
