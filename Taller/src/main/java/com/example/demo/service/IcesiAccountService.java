@@ -69,4 +69,60 @@ public class IcesiAccountService {
             throw new ChangeSetPersister.NotFoundException();
         }
     }
+
+    public final void transferMoney(UUID issuerAccount, UUID recipientAccount, Long amount) {
+        IcesiAccount account1 = accountRepository.findById(issuerAccount).orElseThrow(
+                () -> new IllegalArgumentException("Invalid issuer account Id:" + issuerAccount));
+        IcesiAccount account2 = accountRepository.findById(issuerAccount).orElseThrow(
+                () -> new IllegalArgumentException("Invalid recipient account Id:" + recipientAccount));
+
+        if (!account1.isActive() && !account2.isActive()) {
+            throw new IllegalArgumentException("Account is not active.");
+        }
+        if (account1.getType().equals("Deposit") || account2.getType().equals("Deposit")) {
+            throw new IllegalArgumentException("One account is deposit only.");
+        }
+
+        if (account1.getBalance() < amount) {
+            throw new IllegalArgumentException("Account balance is insufficient.");
+        }
+
+        account1.setBalance(account1.getBalance() - amount);
+        account2.setBalance(account2.getBalance() + amount);
+        accountRepository.save(account1);
+        accountRepository.save(account2);
+    }
+
+    public final void withdrawMoney(UUID accountId, Long amount) {
+        IcesiAccount account = accountRepository.findById(accountId).orElseThrow(
+                () -> new IllegalArgumentException("Invalid account Id:" + accountId));
+
+        if (!account.isActive()) {
+            throw new IllegalArgumentException("Account is not active.");
+        }
+
+        if (amount <= 0) {
+            throw new IllegalArgumentException("Amount to withdraw must be greater than zero.");
+        }
+
+        if (account.getBalance() < amount) {
+            throw new IllegalArgumentException("Account balance is insufficient.");
+        }
+
+        account.setBalance(account.getBalance() - amount);
+        accountRepository.save(account);
+    }
+
+    public final void depositMoney(UUID accountId, Long amount) {
+        IcesiAccount account = accountRepository.findById(accountId).orElseThrow(
+                () -> new IllegalArgumentException("Invalid account Id:" + accountId));
+        if (!account.isActive()) {
+            throw new IllegalArgumentException("Account is not active.");
+        }
+        if (amount <= 0) {
+            throw new IllegalArgumentException("Amount to deposit must be greater than zero.");
+        }
+        account.setBalance(account.getBalance() + amount);
+        accountRepository.save(account);
+    }
 }
