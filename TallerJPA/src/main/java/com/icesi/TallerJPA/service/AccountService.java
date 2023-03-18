@@ -10,6 +10,7 @@ import com.icesi.TallerJPA.repository.AccountRepository;
 import com.icesi.TallerJPA.repository.UserRespository;
 import lombok.AllArgsConstructor;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.util.Random;
 import java.util.UUID;
@@ -66,4 +67,22 @@ public class AccountService {
             throw new IllegalArgumentException("Account type does not exist");
         }
     }
+
+    @Transactional
+    public String activeAccount(String accountNumber){
+        accountRepository.activeAccount(accountNumber);
+        return "The account " + accountNumber + " was active";
+    }
+
+    @Transactional
+    public String disableAccount(String accountNumber){
+        accountRepository.inactiveAccount(accountNumber);
+        if(!accountRepository.IcesiAccountByActive(accountNumber)){
+            return "The account " + accountNumber + " was inactive";
+        } else {
+            throw new RuntimeException("This account can not be disable");
+        }
+    }
+
+
 }
