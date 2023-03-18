@@ -128,6 +128,16 @@ public class IcesiAccountServiceTest {
     }
 
     @Test
+    public void depositWhenAccountIsDeactivatedTest() {
+        when(icesiAccountRepository.findByAccountNumber(any())).thenReturn(Optional.ofNullable(createDefaultIcesiAccountDeactivated()));
+        when(icesiAccountRepository.save(any())).thenReturn(createDefaultIcesiAccountDeactivated());
+
+        IcesiAccount icesiAccount = icesiAccountRepository.findByAccountNumber("c0860f9e-c425-11ed-afa1-0242ac120002").get();
+
+        String testValue = icesiAccountService.deposit(icesiAccount.getAccountNumber(), 100L);
+        assertEquals(testValue, "Deposit not successful");
+    }
+    @Test
     public void transferTest() {
         when(icesiAccountRepository.findByAccountNumber(any())).thenReturn(Optional.ofNullable(createDefaultIcesiAccount()));
         when(icesiAccountRepository.findByAccountNumber("c0860f9e-c425-11ed-afa1-0242ac120002")).thenReturn(Optional.ofNullable(createDefaultIcesiAccount()));
@@ -181,6 +191,7 @@ public class IcesiAccountServiceTest {
     }
     private IcesiAccount createDefaultIcesiAccountDeactivated() {
         return IcesiAccount.builder()
+                .accountId(UUID.fromString("c0860f9e-c425-11ed-afa1-0242ac120002"))
                 .balance(0L)
                 .type("Ahorros")
                 .active(false)

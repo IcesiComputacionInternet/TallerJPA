@@ -102,7 +102,7 @@ public class IcesiAccountService {
 
     public String deposit(String accountNumber, Long amount) {
         Optional<IcesiAccount> icesiAccount = icesiAccountRepository.findByAccountNumber(accountNumber);
-        if (icesiAccount.isPresent()) {
+        if (icesiAccount.isPresent() && icesiAccount.get().isActive()) {
             icesiAccount.get().setBalance(icesiAccount.get().getBalance() + amount);
             icesiAccountRepository.save(icesiAccount.get());
             return "Deposit successful";
