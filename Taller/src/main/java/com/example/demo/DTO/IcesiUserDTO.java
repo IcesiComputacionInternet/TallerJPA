@@ -12,7 +12,7 @@ import java.util.UUID;
 @AllArgsConstructor
 public class IcesiUserDTO {
 
-    private String userId;
+    private UUID userId;
     private String firstName;
     private String lastName;
     private String email;

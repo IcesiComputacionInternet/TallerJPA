@@ -27,7 +27,7 @@ public class IcesiUserService {
         }
 
         //Generation of UUID
-        user.setUserId(UUID.randomUUID().toString());
+        user.setUserId(UUID.randomUUID());
 
         IcesiUser existingUser = userRepository.findByEmail(user.getEmail());
         IcesiUser existingUserByPhone = userRepository.findByPhoneNumber(user.getPhoneNumber());

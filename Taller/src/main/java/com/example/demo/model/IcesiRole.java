@@ -20,7 +20,6 @@ public class IcesiRole {
     private String description;
     @Column(unique = true)
     private String name;
-
     @OneToMany(mappedBy = "icesiRole")
     private List<IcesiUser> users;
 }
