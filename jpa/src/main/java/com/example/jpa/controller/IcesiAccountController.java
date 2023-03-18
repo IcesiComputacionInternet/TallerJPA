@@ -36,17 +36,17 @@ public class IcesiAccountController {
     }
 
     @PatchMapping("/deposit")
-    public String deposit(@RequestBody String accountNumber, @RequestBody Long amount) {
-        return accountService.deposit(accountNumber, amount) ? "Deposit successful" : "Account not found";
+    public String deposit(@RequestBody String accountNumber, @RequestBody String amount) {
+        return accountService.deposit(accountNumber, Long.parseLong(amount)) ? "Deposit successful" : "Account not found";
     }
 
     @PatchMapping("/withdraw")
-    public String withdraw(@RequestBody String accountNumber, @RequestBody Long amount) {
-        return accountService.withdraw(accountNumber, amount) ? "Withdraw successful" : "Account not found";
+    public String withdraw(@RequestBody String accountNumber, @RequestBody String amount) {
+        return accountService.withdraw(accountNumber, Long.parseLong(amount)) ? "Withdraw successful" : "Account not found";
     }
 
     @PatchMapping("/transfer")
-    public String transfer(@RequestBody String accountNumberFrom, @RequestBody String accountNumberTo, @RequestBody Long amount) {
-        return accountService.transfer(accountNumberFrom, accountNumberTo, amount) ? "Transfer successful" : "Account not found";
+    public String transfer(@RequestBody String accountNumberFrom, @RequestBody String accountNumberTo, @RequestBody String amount) {
+        return accountService.transfer(accountNumberFrom, accountNumberTo, Long.parseLong(amount)) ? "Transfer successful" : "Account not found";
     }
 }
