@@ -78,7 +78,10 @@ public class AccountService {
         Optional<IcesiAccount> accountOptional = icesiAccountRepository.findByAccountNumber(accountNumber);
         if(accountOptional.isPresent()){
             IcesiAccount account = accountOptional.get();
-            if(account.getBalance()<amount){
+            if(!account.isActive()){
+                throw  new RuntimeException("Account is not active")
+            }
+            else if(account.getBalance()<amount){
                 throw new RuntimeException("Account doesn't have enough balance");
             }else if(!account.isActive()){
                 throw new RuntimeException("Account is not active");

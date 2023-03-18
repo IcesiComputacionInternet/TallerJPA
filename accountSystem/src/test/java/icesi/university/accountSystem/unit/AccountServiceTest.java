@@ -57,6 +57,65 @@ public class AccountServiceTest {
         accountRepository.save(account);
         verify(accountRepository, times(1)).save(argThat(new AccountMatcher(account)));
     }
+    @Test
+    public void withdrawal() {
+        when(accountRepository.findByAccountNumber(any())).thenReturn(Optional.ofNullable(createDefaultAccount()));
+        when(accountRepository.save(any())).thenReturn(createDefaultAccount());
+
+        IcesiAccount icesiAccount = accountRepository.findByAccountNumber(createDefaultAccount().getAccountNumber()).get();
+        accountService.withdrawal(icesiAccount.getAccountNumber(), 100L);
+
+        verify(accountRepository, atLeast(1)).findByAccountNumber(any());
+        verify(accountRepository, atLeast(1)).save(any());
+        assertEquals(icesiAccount.getBalance(), 900L);
+    }
+    @Test
+    public void deposit() {
+        when(accountRepository.findByAccountNumber(any())).thenReturn(Optional.ofNullable(createDefaultAccount()));
+        when(accountRepository.save(any())).thenReturn(createDefaultAccount());
+        IcesiAccount icesiAccount = accountRepository.findByAccountNumber(createDefaultAccount().getAccountNumber()).get();
+        accountService.deposit(icesiAccount.getAccountNumber(), 5000L);
+
+        verify(accountRepository, times(2)).findByAccountNumber(any());
+        verify(accountRepository, times(1)).save(any());
+        assertEquals(icesiAccount.getBalance(), 6000L);
+    }
+
+    @Test
+    public void transfer() {
+        when(accountRepository.findByAccountNumber(createDefaultAccount().getAccountNumber())).thenReturn(Optional.ofNullable(createDefaultAccount()));
+        when(accountRepository.findByAccountNumber(createAnotherAccount().getAccountNumber())).thenReturn(Optional.ofNullable(createAnotherAccount()));
+        when(accountRepository.save(any())).thenReturn(createDepositAccount());
+
+        IcesiAccount icesiAccount = accountRepository.findByAccountNumber(createDefaultAccount().getAccountNumber()).get();
+        IcesiAccount icesiAccount2 = accountRepository.findByAccountNumber(createAnotherAccount().getAccountNumber()).get();
+        accountService.transfer(icesiAccount.getAccountNumber(),icesiAccount2.getAccountNumber() ,100L);
+
+        verify(accountRepository, times(2)).save(any());
+
+        assertEquals(100L,icesiAccount2.getBalance());
+    }
+
+    @Test
+    public void deactivateAccountWithBalanceDifferent0() {
+        when(accountRepository.findByAccountNumber(any())).thenReturn(Optional.ofNullable(createDefaultAccount()));
+        when(accountRepository.save(any())).thenReturn(createDefaultAccount());
+
+        IcesiAccount icesiAccount = createDefaultAccount();
+        assertThrows(RuntimeException.class,()->accountService.deactivateAccount(icesiAccount.getAccountNumber()));
+        verify(accountRepository, times(2)).findByAccountNumber(any());
+    }
+
+    @Test
+    public void activateAccountAlreadyActivate() {
+        when(accountRepository.findByAccountNumber(any())).thenReturn(Optional.ofNullable(createDefaultAccount()));
+        when(accountRepository.save(any())).thenReturn(createDefaultAccount());
+
+        IcesiAccount icesiAccount = createDefaultAccount();
+
+        assertThrows(RuntimeException.class,()->accountService.activateAccount(icesiAccount.getAccountNumber()));
+        verify(accountRepository, times(2)).findByAccountNumber(any());
+    }
 
     @Test
     public void saveWithbelow0(){
@@ -111,7 +170,7 @@ public class AccountServiceTest {
                 .active(true)
                 .user(createDefaultUser())
                 .type("NORMAL")
-                .balance(0)
+                .balance(1000L)
                 .accountNumber("123-456789-10")
                 .build();
     }
@@ -121,8 +180,18 @@ public class AccountServiceTest {
                 .active(true)
                 .user(createDefaultUser())
                 .type("NORMAL")
-                .balance(0)
+                .balance(1000L)
                 .accountNumber("123-456789-10")
+                .build();
+    }
+
+    private IcesiAccount createAnotherAccount() {
+        return IcesiAccount.builder()
+                .active(true)
+                .user(createDefaultUser())
+                .type("NORMAL")
+                .balance(0L)
+                .accountNumber("123-456789-11")
                 .build();
     }
 
@@ -131,7 +200,7 @@ public class AccountServiceTest {
                 .active(true)
                 .user(createDefaultUser())
                 .type("DEPOSIT")
-                .balance(10000)
+                .balance(10000L)
                 .accountNumber("123-456789-10")
                 .build();
     }
@@ -141,7 +210,7 @@ public class AccountServiceTest {
                 .active(true)
                 .user(createDefaultUser())
                 .type("NORMAL")
-                .balance(10000)
+                .balance(10000L)
                 .accountNumber("123-456789-10")
                 .build();
     }
