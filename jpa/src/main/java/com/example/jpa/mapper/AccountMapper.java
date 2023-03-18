@@ -10,7 +10,7 @@ import org.mapstruct.Mapping;
 @Mapper(componentModel = "spring")
 public interface AccountMapper {
 
-    @Mapping(target = "user", source = "user", ignore = true)
+    //@Mapping(target = "user", source = "user", ignore = true)
     IcesiAccount fromAccountDTO(AccountRequestDTO createdAccountDTO);
 
     AccountResponseDTO fromAccountToSendAccountDTO(IcesiAccount account);

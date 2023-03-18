@@ -6,6 +6,7 @@ import org.springframework.data.jpa.repository.Modifying;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.stereotype.Repository;
 
+import java.util.List;
 import java.util.Optional;
 import java.util.UUID;
 
@@ -17,6 +18,9 @@ public interface AccountRepository extends JpaRepository<IcesiAccount, UUID> {
 
     @Query("SELECT a FROM IcesiAccount a WHERE a.accountNumber = :accountNumber")
     Optional<IcesiAccount> getByAccountNumber(String accountNumber);
+
+    @Query(value = "SELECT a FROM IcesiAccount  a where a.active = true")
+    List<IcesiAccount> getAllAccounts();
 
     @Modifying
     @Query("UPDATE IcesiAccount a SET a.balance = :balance WHERE a.accountNumber = :accountNumber")
