@@ -75,25 +75,79 @@ public class AccountService {
         return String.format("%s-%s-%s", str.substring(0,3),str.substring(3,9),str.substring(9,11));
     }
 
+    public void validateAccountNumber(String accountNumber){
+        if(!accountRepository.findByAccountNumber(accountNumber).isPresent()){
+            throw new RuntimeException("Account "+accountNumber+" does not exists");
+        }
+    }
 
-
-    public void withdrawalMoney(IcesiAccount icesiAccount, long money){
-        if(money>=0 ){
-            icesiAccount.setBalance(icesiAccount.getBalance()-money);
-        }else {
+    public void validateMoney(long money){
+        if(money<0 ){
             throw new RuntimeException("The amount of money can't be a negative value");
+
+        }
+    }
+    public void validateAccountEnable(IcesiAccount icesiAccount){
+        if(!icesiAccount.isActive()){
+            throw new RuntimeException("Transaction can't be made, account "+icesiAccount.getAccountNumber() +" is disabled");
+        }
+    }
+    public void withdrawalMoney(String accountNumber, long money){
+        validateAccountNumber(accountNumber);
+        validateMoney(money);
+
+        IcesiAccount icesiAccount=accountRepository.findByAccountNumber(accountNumber).get();
+        validateAccountEnable(icesiAccount);
+
+        if(icesiAccount.getBalance()<money){
+            throw new RuntimeException("Not enough money to withdrawal in the account");
+        }
+        icesiAccount.setBalance(icesiAccount.getBalance()-money);
+
+
+    }
+
+    public void depositMoney(String accountNumber, long money){
+        validateAccountNumber(accountNumber);
+        validateMoney(money);
+        IcesiAccount icesiAccount=accountRepository.findByAccountNumber(accountNumber).get();
+        validateAccountEnable(icesiAccount);
+
+        icesiAccount.setBalance(icesiAccount.getBalance()+money);
+
+    }
+    public void validateTypeToTransfer(IcesiAccount icesiAccount){
+        if(icesiAccount.getType().equals("deposit only")){
+            throw new RuntimeException("Deposit only accounts can't transfer or be transferred money");
+        }
+    }
+    public void transferMoney(String accountNumberFrom,String accountNumberTo, long money){
+        validateAccountNumber(accountNumberFrom);
+        validateAccountNumber(accountNumberTo);
+        validateMoney(money);
+        IcesiAccount icesiAccountFrom=accountRepository.findByAccountNumber(accountNumberFrom).get();
+        IcesiAccount icesiAccountTo=accountRepository.findByAccountNumber(accountNumberTo).get();
+        validateTypeToTransfer(icesiAccountFrom);
+        validateTypeToTransfer(icesiAccountTo);
+        validateAccountEnable(icesiAccountFrom);
+        validateAccountEnable(icesiAccountTo);
+
+        if(icesiAccountFrom.getBalance()<money){
+            throw new RuntimeException("Not enough money to transfer in the account "+icesiAccountFrom.getAccountNumber());
         }
 
+        icesiAccountFrom.setBalance(icesiAccountFrom.getBalance()-money);
+        icesiAccountTo.setBalance(icesiAccountTo.getBalance()+money);
     }
 
-    public void depositMoney(){
+    public void changeState(String accountNumber, boolean active){ //enable/disable
+        validateAccountNumber(accountNumber);
+        IcesiAccount icesiAccount=accountRepository.findByAccountNumber(accountNumber).get();
+        if(!active && icesiAccount.getBalance()>0){
+            throw new RuntimeException("Balance is not 0. Account can't be disabled");
+        }
 
-    }
-    public void transferMoney(){
-
-    }
-
-    public void changeState(){
+        icesiAccount.setActive(active);
 
     }
 
