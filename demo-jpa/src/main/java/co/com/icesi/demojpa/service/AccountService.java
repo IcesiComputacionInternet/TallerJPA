@@ -2,7 +2,6 @@ package co.com.icesi.demojpa.service;
 
 import co.com.icesi.demojpa.dto.AccountCreateDTO;
 import co.com.icesi.demojpa.mapper.AccountMapper;
-import co.com.icesi.demojpa.mapper.UserMapper;
 import co.com.icesi.demojpa.model.IcesiAccount;
 import co.com.icesi.demojpa.model.IcesiUser;
 import co.com.icesi.demojpa.repository.AccountRepository;
@@ -63,6 +62,33 @@ public class AccountService {
             accountOptional.get().setActive(true);
             accountRepository.save(accountOptional.get());
         }
+    }
+
+    public void transferMoney(String sourceAccountNumber, String targetAccountNumber, long amount){
+        Optional<IcesiAccount> sourceAccountOptional = accountRepository.findByNumber(sourceAccountNumber);
+        Optional<IcesiAccount> targetAccountOptional = accountRepository.findByNumber(targetAccountNumber);
+
+        if(sourceAccountOptional.isEmpty() || targetAccountOptional.isEmpty()){
+            throw new RuntimeException("One or both accounts do not exist");
+        }
+        if(sourceAccountOptional.get().getBalance()<=0){
+            throw new RuntimeException("Source account must have balance greater than 0");
+        }
+        if(!sourceAccountOptional.get().isActive() || !targetAccountOptional.get().isActive()){
+            throw new RuntimeException("One or both accounts are disabled");
+        }
+        if(sourceAccountOptional.get().getType().equals("Deposit") || targetAccountOptional.get().getType().equals("Deposit")){
+            throw new RuntimeException("One or both accounts are deposit accounts, " +
+                    "you can't transfer money to this type of accounts");
+        }
+        if(sourceAccountOptional.get().getBalance()<amount){
+            throw new RuntimeException("Source account must have balance greater than the amount to transfer");
+        }
+
+        sourceAccountOptional.get().setBalance(sourceAccountOptional.get().getBalance()-amount);
+        targetAccountOptional.get().setBalance(targetAccountOptional.get().getBalance()+amount);
+        accountRepository.save(sourceAccountOptional.get());
+        accountRepository.save(targetAccountOptional.get());
     }
 
     public String generateAccountNumber() {
