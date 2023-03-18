@@ -221,31 +221,57 @@ public class AccountServiceTest {
         assertEquals(msg, "The withdrawal was successful");
     }
 
-    /*
+
     @Test
     public void testWithdrawAccountWithBalanceLessThanAmount(){
         IcesiAccount icesiAccount = defaultAccount();
-
-        try{
-            accountService.withdrawal(icesiAccount.getAccountNumber(), 10000000L);
-            fail();
-        } catch (DataIntegrityViolationException e) {
+        try {
+            doThrow(DataIntegrityViolationException.class)
+                    .when(accountRepository).withdrawalAccount(icesiAccount.getAccountNumber(), 100000000L);
+            accountService.withdrawal(icesiAccount.getAccountNumber(), 100000000L);
+            verify(accountRepository, times(1)).withdrawalAccount(icesiAccount.getAccountNumber(), 100000000L);
+        } catch (DataIntegrityViolationException e){
             String message = e.getMessage();
-            assertEquals("The withdrawal was not successful", message);
+            assertEquals("You don't have the amount necessary", message);
         }
     }
 
 
 
-     */
+
     @Test
     public void testDeposit(){
         IcesiAccount icesiAccount = defaultAccount();
-
         String msg = accountService.deposit(icesiAccount.getAccountNumber(), 100L);
         verify(accountRepository, times(1)).depositAccount(icesiAccount.getAccountNumber(), 100L);
-
         assertEquals(msg, "Deposit was successful");
     }
+
+    @Test
+    public void testDepositWithAmountNegative(){
+        IcesiAccount icesiAccount = defaultAccount();
+        try {
+            accountService.deposit(icesiAccount.getAccountNumber(), -100L);
+            verify(accountRepository, times(1)).depositAccount(icesiAccount.getAccountNumber(), -100L);
+        } catch (RuntimeException e){
+            String message = e.getMessage();
+            assertEquals("Don't deposit a negative amount", message);
+        }
+    }
+
+    /*
+    @Test
+    public void testTransfer(){
+        IcesiAccount icesiAccount = defaultAccount();
+        IcesiAccount icesiAccount2 = defaultAccount();
+
+        icesiAccount2.setAccountNumber("123-123456-12");
+        icesiAccount.setBalance(1000L);
+        String msg = accountService.transfer(icesiAccount.getAccountNumber(), icesiAccount2.getAccountNumber(), 100L);
+        verify(accountRepository, times(1)).transferAccount(icesiAccount.getAccountNumber(), icesiAccount2.getAccountNumber(), 100L);
+        assertEquals(msg, "Transfer was successful");
+    }
+
+     */
 
 }
