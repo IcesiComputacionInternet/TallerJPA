@@ -1,5 +1,6 @@
 package com.example.demo.model;
 
+import lombok.Builder;
 import lombok.Getter;
 import lombok.Setter;
 
@@ -9,6 +10,7 @@ import javax.persistence.Id;
 import javax.persistence.ManyToOne;
 import java.util.UUID;
 
+@Builder
 @Entity
 @Getter @Setter
 public class IcesiAccount {
