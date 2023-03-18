@@ -1,6 +1,7 @@
 package com.example.tallerjpa.dto;
 
 
+import com.example.tallerjpa.model.IcesiUser;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
@@ -17,4 +18,5 @@ public class AccountDTO {
     private String type;
     private boolean active;
     private String emailUser;
+
 }
