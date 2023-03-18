@@ -34,7 +34,6 @@ public class AccountServiceTest {
         accountRepository = mock(AccountRepository.class);
         accountMapper = spy(AccountMapperImpl.class);
         userRepository = mock(UserRepository.class);
-
         accountService = new AccountService(accountRepository, accountMapper, userRepository);
     }
 
@@ -126,6 +125,22 @@ public class AccountServiceTest {
     }
 
     @Test
+    public void testWithdrawAccountIsNotActive() {
+        Account account = defaultAccount();
+        account.setActive(false);
+        when(accountRepository.findByAccountNumber(any())).thenReturn(java.util.Optional.of(account));
+
+        try {
+            accountService.withdraw(5L,"12345");
+        } catch (RuntimeException e) {
+            assertEquals("The account 12345 is not active", e.getMessage());
+        }
+
+        assertEquals(100L, account.getBalance());
+        verify(accountRepository, times(1)).findByAccountNumber(any());
+    }
+
+    @Test
     public void testDeposit() {
         Account account = defaultAccount();
         when(accountRepository.findByAccountNumber(any())).thenReturn(java.util.Optional.of(account));
@@ -151,11 +166,28 @@ public class AccountServiceTest {
     }
 
     @Test
+    public void testDepositAccountIsNotActive() {
+        Account account = defaultAccount();
+        account.setActive(false);
+        when(accountRepository.findByAccountNumber(any())).thenReturn(java.util.Optional.of(account));
+
+        try {
+            accountService.deposit(5L,"12345");
+        } catch (RuntimeException e) {
+            assertEquals("The account 12345 is not active", e.getMessage());
+        }
+
+        assertEquals(100L, account.getBalance());
+        verify(accountRepository, times(1)).findByAccountNumber(any());
+    }
+
+    @Test
     public void testTransfer() {
         Account account = defaultAccount();
         account.setType(TypeAccount.ACCOUNT_NORMAL);
         Account account2 = Account.builder()
                 .balance(100L)
+                .active(true)
                 .type(TypeAccount.ACCOUNT_NORMAL)
                 .accountNumber("54321")
                 .build();
@@ -172,11 +204,37 @@ public class AccountServiceTest {
     }
 
     @Test
+    public void testTransferAccountIsNotActive() {
+        Account account = defaultAccount();
+        account.setType(TypeAccount.ACCOUNT_NORMAL);
+        Account account2 = Account.builder()
+                .balance(100L)
+                .active(false)
+                .type(TypeAccount.ACCOUNT_NORMAL)
+                .accountNumber("54321")
+                .build();
+
+        when(accountRepository.findByAccountNumber("12345")).thenReturn(java.util.Optional.of(account));
+        when(accountRepository.findByAccountNumber("54321")).thenReturn(java.util.Optional.of(account2));
+
+        try {
+            accountService.transfer(5L,"12345", "54321");
+        } catch (RuntimeException e) {
+            assertEquals("The account 54321 is not active", e.getMessage());
+        }
+
+        assertEquals(account.getBalance(), account.getBalance());
+        verify(accountRepository, times(2)).findByAccountNumber(any());
+        verify(accountRepository, times(0)).updateBalance(any(), any());
+    }
+
+    @Test
     public void testTransferAccount2IsNotReceiver(){
         Account account = defaultAccount();
         account.setType(TypeAccount.ACCOUNT_NORMAL);
         Account account2 = Account.builder()
                 .balance(100L)
+                .active(true)
                 .type(TypeAccount.DEPOSIT_ONLY)
                 .accountNumber("54321")
                 .build();

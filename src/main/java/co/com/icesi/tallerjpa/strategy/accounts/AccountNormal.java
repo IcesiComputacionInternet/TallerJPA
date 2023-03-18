@@ -13,7 +13,7 @@ public class AccountNormal implements TypeAccountStrategy {
 
     @Override
     public void withdraw(Long amount, Account account) {
-        if (amount < 0) { throw new RuntimeException("The amount must be greater than 0"); }
+        generalValidations(account, amount);
         if(account.getBalance() < amount) { throw new RuntimeException("Insufficient funds"); }
         account.setBalance(account.getBalance() - amount);
 
@@ -21,8 +21,9 @@ public class AccountNormal implements TypeAccountStrategy {
 
     @Override
     public void transfer(Long amount, Account accountOrigin, Account accountDestination, boolean isReceiverAccountValid) {
+        generalValidations(accountOrigin, amount);
+        generalValidations(accountDestination, amount);
         if(!isReceiverAccountValid) { throw new RuntimeException("The account type does not allow transfers"); }
-        if (amount < 0) { throw new RuntimeException("The amount must be greater than 0"); }
         if(accountOrigin.getBalance() < amount) { throw new RuntimeException("Insufficient funds"); }
         accountOrigin.setBalance(accountOrigin.getBalance() - amount);
         accountDestination.setBalance(accountDestination.getBalance() + amount);
@@ -35,8 +36,15 @@ public class AccountNormal implements TypeAccountStrategy {
 
     @Override
     public void deposit(Long amount, Account account) {
-        if (amount < 0) { throw new RuntimeException("The amount must be greater than 0"); }
+        generalValidations(account, amount);
         account.setBalance(account.getBalance() + amount);
 
+    }
+
+    private void generalValidations(Account account, Long amount){
+        if (!account.isActive()) {
+            throw new RuntimeException("The account " + account.getAccountNumber() + " is not active");
+        }
+        if (amount < 0) { throw new RuntimeException("The amount must be greater than 0"); }
     }
 }

@@ -43,9 +43,7 @@ public class AccountService {
     @Transactional
     public String withdraw(Long amount, String accountNumber) {
         Account account = getAccountByAccountNumber(accountNumber);
-
         account.getType().getStrategy().withdraw(amount, account);
-
         accountRepository.updateBalance(account.getBalance(), accountNumber);
         return "The withdrawal was successful";
     }
@@ -53,11 +51,8 @@ public class AccountService {
     @Transactional
     public String deposit(Long amount, String accountNumber) {
         Account account = getAccountByAccountNumber(accountNumber);
-
         account.getType().getStrategy().deposit(amount, account);
-
         accountRepository.updateBalance(account.getBalance(), accountNumber);
-        enableAccount(accountNumber);
         return "The deposit was successful";
     }
 
@@ -71,7 +66,6 @@ public class AccountService {
 
         accountRepository.updateBalance(accountOrigin.getBalance(), accountNumberOrigin);
         accountRepository.updateBalance(accountDestination.getBalance(), accountNumberDestination);
-        enableAccount(accountNumberDestination);
         return "The transfer was successful";
     }
 
