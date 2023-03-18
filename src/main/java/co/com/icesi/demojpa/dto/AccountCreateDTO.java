@@ -5,6 +5,7 @@ import lombok.Data;
 
 import java.util.List;
 import java.util.Optional;
+import java.util.UUID;
 
 @Data
 @Builder
@@ -18,5 +19,5 @@ public class AccountCreateDTO {
 
     private boolean active;
 
-    private Optional<List<UserCreateDTO>> users;
+    private String userId;
 }

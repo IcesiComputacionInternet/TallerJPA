@@ -6,12 +6,17 @@ import co.com.icesi.demojpa.mapper.AccountMapper;
 import co.com.icesi.demojpa.mapper.AccountMapperImpl;
 import co.com.icesi.demojpa.model.IcesiAccount;
 
+import co.com.icesi.demojpa.model.IcesiRole;
+import co.com.icesi.demojpa.model.IcesiUser;
 import co.com.icesi.demojpa.repository.AccountRepository;
+import co.com.icesi.demojpa.repository.UserRepository;
 import co.com.icesi.demojpa.servicio.AccountService;
 
+import co.com.icesi.demojpa.servicio.UserService;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 
+import java.util.ArrayList;
 import java.util.Optional;
 import java.util.UUID;
 
@@ -29,18 +34,48 @@ public class AccountServiceTest {
 
     private AccountRepository  accountRepository;
 
+    private UserRepository userRepository;
+
+    private UserService userService;
+
     @BeforeEach
     private void init(){
+        userService =mock(UserService.class);
+        userRepository=mock(UserRepository.class);
         accountRepository = mock(AccountRepository.class);
         accountMapper = spy(AccountMapperImpl.class);
-        accountService = new AccountService(accountRepository,accountMapper);
+        accountService = new AccountService(accountRepository, userRepository, userService, accountMapper);
     }
 
     @Test
     public void testCreateAccount(){
-        accountService.save(defaultAccountDTO());
+
+        IcesiUser icesiUser =defaultIcesiUser();
+        AccountCreateDTO accountCreateDTO = defaultAccountDTO();
+        accountCreateDTO.setUserId(icesiUser.getUserId().toString());
+
+        when(userRepository.findById(icesiUser.getUserId())).thenReturn(Optional.of(icesiUser));
+        accountService.save(accountCreateDTO);
+
         IcesiAccount icesiAccount = defaultIcesiAccount();
         verify(accountRepository,times(1)).save(argThat(new IcesiAccountMatcher(icesiAccount)));
+    }
+
+    @Test
+    public void testCreateAccountWithNoValidUser(){
+        IcesiUser icesiUser =defaultIcesiUser();
+        AccountCreateDTO accountCreateDTO = defaultAccountDTO();
+        accountCreateDTO.setUserId(icesiUser.getUserId().toString());
+
+        when(userRepository.findById(any())).thenReturn(Optional.empty());
+        try{
+            accountService.save(accountCreateDTO);
+            fail();
+        }catch (RuntimeException exception){
+            assertEquals("No existe una cuenta con esta id",exception.getMessage());
+        }
+
+
     }
 
     @Test
@@ -60,7 +95,7 @@ public class AccountServiceTest {
     public void testFindByNumber(){
         IcesiAccount account =defaultIcesiAccountWithNumberAndID();
         accountRepository.save(account);
-        when(accountRepository.findByAccountNumber(any())).thenReturn(Optional.of(account));
+        when(accountRepository.findByAccountNumber(account.getAccountNumber())).thenReturn(Optional.of(account));
         Optional<IcesiAccount> account2 = accountRepository.findByAccountNumber(account.getAccountNumber());
         assertEquals(account2.get().getAccountNumber(),account.getAccountNumber());
         verify(accountRepository, times(1)).findByAccountNumber(any());
@@ -291,6 +326,7 @@ public class AccountServiceTest {
 
         try{
             accountService.transfer(icesiAccount.getAccountNumber(),icesiAccount2.getAccountNumber(),100L);
+            fail();
         }catch (RuntimeException exception){
             assertEquals("La cuenta que manda el dinero no existe",exception.getMessage());
         }
@@ -307,6 +343,7 @@ public class AccountServiceTest {
 
         try{
             accountService.transfer(icesiAccount.getAccountNumber(),icesiAccount2.getAccountNumber(),100L);
+            fail();
         }catch (RuntimeException exception){
             assertEquals("La cuenta que recibe el dinero no existe",exception.getMessage());
         }
@@ -323,6 +360,7 @@ public class AccountServiceTest {
 
         try{
             accountService.transfer(icesiAccount.getAccountNumber(),icesiAccount2.getAccountNumber(),100L);
+            fail();
         }catch (RuntimeException exception){
             assertEquals("La cuenta que manda el dinero es de tipo 'deposit only' ",exception.getMessage());
         }
@@ -339,6 +377,7 @@ public class AccountServiceTest {
 
         try{
             accountService.transfer(icesiAccount.getAccountNumber(),icesiAccount2.getAccountNumber(),100L);
+            fail();
         }catch (RuntimeException exception){
             assertEquals("La cuenta que recibe el dinero es de tipo 'deposit only' ",exception.getMessage());
         }
@@ -356,6 +395,7 @@ public class AccountServiceTest {
 
         try{
             accountService.transfer(icesiAccount.getAccountNumber(),icesiAccount2.getAccountNumber(),100L);
+            fail();
         }catch (RuntimeException exception){
             assertEquals("La cuenta que manda el dinero no tiene balance suficiente ",exception.getMessage());
         }
@@ -372,6 +412,7 @@ public class AccountServiceTest {
 
         try{
             accountService.transfer(icesiAccount.getAccountNumber(),icesiAccount2.getAccountNumber(),100L);
+            fail();
         }catch (RuntimeException exception){
             assertEquals("La cuenta que manda el dinero no esta activa",exception.getMessage());
         }
@@ -388,6 +429,7 @@ public class AccountServiceTest {
 
         try{
             accountService.transfer(icesiAccount.getAccountNumber(),icesiAccount2.getAccountNumber(),100L);
+            fail();
         }catch (RuntimeException exception){
             assertEquals("La cuenta que recibe el dinero no esta activa",exception.getMessage());
         }
@@ -403,6 +445,7 @@ public class AccountServiceTest {
 
         try{
             accountService.transfer(icesiAccount.getAccountNumber(),icesiAccount2.getAccountNumber(),-100L);
+            fail();
         }catch (RuntimeException exception){
             assertEquals("La cantidad de dinero que se quiere enviar debe ser mayor que 0",exception.getMessage());
         }
@@ -418,6 +461,7 @@ public class AccountServiceTest {
 
         try{
             accountService.transfer(icesiAccount.getAccountNumber(),icesiAccount2.getAccountNumber(),0L);
+            fail();
         }catch (RuntimeException exception){
             assertEquals("La cantidad de dinero que se quiere enviar debe ser mayor que 0",exception.getMessage());
         }
@@ -427,9 +471,26 @@ public class AccountServiceTest {
 
     private AccountCreateDTO defaultAccountDTO(){
         return AccountCreateDTO.builder()
+                .userId("")
                 .active(true)
                 .balance(10000)
                 .type("polish emissary")
+                .build();
+    }
+
+    private IcesiUser defaultIcesiUser(){
+        return IcesiUser.builder()
+                .userId(UUID.randomUUID())
+                .email("5")
+                .firstName("John")
+                .lastname("Doe")
+                .phone("123")
+                .password("123")
+                .accounts(new ArrayList<>())
+                .role(IcesiRole.builder()
+                        .name("rol de prueba")
+                        .description("rol de prueba")
+                        .build())
                 .build();
     }
 
@@ -438,6 +499,17 @@ public class AccountServiceTest {
                 .active(true)
                 .balance(10000)
                 .type("polish emissary")
+                .account(IcesiUser.builder()
+                        .email("5")
+                        .firstName("John")
+                        .lastname("Doe")
+                        .phone("123")
+                        .password("123")
+                        .role(IcesiRole.builder()
+                                .name("rol de prueba")
+                                .description("rol de prueba")
+                                .build())
+                        .build())
                 .build();
     }
     private IcesiAccount defaultIcesiAccountWithNumberAndID(){
