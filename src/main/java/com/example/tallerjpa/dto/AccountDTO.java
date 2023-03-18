@@ -19,4 +19,5 @@ public class AccountDTO {
     private boolean active;
     private String emailUser;
 
+
 }
