@@ -37,7 +37,7 @@ public class UserService {
             throw new RuntimeException("User must have a role");
         }
 
-        Optional<IcesiRole> roleOptional = Optional.ofNullable(roleRepository.findByName(user.getRole().getName()));
+        Optional<IcesiRole> roleOptional = roleRepository.findByName(user.getRole().getName());
 
         if(roleOptional.isEmpty()){
             throw new RuntimeException("Role does not exist");
@@ -49,6 +49,7 @@ public class UserService {
         IcesiRole role = roleOptional.get();
         icesiUser.setRole(role);
         role.getUsers().add(icesiUser);
+        roleRepository.save(role);
         return userRepository.save(icesiUser);
     }
 }

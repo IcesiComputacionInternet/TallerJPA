@@ -14,4 +14,5 @@ public class AccountCreateDTO {
     private long balance;
     private String type;
     private boolean active;
+    private UserCreateDTO user;
 }
