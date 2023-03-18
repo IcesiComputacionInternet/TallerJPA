@@ -2,6 +2,8 @@ package com.example.jpa.service;
 
 import com.example.jpa.dto.AccountRequestDTO;
 import com.example.jpa.dto.AccountResponseDTO;
+import com.example.jpa.exceptions.AccountNotFoundException;
+import com.example.jpa.exceptions.AccountTypeException;
 import com.example.jpa.exceptions.BalanceNegativeException;
 import com.example.jpa.exceptions.UserNotFoundException;
 import com.example.jpa.mapper.AccountMapper;
@@ -69,7 +71,98 @@ public class AccountService {
         return accountNumber;
     }
 
+    //Enable account if balance is positive
+    public boolean enableAccount(String accountNumber){
+        if(accountRepository.getByAccountNumber(accountNumber).isPresent()){
+            IcesiAccount account = accountRepository.getByAccountNumber(accountNumber).get();
+            if(account.getBalance() > 0){
+                account.setActive(true);
+                accountRepository.save(account);
+                return true;
+            }else {
+                throw new BalanceNegativeException("The account has a negative balance");
+            }
+        }else {
+            throw new AccountNotFoundException("Account not found");
+        }
+    }
 
+    //Disable account if balance is 0
+    public boolean disableAccount(String accountNumber){
+        if(accountRepository.getByAccountNumber(accountNumber).isPresent()){
+            IcesiAccount account = accountRepository.getByAccountNumber(accountNumber).get();
+            if(account.getBalance() == 0){
+                account.setActive(false);
+                accountRepository.save(account);
+                return true;
+            }else {
+                throw new BalanceNegativeException("The account has a positive balance, it's not recommended to disable it");
+            }
+        }else {
+            throw new AccountNotFoundException("Account not found");
+        }
+    }
+
+    //Deposit money to an account
+    public boolean deposit(String accountNumber, Long amount){
+        if(accountRepository.getByAccountNumber(accountNumber).isPresent()){
+            IcesiAccount account = accountRepository.getByAccountNumber(accountNumber).get();
+            account.setBalance(account.getBalance() + amount);
+            accountRepository.save(account);
+            return true;
+        }else {
+            throw new AccountNotFoundException("Account not found");
+        }
+    }
+
+    //Withdraw money from an account
+    public boolean withdraw(String accountNumber, Long amount){
+        if(accountRepository.getByAccountNumber(accountNumber).isPresent()){
+            IcesiAccount account = accountRepository.getByAccountNumber(accountNumber).get();
+            if(account.getBalance() >= amount){
+                account.setBalance(account.getBalance() - amount);
+                accountRepository.save(account);
+                return true;
+            }else {
+                throw new BalanceNegativeException("There is not enough money in the account, balance will be negative");
+            }
+        }else {
+            throw new AccountNotFoundException("Account not found");
+        }
+    }
+
+    /* Transfer money from one account to another, if the accounts are active,
+     the balance is positive and the amount is less than the balance, and the type
+     of the accounts is different from "deposit" */
+    public boolean transfer(String accountNumberFrom, String accountNumberTo, Long amount){
+        if(accountRepository.getByAccountNumber(accountNumberFrom).isPresent() &&
+                accountRepository.getByAccountNumber(accountNumberTo).isPresent()){
+            IcesiAccount accountFrom = accountRepository.getByAccountNumber(accountNumberFrom).get();
+            IcesiAccount accountTo = accountRepository.getByAccountNumber(accountNumberTo).get();
+            if(accountFrom.isActive() && accountTo.isActive()){
+                if(accountFrom.getBalance() >= amount){
+                    if(accountFrom.getType().equalsIgnoreCase("deposit") ||
+                            accountTo.getType().equalsIgnoreCase("deposit")){
+                        throw new AccountTypeException("The account type is deposit only");
+                    }else {
+                        accountFrom.setBalance(accountFrom.getBalance() - amount);
+                        accountTo.setBalance(accountTo.getBalance() + amount);
+                        accountRepository.save(accountFrom);
+                        accountRepository.save(accountTo);
+                        return true;
+                    }
+                }else {
+                    throw new BalanceNegativeException("There is not enough money in the account, balance will be negative");
+                }
+            }else {
+                throw new BalanceNegativeException("The account is not active");
+            }
+        }else {
+            throw new AccountNotFoundException("Account not found");
+        }
+    }
+
+    //Get all accounts
     public List<AccountResponseDTO> getAccounts(){
         return accountRepository.getAllAccounts().stream().map(accountMapper::fromAccountToSendAccountDTO).collect(Collectors.toList());
     }
