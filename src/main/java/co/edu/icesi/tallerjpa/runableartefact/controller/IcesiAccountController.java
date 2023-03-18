@@ -7,6 +7,8 @@ import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RestController;
 
+import java.util.Map;
+
 @RestController
 @AllArgsConstructor
 public class IcesiAccountController {
@@ -29,18 +31,21 @@ public class IcesiAccountController {
     }
 
     @PostMapping("/account/withdrawal")
-    public String withdrawal(@RequestBody String accountNumber, Long amount) {
-        return icesiAccountService.withdrawal(accountNumber, amount);
+    public String withdrawal(@RequestBody Map<String, String> withdrawalInformation, Long amount) {
+        return icesiAccountService.withdrawal(withdrawalInformation.get("accountNumber")
+                , Long.valueOf(withdrawalInformation.get("amount")));
     }
 
     @PostMapping("/account/deposit")
-    public String deposit(@RequestBody String accountNumber, Long amount) {
-        return icesiAccountService.deposit(accountNumber, amount);
+    public String deposit(@RequestBody Map<String, String> depositInformation) {
+        return icesiAccountService.deposit(depositInformation.get("accountNumber"), Long.valueOf(depositInformation.get("amount")));
     }
 
     @PostMapping("/account/transfer")
-    public String transfer(@RequestBody String accountNumberOrigin, String accountNumberDestination, Long amount) {
-        return icesiAccountService.transfer(accountNumberOrigin, accountNumberDestination, amount);
+    public String transfer(@RequestBody Map<String,String> transferInformation,String accountNumberOrigin, String accountNumberDestination, Long amount) {
+        return icesiAccountService.transfer(transferInformation.get("accountNumberOrigin")
+                , transferInformation.get("accountNumberDestination")
+                , Long.valueOf(transferInformation.get("amount")));
     }
 
 }

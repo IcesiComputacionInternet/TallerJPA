@@ -1,6 +1,8 @@
 package co.edu.icesi.tallerjpa.runableartefact.service;
 
 import co.edu.icesi.tallerjpa.runableartefact.dto.IcesiAccountDTO;
+import co.edu.icesi.tallerjpa.runableartefact.exception.implementation.InsufficientBalance;
+import co.edu.icesi.tallerjpa.runableartefact.exception.implementation.OperationNotAvailable;
 import co.edu.icesi.tallerjpa.runableartefact.exception.implementation.ParameterRequired;
 import co.edu.icesi.tallerjpa.runableartefact.mapper.IcesiAccountMapper;
 import co.edu.icesi.tallerjpa.runableartefact.model.IcesiAccount;
@@ -43,7 +45,7 @@ public class IcesiAccountService {
             icesiAccountRepository.save(icesiAccount.get());
             return "Account activated";
         }
-        return "Account not found";
+        return "Account not activated";
     }
 
     public String deactivateAccount(String accountNumber){
@@ -53,19 +55,25 @@ public class IcesiAccountService {
             icesiAccountRepository.save(icesiAccount.get());
             return "Account deactivated";
         }
-        return "Account not found";
+        return "Account not deactivated";
     }
 
     public String withdrawal(String accountNumber, Long amount) {
         Optional<IcesiAccount> icesiAccount = icesiAccountRepository.findByAccountNumber(accountNumber);
         if (icesiAccount.isPresent()
                 && validateAccountBalanceToWithdrawal(icesiAccount.get())
-                && icesiAccount.get().getBalance() >= amount) {
+                && validateAccountEnoughBalanceToWithdrawal(icesiAccount.get().getBalance(), amount)) {
             icesiAccount.get().setBalance(icesiAccount.get().getBalance() - amount);
             icesiAccountRepository.save(icesiAccount.get());
             return "Withdrawal successful";
         }
-        return "Account not found";
+        return "Withdrawal not successful";
+    }
+    private boolean validateAccountEnoughBalanceToWithdrawal(Long accountBalance, Long amount){
+        if (accountBalance < amount){
+            throw new InsufficientBalance("Can't withdrawal more than the account balance");
+        }
+        return true;
     }
 
     public String transfer(String accountNumberOrigin, String accountNumberDestination, Long amount) {
@@ -74,14 +82,21 @@ public class IcesiAccountService {
         if (icesiAccountOrigin.isPresent()
                 && icesiAccountDestination.isPresent()
                 && validateAccountBalanceToWithdrawal(icesiAccountOrigin.get())
+                && canTransfer(icesiAccountOrigin.get())
+                && canTransfer(icesiAccountDestination.get())
                 && icesiAccountOrigin.get().getBalance() >= amount) {
-            icesiAccountOrigin.get().setBalance(icesiAccountOrigin.get().getBalance() - amount);
-            icesiAccountDestination.get().setBalance(icesiAccountDestination.get().getBalance() + amount);
-            icesiAccountRepository.save(icesiAccountOrigin.get());
-            icesiAccountRepository.save(icesiAccountDestination.get());
+            withdrawal(accountNumberOrigin, amount);
+            deposit(accountNumberDestination, amount);
             return "Transfer successful";
         }
-        return "Account not found";
+        return "Transfer not successful";
+    }
+
+    private boolean canTransfer(IcesiAccount icesiAccount){
+        if (icesiAccount.getType().equals("deposit")){
+            throw new OperationNotAvailable("Can't transfer from/to a deposit account");
+        }
+        return true;
     }
 
 
@@ -92,7 +107,7 @@ public class IcesiAccountService {
             icesiAccountRepository.save(icesiAccount.get());
             return "Deposit successful";
         }
-        return "Account not found";
+        return "Deposit not successful";
     }
 
     private boolean validateAccountBalanceToDeactivate(IcesiAccount icesiAccount) {
