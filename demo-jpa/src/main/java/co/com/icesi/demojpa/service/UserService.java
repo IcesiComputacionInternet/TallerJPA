@@ -2,6 +2,7 @@ package co.com.icesi.demojpa.service;
 
 import co.com.icesi.demojpa.dto.RoleCreateDTO;
 import co.com.icesi.demojpa.dto.UserCreateDTO;
+import co.com.icesi.demojpa.mapper.RoleMapper;
 import co.com.icesi.demojpa.mapper.UserMapper;
 import co.com.icesi.demojpa.model.IcesiRole;
 import co.com.icesi.demojpa.model.IcesiUser;
@@ -10,6 +11,7 @@ import co.com.icesi.demojpa.repository.UserRepository;
 import lombok.AllArgsConstructor;
 import org.springframework.stereotype.Service;
 
+import java.util.ArrayList;
 import java.util.Optional;
 import java.util.UUID;
 
@@ -45,11 +47,11 @@ public class UserService {
 
         IcesiUser icesiUser = userMapper.fromIcesiUserDTO(user);
         icesiUser.setUserId(UUID.randomUUID());
-
         IcesiRole role = roleOptional.get();
         icesiUser.setRole(role);
-        role.getUsers().add(icesiUser);
-        roleRepository.save(role);
+        //icesiUser.setAccounts(new ArrayList<>());
+        //role.getUsers().add(icesiUser);
+        //roleRepository.save(role);
         return userRepository.save(icesiUser);
     }
 }

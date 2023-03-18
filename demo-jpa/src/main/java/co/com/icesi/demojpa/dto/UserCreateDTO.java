@@ -4,6 +4,7 @@ package co.com.icesi.demojpa.dto;
 import lombok.Builder;
 import lombok.Data;
 
+import java.util.List;
 import java.util.UUID;
 
 @Data
@@ -16,4 +17,5 @@ public class UserCreateDTO {
     private String password;
     private String phoneNumber;
     private RoleCreateDTO role;
+    private List<AccountCreateDTO> accounts;
 }

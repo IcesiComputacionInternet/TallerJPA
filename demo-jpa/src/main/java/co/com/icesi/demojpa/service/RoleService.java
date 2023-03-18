@@ -7,6 +7,7 @@ import co.com.icesi.demojpa.repository.RoleRepository;
 import lombok.AllArgsConstructor;
 import org.springframework.stereotype.Service;
 
+import java.util.ArrayList;
 import java.util.Optional;
 import java.util.UUID;
 
@@ -25,6 +26,7 @@ public class RoleService {
 
         IcesiRole icesiRole= roleMapper.fromIcesiRoleDTO(role);
         icesiRole.setRoleId(UUID.randomUUID());
+        icesiRole.setUsers(new ArrayList<>());
         return roleRepository.save(icesiRole);
     }
 
