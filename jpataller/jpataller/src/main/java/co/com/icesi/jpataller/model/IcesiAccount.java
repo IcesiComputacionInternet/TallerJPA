@@ -6,6 +6,7 @@ import lombok.Data;
 import lombok.NoArgsConstructor;
 
 import javax.persistence.Entity;
+import javax.persistence.Id;
 import javax.persistence.JoinColumn;
 import javax.persistence.ManyToOne;
 import java.util.UUID;
@@ -17,6 +18,7 @@ import java.util.UUID;
 @Builder
 public class IcesiAccount {
 
+    @Id
     private UUID accountId;
 
     private String accountNumber;

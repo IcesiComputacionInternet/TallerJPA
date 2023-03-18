@@ -2,12 +2,15 @@ package co.com.icesi.jpataller.service;
 
 import co.com.icesi.jpataller.dto.IcesiUserDTO;
 import co.com.icesi.jpataller.mapper.IcesiUserMapper;
+import co.com.icesi.jpataller.model.IcesiAccount;
 import co.com.icesi.jpataller.model.IcesiUser;
+import co.com.icesi.jpataller.repository.IcesiAccountRepository;
 import co.com.icesi.jpataller.repository.IcesiRoleRepository;
 import co.com.icesi.jpataller.repository.IcesiUserRepository;
 import lombok.AllArgsConstructor;
 import org.springframework.stereotype.Service;
 
+import java.util.Optional;
 import java.util.UUID;
 
 @Service
@@ -20,6 +23,8 @@ public class IcesiUserService {
     private final IcesiRoleRepository icesiRoleRepository;
 
     private final IcesiRoleService icesiRoleService;
+
+    private final IcesiAccountRepository icesiAccountRepository;
 
     public IcesiUser createUser(IcesiUserDTO user) {
         boolean[] checks = {false, false, false};
@@ -46,4 +51,14 @@ public class IcesiUserService {
             return icesiUserRepository.save(icesiUser);
         }
     }
+
+    public void createAccount(IcesiUserDTO icesiUserDTO, String accountNumber) {
+        Optional<IcesiAccount> icesiAccount = icesiAccountRepository.findByAccountNumber(accountNumber);
+        if (icesiAccount.isEmpty()) {
+            throw new RuntimeException("No existe una cuenta con ese número");
+        }
+        IcesiUser icesiUser = icesiUserMapper.fromDTO(icesiUserDTO);
+        icesiUser.getAccounts().add(icesiAccount.get());
+    }
+
 }
