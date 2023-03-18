@@ -18,8 +18,8 @@ public class RoleService {
     private final RoleMapper roleMapper;
 
     public IcesiRole save(RoleCreateDTO role){
-        Optional<IcesiRole> roleOptional = roleRepository.findByName(role.getName());
-        if(roleOptional.isPresent()){
+
+        if(roleRepository.findByName(role.getName()).isPresent()){
             throw new RuntimeException("Role name already exists");
         }
 
