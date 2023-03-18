@@ -4,6 +4,8 @@ import com.icesi.TallerJPA.dto.IcesiAccountDTO;
 import com.icesi.TallerJPA.enums.IcesiAccountType;
 import com.icesi.TallerJPA.mapper.AccountMapper;
 import com.icesi.TallerJPA.mapper.AccountMapperImpl;
+import com.icesi.TallerJPA.mapper.UserMapper;
+import com.icesi.TallerJPA.mapper.UserMapperImpl;
 import com.icesi.TallerJPA.model.IcesiAccount;
 import com.icesi.TallerJPA.model.IcesiRole;
 import com.icesi.TallerJPA.model.IcesiUser;
@@ -29,6 +31,7 @@ public class AccountServiceTest {
     private AccountRepository accountRepository;
     private UserRespository userRespository;
     private AccountService accountService;
+
 
     @BeforeEach
     public void setup() {
@@ -259,19 +262,76 @@ public class AccountServiceTest {
         }
     }
 
-    /*
+
     @Test
     public void testTransfer(){
-        IcesiAccount icesiAccount = defaultAccount();
-        IcesiAccount icesiAccount2 = defaultAccount();
+        IcesiAccount icesiAccountOrigin = defaultAccount();
+        icesiAccountOrigin.setType(IcesiAccountType.valueOf("DEFAULT"));
+        IcesiAccount icesiAccountDestination = defaultAccount();
+        icesiAccountDestination.setAccountNumber("123-123456-12");
+        icesiAccountDestination.setType(IcesiAccountType.valueOf("DEFAULT"));
 
-        icesiAccount2.setAccountNumber("123-123456-12");
-        icesiAccount.setBalance(1000L);
-        String msg = accountService.transfer(icesiAccount.getAccountNumber(), icesiAccount2.getAccountNumber(), 100L);
-        verify(accountRepository, times(1)).transferAccount(icesiAccount.getAccountNumber(), icesiAccount2.getAccountNumber(), 100L);
-        assertEquals(msg, "Transfer was successful");
+
+        when(accountRepository.getTypeofAccount(icesiAccountOrigin.getAccountNumber())).thenReturn(Optional.of(icesiAccountOrigin));
+        when(accountRepository.getTypeofAccount(icesiAccountDestination.getAccountNumber())).thenReturn(Optional.of(icesiAccountDestination));
+        doNothing().when(accountRepository).withdrawalAccount(icesiAccountOrigin.getAccountNumber(), 100L);
+        doNothing().when(accountRepository).depositAccount(icesiAccountDestination.getAccountNumber(), 100L);
+
+
+        String msg = accountService.transfer(icesiAccountOrigin.getAccountNumber(), icesiAccountDestination.getAccountNumber(), 100L);
+
+        verify(accountRepository, times(1)).getTypeofAccount(icesiAccountOrigin.getAccountNumber());
+        verify(accountRepository, times(1)).getTypeofAccount(icesiAccountDestination.getAccountNumber());
+        verify(accountRepository, times(1)).withdrawalAccount(icesiAccountOrigin.getAccountNumber(), 100L);
+        verify(accountRepository, times(1)).depositAccount(icesiAccountDestination.getAccountNumber(), 100L);
+
+        assertEquals("The transaction was successful", msg);
+
+        /*
+                IcesiAccount icesiAccount = defaultAccount();
+        try {
+            accountService.setTypeAccount("DEPOSIT20", icesiAccount);
+            fail();
+        } catch (RuntimeException exception) {
+            String message = exception.getMessage();
+            assertEquals("Account type does not exist", message);
+        }
+         */
     }
 
-     */
+    @Test
+    public void testTransferWithOriginDeposit(){
+        IcesiAccount icesiAccountOrigin = defaultAccount();
+        IcesiAccount icesiAccountDestination = defaultAccount();
+        icesiAccountDestination.setAccountNumber("123-123456-12");
+        icesiAccountDestination.setType(IcesiAccountType.valueOf("DEFAULT"));
 
+        try {
+            when(accountRepository.getTypeofAccount(icesiAccountOrigin.getAccountNumber())).thenReturn(Optional.of(icesiAccountOrigin));
+            accountService.transfer(icesiAccountOrigin.getAccountNumber(), icesiAccountDestination.getAccountNumber(), 100L);
+            verify(accountRepository, times(1)).getTypeofAccount(icesiAccountOrigin.getAccountNumber());
+            fail();
+        } catch (RuntimeException e){
+            String message = e.getMessage();
+            assertEquals("Deposit Destination Account or inactive", message);
+        }
+    }
+
+    @Test
+    public void testTransferWithDestinationDeposit(){
+        IcesiAccount icesiAccountOrigin = defaultAccount();
+        icesiAccountOrigin.setType(IcesiAccountType.valueOf("DEFAULT"));
+        IcesiAccount icesiAccountDestination = defaultAccount();
+        icesiAccountDestination.setAccountNumber("123-123456-12");
+
+        try {
+            when(accountRepository.getTypeofAccount(icesiAccountDestination.getAccountNumber())).thenReturn(Optional.of(icesiAccountDestination));
+            accountService.transfer(icesiAccountOrigin.getAccountNumber(), icesiAccountDestination.getAccountNumber(), 100L);
+            verify(accountRepository, times(1)).getTypeofAccount(icesiAccountDestination.getAccountNumber());
+            fail();
+        } catch (RuntimeException e){
+            String message = e.getMessage();
+            assertEquals("Deposit Origin Account or inactive", message);
+        }
+    }
 }

@@ -10,7 +10,7 @@ public interface AccountMapper {
 
     IcesiAccount fromIcesiAccountDTO(IcesiAccountDTO icesiAccountDTO);
 
-    IcesiAccountDTO formIcesiAccount(IcesiAccount icesiAccount);
+    IcesiAccountDTO fromIcesiAccount(IcesiAccount icesiAccount);
 
     IcesiAccountResponseDTO toResponse(IcesiAccount icesiAccount);
 }
