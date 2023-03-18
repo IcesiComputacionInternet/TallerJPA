@@ -30,4 +30,9 @@ public class IcesiAccountController {
     public String withdrawalAccount(@PathVariable String accountNumber, @RequestBody Long value){
         return accountService.withdrawal(accountNumber, value);
     }
+
+    @PatchMapping("/account/deposit/{accountNumber}")
+    public String depositAccount(@PathVariable String accountNumber, @RequestBody Long value){
+        return accountService.deposit(accountNumber, value);
+    }
 }

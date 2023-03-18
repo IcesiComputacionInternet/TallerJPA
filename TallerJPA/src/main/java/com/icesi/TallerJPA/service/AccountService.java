@@ -95,5 +95,15 @@ public class AccountService {
         }
     }
 
+    @Transactional
+    public String deposit(String accountNumber, Long value){
+        if(value>0){
+            accountRepository.depositAccount(accountNumber, value);
+            return "Deposit was successful";
+        } else {
+            throw new RuntimeException("Don't deposit a negative amount");
+        }
+    }
+
 
 }
