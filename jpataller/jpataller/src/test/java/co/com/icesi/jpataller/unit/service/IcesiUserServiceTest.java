@@ -15,6 +15,7 @@ import co.com.icesi.jpataller.service.IcesiUserService;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 
+import javax.swing.text.html.Option;
 import java.util.Optional;
 import java.util.UUID;
 
@@ -36,14 +37,32 @@ public class IcesiUserServiceTest {
 
     private IcesiAccountRepository icesiAccountRepository;
 
+    private IcesiRoleService icesiRoleService;
+
     private IcesiUserDTO defaultIcesiUserDTO(){
         return IcesiUserDTO.builder()
                 .firstName("Gabriel")
                 .lastName("Delgado")
-                .email("gabriel.delgado1@u.icesi.edu.co")
+                .email("gabriel.delgado@o.com")
                 .phoneNumber("318764332")
                 .password("sape")
                 .roleName("Rol 1")
+                .build();
+    }
+
+    private IcesiUser defaultIcesiUser(){
+        return IcesiUser.builder()
+                .firstName("Gabriel")
+                .lastName("Delgado")
+                .email("gabriel.delgado@o.com")
+                .phoneNumber("318764332")
+                .password("sape")
+                .role(IcesiRole.builder()
+                        .name("Rol 1")
+                        .description("Es un rol de prueba")
+                        .roleId(UUID.randomUUID())
+                        .build())
+                .userId(UUID.randomUUID())
                 .build();
     }
 
@@ -58,17 +77,6 @@ public class IcesiUserServiceTest {
     }
 
 
-    private IcesiUser defaultIcesiUser(){
-        return IcesiUser.builder()
-                .firstName("Gabriel")
-                .lastName("Delgado")
-                .email("gabriel.delgado1@u.icesi.edu.co")
-                .phoneNumber("318764332")
-                .password("sape")
-                .role(defaultIcesiRole())
-                .userId(UUID.randomUUID())
-                .build();
-    }
 
     private IcesiRole defaultIcesiRole(){
         return IcesiRole.builder()
@@ -85,15 +93,19 @@ public class IcesiUserServiceTest {
         icesiUserService = mock(IcesiUserService.class);
         icesiRoleRepository = mock(IcesiRoleRepository.class);
         icesiAccountRepository = mock(IcesiAccountRepository.class);
+        icesiRoleService = mock(IcesiRoleService.class);
     }
 
     @Test
     public void testCreateUser() {
-        when(icesiRoleRepository.findByName(any())).thenReturn(Optional.of(defaultIcesiRole()));
+        IcesiRole role = defaultIcesiRole();
+        when(icesiRoleRepository.findByName(any())).thenReturn(Optional.of(role));
+        when(icesiUserRepository.findByEmail(anyString())).thenReturn(Optional.empty());
+        when(icesiUserRepository.findByPhoneNumber(anyString())).thenReturn(Optional.empty());
         icesiUserService.createUser(defaultIcesiUserDTO());
         IcesiUser icesiUser = defaultIcesiUser();
-
         verify(icesiUserRepository, times(1)).save(argThat(new IcesiUserMatcher(icesiUser)));
+
     }
 
     @Test
@@ -106,7 +118,7 @@ public class IcesiUserServiceTest {
             fail();
         }catch (RuntimeException exception){
             String message= exception.getMessage();
-            assertEquals("User email is in use",message);
+            assertEquals("Ya existe un usuario con este email",message);
         }
     }
 
