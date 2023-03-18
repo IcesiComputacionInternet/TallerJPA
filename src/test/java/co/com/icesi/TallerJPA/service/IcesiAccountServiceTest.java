@@ -259,6 +259,16 @@ public class IcesiAccountServiceTest {
     }
 
 
+    @Test
+    public void testUniqueAccountNumber(){
+        when(userRepository.findbyName(any())).thenReturn(Optional.ofNullable(defaultUser()));
+        when(respository.findByAccountNumber(any())).thenReturn(Optional.ofNullable(defaultAccount("normal")),Optional.empty());
+        service.save(defaultDTO("NORMAL"));
+        verify(respository,times(2)).findByAccountNumber(any());
+
+    }
+
+
     private IcesiAccount defaultAccount(String type){
         return IcesiAccount.builder()
                 .accountNumber("897-887868-67")
