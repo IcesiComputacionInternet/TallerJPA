@@ -6,7 +6,7 @@ import org.springframework.web.bind.annotation.RestController;
 @RestController
 public class CategoryController {
 
-    private CatergoryRepository catergoryRepository;
+    private final CatergoryRepository catergoryRepository;
 
     public CategoryController(CatergoryRepository catergoryRepository) {
         this.catergoryRepository = catergoryRepository;

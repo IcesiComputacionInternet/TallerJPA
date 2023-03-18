@@ -13,9 +13,9 @@ import java.util.UUID;
 @RestController
 public class AccountController {
 
-    private AccountService accountService;
+    private final AccountService accountService;
 
-    private AccountRepository accountRepository;
+    private final AccountRepository accountRepository;
 
 
     public AccountController(AccountRepository accountRepository, AccountService accountService, AccountRepository accountRepository1) {
@@ -31,13 +31,6 @@ public class AccountController {
     @PostMapping("/disableAccount/{accountNumber}")
     public void disableAccount(@PathVariable String accountNumber){
         accountService.disableAccount(accountNumber);
-    }
-
-
-
-    @PostMapping ("/all/{accountNumber}")
-    public Optional<IcesiAccount> showAccounts(@PathVariable String accountNumber){
-        return accountRepository.findAll(accountNumber);
     }
 
     @PostMapping ("/accounts/{id}")
