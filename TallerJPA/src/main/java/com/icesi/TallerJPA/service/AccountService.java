@@ -2,6 +2,8 @@ package com.icesi.TallerJPA.service;
 
 import com.icesi.TallerJPA.dto.IcesiAccountDTO;
 import com.icesi.TallerJPA.dto.IcesiAccountResponseDTO;
+import com.icesi.TallerJPA.dto.IcesiRoleDTO;
+import com.icesi.TallerJPA.enums.IcesiAccountType;
 import com.icesi.TallerJPA.mapper.AccountMapper;
 import com.icesi.TallerJPA.model.IcesiAccount;
 import com.icesi.TallerJPA.repository.AccountRepository;
@@ -25,12 +27,22 @@ public class AccountService {
 
         if(icesiAccountDTO.getBalance() <= 0 ){throw new RuntimeException("Balance can't be below 0");}
 
+        return createAccount(icesiAccountDTO);
+    }
+
+    public IcesiAccountResponseDTO createAccount(IcesiAccountDTO icesiAccountDTO){
+
         IcesiAccount icesiAccount = accountMapper.fromIcesiAccountDTO(icesiAccountDTO);
-        icesiAccount.setAccountId(UUID.randomUUID());
-        icesiAccount.setAccountNumber(setAccountNumber(generateAccountNumber()));
+
         icesiAccount.setIcesiUser(userRespository.findIcesiUserByEmail(icesiAccountDTO.getEmailUser())
                 .orElseThrow(()-> new RuntimeException("User not found")));
-        return accountMapper.toResponse(icesiAccount);
+
+        icesiAccount.setAccountId(UUID.randomUUID());
+        icesiAccount.setAccountNumber(setAccountNumberGenerate(generateAccountNumber()));
+
+        setTypeAccount(icesiAccountDTO.getType().getValue(), icesiAccount);
+
+        return accountMapper.toResponse(accountRepository.save(icesiAccount));
     }
 
     public String generateAccountNumber(){
@@ -39,13 +51,19 @@ public class AccountService {
                 random.nextInt(1000000), random.nextInt(100));
     }
 
-    public String setAccountNumber(String number){
+    public String setAccountNumberGenerate(String number){
         if(accountRepository.existsByAccountNumber(generateAccountNumber())){
-            return setAccountNumber(number);
+            return setAccountNumberGenerate(number);
         } else {
             return number;
         }
     }
 
-
+    public void setTypeAccount(String type, IcesiAccount icesiAccount){
+        try {
+            icesiAccount.setType(IcesiAccountType.valueOf(type.toUpperCase()));
+        } catch (IllegalArgumentException e){
+            throw new IllegalArgumentException("Account type does not exist");
+        }
+    }
 }

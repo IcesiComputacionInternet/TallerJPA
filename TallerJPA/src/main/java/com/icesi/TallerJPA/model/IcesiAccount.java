@@ -1,5 +1,6 @@
 package com.icesi.TallerJPA.model;
 
+import com.icesi.TallerJPA.enums.IcesiAccountType;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
@@ -20,7 +21,7 @@ public class IcesiAccount {
 
     private String accountNumber;
     private long balance;
-    private String type;
+    private IcesiAccountType type;
     private Boolean active;
 
     @ManyToOne
