@@ -32,11 +32,10 @@ public class IcesiAccountService {
         return "Account saved";
     }
 
-    private boolean isAValidBalance(Long balance){
+    private void isAValidBalance(Long balance){
         if (balance < 0){
             throw new ParameterRequired("Balance can't be negative");
         }
-        return true;
     }
 
     private void setIcesiUserToIcesiAccount(IcesiAccountDTO icesiAccountDTO, IcesiAccount icesiAccount) {
