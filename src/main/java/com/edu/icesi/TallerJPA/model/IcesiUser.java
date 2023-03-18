@@ -4,7 +4,7 @@ import lombok.Builder;
 import lombok.Data;
 
 import javax.persistence.*;
-import java.util.Set;
+import java.util.List;
 import java.util.UUID;
 
 @Data
@@ -26,9 +26,9 @@ public class IcesiUser {
     private String password;
 
     @OneToMany(mappedBy = "icesiUser")
-    private Set<IcesiAccount> accounts;
+    private List<IcesiAccount> accounts;
 
-    @ManyToOne
+    @ManyToOne(optional = false)
     @JoinColumn(name = "icesi_role_role_id", nullable = false)
     private IcesiRole icesiRole;
 }

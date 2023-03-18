@@ -7,7 +7,7 @@ import com.edu.icesi.TallerJPA.repository.UserRepository;
 import lombok.AllArgsConstructor;
 import org.springframework.stereotype.Service;
 
-import java.util.Optional;
+import java.util.List;
 import java.util.UUID;
 
 @Service
@@ -28,16 +28,14 @@ public class UserService {
 
         }else if(userRepository.findByPhoneNumber(userCreateDTO.getPhoneNumber()).isPresent()){
             throw new RuntimeException("User with this phone number already exists");
+
+        }else if(userCreateDTO.getIcesiRole() == null){
+            throw new RuntimeException("Role can't be null");
         }
+
         IcesiUser icesiUser = userMapper.fromIcesiUserDTO(userCreateDTO);
         icesiUser.setUserId(UUID.randomUUID());
 
         return userRepository.save(icesiUser);
-    }
-
-    private IcesiUser validateUserEmail(UserCreateDTO userCreateDTO){
-        Optional<IcesiUser> icesiUser = userRepository.findByEmail(userCreateDTO.getEmail());
-
-        return icesiUser.orElseThrow(() -> new RuntimeException("User with this email already exists"));
     }
 }

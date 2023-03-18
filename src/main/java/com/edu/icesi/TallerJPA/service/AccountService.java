@@ -7,10 +7,9 @@ import com.edu.icesi.TallerJPA.repository.AccountRepository;
 import lombok.AllArgsConstructor;
 import org.springframework.stereotype.Service;
 
-import java.util.List;
-import java.util.Optional;
 import java.util.Random;
 import java.util.UUID;
+import java.util.function.Supplier;
 
 @Service
 @AllArgsConstructor
@@ -22,14 +21,14 @@ public class AccountService {
 
     public IcesiAccount save(AccountCreateDTO accountCreateDTO) {
 
-        accountCreateDTO.setAccountNumber(generateNumberAccount());
+        accountCreateDTO.setAccountNumber(sendToGenerateAccountNumbers());
 
         if (accountRepository.findByAccountNumber(accountCreateDTO.getAccountNumber()).isPresent()) {
             throw new RuntimeException("Account already exists, try again");
         }
 
         if (validateBalance(accountCreateDTO.getBalance())) {
-            throw new RuntimeException("Balance can't be 0");
+            throw new RuntimeException("Balance can't be below 0");
         }
 
         IcesiAccount icesiAccount = accountMapper.fromIcesiAccountDTO(accountCreateDTO);
@@ -38,13 +37,20 @@ public class AccountService {
         return accountRepository.save(icesiAccount);
     }
 
-    public String generateNumberAccount() {
+    public String sendToGenerateAccountNumbers(){
 
-        String first = generateNumbers(3);
-        String middle = generateNumbers(6);
-        String last = generateNumbers(2);
+        String accountNumber = "";
+        accountNumber += generateAccountNumber(3).get();
+        accountNumber += "-";
+        accountNumber += generateAccountNumber(6).get();
+        accountNumber += "-";
+        accountNumber += generateAccountNumber(2).get();
 
-        return first + "-" + middle + "-" + last;
+        return accountNumber;
+    }
+
+    public Supplier<String> generateAccountNumber(int length) {
+        return () -> generateNumbers(length);
     }
 
     public String generateNumbers(int length) {
@@ -55,50 +61,40 @@ public class AccountService {
         for (int i = 0; i < length; i++) {
             stringWithId += random.nextInt(10);
         }
+
         return stringWithId;
     }
 
     public boolean validateBalance(long balance) {
 
-        boolean verification = false;
-
-        if (balance == 0) {
-            verification = true;
-        }
-        return verification;
+        return balance < 0;
     }
 
-    public IcesiAccount setStateAccount(String accountNumber) {
+    public void setStateAccount(AccountCreateDTO account, String accountNumber) {
 
-        Optional<IcesiAccount> account = accountRepository.findByAccountNumber(accountNumber);
+        if (accountRepository.findByAccountNumber(accountNumber).isPresent()){
+            if (account.getBalance() == 0 && account.isActive()){
+                account.setActive(false);
 
-        if (account.isPresent()){
-            if (account.get().getBalance() == 0 && account.get().isActive()){
-                account.get().setActive(false);
-
-            } else if (account.get().getBalance() != 0 && !account.get().isActive()) {
-                account.get().setActive(true);
-
-            } else if (!account.get().isActive()) {
-                account.get().setActive(true);
+            } else if (!account.isActive()) {
+                account.setActive(true);
 
             }else{
                 throw new RuntimeException("Account can't change status");
             }
+        }else {
+            throw new RuntimeException("Account not found");
         }
 
-        return account.orElseThrow(() -> new RuntimeException("Account not found"));
     }
 
-    public IcesiAccount withdrawals(List<IcesiAccount> accounts, String accountNumber, int moneyToWithdraw) {
+    public void withdrawals(AccountCreateDTO account, String accountNumber, int moneyToWithdraw) {
 
-        List<IcesiAccount> icesiAccount = accounts.stream().filter(account -> account != null && account.getAccountNumber().equalsIgnoreCase(accountNumber)).toList();
-
-        if (!icesiAccount.isEmpty()) {
-            long balance = icesiAccount.get(0).getBalance();
+        if (accountRepository.findByAccountNumber(accountNumber).isPresent()) {
+            long balance = account.getBalance();
 
             if (balance > moneyToWithdraw) {
-                icesiAccount.get(0).setBalance(balance - moneyToWithdraw);
+                account.setBalance(balance - moneyToWithdraw);
 
             } else {
                 throw new RuntimeException("Insufficient money");
@@ -107,38 +103,54 @@ public class AccountService {
             throw new RuntimeException("Account not found");
         }
 
-        return icesiAccount.get(0);
     }
 
-    public IcesiAccount depositMoney(String destinationAccountNumber, int moneyToDeposit) {
-        Optional<IcesiAccount> account = accountRepository.findByAccountNumber(destinationAccountNumber);
+    public void depositMoney(AccountCreateDTO account, String accountNumber,int moneyToDeposit) {
 
-        account.ifPresent(icesiAccount -> icesiAccount.setBalance(icesiAccount.getBalance() + moneyToDeposit));
+        if (accountRepository.findByAccountNumber(accountNumber).isPresent() && moneyToDeposit > 0){
+            account.setBalance(account.getBalance() + moneyToDeposit);
 
-        return account.orElseThrow(() -> new RuntimeException("Account not found"));
+        }else if (moneyToDeposit <= 0){
+            throw new RuntimeException("Invalid value");
+        }
+        else {
+            throw new RuntimeException("Account not found");
+        }
     }
 
-    public IcesiAccount transferMoney(List<IcesiAccount> accounts, String sourceAccountNumber, String destinationAccountNumber, int moneyToTransfer) {
+    public void transferMoney(AccountCreateDTO sourceAccount, AccountCreateDTO destinationAccount, int moneyToTransfer) {
 
-        List<IcesiAccount> sourceAccount = accounts.stream().filter(source -> source.getAccountNumber().equals(sourceAccountNumber)).toList();
+        if (accountRepository.findByAccountNumber(sourceAccount.getAccountNumber()).isPresent() &&
+                accountRepository.findByAccountNumber(destinationAccount.getAccountNumber()).isPresent() &&
+                validateAccountType(sourceAccount, destinationAccount)){
 
-        List<IcesiAccount> destinationAccount = accounts.stream().filter(destination -> destination.getAccountNumber().equals(destinationAccountNumber)).toList();
+            if (sourceAccount.getBalance() >= moneyToTransfer ){
+                sourceAccount.setBalance(sourceAccount.getBalance() - moneyToTransfer);
+                destinationAccount.setBalance(destinationAccount.getBalance() + moneyToTransfer);
 
-        if (!sourceAccount.isEmpty() && !destinationAccount.isEmpty() &&
-                !sourceAccount.get(0).getType().equals("Deposit Only") && !destinationAccount.get(0).getType().equals("Deposit Only")) {
-
-            if (sourceAccount.get(0).getBalance() >= moneyToTransfer){
-                destinationAccount.get(0).setBalance(destinationAccount.get(0).getBalance() + moneyToTransfer);
+            } else if (moneyToTransfer < 0) {
+                throw new RuntimeException("Invalid value");
 
             } else{
                 throw new RuntimeException("Insufficient money to make a transfer");
             }
         }else {
-            throw new RuntimeException("The transfer not was possible");
+            validateAccountType(sourceAccount, destinationAccount);
         }
-
-        return destinationAccount.get(0);
     }
 
+    private boolean validateAccountType(AccountCreateDTO accountCreateDTO, AccountCreateDTO accountCreateDTO1) {
+
+        boolean verificationOfType = true;
+
+        if (accountCreateDTO == null || accountCreateDTO1 == null) {
+            throw new RuntimeException("It is not possible to make the transfer. At least one account not exists");
+        }
+        else if(accountCreateDTO.getType().equalsIgnoreCase("Deposit Only") || accountCreateDTO1.getType().equalsIgnoreCase("Deposit Only")){
+            throw new RuntimeException("It is not possible to make the transfer. At least one account is deposit only");
+        }
+
+        return verificationOfType;
+    }
 
 }

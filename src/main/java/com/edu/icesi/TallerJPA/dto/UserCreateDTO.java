@@ -1,9 +1,8 @@
 package com.edu.icesi.TallerJPA.dto;
 
+import com.edu.icesi.TallerJPA.model.IcesiRole;
 import lombok.Builder;
 import lombok.Data;
-
-import java.util.UUID;
 
 @Data
 @Builder
@@ -18,5 +17,7 @@ public class UserCreateDTO {
     private String phoneNumber;
 
     private String password;
+
+    private IcesiRole icesiRole;
 
 }

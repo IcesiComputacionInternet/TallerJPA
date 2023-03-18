@@ -6,7 +6,7 @@ import lombok.Data;
 import javax.persistence.Entity;
 import javax.persistence.Id;
 import javax.persistence.OneToMany;
-import java.util.Set;
+import java.util.List;
 import java.util.UUID;
 
 @Data
@@ -22,5 +22,5 @@ public class IcesiRole {
     private String name;
 
     @OneToMany(mappedBy = "icesiRole")
-    private Set<IcesiUser> icesiUsers;
+    private List<IcesiUser> icesiUsers;
 }

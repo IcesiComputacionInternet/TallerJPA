@@ -1,6 +1,6 @@
 package com.edu.icesi.TallerJPA.dto;
 
-import com.edu.icesi.TallerJPA.model.IcesiRole;
+import com.edu.icesi.TallerJPA.model.IcesiUser;
 import lombok.Builder;
 import lombok.Data;
 
@@ -16,5 +16,5 @@ public class AccountCreateDTO {
 
     private boolean active;
 
-    private IcesiRole role;
+    private IcesiUser icesiUser;
 }
