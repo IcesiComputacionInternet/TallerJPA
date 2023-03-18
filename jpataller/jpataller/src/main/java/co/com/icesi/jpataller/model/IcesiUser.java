@@ -5,8 +5,8 @@ import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
-import javax.persistence.Entity;
-import javax.persistence.Id;
+import javax.persistence.*;
+import java.util.List;
 import java.util.UUID;
 
 @Data
@@ -28,4 +28,11 @@ public class IcesiUser {
     private String phoneNumber;
 
     private String password;
+
+    @ManyToOne
+    @JoinColumn(name="icesi_role_role_id", nullable = false)
+    private IcesiRole role;
+
+    @OneToMany(mappedBy = "accountOwner")
+    private List<IcesiAccount> accounts;
 }
