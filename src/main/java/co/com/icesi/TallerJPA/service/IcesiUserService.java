@@ -21,9 +21,6 @@ public class IcesiUserService {
     private final IcesiRoleRepository roleRepository;
     private final IcesiUserMapper mapper;
 
-
-    //TODO: CHECK THE IMPLEMENTATION FOR GET
-
     public boolean save(IcesiUserDTO dto){
 
         if(mainRepository.findByEmail(dto.getEmail()).isPresent() && mainRepository.findByPhoneNumber(dto.getPhoneNumber()).isPresent()){
@@ -37,7 +34,7 @@ public class IcesiUserService {
             user.setUserID(UUID.randomUUID());
             user.setAccounts(new ArrayList<>());
 
-            if (roleRepository.findByName(user.getRole().getName()).isPresent()) {
+            if (user.getRole()!=null && roleRepository.findByName(user.getRole().getName()).isPresent()) {
                 IcesiRole relation  = roleRepository.findByName(user.getRole().getName()).get();
                 relation.getUsers().add(user);
                 user.setRole(relation);
@@ -45,7 +42,7 @@ public class IcesiUserService {
                 roleRepository.save(relation);
                 return true;
             } else {
-                throw new RuntimeException("This role doesn't exist");
+                throw new RuntimeException("This role doesn't exist or is null");
             }
 
         }

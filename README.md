@@ -43,10 +43,10 @@ entity with details about the number and balance also a type which can be a norm
 
 Besides creation of the user, role and account you'll implement the following functions.
 
-- A function in AccountService to enable/disable the account.
-- A function in AccountService to withdrawal money.
-- A function in AccountService to deposit money.
-- A function in AccountService to transfer money to another account.
+- A function in AccountService to enable/disable the account. [DONE]
+- A function in AccountService to withdrawal money. [DONE]
+- A function in AccountService to deposit money. [DONE]
+- A function in AccountService to transfer money to another account. [DONE]
 
 For testing keep in mind edge cases they can be considered to increase the note. The basic ones are expected to be tested.
 

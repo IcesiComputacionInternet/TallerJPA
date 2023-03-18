@@ -6,7 +6,6 @@ import co.com.icesi.TallerJPA.model.IcesiRole;
 import co.com.icesi.TallerJPA.repository.IcesiRoleRepository;
 import lombok.AllArgsConstructor;
 import org.springframework.stereotype.Service;
-
 import java.util.ArrayList;
 import java.util.List;
 import java.util.UUID;
@@ -19,7 +18,6 @@ public class IcesiRoleService {
     private final IcesiRoleMapper mapper;
 
     public IcesiRole save(IcesiRoleDTO dto){
-
         if(repository.findByName(dto.getName()).isPresent()){
             throw new RuntimeException("This name's role already exists");
         }else{
@@ -28,9 +26,6 @@ public class IcesiRoleService {
             role.setUsers(new ArrayList<>());
             return  repository.save(role);
         }
-
-
-
     }
 
     public List<IcesiRoleDTO> getRoles(){

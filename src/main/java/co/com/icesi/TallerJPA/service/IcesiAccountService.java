@@ -49,10 +49,9 @@ public class IcesiAccountService {
 
     }
 
-    public boolean manageAccount(String id, String action){
-        UUID accountID = UUID.fromString(id);
-        if(mainRespository.findByAccountId(accountID).isPresent()){
-            IcesiAccount account = mainRespository.findByAccountId(accountID).get();
+    public boolean manageAccount(String accountNumber, String action){
+        if(mainRespository.findByAccountNumber(accountNumber).isPresent()){
+            IcesiAccount account = mainRespository.findByAccountNumber(accountNumber).get();
             if(action.equalsIgnoreCase("enable") && !account.isActive()){
                 account.setActive(true);
             }else if(action.equalsIgnoreCase("disable")){
@@ -61,7 +60,6 @@ public class IcesiAccountService {
                 }else{
                     return false;
                 }
-
             }else{
                 return  false;
             }
@@ -86,7 +84,6 @@ public class IcesiAccountService {
         }else{
             return  false;
         }
-
     }
 
     public boolean  depositMoney (String accountNumber, Long amount ){
@@ -109,11 +106,11 @@ public class IcesiAccountService {
     public boolean transferMoney(String accountNumberSource,String accountNumberDestination, Long amount){
         Optional<IcesiAccount> accountSource = mainRespository.findByAccountNumber(accountNumberSource);
         Optional<IcesiAccount> accountDestination  = mainRespository.findByAccountNumber(accountNumberDestination);
-        if(accountSource.isPresent() && accountDestination.isPresent()&& amount >0){
+        if(accountSource.isPresent() && accountDestination.isPresent()){
             if(!isDeposit(accountDestination.get()) && !isDeposit(accountSource.get())){
                 return depositMoney(accountNumberDestination,amount) && withdrawalMoney(accountNumberSource , amount);
             } else {
-                throw new RuntimeException("One of the accounts can not transfer money");
+                throw new RuntimeException("One of the accounts can't perform the transaction or one of them has is type deposit");
             }
 
         }else{
