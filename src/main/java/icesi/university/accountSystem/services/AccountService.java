@@ -45,12 +45,13 @@ public class AccountService {
             throw new RuntimeException("Account not found");
         }
         else{
-            Optional<IcesiAccount> account = icesiAccountRepository.findByAccountNumber(accountNumber);
-            if(account.get().isActive()){
+            Optional<IcesiAccount> accountOptional = icesiAccountRepository.findByAccountNumber(accountNumber);
+            IcesiAccount account = accountOptional.get();
+            if(accountOptional.get().isActive()){
                 throw new RuntimeException("Account is already activated");
             }else{
-                account.get().setActive(true);
-                icesiAccountRepository.save(account.get());
+                account.setActive(true);
+                icesiAccountRepository.save(account);
             }
         }
     }
@@ -79,7 +80,7 @@ public class AccountService {
         if(accountOptional.isPresent()){
             IcesiAccount account = accountOptional.get();
             if(!account.isActive()){
-                throw  new RuntimeException("Account is not active")
+                throw new RuntimeException("Account is not active");
             }
             else if(account.getBalance()<amount){
                 throw new RuntimeException("Account doesn't have enough balance");

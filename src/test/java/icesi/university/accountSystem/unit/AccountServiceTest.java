@@ -18,8 +18,7 @@ import java.util.ArrayList;
 import java.util.Optional;
 import java.util.UUID;
 
-import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.junit.jupiter.api.Assertions.assertTrue;
+import static org.junit.jupiter.api.Assertions.*;
 import static org.mockito.Mockito.*;
 
 public class AccountServiceTest {
@@ -69,6 +68,7 @@ public class AccountServiceTest {
         verify(accountRepository, atLeast(1)).save(any());
         assertEquals(icesiAccount.getBalance(), 900L);
     }
+
     @Test
     public void deposit() {
         when(accountRepository.findByAccountNumber(any())).thenReturn(Optional.ofNullable(createDefaultAccount()));
@@ -97,16 +97,6 @@ public class AccountServiceTest {
     }
 
     @Test
-    public void deactivateAccountWithBalanceDifferent0() {
-        when(accountRepository.findByAccountNumber(any())).thenReturn(Optional.ofNullable(createDefaultAccount()));
-        when(accountRepository.save(any())).thenReturn(createDefaultAccount());
-
-        IcesiAccount icesiAccount = createDefaultAccount();
-        assertThrows(RuntimeException.class,()->accountService.deactivateAccount(icesiAccount.getAccountNumber()));
-        verify(accountRepository, times(2)).findByAccountNumber(any());
-    }
-
-    @Test
     public void activateAccountAlreadyActivate() {
         when(accountRepository.findByAccountNumber(any())).thenReturn(Optional.ofNullable(createDefaultAccount()));
         when(accountRepository.save(any())).thenReturn(createDefaultAccount());
@@ -114,6 +104,16 @@ public class AccountServiceTest {
         IcesiAccount icesiAccount = createDefaultAccount();
 
         assertThrows(RuntimeException.class,()->accountService.activateAccount(icesiAccount.getAccountNumber()));
+        verify(accountRepository, times(2)).findByAccountNumber(any());
+    }
+
+    @Test
+    public void deactivateAccountWithBalanceDifferent0() {
+        when(accountRepository.findByAccountNumber(any())).thenReturn(Optional.ofNullable(createDefaultAccount()));
+        when(accountRepository.save(any())).thenReturn(createDefaultAccount());
+
+        IcesiAccount icesiAccount = createDefaultAccount();
+        assertThrows(RuntimeException.class,()->accountService.deactivateAccount(icesiAccount.getAccountNumber()));
         verify(accountRepository, times(2)).findByAccountNumber(any());
     }
 
@@ -185,6 +185,17 @@ public class AccountServiceTest {
                 .build();
     }
 
+    private IcesiAccount createDisableAccount() {
+        return IcesiAccount.builder()
+                .accountId(UUID.randomUUID())
+                .active(false)
+                .user(createDefaultUser())
+                .type("NORMAL")
+                .balance(0)
+                .accountNumber("123-456789-12")
+                .build();
+    }
+
     private IcesiAccount createAnotherAccount() {
         return IcesiAccount.builder()
                 .active(true)
@@ -200,7 +211,7 @@ public class AccountServiceTest {
                 .active(true)
                 .user(createDefaultUser())
                 .type("DEPOSIT")
-                .balance(10000L)
+                .balance(10000)
                 .accountNumber("123-456789-10")
                 .build();
     }
@@ -210,7 +221,7 @@ public class AccountServiceTest {
                 .active(true)
                 .user(createDefaultUser())
                 .type("NORMAL")
-                .balance(10000L)
+                .balance(10000)
                 .accountNumber("123-456789-10")
                 .build();
     }
