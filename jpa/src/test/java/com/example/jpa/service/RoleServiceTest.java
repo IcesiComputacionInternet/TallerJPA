@@ -31,17 +31,7 @@ public class RoleServiceTest {
 
     @Test
     public void testSaveRole(){
-        when(roleRepository.findByName(any())).thenReturn(Optional.empty());
-        when(roleRepository.save(any())).thenReturn(defaultRole()
-        roleService.save(defaultRoleDTO());
-        verify(roleRepository, times(1)).save(argThat(new RoleMatcher(defaultRole())));
-        verify(roleMapper, times(1)).fromRoleDTO(any());
-    }
-
-    @Test
-    public void createRole() {
-        when(roleRepository.findByName(any())).thenReturn(Optional.empty());
-        when(roleRepository.save(any())).thenReturn(defaultRole());
+        when(roleRepository.getByName(any())).thenReturn(Optional.empty());
         roleService.save(defaultRoleDTO());
         verify(roleRepository, times(1)).save(argThat(new RoleMatcher(defaultRole())));
         verify(roleMapper, times(1)).fromRoleDTO(any());
@@ -49,7 +39,7 @@ public class RoleServiceTest {
 
     @Test
     public void testSaveRoleWhenRoleNameAlreadyExists(){
-        when(roleRepository.findByName(any())).thenReturn(Optional.of(defaultRole()));
+        when(roleRepository.getByName(any())).thenReturn(Optional.of(defaultRole()));
         try {
             roleService.save(defaultRoleDTO());
             fail();
@@ -74,7 +64,7 @@ public class RoleServiceTest {
 
     private IcesiRole defaultRole() {
         return IcesiRole.builder()
-                .name("ROLE_USER")
+                .name(ROLE_USER)
                 .description("User role test")
                 .build();
     }

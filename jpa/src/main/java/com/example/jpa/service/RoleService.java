@@ -23,7 +23,7 @@ public class RoleService {
     @SneakyThrows
     public IcesiRole save(RoleDTO roleDTO){
         //Role name should be unique
-        if (roleRepository.findByName(roleDTO.getName())){
+        if (roleRepository.getByName(roleDTO.getName()).isPresent()){
             throw new RuntimeException("Role name already exists");
         }else{
             IcesiRole role = roleMapper.fromRoleDTO(roleDTO);
