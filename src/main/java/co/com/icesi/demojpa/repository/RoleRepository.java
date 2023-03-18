@@ -1,8 +1,7 @@
 package co.com.icesi.demojpa.repository;
 
-import co.com.icesi.demojpa.model.IcesiAccount;
+
 import co.com.icesi.demojpa.model.IcesiRole;
-import co.com.icesi.demojpa.model.IcesiUser;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.stereotype.Repository;
 

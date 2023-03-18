@@ -40,7 +40,7 @@ public class UserService {
             throw new RuntimeException("Ya hay un usuario con este celular");
         } else if (user.getRoleName().isEmpty()) {
             throw new RuntimeException("El usuario no tiene rol");
-        } else if (!roleRepository.findByName(user.getRoleName()).isPresent()) {
+        } else if (roleRepository.findByName(user.getRoleName()).isEmpty()) {
             throw new RuntimeException("Este rol no existe");
         }
         IcesiUser icesiUser = userMapper.fromIcesiUserDTO(user);

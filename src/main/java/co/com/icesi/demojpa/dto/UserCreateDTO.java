@@ -1,6 +1,6 @@
 package co.com.icesi.demojpa.dto;
 
-import co.com.icesi.demojpa.model.IcesiRole;
+
 import lombok.Builder;
 import lombok.Data;
 
