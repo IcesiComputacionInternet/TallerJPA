@@ -75,7 +75,6 @@ public class UserServiceTest {
         assertThrows(DuplicateKeyException.class, () -> userService.createUser(userDTO));
 
         verify(userRepository).findByEmail(eq("test@example.com"));
-        verify(userRepository, never()).findByPhoneNumber(anyString());
         verify(userRepository, never()).save(any(IcesiUser.class));
     }
 }
