@@ -6,6 +6,7 @@ import org.springframework.data.jpa.repository.Modifying;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
 
+import java.util.Optional;
 import java.util.UUID;
 
 public interface AccountRepository extends JpaRepository<IcesiAccount, UUID> {
@@ -21,7 +22,11 @@ public interface AccountRepository extends JpaRepository<IcesiAccount, UUID> {
     @Query("UPDATE IcesiAccount a SET a.active = false WHERE a.accountNumber = :accountNumber AND a.balance = 0")
     void inactiveAccount(@Param("accountNumber") String accountNumber);
 
-    @Query("SELECT a.active FROM IcesiAccount a WHERE a.accountNumber =:accountNumber")
+    @Query("SELECT a.active FROM IcesiAccount a WHERE a.accountNumber = :accountNumber")
     Boolean IcesiAccountByActive(@Param("accountNumber") String accountNumber);
+
+    @Modifying
+    @Query("UPDATE IcesiAccount a SET a.balance = a.balance - :withdrawal WHERE a.accountNumber = :accountNumber")
+    void withdrawalAccount(@Param("accountNumber") String accountNumber, @Param("withdrawal") Long withdrawal);
 
 }

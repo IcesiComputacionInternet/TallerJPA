@@ -20,6 +20,8 @@ public class IcesiAccount {
     private UUID accountId;
 
     private String accountNumber;
+
+    @Column(name = "balance", nullable = false, columnDefinition = "BIGINT CHECK (balance >= 0)")
     private long balance;
     private IcesiAccountType type;
     private Boolean active;

@@ -25,4 +25,9 @@ public class IcesiAccountController {
     public String inactiveAccount(@PathVariable String accountNumber){
         return accountService.disableAccount(accountNumber);
     }
+
+    @PatchMapping("/account/withdrawal/{accountNumber}")
+    public String withdrawalAccount(@PathVariable String accountNumber, @RequestBody Long value){
+        return accountService.withdrawal(accountNumber, value);
+    }
 }

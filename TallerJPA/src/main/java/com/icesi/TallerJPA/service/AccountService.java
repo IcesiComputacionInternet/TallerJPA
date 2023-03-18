@@ -9,6 +9,7 @@ import com.icesi.TallerJPA.model.IcesiAccount;
 import com.icesi.TallerJPA.repository.AccountRepository;
 import com.icesi.TallerJPA.repository.UserRespository;
 import lombok.AllArgsConstructor;
+import org.springframework.dao.DataIntegrityViolationException;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -81,6 +82,16 @@ public class AccountService {
             return "The account " + accountNumber + " was inactive";
         } else {
             throw new RuntimeException("This account can not be disable");
+        }
+    }
+
+    @Transactional
+    public String withdrawal(String accountNumber, Long value){
+        try{
+            accountRepository.withdrawalAccount(accountNumber, value);
+            return "The withdrawal was successful";
+        } catch (DataIntegrityViolationException e){
+            throw new DataIntegrityViolationException("You don't have the amount necessary");
         }
     }
 
