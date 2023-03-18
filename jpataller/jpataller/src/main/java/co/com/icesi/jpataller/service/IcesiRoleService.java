@@ -35,6 +35,6 @@ public class IcesiRoleService {
         if (icesiUser.isEmpty()) {
             throw new RuntimeException("No existe un usuario con este id");
         }
-        icesiRole.getUsers().add(icesiUser.get());
+        icesiRole.getUsers().add(icesiUserRepository.findById(userId).get());
     }
 }

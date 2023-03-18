@@ -29,7 +29,7 @@ public class IcesiAccountService {
          if(icesiUserRepository.findById(UUID.fromString(icesiAccountDTO.getUserId())).isEmpty()) {
             throw new RuntimeException("No existe un usuario que cree esta cuenta.");
          } else if (icesiAccountDTO.getBalance() < 0) {
-            throw new RuntimeException("El balance de la cuenta es menor de 0.");
+            throw new RuntimeException("El balance de la cuenta es menor a 0");
          }
 
          IcesiAccount icesiAccount = icesiAccountMapper.fromDTO(icesiAccountDTO);
@@ -146,6 +146,8 @@ public class IcesiAccountService {
             } else if (destinyAccountOptional.isEmpty()) {
                 throw new RuntimeException("La cuenta de destino no existe");
             }
+        } else {
+            throw new RuntimeException("La cantidad de dinero debe ser mayor que 0.");
         }
     }
 
