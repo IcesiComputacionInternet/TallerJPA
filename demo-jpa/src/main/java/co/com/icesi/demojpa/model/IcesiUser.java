@@ -1,14 +1,15 @@
 package co.com.icesi.demojpa.model;
 
 import lombok.AllArgsConstructor;
+import lombok.Builder;
+import lombok.Data;
 
-import javax.persistence.Entity;
-import javax.persistence.Id;
-import javax.persistence.ManyToOne;
-import javax.persistence.OneToMany;
+import javax.persistence.*;
 import java.util.List;
 import java.util.UUID;
 
+@Data
+@Builder
 @Entity
 @AllArgsConstructor
 public class IcesiUser {
@@ -24,5 +25,6 @@ public class IcesiUser {
     private List<IcesiAccount> accounts;
 
     @ManyToOne
+    @JoinColumn(name = "role_id", nullable = false)
     private IcesiRole role;
 }
