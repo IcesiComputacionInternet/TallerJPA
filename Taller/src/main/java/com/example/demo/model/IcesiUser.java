@@ -12,7 +12,7 @@ import java.util.UUID;
 public class IcesiUser {
 
     @Id
-    private UUID userId;
+    private String userId;
     private String firstName;
     private String lastName;
     @Column(unique = true)
