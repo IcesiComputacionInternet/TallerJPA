@@ -13,11 +13,9 @@ import org.springframework.stereotype.Service;
 
 import java.util.*;
 import java.util.function.BiPredicate;
-import java.util.function.Function;
 import java.util.function.Predicate;
 import java.util.stream.Collectors;
 import java.util.stream.IntStream;
-import java.util.stream.Stream;
 
 @Service
 @AllArgsConstructor
@@ -41,6 +39,7 @@ public class AccountService {
     public String enableAccount(String accountNumber){
         IcesiAccount icesiAccount = findAccount(accountNumber);
         icesiAccount.setActive(true);
+        accountRepository.save(icesiAccount);
         return "The account has been activated";
     }
 
@@ -50,6 +49,7 @@ public class AccountService {
 
         if(hasNoFunds().test(balance)){
             icesiAccount.setActive(false);
+            accountRepository.save(icesiAccount);
             return "The account has been deactivated";
         }
 
@@ -71,6 +71,7 @@ public class AccountService {
 
         long newBalance = accountBalance - amountToWithdrawal;
         account.setBalance(newBalance);
+        accountRepository.save(account);
         return  "The withdrawal was successfully carried out";
     }
 
@@ -84,6 +85,7 @@ public class AccountService {
         long accountBalance = account.getBalance();
         long newAccountBalance = accountBalance + amountToDeposit;
         account.setBalance(newAccountBalance);
+        accountRepository.save(account);
         return "The deposit was successfully carried out";
     }
 
@@ -101,6 +103,8 @@ public class AccountService {
 
         withdrawal(accountNumberToWithdrawal, amountToDeposit);
         depositMoney(accountNumberToDeposit, amountToDeposit);
+        accountRepository.save(accountToWithdrawal);
+        accountRepository.save(accountToDeposit);
         return "The transaction was successfully completed";
     }
 
@@ -125,15 +129,10 @@ public class AccountService {
         String accountNumberGenerated = "";
 
         do {
-            IntStream threeDigitNumber = random.ints(3, 0, 10);
-            IntStream sixDigitNumber = random.ints(6, 0, 10);
-            IntStream twoDigitNumber = random.ints(2, 0, 10);
-
-            IntStream accountNumbers = IntStream.concat(threeDigitNumber, IntStream.concat(sixDigitNumber, twoDigitNumber));
-
-            accountNumberGenerated = accountNumbers
-                    .mapToObj(String::valueOf)
-                    .collect(Collectors.joining("-"));
+            int threeDigitNumber = random.nextInt(1000);
+            int sixDigitNumber = random.nextInt(1000000);
+            int twoDigitNumber = random.nextInt(100);
+            accountNumberGenerated = String.format("%03d-%06d-%02d", threeDigitNumber, sixDigitNumber, twoDigitNumber);
 
         }while (accountNumberInUse().test(accountNumberGenerated));
 

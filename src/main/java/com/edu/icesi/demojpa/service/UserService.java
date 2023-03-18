@@ -24,14 +24,14 @@ public class UserService {
         verifyFields(user);
         IcesiUser icesiUser = userMapper.fromIcesiUserDTO(user);
         icesiUser.setUserId(idGenerator());
-        icesiUser.setRole(findRole(user.getRole()));
+        icesiUser.setRole(findRole(user.getRoleType()));
         return userRepository.save(icesiUser);
     }
 
     public void verifyFields(UserCreateDTO user){
         String email = user.getEmail();
         String phoneNumber = user.getPhoneNumber();
-        String role = user.getRole();
+        String role = user.getRoleType();
         boolean emailIsUsed = isEmailInUse().test(email);
         boolean phoneNumberIsUsed = isPhoneNumberInUse().test(phoneNumber);
         boolean roleDontExists = isInvalidRole().test(role);
@@ -56,15 +56,15 @@ public class UserService {
         return UUID.randomUUID();
     }
 
-    private Predicate<String> isEmailInUse(){
+    public Predicate<String> isEmailInUse(){
         return (email) -> userRepository.findUserByEmail(email).isPresent();
     }
 
-    private Predicate<String> isPhoneNumberInUse(){
+    public Predicate<String> isPhoneNumberInUse(){
         return (phoneNumber) -> userRepository.finUserByPhoneNumber(phoneNumber).isPresent();
     }
 
-    private Predicate<String> isInvalidRole(){
+    public Predicate<String> isInvalidRole(){
         return (role) -> roleRepository.findRoleByName(role).isEmpty();
     }
 

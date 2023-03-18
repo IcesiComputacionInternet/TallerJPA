@@ -1,5 +1,6 @@
 package com.edu.icesi.demojpa.model;
 
+import lombok.Builder;
 import lombok.Data;
 
 import javax.persistence.*;
@@ -8,6 +9,7 @@ import java.util.UUID;
 
 @Data
 @Entity
+@Builder
 public class IcesiRole {
 
     @Id
