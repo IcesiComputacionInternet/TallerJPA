@@ -110,7 +110,44 @@ public class IcesiAccountService {
         }
     }
 
-    
+    public void transferMoney(String originAccountNumber, String destinyAccountNumber, long amount) {
+        Optional<IcesiAccount> originAccountOptional = icesiAccountRepository.findByAccountNumber(originAccountNumber);
+        Optional<IcesiAccount> destinyAccountOptional = icesiAccountRepository.findByAccountNumber(destinyAccountNumber);
+
+        if (amount > 0) {
+            if (originAccountOptional.isPresent() && destinyAccountOptional.isPresent()) {
+                IcesiAccount originAccount = originAccountOptional.get();
+                IcesiAccount destinyAccount = destinyAccountOptional.get();
+
+                if (originAccount.isActive() && destinyAccount.isActive()) {
+                    if (!originAccount.getType().equalsIgnoreCase("Deposit Only") && !destinyAccount.getType().equalsIgnoreCase("Deposit Only")) {
+                        if (originAccount.getBalance() >= amount) {
+                            originAccount.setBalance(originAccount.getBalance() - amount);
+                            destinyAccount.setBalance(destinyAccount.getBalance() + amount);
+
+                            icesiAccountRepository.save(originAccount);
+                            icesiAccountRepository.save(destinyAccount);
+
+                        } else {
+                            throw new RuntimeException("La cuenta de origen no tiene dinero suficiente");
+                        }
+                    } else if (originAccount.getType().equalsIgnoreCase("Deposit Only")) {
+                        throw new RuntimeException("La cuenta de origen es del tipo solo deposito");
+                    } else if (destinyAccount.getType().equalsIgnoreCase("Deposit Only")) {
+                        throw new RuntimeException("La cuenta de destino es del tipo solo deposito");
+                    }
+                } else if (!originAccount.isActive()) {
+                    throw new RuntimeException("La cuenta de origen está desactivada");
+                } else if (!destinyAccount.isActive()) {
+                    throw new RuntimeException("La cuenta de destino está desactivada");
+                }
+            } else if (originAccountOptional.isEmpty()) {
+                throw new RuntimeException("La cuenta de origen no existe");
+            } else if (destinyAccountOptional.isEmpty()) {
+                throw new RuntimeException("La cuenta de destino no existe");
+            }
+        }
+    }
 
 
 
