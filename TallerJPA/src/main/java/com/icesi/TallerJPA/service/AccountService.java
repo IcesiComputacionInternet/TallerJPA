@@ -26,22 +26,17 @@ public class AccountService {
     private final UserRespository userRespository;
 
     public IcesiAccountResponseDTO save(IcesiAccountDTO icesiAccountDTO) {
-
         if(icesiAccountDTO.getBalance() <= 0 ){throw new RuntimeException("Balance can't be below 0");}
-
         return createAccount(icesiAccountDTO);
     }
 
     public IcesiAccountResponseDTO createAccount(IcesiAccountDTO icesiAccountDTO){
 
         IcesiAccount icesiAccount = accountMapper.fromIcesiAccountDTO(icesiAccountDTO);
-
         icesiAccount.setIcesiUser(userRespository.findIcesiUserByEmail(icesiAccountDTO.getEmailUser())
                 .orElseThrow(()-> new RuntimeException("User not found")));
-
         icesiAccount.setAccountId(UUID.randomUUID());
         icesiAccount.setAccountNumber(setAccountNumberGenerate(generateAccountNumber()));
-
         setTypeAccount(icesiAccountDTO.getType().getValue(), icesiAccount);
 
         return accountMapper.toResponse(accountRepository.save(icesiAccount));
