@@ -25,7 +25,6 @@ public class RoleService {
         }
         IcesiRole icesiRole=roleMapper.fromIcesiRoleDTO(role);
         icesiRole.setRoleId(UUID.randomUUID());
-        icesiRole.setUsers(new ArrayList<>());
         return roleRepository.save(icesiRole);
     }
 

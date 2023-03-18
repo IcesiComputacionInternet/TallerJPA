@@ -38,7 +38,6 @@ public class AccountService {
         icesiAccount.setAccountId(UUID.randomUUID());
         icesiAccount.setAccountNumber(accountNumberSupplier().get());
         icesiAccount.setUser(icesiUser);
-        icesiUser.getAccounts().add(icesiAccount);
 
         return accountRepository.save(icesiAccount);
 
