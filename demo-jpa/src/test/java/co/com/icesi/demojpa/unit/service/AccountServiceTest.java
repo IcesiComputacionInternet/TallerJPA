@@ -196,6 +196,17 @@ public class AccountServiceTest {
         when(accountRepository.findByNumber(createDefaultPositiveBalanceAccount().getAccountNumber())).thenReturn(Optional.ofNullable(createDefaultPositiveBalanceAccount()));
         when(accountRepository.findByNumber(createDefault0BalanceAccount().getAccountNumber())).thenReturn(Optional.ofNullable(createDefault0BalanceAccount()));
         when(accountRepository.save(any())).thenReturn(createDepositAccount());
+
+        IcesiAccount sourceAccount = accountRepository.findByNumber(createDefaultPositiveBalanceAccount().getAccountNumber()).get();
+        IcesiAccount targetAccount = accountRepository.findByNumber(createDefault0BalanceAccount().getAccountNumber()).get();
+        accountService.transferMoney(sourceAccount.getAccountNumber(),targetAccount.getAccountNumber() ,1000);
+
+        verify(accountRepository, times(2)).save(any());
+
+        assertEquals(999000,sourceAccount.getBalance());
+
+        assertEquals(1000,targetAccount.getBalance());
+
     }
 
     @Test
@@ -283,7 +294,7 @@ public class AccountServiceTest {
         return IcesiAccount.builder()
                 .accountId(UUID.randomUUID())
                 .accountNumber("123-456789-12")
-                .type("Deposit")
+                .type("Default")
                 .user(defaultCreateUser())
                 .balance(0)
                 .active(true)
