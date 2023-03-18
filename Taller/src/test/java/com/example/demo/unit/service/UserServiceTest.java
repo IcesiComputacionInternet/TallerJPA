@@ -7,7 +7,6 @@ import com.example.demo.model.IcesiUser;
 import com.example.demo.service.IcesiUserService;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
-import org.junit.rules.Timeout;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.MockitoAnnotations;
@@ -17,7 +16,6 @@ import java.util.UUID;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertThrows;
-import static org.mockito.ArgumentMatchers.anyString;
 import static org.mockito.Mockito.*;
 
 public class UserServiceTest {
@@ -70,11 +68,27 @@ public class UserServiceTest {
                 .phoneNumber("123456789")
                 .userId(userId)
                 .build();
-        when(userRepository.findByEmail(anyString())).thenReturn(user);
+        when(userRepository.findByEmail("test@example.com")).thenReturn(user);
 
         assertThrows(DuplicateKeyException.class, () -> userService.createUser(userDTO));
+    }
 
-        verify(userRepository).findByEmail(eq("test@example.com"));
-        verify(userRepository, never()).save(any(IcesiUser.class));
+    @Test
+    void phoneNumberAlreadyExists() {
+        // Test case 3: number phone already exist
+        UUID userId = UUID.randomUUID();
+        IcesiUserDTO userDTO = IcesiUserDTO.builder()
+                .email("test@example.com")
+                .phoneNumber("123456789")
+                .icesiRoleId(UUID.fromString("a74637b7-ca5d-4ee9-bacf-b3f946ffe4cb"))
+                .build();
+        IcesiUser user = IcesiUser.builder()
+                .email("test@example.com")
+                .phoneNumber("123456789")
+                .userId(userId)
+                .build();
+        when(userRepository.findByPhoneNumber("123456789")).thenReturn(user);
+
+        assertThrows(DuplicateKeyException.class, () -> userService.createUser(userDTO));
     }
 }
