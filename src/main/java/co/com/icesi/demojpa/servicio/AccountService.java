@@ -4,6 +4,7 @@ import co.com.icesi.demojpa.dto.AccountCreateDTO;
 import co.com.icesi.demojpa.mapper.AccountMapper;
 import co.com.icesi.demojpa.model.IcesiAccount;
 import co.com.icesi.demojpa.repository.AccountRepository;
+import co.com.icesi.demojpa.repository.UserRepository;
 import org.springframework.stereotype.Service;
 
 import javax.transaction.Transactional;
@@ -14,28 +15,38 @@ import java.util.stream.IntStream;
 
 @Service
 public class AccountService {
-    //TODO llenar esta clase
+
     private final Random rand= new Random();
     private final AccountRepository accountRepository;
 
+    private final UserRepository userRepository;
+
+    private final UserService userService;
     private final AccountMapper accountMapper;
 
-    public AccountService(AccountRepository accountRepository, AccountMapper accountMapper) {
+    public AccountService(AccountRepository accountRepository, UserRepository userRepository, UserService userService, AccountMapper accountMapper) {
         this.accountRepository = accountRepository;
+        this.userRepository = userRepository;
+        this.userService = userService;
         this.accountMapper = accountMapper;
     }
 
     public IcesiAccount save(AccountCreateDTO account){
         if(account.getBalance()<0){
             throw new RuntimeException("El balance no puede ser menor a 0");
+        } else if (userRepository.findById(UUID.fromString(account.getUserId())).isEmpty()) {
+            throw new RuntimeException("No existe una cuenta con esta id");
         }
 
+        //garantiza que no se repitan numeros entre cuentas :D
         String number=genNumber();
         while(accountRepository.findByAccountNumber(number).isPresent()){
             number=genNumber();
         }
         IcesiAccount icesiAccount = accountMapper.fromIcesiAccountDTO(account);
-        icesiAccount.setAccountNumber(genNumber());
+        icesiAccount.setAccount(userRepository.findById(UUID.fromString(account.getUserId())).get());
+        icesiAccount.setAccountNumber(number);
+        userService.addAccount(icesiAccount.getAccount(), icesiAccount.getAccountNumber());
         icesiAccount.setAccountId(UUID.randomUUID());
         return accountRepository.save(icesiAccount);
     }
@@ -46,7 +57,7 @@ public class AccountService {
         return String.format("%s-%s-%s",number.substring(0,3),number.substring(3,9),number.substring(9,11));
     }
 
-    //TODO disable account
+
     @Transactional
     public void disableAccount(String accountNumber){
         if(accountRepository.findByAccountNumber(accountNumber).isPresent() && accountRepository.findByAccountNumber(accountNumber).get().getBalance()==0){
@@ -59,7 +70,7 @@ public class AccountService {
     }
 
 
-    //TODO enable account
+
     public void enableAccount(String accountNumber){
         if(accountRepository.findByAccountNumber(accountNumber).isPresent() && !accountRepository.findByAccountNumber(accountNumber).get().isActive()){
             accountRepository.enableAccount(accountNumber);
@@ -70,7 +81,7 @@ public class AccountService {
         }
     }
 
-    //TODO withdrawal
+
     public void withdrawal(String accountNumber, long withdrawalAmount){
         if(accountRepository.findByAccountNumber(accountNumber).isPresent() &&
                 accountRepository.findByAccountNumber(accountNumber).get().getBalance()>=withdrawalAmount &&
@@ -90,7 +101,7 @@ public class AccountService {
         }
     }
 
-    //TODO deposit
+
     public void deposit(String accountNumber, long depositAmount){
         if(accountRepository.findByAccountNumber(accountNumber).isPresent() &&
                 accountRepository.findByAccountNumber(accountNumber).get().isActive() &&
@@ -107,7 +118,7 @@ public class AccountService {
         }
     }
 
-    //TODO transfer
+
     public void transfer(String sendAccNum, String receiveAccNum, long sendValue){
         if(accountRepository.findByAccountNumber(sendAccNum).isPresent() &&
                 accountRepository.findByAccountNumber(receiveAccNum).isPresent() &&

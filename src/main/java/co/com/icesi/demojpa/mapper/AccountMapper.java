@@ -6,7 +6,7 @@ import org.mapstruct.Mapper;
 
 @Mapper(componentModel = "spring")
 public interface AccountMapper {
-    //TODO llenar esta clase
+
 
     IcesiAccount fromIcesiAccountDTO(AccountCreateDTO accountCreateDTO);
 

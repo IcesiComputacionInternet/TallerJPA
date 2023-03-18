@@ -6,7 +6,6 @@ import org.springframework.data.jpa.repository.Modifying;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.stereotype.Repository;
 
-import java.util.List;
 import java.util.Optional;
 import java.util.UUID;
 
@@ -29,10 +28,5 @@ public interface AccountRepository extends JpaRepository<IcesiAccount, UUID> {
     void updateBalance(String accountNumber, long balance);
 
 
-    @Query(value = "SELECT a FROM IcesiAccount a WHERE a.accountNumber= :fromString")
-    Optional<IcesiAccount> findAll(String fromString);
 
-
-    @Query(value = "select a from IcesiAccount a")
-    List<IcesiAccount> findAll();
 }

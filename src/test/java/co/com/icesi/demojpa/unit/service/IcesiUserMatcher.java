@@ -8,7 +8,7 @@ import java.util.Objects;
 
 public class IcesiUserMatcher implements ArgumentMatcher<IcesiUser> {
 
-    private IcesiUser icesiUserLeft;
+    private final IcesiUser icesiUserLeft;
 
     public IcesiUserMatcher(IcesiUser icesiUser1) {
         icesiUserLeft=icesiUser1;

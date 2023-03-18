@@ -9,7 +9,7 @@ import java.util.Objects;
 public class IcesiRoleMatcher implements ArgumentMatcher<IcesiRole> {
 
 
-    private IcesiRole icesiRoleLeft;
+    private final IcesiRole icesiRoleLeft;
 
     public IcesiRoleMatcher(IcesiRole icesiRoleLeft) {
         this.icesiRoleLeft = icesiRoleLeft;

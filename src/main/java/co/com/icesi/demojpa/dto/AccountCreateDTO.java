@@ -3,9 +3,6 @@ package co.com.icesi.demojpa.dto;
 import lombok.Builder;
 import lombok.Data;
 
-import java.util.List;
-import java.util.Optional;
-
 @Data
 @Builder
 public class AccountCreateDTO {
@@ -18,5 +15,5 @@ public class AccountCreateDTO {
 
     private boolean active;
 
-    private Optional<List<UserCreateDTO>> users;
+    private String userId;
 }

@@ -7,7 +7,6 @@ import lombok.NoArgsConstructor;
 
 import javax.persistence.*;
 import java.util.List;
-import java.util.Objects;
 import java.util.UUID;
 
 @Data
@@ -38,7 +37,7 @@ public class IcesiUser {
     @ManyToOne
     @JoinColumn(name="icesi_role_role_id", nullable=false)
     private IcesiRole role;
-    //TODO desdocumentar esto
+
 
     @OneToMany(mappedBy = "account")
     private List<IcesiAccount> accounts;

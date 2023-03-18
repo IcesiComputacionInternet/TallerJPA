@@ -9,4 +9,5 @@ public class RoleCreateDTO {
     private String description;
 
     private  String name;
+
 }

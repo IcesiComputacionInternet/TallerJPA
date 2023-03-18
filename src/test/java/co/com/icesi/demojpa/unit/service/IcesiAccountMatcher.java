@@ -1,6 +1,5 @@
 package co.com.icesi.demojpa.unit.service;
 
-import ch.qos.logback.core.net.SyslogOutputStream;
 import co.com.icesi.demojpa.model.IcesiAccount;
 import org.mockito.ArgumentMatcher;
 
@@ -8,7 +7,7 @@ import java.util.Objects;
 
 public class IcesiAccountMatcher implements ArgumentMatcher<IcesiAccount> {
 
-    private IcesiAccount icesiAccountLeft;
+    private final IcesiAccount icesiAccountLeft;
 
     public IcesiAccountMatcher(IcesiAccount icesiAccountLeft) {
         this.icesiAccountLeft = icesiAccountLeft;
