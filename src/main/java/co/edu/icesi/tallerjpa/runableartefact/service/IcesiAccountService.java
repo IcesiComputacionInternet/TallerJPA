@@ -23,12 +23,20 @@ public class IcesiAccountService {
     private final IcesiAccountMapper icesiAccountMapper;
 
     public String saveNewAccount(IcesiAccountDTO icesiAccountDTO) {
+        isAValidBalance(icesiAccountDTO.getBalance());
         IcesiAccount icesiAccount = icesiAccountMapper.toIcesiAccount(icesiAccountDTO);
         icesiAccount.setAccountId(UUID.randomUUID());
         icesiAccount.setAccountNumber(generateAccountNumberThatDontExist());
         setIcesiUserToIcesiAccount(icesiAccountDTO, icesiAccount);
         icesiAccountRepository.save(icesiAccount);
         return "Account saved";
+    }
+
+    private boolean isAValidBalance(Long balance){
+        if (balance < 0){
+            throw new ParameterRequired("Balance can't be negative");
+        }
+        return true;
     }
 
     private void setIcesiUserToIcesiAccount(IcesiAccountDTO icesiAccountDTO, IcesiAccount icesiAccount) {
