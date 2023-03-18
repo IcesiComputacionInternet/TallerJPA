@@ -41,16 +41,16 @@ public class AccountService {
     }
 
     public void activateAccount(String accountNumber){
-        if(icesiAccountRepository.findByAccountNumber(accountNumber).isEmpty()){
+        if( icesiAccountRepository.findByAccountNumber(accountNumber).isEmpty()){
             throw new RuntimeException("Account not found");
         }
         else{
-            Optional<IcesiAccount> accountOptional = icesiAccountRepository.findByAccountNumber(accountNumber);
-            IcesiAccount account = accountOptional.get();
-            if(accountOptional.get().isActive()){
+            IcesiAccount account =  icesiAccountRepository.findByAccountNumber(accountNumber).get();
+            if(account.isActive()){
                 throw new RuntimeException("Account is already activated");
             }else{
                 account.setActive(true);
+                System.out.println(account.isActive());
                 icesiAccountRepository.save(account);
             }
         }
@@ -67,6 +67,7 @@ public class AccountService {
             }else{
                 if(account.get().getBalance()==0){
                     account.get().setActive(false);
+                    System.out.println(account.get().isActive());
                     icesiAccountRepository.save(account.get());
                 }else{
                     throw new RuntimeException("Account balance is different from 0");

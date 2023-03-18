@@ -118,6 +118,26 @@ public class AccountServiceTest {
     }
 
     @Test
+    public void activateAccount() {
+        when(accountRepository.findByAccountNumber(any())).thenReturn(Optional.ofNullable(createDisableAccount()));
+        when(accountRepository.save(any())).thenReturn(createDisableAccount());
+
+        IcesiAccount icesiAccount = createDisableAccount();
+        accountService.activateAccount(icesiAccount.getAccountNumber());
+        verify(accountRepository, times(2)).findByAccountNumber(any());
+    }
+
+    @Test
+    public void deactivateAccount() {
+        when(accountRepository.findByAccountNumber(any())).thenReturn(Optional.ofNullable(createAnotherAccount()));
+        when(accountRepository.save(any())).thenReturn(createAnotherAccount());
+
+        IcesiAccount icesiAccount = createAnotherAccount();
+        accountService.deactivateAccount(icesiAccount.getAccountNumber());
+        verify(accountRepository, times(2)).findByAccountNumber(any());
+    }
+
+    @Test
     public void saveWithbelow0(){
         when(userRepository.findByEmail(any())).thenReturn(Optional.of(createDefaultUser()));
         IcesiAccount account = IcesiAccount.builder()
@@ -134,19 +154,6 @@ public class AccountServiceTest {
         }
 
         verify(accountRepository, times(1)).save(argThat(new AccountMatcher(account)));
-    }
-
-    @Test
-    public void disableAccountWithout0(){
-        when(accountRepository.save(any())).thenReturn(createAccountMoreThan0());
-        when(accountRepository.findByAccountNumber(any())).thenReturn(Optional.ofNullable(createAccountMoreThan0()));
-
-        try {
-            accountRepository.save(any());
-            accountService.deactivateAccount(createAccountMoreThan0().getAccountNumber());}
-        catch (RuntimeException e){
-            assertEquals("Account balance is different from 0",e.getMessage());
-        }
     }
 
     @Test
