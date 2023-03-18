@@ -4,6 +4,7 @@ import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.Setter;
 
+import javax.persistence.Column;
 import javax.persistence.Entity;
 import javax.persistence.Id;
 import javax.persistence.OneToMany;
@@ -17,6 +18,7 @@ public class IcesiRole {
     @Id
     private UUID roleId;
     private String description;
+    @Column(unique = true)
     private String name;
 
     @OneToMany(mappedBy = "icesiRole")
