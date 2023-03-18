@@ -106,14 +106,14 @@ public class UserServiceTest {
     }
 
     private UserCreateDTO defaultUserCreateDTO(){
-        RoleCreateDTO roleCreateDTO= defaultRoleCreateDTO();
+
         return UserCreateDTO.builder()
                 .firstName("Julieta")
                 .lastName("Venegas")
                 .email("julietav@example.com")
                 .phoneNumber("3184441232")
                 .password("julieta123")
-                .roleCreateDTO(roleCreateDTO)
+                .roleCreateDTO(defaultRoleCreateDTO())
                 .build();
     }
 
@@ -130,14 +130,14 @@ public class UserServiceTest {
 
 
     private IcesiUser defaultIcesiUser(){
-      IcesiRole icesiRole=defaultIcesiRole();
+
         return IcesiUser.builder()
                 .firstName("Julieta")
                 .lastName("Venegas")
                 .email("julietav@example.com")
                 .phoneNumber("3184441232")
                 .password("julieta123")
-                .role(icesiRole)
+                .role(defaultIcesiRole())
                 .userId(UUID.randomUUID())
                 .build();
     }

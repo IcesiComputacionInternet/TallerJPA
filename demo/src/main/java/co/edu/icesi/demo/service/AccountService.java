@@ -140,7 +140,7 @@ public class AccountService {
     }
 
     public void changeState(String accountNumber, boolean active){ //enable/disable
-        validateAccountNumber(accountNumber);
+       validateAccountNumber(accountNumber);
         IcesiAccount icesiAccount=accountRepository.findByAccountNumber(accountNumber).get();
         if(!active && icesiAccount.getBalance()>0){
             throw new RuntimeException("Balance is not 0. Account can't be disabled");
