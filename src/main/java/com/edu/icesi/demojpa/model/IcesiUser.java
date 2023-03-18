@@ -19,10 +19,10 @@ public class IcesiUser {
     private String phoneNumber;
     private String password;
 
-    @OneToMany(mappedBy = "icesiUser")
-    private Set<IcesiAccount> icesiAccounts;
+    @OneToMany(mappedBy = "user")
+    private Set<IcesiAccount> accounts;
 
     @ManyToOne(optional = false)
-    @JoinColumn(name = "icesi_user_user_id", nullable = false)
-    private IcesiRole icesiRole;
+    @JoinColumn(name = "icesi_role_users", nullable = false)
+    private IcesiRole role;
 }

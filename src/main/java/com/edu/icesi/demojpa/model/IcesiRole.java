@@ -15,7 +15,7 @@ public class IcesiRole {
     private String description;
     private String name;
 
-    @OneToMany(mappedBy = "icesiRole")
-    private Set<IcesiUser> icesiUsers;
+    @OneToMany(mappedBy = "role")
+    private Set<IcesiUser> users;
 
 }

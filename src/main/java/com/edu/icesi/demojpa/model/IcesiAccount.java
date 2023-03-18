@@ -20,6 +20,6 @@ public class IcesiAccount {
     private boolean active;
 
     @ManyToOne()
-    @JoinColumn(name = "icesi_user_icesi_accounts")
-    private IcesiUser icesiUser;
+    @JoinColumn(name = "icesi_user_accounts")
+    private IcesiUser user;
 }

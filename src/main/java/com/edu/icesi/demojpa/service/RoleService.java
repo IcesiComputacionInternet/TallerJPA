@@ -8,6 +8,7 @@ import lombok.AllArgsConstructor;
 import org.springframework.stereotype.Service;
 
 import java.util.UUID;
+import java.util.function.Predicate;
 
 @Service
 @AllArgsConstructor
@@ -16,24 +17,26 @@ public class RoleService {
     private final RoleMapper roleMapper;
 
     public IcesiRole save(RoleCreateDTO role){
-        String name = role.getName();
-
-        if(isNameInUse(name)){
-            fieldIsRepeatedException("name");
-        }
-
+        verifyFieldInUse(role);
         IcesiRole icesiRole = roleMapper.fromIcesiRoleDTO(role);
-        icesiRole.setRoleId(roleIdGenerator());
-
+        icesiRole.setRoleId(idGenerator());
         return roleRepository.save(icesiRole);
     }
 
-    public UUID roleIdGenerator(){
+    public void verifyFieldInUse(RoleCreateDTO role){
+        String name = role.getName();
+
+        if(isNameInUse().test(name)){
+            fieldIsRepeatedException("name");
+        }
+    }
+
+    public UUID idGenerator(){
         return UUID.randomUUID();
     }
 
-    public boolean isNameInUse(String name){
-        return roleRepository.findRoleByName(name).isPresent();
+    public Predicate<String> isNameInUse(){
+        return (name) -> roleRepository.findRoleByName(name).isPresent();
     }
 
     private void fieldIsRepeatedException(String field) {
