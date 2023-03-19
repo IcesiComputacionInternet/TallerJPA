@@ -9,6 +9,8 @@ import lombok.AllArgsConstructor;
 import lombok.Builder;
 import org.springframework.stereotype.Service;
 
+import java.util.UUID;
+
 
 @Service
 @AllArgsConstructor
@@ -20,22 +22,18 @@ public class IcesiUserService {
 
 
     public IcesiUser saveUser(IcesiUserDto icesiUserToSave){
-        return null;
-    }
-    //private final IcesiRoleRepository icesiRoleRepository;
-   // private final IcesiRoleMapper icesiRoleMapper;
-
-   /* public IcesiRole saveRole(IcesiRoleDto roleToSave){
-
-        //Role name should be unique
-        if(icesiRoleRepository.findByName(roleToSave.getName()).isPresent()){
-            throw new RuntimeException("Role already taken");
-        }else{
-            //comvert from dto to actual role
-            IcesiRole icesiRole = icesiRoleMapper.fromIcesiRoleDto(roleToSave);
-            //Generate id
-            icesiRole.setRoleId(UUID.randomUUID());
-            return icesiRoleRepository.save(icesiRole);
+        if(icesiUserRepository.findByEmail(icesiUserToSave.getEmail()).isPresent()){
+            if(icesiUserRepository.findByPhoneNumber(icesiUserToSave.getPhoneNumber()).isPresent()){
+                throw new RuntimeException("Both email and phone number are already taken");
+            }else{
+                throw new RuntimeException("Email has already been taken");
+            }
         }
-    }*/
+        if(icesiUserRepository.findByPhoneNumber(icesiUserToSave.getPhoneNumber()).isPresent()){
+            throw new RuntimeException("Phone number has already been taken");
+        }
+        IcesiUser icesiUser = icesiUserMapper.fromIcesiUserDto(icesiUserToSave);
+        icesiUser.setUserId(UUID.randomUUID());
+        return icesiUserRepository.save(icesiUser);
+    }
 }
