@@ -1,13 +1,12 @@
 package co.edu.icesi.demo.dto;
 
-import co.edu.icesi.demo.model.IcesiUser;
+
+import lombok.Builder;
 import lombok.Data;
 
 import javax.persistence.Entity;
-import javax.persistence.ManyToOne;
 import java.util.UUID;
-
-@Entity
+@Builder
 @Data
 public class IcesiAccountDto {
     private UUID accountId;
