@@ -3,12 +3,15 @@ package co.edu.icesi.demo.unit.service;
 import co.edu.icesi.demo.dto.IcesiAccountDto;
 import co.edu.icesi.demo.mapper.IcesiAccountMapper;
 import co.edu.icesi.demo.model.IcesiAccount;
+import co.edu.icesi.demo.model.IcesiRole;
 import co.edu.icesi.demo.repository.IcesiAccountRepository;
 import co.edu.icesi.demo.service.IcesiAccountService;
 import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
 
-import static org.mockito.Mockito.mock;
-import static org.mockito.Mockito.spy;
+import static org.mockito.ArgumentMatchers.argThat;
+import static org.mockito.Mockito.*;
+import static org.mockito.Mockito.times;
 
 public class IcesiAccountTest {
 
@@ -43,4 +46,11 @@ public class IcesiAccountTest {
                 .build();
     }
 
+    @Test
+    public void testSaveAccount(){
+        icesiAccountService.saveAccount(createDefaultIcesiAccountDto());
+        IcesiAccount icesiAccount = createDefaultIcesiAccount();
+
+        verify(icesiAccountRepository, times(1)).save(argThat(new IcesiRoleMatcher(icesiAccount)));
+    }
 }
