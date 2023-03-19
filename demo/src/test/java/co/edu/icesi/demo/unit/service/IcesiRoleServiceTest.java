@@ -1,0 +1,66 @@
+package co.edu.icesi.demo.unit.service;
+
+import co.edu.icesi.demo.dto.IcesiRoleDto;
+import co.edu.icesi.demo.mapper.IcesiRoleMapper;
+import co.edu.icesi.demo.model.IcesiRole;
+import co.edu.icesi.demo.repository.IcesiRoleRepository;
+import co.edu.icesi.demo.service.IcesiRoleService;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
+
+import java.util.Optional;
+
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.fail;
+import static org.mockito.Mockito.*;
+
+public class IcesiRoleServiceTest {
+
+    private IcesiRoleService icesiRoleService;
+
+    private IcesiRoleRepository icesiRoleRepository;
+
+    private IcesiRoleMapper icesiRoleMapper;
+
+    @BeforeEach
+    public void setup(){
+        icesiRoleRepository = mock(IcesiRoleRepository.class);
+        icesiRoleMapper = spy(IcesiRoleMapper.class);
+        icesiRoleService = new IcesiRoleService(icesiRoleRepository,icesiRoleMapper);
+    }
+
+    private IcesiRole createDefaultIcesiRole(){
+        return IcesiRole.builder()
+                .name("suffering_soul")
+                .description("me")
+                .build();
+    }
+
+    private IcesiRoleDto createDefaultIcesiRoleDto(){
+        return IcesiRoleDto.builder()
+                .name("suffering_soul")
+                .description("me")
+                .build();
+    }
+
+    @Test
+    public void testSaveRole(){
+        icesiRoleService.saveRole(createDefaultIcesiRoleDto());
+        IcesiRole icesiRole = createDefaultIcesiRole();
+
+        verify(icesiRoleRepository, times(1)).save(argThat(new IcesiRoleMatcher(icesiRole)));
+    }
+
+    @Test
+    public void testCreateExistingRoleName(){
+        when(icesiRoleRepository.findByName(any())).thenReturn(Optional.of(createDefaultIcesiRole()));
+        try {
+            icesiRoleService.saveRole(createDefaultIcesiRoleDto());
+            fail();
+        }catch (RuntimeException exception){
+            String msg = exception.getMessage();
+            assertEquals("Role already taken", msg);
+        }
+    }
+
+}
