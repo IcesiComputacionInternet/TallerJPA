@@ -51,6 +51,6 @@ public class IcesiAccountTest {
         icesiAccountService.saveAccount(createDefaultIcesiAccountDto());
         IcesiAccount icesiAccount = createDefaultIcesiAccount();
 
-        verify(icesiAccountRepository, times(1)).save(argThat(new IcesiRoleMatcher(icesiAccount)));
+        verify(icesiAccountRepository, times(1)).save(argThat(new IcesiAccountMatcher(icesiAccount)));
     }
 }
