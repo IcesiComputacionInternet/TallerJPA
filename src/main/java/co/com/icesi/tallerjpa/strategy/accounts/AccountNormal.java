@@ -4,8 +4,8 @@ import co.com.icesi.tallerjpa.enums.TypeAccount;
 import co.com.icesi.tallerjpa.model.Account;
 import co.com.icesi.tallerjpa.strategy.accounts.interfaces.TypeAccountStrategy;
 
-public class AccountNormal implements TypeAccountStrategy {
 
+public class AccountNormal implements TypeAccountStrategy {
     @Override
     public TypeAccount getType() {
         return TypeAccount.ACCOUNT_NORMAL;
@@ -20,10 +20,10 @@ public class AccountNormal implements TypeAccountStrategy {
     }
 
     @Override
-    public void transfer(Long amount, Account accountOrigin, Account accountDestination, boolean isReceiverAccountValid) {
+    public void transfer(Long amount, Account accountOrigin, Account accountDestination) {
         generalValidations(accountOrigin, amount);
         generalValidations(accountDestination, amount);
-        if(!isReceiverAccountValid) { throw new RuntimeException("The account type does not allow transfers"); }
+        if(!accountDestination.getType().getStrategy().isReceiverAccountValid()) { throw new RuntimeException("The account type does not allow transfers"); }
         if(accountOrigin.getBalance() < amount) { throw new RuntimeException("Insufficient funds"); }
         accountOrigin.setBalance(accountOrigin.getBalance() - amount);
         accountDestination.setBalance(accountDestination.getBalance() + amount);

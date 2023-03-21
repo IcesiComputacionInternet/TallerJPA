@@ -4,9 +4,8 @@ import co.com.icesi.tallerjpa.enums.TypeAccount;
 import co.com.icesi.tallerjpa.model.Account;
 import co.com.icesi.tallerjpa.strategy.accounts.interfaces.TypeAccountStrategy;
 
+
 public class AccountDepositOnly implements TypeAccountStrategy {
-
-
     @Override
     public TypeAccount getType() {
         return TypeAccount.DEPOSIT_ONLY;
@@ -20,7 +19,7 @@ public class AccountDepositOnly implements TypeAccountStrategy {
     }
 
     @Override
-    public void transfer(Long amount, Account accountOrigin, Account accountDestination, boolean isReceiverAccountValid) {
+    public void transfer(Long amount, Account accountOrigin, Account accountDestination) {
         throw new UnsupportedOperationException("This account type does not transfer");
     }
 

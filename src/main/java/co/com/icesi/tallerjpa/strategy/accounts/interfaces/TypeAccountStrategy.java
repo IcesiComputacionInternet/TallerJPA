@@ -7,7 +7,7 @@ public interface TypeAccountStrategy {
 
     TypeAccount getType();
     void withdraw(Long amount, Account account);
-    void transfer(Long amount, Account accountOrigin, Account accountDestination, boolean isReceiverAccountValid);
+    void transfer(Long amount, Account accountOrigin, Account accountDestination);
     boolean isReceiverAccountValid();
     void deposit(Long amount, Account account);
 

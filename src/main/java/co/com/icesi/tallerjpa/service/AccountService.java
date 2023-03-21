@@ -61,8 +61,7 @@ public class AccountService {
         Account accountOrigin = getAccountByAccountNumber(accountNumberOrigin);
         Account accountDestination = getAccountByAccountNumber(accountNumberDestination);
 
-        boolean isReceiverAccountValid = accountDestination.getType().getStrategy().isReceiverAccountValid();
-        accountOrigin.getType().getStrategy().transfer(amount, accountOrigin, accountDestination, isReceiverAccountValid);
+        accountOrigin.getType().getStrategy().transfer(amount, accountOrigin, accountDestination);
 
         accountRepository.updateBalance(accountOrigin.getBalance(), accountNumberOrigin);
         accountRepository.updateBalance(accountDestination.getBalance(), accountNumberDestination);

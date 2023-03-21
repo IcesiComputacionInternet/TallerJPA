@@ -14,6 +14,7 @@ import co.com.icesi.tallerjpa.unit.matcher.AccountMatcher;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 
+import java.util.Optional;
 import java.util.UUID;
 
 import static org.junit.jupiter.api.Assertions.*;
@@ -39,7 +40,7 @@ public class AccountServiceTest {
 
     @Test
     public void testCreateAccount() {
-        when(userRepository.findByEmail(any())).thenReturn(java.util.Optional.of(defaultIcesiUser()));
+        when(userRepository.findByEmail(any())).thenReturn(Optional.of(defaultIcesiUser()));
         accountService.save(defaultAccountDTO());
 
         verify(userRepository, times(1)).findByEmail(any());
@@ -48,7 +49,7 @@ public class AccountServiceTest {
     }
     @Test
     public void testCreateAccountWithUserNotFound() {
-        when(userRepository.findByEmail(any())).thenReturn(java.util.Optional.empty());
+        when(userRepository.findByEmail(any())).thenReturn(Optional.empty());
 
         try {
             accountService.save(defaultAccountDTO());
@@ -63,7 +64,7 @@ public class AccountServiceTest {
 
     @Test
     public void testGetAccountByAccountNumber() {
-        when(accountRepository.findByAccountNumber(any())).thenReturn(java.util.Optional.of(defaultAccount()));
+        when(accountRepository.findByAccountNumber(any())).thenReturn(Optional.of(defaultAccount()));
 
         Account account = accountService.getAccountByAccountNumber("12345");
 
@@ -72,7 +73,7 @@ public class AccountServiceTest {
     }
     @Test
     public void testGetAccountByAccountNumberNotFound() {
-        when(accountRepository.findByAccountNumber(any())).thenReturn(java.util.Optional.empty());
+        when(accountRepository.findByAccountNumber(any())).thenReturn(Optional.empty());
 
         try {
             accountService.getAccountByAccountNumber("12345");
@@ -86,7 +87,7 @@ public class AccountServiceTest {
     @Test
     public void testWithdraw() {
         Account account = defaultAccount();
-        when(accountRepository.findByAccountNumber(any())).thenReturn(java.util.Optional.of(account));
+        when(accountRepository.findByAccountNumber(any())).thenReturn(Optional.of(account));
 
         accountService.withdraw(5L,"12345");
 
@@ -97,7 +98,7 @@ public class AccountServiceTest {
 
     @Test
     public void testWithdrawAccountNotFound() {
-        when(accountRepository.findByAccountNumber(any())).thenReturn(java.util.Optional.empty());
+        when(accountRepository.findByAccountNumber(any())).thenReturn(Optional.empty());
 
         try {
             accountService.withdraw(5L,"12345");
@@ -112,7 +113,7 @@ public class AccountServiceTest {
     @Test
     public void testWithdrawAmountGreaterThanBalance() {
         Account account = defaultAccount();
-        when(accountRepository.findByAccountNumber(any())).thenReturn(java.util.Optional.of(account));
+        when(accountRepository.findByAccountNumber(any())).thenReturn(Optional.of(account));
 
         try {
             accountService.withdraw(105L,"12345");
@@ -128,7 +129,7 @@ public class AccountServiceTest {
     public void testWithdrawAccountIsNotActive() {
         Account account = defaultAccount();
         account.setActive(false);
-        when(accountRepository.findByAccountNumber(any())).thenReturn(java.util.Optional.of(account));
+        when(accountRepository.findByAccountNumber(any())).thenReturn(Optional.of(account));
 
         try {
             accountService.withdraw(5L,"12345");
@@ -143,7 +144,7 @@ public class AccountServiceTest {
     @Test
     public void testDeposit() {
         Account account = defaultAccount();
-        when(accountRepository.findByAccountNumber(any())).thenReturn(java.util.Optional.of(account));
+        when(accountRepository.findByAccountNumber(any())).thenReturn(Optional.of(account));
 
         accountService.deposit(5L,"12345");
 
@@ -154,7 +155,7 @@ public class AccountServiceTest {
 
     @Test
     public void testDepositAccountNotFound() {
-        when(accountRepository.findByAccountNumber(any())).thenReturn(java.util.Optional.empty());
+        when(accountRepository.findByAccountNumber(any())).thenReturn(Optional.empty());
 
         try {
             accountService.deposit(5L,"12345");
@@ -169,7 +170,7 @@ public class AccountServiceTest {
     public void testDepositAccountIsNotActive() {
         Account account = defaultAccount();
         account.setActive(false);
-        when(accountRepository.findByAccountNumber(any())).thenReturn(java.util.Optional.of(account));
+        when(accountRepository.findByAccountNumber(any())).thenReturn(Optional.of(account));
 
         try {
             accountService.deposit(5L,"12345");
@@ -192,8 +193,8 @@ public class AccountServiceTest {
                 .accountNumber("54321")
                 .build();
 
-        when(accountRepository.findByAccountNumber("12345")).thenReturn(java.util.Optional.of(account));
-        when(accountRepository.findByAccountNumber("54321")).thenReturn(java.util.Optional.of(account2));
+        when(accountRepository.findByAccountNumber("12345")).thenReturn(Optional.of(account));
+        when(accountRepository.findByAccountNumber("54321")).thenReturn(Optional.of(account2));
 
         accountService.transfer(5L,"12345", "54321");
 
@@ -214,8 +215,8 @@ public class AccountServiceTest {
                 .accountNumber("54321")
                 .build();
 
-        when(accountRepository.findByAccountNumber("12345")).thenReturn(java.util.Optional.of(account));
-        when(accountRepository.findByAccountNumber("54321")).thenReturn(java.util.Optional.of(account2));
+        when(accountRepository.findByAccountNumber("12345")).thenReturn(Optional.of(account));
+        when(accountRepository.findByAccountNumber("54321")).thenReturn(Optional.of(account2));
 
         try {
             accountService.transfer(5L,"12345", "54321");
@@ -239,8 +240,8 @@ public class AccountServiceTest {
                 .accountNumber("54321")
                 .build();
 
-        when(accountRepository.findByAccountNumber("12345")).thenReturn(java.util.Optional.of(account));
-        when(accountRepository.findByAccountNumber("54321")).thenReturn(java.util.Optional.of(account2));
+        when(accountRepository.findByAccountNumber("12345")).thenReturn(Optional.of(account));
+        when(accountRepository.findByAccountNumber("54321")).thenReturn(Optional.of(account2));
 
         try {
             accountService.transfer(5L,"12345", "54321");
@@ -256,7 +257,7 @@ public class AccountServiceTest {
     @Test
     public void testTransferWithNoAccountNotAccepted() {
         Account account = defaultAccount();
-        when(accountRepository.findByAccountNumber(any())).thenReturn(java.util.Optional.of(account));
+        when(accountRepository.findByAccountNumber(any())).thenReturn(Optional.of(account));
 
         try {
             accountService.transfer(5L,"12345", "54321");
@@ -311,14 +312,14 @@ public class AccountServiceTest {
 
     @Test
     public void testGenerateAccountNumber() {
-        when(userRepository.findByEmail(any())).thenReturn(java.util.Optional.of(defaultIcesiUser()));
+        when(userRepository.findByEmail(any())).thenReturn(Optional.of(defaultIcesiUser()));
         accountService.save(defaultAccountDTO());
         verify(accountRepository, times(1)).existsByAccountNumber(any());
     }
 
     @Test
     public void testGenerateAccountNumberAlreadyExists() {
-        when(userRepository.findByEmail(any())).thenReturn(java.util.Optional.of(defaultIcesiUser()));
+        when(userRepository.findByEmail(any())).thenReturn(Optional.of(defaultIcesiUser()));
         when(accountRepository.existsByAccountNumber(any())).thenReturn(true, false);
         accountService.save(defaultAccountDTO());
         verify(accountRepository, times(2)).existsByAccountNumber(any());

@@ -12,6 +12,8 @@ import co.com.icesi.tallerjpa.service.UserService;
 import co.com.icesi.tallerjpa.unit.matcher.UserMatcher;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
+
+import java.util.Optional;
 import java.util.UUID;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
@@ -36,12 +38,36 @@ public class UserServiceTest {
 
     @Test
     public void testCreateUser(){
-        when(roleRepository.findByName(any())).thenReturn(defaultRole());
+        when(roleRepository.findByName(any())).thenReturn(Optional.of(defaultRole()));
 
         userService.save(defaultUserDTO());
         verify(roleRepository, times(1)).findByName(any());
         verify(userMapper, times(1)).fromUserDTO(any());
         verify(userRepository, times(1)).save(argThat(new UserMatcher(defaultIcesiUser())));
+    }
+
+    @Test
+    public void testCreateUserWhenRoleIsNull(){
+        RequestUserDTO userDTO = defaultUserDTO();
+        userDTO.setRole(null);
+
+        try{
+            userService.save(userDTO);
+        }catch (Exception e){
+            assertEquals("Role not found", e.getMessage());
+        }
+
+    }
+    @Test
+    public void testCreateUserWhenRoleDoesNotExist(){
+        when(roleRepository.findByName(any())).thenReturn(Optional.empty());
+
+        try{
+            userService.save(defaultUserDTO());
+        }catch (Exception e){
+            assertEquals("Role not found", e.getMessage());
+        }
+
     }
     @Test
     public void testCreateUserWhenEmailAlreadyExist(){
