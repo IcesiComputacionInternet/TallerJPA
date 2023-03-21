@@ -1,43 +1,43 @@
 package co.com.icesi.tallerjpa.controller;
 
+import co.com.icesi.tallerjpa.controller.api.AccountApi;
 import co.com.icesi.tallerjpa.dto.RequestAccountDTO;
 import co.com.icesi.tallerjpa.dto.ResponseAccountDTO;
+import co.com.icesi.tallerjpa.dto.TransactionDTO;
 import co.com.icesi.tallerjpa.service.AccountService;
 import lombok.AllArgsConstructor;
 import org.springframework.web.bind.annotation.*;
 
-@RestController
+@RestController(AccountApi.BASE_URL)
 @AllArgsConstructor
-public class AccountController {
+public class AccountController implements AccountApi {
 
     private final AccountService accountService;
 
-    @PostMapping("/add/account")
     public ResponseAccountDTO save(@RequestBody RequestAccountDTO account){
        return accountService.save(account);
     }
 
-    @PatchMapping("/withdraw/{accountNumber}")
-    public String withdraw(@PathVariable String accountNumber, @RequestBody Long amount){
-        return accountService.withdraw(amount, accountNumber);
+    public String withdraw(@RequestBody TransactionDTO transactionDTO){
+        return accountService.withdraw(transactionDTO.getAmount(), transactionDTO.getAccountNumberOrigin());
     }
 
-    @PatchMapping("/deposit/{accountNumber}")
-    public String deposit(@PathVariable String accountNumber, @RequestBody Long amount){
-        return accountService.deposit(amount, accountNumber);
+    public String deposit(@RequestBody TransactionDTO transactionDTO){
+        return accountService.deposit(transactionDTO.getAmount(), transactionDTO.getAccountNumberOrigin());
     }
 
-    @PatchMapping("/transfer/{accountNumberOrigin}/{accountNumberDestination}")
-    public String transfer(@PathVariable String accountNumberOrigin, @PathVariable String accountNumberDestination, @RequestBody Long amount){
-        return accountService.transfer(amount, accountNumberOrigin, accountNumberDestination);
+    public String transfer(@RequestBody TransactionDTO transactionDTO){
+        return accountService.transfer(
+                transactionDTO.getAmount(),
+                transactionDTO.getAccountNumberOrigin(),
+                transactionDTO.getAccountNumberDestination()
+        );
     }
 
-    @PatchMapping("/enableAccount/{accountNumber}")
     public String enableAccount(@PathVariable String accountNumber){
         return accountService.enableAccount(accountNumber);
     }
-
-    @PatchMapping("/disableAccount/{accountNumber}")
+    
     public String disableAccount(@PathVariable String accountNumber){
         return accountService.disableAccount(accountNumber);
     }

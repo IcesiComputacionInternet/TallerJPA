@@ -15,6 +15,7 @@ public class AccountMatcher implements ArgumentMatcher<Account> {
                     accountRight.getBalance().equals(accountLeft.getBalance()) &&
                     accountRight.getType().equals(accountLeft.getType()) &&
                     accountRight.isActive() == accountLeft.isActive() &&
-                    accountRight.getUser().getUserId().equals(accountLeft.getUser().getUserId());
+                    accountRight.getUser().getUserId().equals(accountLeft.getUser().getUserId()) &&
+                    accountRight.getAccountNumber().matches("^\\d{3}-\\d{6}-\\d{2}$");
         }
 }
