@@ -2,6 +2,8 @@ package co.com.icesi.tallerjpa.mapper;
 
 import co.com.icesi.tallerjpa.dto.RequestAccountDTO;
 import co.com.icesi.tallerjpa.dto.ResponseAccountDTO;
+import co.com.icesi.tallerjpa.dto.TransactionOperationDTO;
+import co.com.icesi.tallerjpa.dto.TransactionResultDTO;
 import co.com.icesi.tallerjpa.model.Account;
 import org.mapstruct.Mapper;
 import org.mapstruct.Mapping;
@@ -14,4 +16,6 @@ public interface AccountMapper {
     @Mapping(target = "user", source = "user",ignore=true)
     RequestAccountDTO fromAccount(Account account);
     ResponseAccountDTO fromAccountToSendAccountDTO(Account account);
+
+    TransactionResultDTO fromTransactionOperation(TransactionOperationDTO operationDTO, String result);
 }

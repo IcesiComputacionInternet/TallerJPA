@@ -2,6 +2,8 @@ package co.com.icesi.tallerjpa.controller;
 
 import co.com.icesi.tallerjpa.dto.RequestAccountDTO;
 import co.com.icesi.tallerjpa.dto.ResponseAccountDTO;
+import co.com.icesi.tallerjpa.dto.TransactionOperationDTO;
+import co.com.icesi.tallerjpa.dto.TransactionResultDTO;
 import co.com.icesi.tallerjpa.service.AccountService;
 import lombok.AllArgsConstructor;
 import org.springframework.web.bind.annotation.*;
@@ -17,19 +19,19 @@ public class AccountController {
        return accountService.save(account);
     }
 
-    @PatchMapping("/withdraw/{accountNumber}")
-    public String withdraw(@PathVariable String accountNumber, @RequestBody Long amount){
-        return accountService.withdraw(amount, accountNumber);
+    @PatchMapping("/withdraw/")
+    public TransactionResultDTO withdraw(@RequestBody TransactionOperationDTO transaction){
+        return accountService.withdraw(transaction);
     }
 
-    @PatchMapping("/deposit/{accountNumber}")
-    public String deposit(@PathVariable String accountNumber, @RequestBody Long amount){
-        return accountService.deposit(amount, accountNumber);
+    @PatchMapping("/deposit/")
+    public TransactionResultDTO deposit(@RequestBody TransactionOperationDTO transaction){
+        return accountService.deposit(transaction);
     }
 
-    @PatchMapping("/transfer/{accountNumberOrigin}/{accountNumberDestination}")
-    public String transfer(@PathVariable String accountNumberOrigin, @PathVariable String accountNumberDestination, @RequestBody Long amount){
-        return accountService.transfer(amount, accountNumberOrigin, accountNumberDestination);
+    @PatchMapping("/transfer/")
+    public TransactionResultDTO transfer(@RequestBody TransactionOperationDTO transaction){
+        return accountService.transfer(transaction);
     }
 
     @PatchMapping("/enableAccount/{accountNumber}")

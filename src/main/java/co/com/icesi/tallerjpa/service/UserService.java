@@ -11,7 +11,10 @@ import lombok.AllArgsConstructor;
 import lombok.SneakyThrows;
 import org.springframework.stereotype.Service;
 
+import java.util.ArrayList;
+import java.util.List;
 import java.util.UUID;
+import java.util.stream.Collectors;
 
 @Service
 @AllArgsConstructor
@@ -22,18 +25,28 @@ public class UserService {
     private final RoleRepository roleRepository;
 
     @SneakyThrows
-    public ResponseUserDTO save(RequestUserDTO userDTO){
+    public ResponseUserDTO save(RequestUserDTO userDTO) {
 
         boolean emailExists = userRepository.existsByEmail(userDTO.getEmail());
         boolean phoneExists = userRepository.existsByPhoneNumber(userDTO.getPhoneNumber());
 
-        if (emailExists && phoneExists){ throw new ExistsException("Email and Phone is already used");}
-        if (emailExists){ throw new ExistsException("Email already exists");}
-        if (phoneExists){ throw new ExistsException("Phone number already exists");}
+        List<String> errors = new ArrayList<>();
+
+        if (emailExists) {
+            errors.add("Email already exists");
+        }
+        if (phoneExists) {
+            errors.add("Phone number already exists");
+        }
+
+        if(!errors.isEmpty()){
+            throw new ExistsException(String.join(" ", errors));
+        }
 
         IcesiUser user = userMapper.fromUserDTO(userDTO);
         user.setUserId(UUID.randomUUID());
-        user.setRole(roleRepository.findByName(userDTO.getRole()));
+        var role = roleRepository.findByName(userDTO.getRole()).orElseThrow(() -> new ExistsException("Role doesn't exists"));
+        user.setRole(role);
 
         return userMapper.fromUserToSendUserDTO(userRepository.save(user));
 

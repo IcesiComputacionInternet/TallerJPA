@@ -19,11 +19,13 @@ public class RoleService {
     private final RoleMapper roleMapper;
 
     @SneakyThrows
-    public RoleDTO save(RoleDTO roleDTO){
+    public RoleDTO save(RoleDTO roleDTO) {
 
         boolean nameExists = roleRepository.existsByName(roleDTO.getName());
 
-        if (nameExists){ throw new ExistsException("Name already exists");}
+        if (nameExists) {
+            throw new ExistsException("Name already exists");
+        }
 
         Role role = roleMapper.fromRoleDTO(roleDTO);
         role.setRoleId(UUID.randomUUID());

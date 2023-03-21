@@ -14,8 +14,8 @@ public interface AccountRepository extends JpaRepository<Account, UUID> {
 
     @Query("SELECT CASE WHEN (COUNT(u) > 0) THEN true ELSE false END FROM Account u WHERE u.accountNumber = :accountNumber")
     boolean existsByAccountNumber(String accountNumber);
-    @Query("SELECT a FROM Account a WHERE a.accountNumber = :accountNumber")
-    Optional<Account> findByAccountNumber(String accountNumber);
+    @Query("SELECT a FROM Account a WHERE a.accountNumber = :accountNumber AND a.active = :isActive")
+    Optional<Account> findByAccountNumber(String accountNumber, boolean isActive);
     @Modifying
     @Query("UPDATE Account a SET a.balance = :balance WHERE a.accountNumber = :accountNumber")
     void updateBalance(Long balance, String accountNumber);
