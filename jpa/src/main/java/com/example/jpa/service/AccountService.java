@@ -2,6 +2,7 @@ package com.example.jpa.service;
 
 import com.example.jpa.dto.AccountRequestDTO;
 import com.example.jpa.dto.AccountResponseDTO;
+import com.example.jpa.dto.InactiveAccountException;
 import com.example.jpa.exceptions.AccountNotFoundException;
 import com.example.jpa.exceptions.AccountTypeException;
 import com.example.jpa.exceptions.BalanceNegativeException;
@@ -134,31 +135,37 @@ public class AccountService {
     /* Transfer money from one account to another, if the accounts are active,
      the balance is positive and the amount is less than the balance, and the type
      of the accounts is different from "deposit" */
+    //TODO: Make commit of this method
     public boolean transfer(String accountNumberFrom, String accountNumberTo, Long amount){
         if(accountRepository.getByAccountNumber(accountNumberFrom).isPresent() &&
                 accountRepository.getByAccountNumber(accountNumberTo).isPresent()){
             IcesiAccount accountFrom = accountRepository.getByAccountNumber(accountNumberFrom).get();
             IcesiAccount accountTo = accountRepository.getByAccountNumber(accountNumberTo).get();
-            if(accountFrom.isActive() && accountTo.isActive()){
-                if(accountFrom.getBalance() >= amount){
-                    if(accountFrom.getType().equalsIgnoreCase("deposit") ||
-                            accountTo.getType().equalsIgnoreCase("deposit")){
-                        throw new AccountTypeException("The account type is deposit only");
-                    }else {
-                        accountFrom.setBalance(accountFrom.getBalance() - amount);
-                        accountTo.setBalance(accountTo.getBalance() + amount);
-                        accountRepository.save(accountFrom);
-                        accountRepository.save(accountTo);
-                        return true;
-                    }
-                }else {
-                    throw new BalanceNegativeException("There is not enough money in the account, balance will be negative");
-                }
+            if((isEnableToTransfer(accountFrom, accountTo)) && (accountFrom.getBalance() >= amount)){
+                accountFrom.setBalance(accountFrom.getBalance() - amount);
+                accountTo.setBalance(accountTo.getBalance() + amount);
+                accountRepository.save(accountFrom);
+                accountRepository.save(accountTo);
+                return true;
             }else {
-                throw new BalanceNegativeException("The account is not active");
+                throw new BalanceNegativeException("There is not enough money in the account, balance will be negative");
             }
         }else {
             throw new AccountNotFoundException("Account not found");
+        }
+    }
+
+    //TODO: Make commit of this method
+    private boolean isEnableToTransfer(IcesiAccount accountFrom, IcesiAccount accountTo){
+        if(accountFrom.isActive() && accountTo.isActive()) {
+            if(!(accountFrom.getType().equalsIgnoreCase("deposit") ||
+                    accountTo.getType().equalsIgnoreCase("deposit"))) {
+                return true;
+            }else{
+                throw new AccountTypeException("One or both accounts are deposit only");
+            }
+        }else {
+            throw new InactiveAccountException("One or both accounts are not active");
         }
     }
 
