@@ -10,7 +10,7 @@ import java.util.List;
 import java.util.Optional;
 import java.util.UUID;
 
-@RestController
+@RestController("/accounts")
 public class AccountController {
 
     private final AccountService accountService;

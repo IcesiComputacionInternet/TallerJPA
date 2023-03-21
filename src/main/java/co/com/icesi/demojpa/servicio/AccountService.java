@@ -3,6 +3,7 @@ package co.com.icesi.demojpa.servicio;
 import co.com.icesi.demojpa.dto.AccountCreateDTO;
 import co.com.icesi.demojpa.mapper.AccountMapper;
 import co.com.icesi.demojpa.model.IcesiAccount;
+import co.com.icesi.demojpa.model.IcesiUser;
 import co.com.icesi.demojpa.repository.AccountRepository;
 import co.com.icesi.demojpa.repository.UserRepository;
 import org.springframework.stereotype.Service;
@@ -34,17 +35,17 @@ public class AccountService {
     public IcesiAccount save(AccountCreateDTO account){
         if(account.getBalance()<0){
             throw new RuntimeException("El balance no puede ser menor a 0");
-        } else if (userRepository.findById(UUID.fromString(account.getUserId())).isEmpty()) {
-            throw new RuntimeException("No existe una cuenta con esta id");
         }
 
-        //garantiza que no se repitan numeros entre cuentas :D
+        IcesiUser icesiUser = userRepository.findById(UUID.fromString(account.getUserId())).orElseThrow(() -> new RuntimeException("No existe una cuenta con esta id"));
+
         String number=genNumber();
         while(accountRepository.findByAccountNumber(number).isPresent()){
             number=genNumber();
         }
+
         IcesiAccount icesiAccount = accountMapper.fromIcesiAccountDTO(account);
-        icesiAccount.setAccount(userRepository.findById(UUID.fromString(account.getUserId())).get());
+        icesiAccount.setAccount(icesiUser);
         icesiAccount.setAccountNumber(number);
         userService.addAccount(icesiAccount.getAccount(), icesiAccount.getAccountNumber());
         icesiAccount.setAccountId(UUID.randomUUID());
@@ -60,100 +61,95 @@ public class AccountService {
 
     @Transactional
     public void disableAccount(String accountNumber){
-        if(accountRepository.findByAccountNumber(accountNumber).isPresent() && accountRepository.findByAccountNumber(accountNumber).get().getBalance()==0){
-            accountRepository.disableAccount(accountNumber);
-        }else if(accountRepository.findByAccountNumber(accountNumber).isEmpty()) {
-            throw new RuntimeException("No existe una cuenta con este numero");
-        }else{
+
+        IcesiAccount icesiAccount =  accountRepository.findByAccountNumber(accountNumber).orElseThrow(()-> new RuntimeException("No existe una cuenta con este numero"));
+
+        if(icesiAccount.getBalance()!=0){
             throw new RuntimeException("El balance de esta cuenta no es 0");
         }
-    }
 
+        accountRepository.disableAccount(accountNumber);
+
+    }
 
 
     public void enableAccount(String accountNumber){
-        if(accountRepository.findByAccountNumber(accountNumber).isPresent() && !accountRepository.findByAccountNumber(accountNumber).get().isActive()){
-            accountRepository.enableAccount(accountNumber);
-        }else if(accountRepository.findByAccountNumber(accountNumber).isEmpty()) {
-            throw new RuntimeException("No existe una cuenta con este numero");
-        }else{
+
+        accountRepository.findByAccountNumber(accountNumber).orElseThrow(()-> new RuntimeException("No existe una cuenta con este numero"));
+
+        if(accountRepository.findByAccountNumber(accountNumber).get().isActive()){
             throw new RuntimeException("La cuenta ya esta activada");
         }
-    }
+        accountRepository.enableAccount(accountNumber);
 
+    }
 
     public void withdrawal(String accountNumber, long withdrawalAmount){
-        if(accountRepository.findByAccountNumber(accountNumber).isPresent() &&
-                accountRepository.findByAccountNumber(accountNumber).get().getBalance()>=withdrawalAmount &&
-                accountRepository.findByAccountNumber(accountNumber).get().isActive() && withdrawalAmount>0){
 
-            accountRepository.updateBalance(accountNumber,accountRepository.findByAccountNumber(accountNumber).get().getBalance()-withdrawalAmount);
+        IcesiAccount icesiAccount= accountRepository.findByAccountNumber(accountNumber).orElseThrow(()-> new RuntimeException("No existe una cuenta con este numero"));
 
-        }else if(accountRepository.findByAccountNumber(accountNumber).isEmpty()) {
-            throw new RuntimeException("No existe una cuenta con este numero");
-        } else if (!accountRepository.findByAccountNumber(accountNumber).get().isActive()) {
+        if (!icesiAccount.isActive()) {
             throw new RuntimeException("La cuenta no esta activa");
-        } else if (withdrawalAmount<=0) {
+        }
+
+        if (withdrawalAmount<=0) {
             throw new RuntimeException("La cantidad de dinero que se quiere sacar debe ser mayor que 0");
-        }else{
-            //Este caso se da cuando lo que el usuario quiere sacar es mayor a lo que hay en la cuenta
+        }
+
+        if(icesiAccount.getBalance()<withdrawalAmount){
             throw new RuntimeException("No hay balance suficiente para sacar");
         }
-    }
 
+        accountRepository.updateBalance(accountNumber,icesiAccount.getBalance()-withdrawalAmount);
+
+    }
 
     public void deposit(String accountNumber, long depositAmount){
-        if(accountRepository.findByAccountNumber(accountNumber).isPresent() &&
-                accountRepository.findByAccountNumber(accountNumber).get().isActive() &&
-                accountRepository.findByAccountNumber(accountNumber).get().isActive() && depositAmount>0){
 
-            accountRepository.updateBalance(accountNumber,accountRepository.findByAccountNumber(accountNumber).get().getBalance()+depositAmount);
+        IcesiAccount icesiAccount= accountRepository.findByAccountNumber(accountNumber).orElseThrow(()-> new RuntimeException("No existe una cuenta con este numero"));
 
-        }else if(accountRepository.findByAccountNumber(accountNumber).isEmpty()) {
-            throw new RuntimeException("No existe una cuenta con este numero");
-        } else if (depositAmount<=0) {
+        if (depositAmount<=0) {
             throw new RuntimeException("La cantidad de dinero que se quiere depositar debe ser mayor que 0");
-        }else {
+        }
+
+        if(!icesiAccount.isActive()){
             throw new RuntimeException("La cuenta no esta activa");
         }
-    }
 
+        accountRepository.updateBalance(accountNumber,icesiAccount.getBalance()+depositAmount);
+    }
 
     public void transfer(String sendAccNum, String receiveAccNum, long sendValue){
-        if(accountRepository.findByAccountNumber(sendAccNum).isPresent() &&
-                accountRepository.findByAccountNumber(receiveAccNum).isPresent() &&
-                sendValue>0){
 
-            IcesiAccount send = accountRepository.findByAccountNumber(sendAccNum).get();
-            IcesiAccount receive = accountRepository.findByAccountNumber(receiveAccNum).get();
+        IcesiAccount sendIcesiAccount = accountRepository.findByAccountNumber(sendAccNum).orElseThrow(()->new RuntimeException("La cuenta que manda el dinero no existe"));
 
-            if(send.isActive() && receive.isActive() && send.getBalance()>=sendValue &&
-                    !checkType(sendAccNum) && !checkType(receiveAccNum)){
+        IcesiAccount receiveIcesiAccount = accountRepository.findByAccountNumber(receiveAccNum).orElseThrow(()->new RuntimeException("La cuenta que manda el dinero no existe"));
 
-                accountRepository.updateBalance(sendAccNum,send.getBalance()-sendValue);
-                accountRepository.updateBalance(receiveAccNum, receive.getBalance()+sendValue);
-
-            }else if (!send.isActive()){
-                throw new RuntimeException("La cuenta que manda el dinero no esta activa");
-            }else if(!receive.isActive()){
-                throw new RuntimeException("La cuenta que recibe el dinero no esta activa");
-            } else if (checkType(sendAccNum)) {
-                throw new RuntimeException("La cuenta que manda el dinero es de tipo 'deposit only' ");
-            } else if (checkType(receiveAccNum)) {
-                throw new RuntimeException("La cuenta que recibe el dinero es de tipo 'deposit only' ");
-            } else{
-                throw new RuntimeException("La cuenta que manda el dinero no tiene balance suficiente ");
-            }
-        }else if(accountRepository.findByAccountNumber(sendAccNum).isEmpty()) {
-            throw new RuntimeException("La cuenta que manda el dinero no existe");
-        } else if (sendValue<=0) {
+        if (sendValue<=0) {
             throw new RuntimeException("La cantidad de dinero que se quiere enviar debe ser mayor que 0");
-        } else {
-            throw new RuntimeException("La cuenta que recibe el dinero no existe");
         }
+        if (!sendIcesiAccount.isActive()){
+            throw new RuntimeException("La cuenta que manda el dinero no esta activa");
+        }
+        if (!receiveIcesiAccount.isActive()){
+            throw new RuntimeException("La cuenta que recibe el dinero no esta activa");
+        }
+        if (checkType(sendIcesiAccount)) {
+            throw new RuntimeException("La cuenta que manda el dinero es de tipo 'deposit only' ");
+        }
+        if (checkType(receiveIcesiAccount)) {
+            throw new RuntimeException("La cuenta que recibe el dinero es de tipo 'deposit only' ");
+        }
+        if(sendIcesiAccount.getBalance()<sendValue){
+            throw new RuntimeException("La cuenta que manda el dinero no tiene balance suficiente ");
+        }
+
+        accountRepository.updateBalance(sendAccNum,sendIcesiAccount.getBalance()-sendValue);
+        accountRepository.updateBalance(receiveAccNum, receiveIcesiAccount.getBalance()+sendValue);
+
     }
 
-    private boolean checkType(String accountNumber){
-        return accountRepository.findByAccountNumber(accountNumber).get().getType().equalsIgnoreCase("deposit only");
+    private boolean checkType(IcesiAccount account){
+        return account.getType().equalsIgnoreCase("deposit only");
     }
 }

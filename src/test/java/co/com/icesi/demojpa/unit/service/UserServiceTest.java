@@ -71,10 +71,12 @@ public class UserServiceTest {
     @Test
     public void testCreateUserWhenPhoneAlreadyExists(){
         IcesiRole role = testRole();
+        UserCreateDTO user=defaultUserCreateDTO();
+        user.setEmail("noEmail@gmail.com");
         when(roleRepository.findByName(role.getName())).thenReturn(Optional.of((role)));
         when(userRepository.findByPhone(any())).thenReturn(Optional.of(defaultIcesiUser()));
         try{
-            userService.save(defaultUserCreateDTO());
+            userService.save(user);
             fail();
         }catch (RuntimeException exception){
             String message = exception.getMessage();
