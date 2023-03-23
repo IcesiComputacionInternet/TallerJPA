@@ -3,6 +3,8 @@ package co.com.icesi.demojpa.unit.service;
 import co.com.icesi.demojpa.dto.UserCreateDTO;
 import co.com.icesi.demojpa.mapper.UserMapper;
 import co.com.icesi.demojpa.mapper.UserMapperImpl;
+import co.com.icesi.demojpa.mapper.response.UserResponseMapper;
+import co.com.icesi.demojpa.mapper.response.UserResponseMapperImpl;
 import co.com.icesi.demojpa.model.IcesiAccount;
 import co.com.icesi.demojpa.model.IcesiRole;
 import co.com.icesi.demojpa.model.IcesiUser;
@@ -34,14 +36,17 @@ public class UserServiceTest {
 
     private AccountRepository accountRepository;
 
+    private UserResponseMapper userResponseMapper;
+
     @BeforeEach
     private void init(){
         accountRepository=mock(AccountRepository.class);
         roleRepository = mock(RoleRepository.class);
         userRepository = mock(UserRepository.class);
+        userResponseMapper = spy(UserResponseMapperImpl.class);
         userMapper = spy(UserMapperImpl.class);
         roleService =mock(RoleService.class);
-        userService = new UserService(userRepository,userMapper, roleService, roleRepository, accountRepository);
+        userService = new UserService(userRepository,userMapper, roleService, roleRepository, accountRepository, userResponseMapper);
 
     }
 

@@ -1,7 +1,9 @@
 package co.com.icesi.demojpa.servicio;
 
 import co.com.icesi.demojpa.dto.UserCreateDTO;
+import co.com.icesi.demojpa.dto.response.ResponseUserDTO;
 import co.com.icesi.demojpa.mapper.UserMapper;
+import co.com.icesi.demojpa.mapper.response.UserResponseMapper;
 import co.com.icesi.demojpa.model.IcesiAccount;
 import co.com.icesi.demojpa.model.IcesiRole;
 import co.com.icesi.demojpa.model.IcesiUser;
@@ -25,15 +27,18 @@ public class UserService {
 
     private final AccountRepository accountRepository;
 
-    public UserService(UserRepository userRepository, UserMapper userMapper, RoleService roleService, RoleRepository roleRepository, AccountRepository accountRepository) {
+    private final UserResponseMapper userResponseMapper;
+
+    public UserService(UserRepository userRepository, UserMapper userMapper, RoleService roleService, RoleRepository roleRepository, AccountRepository accountRepository,  UserResponseMapper userResponseMapper) {
         this.userRepository = userRepository;
         this.userMapper = userMapper;
         this.roleService = roleService;
         this.roleRepository = roleRepository;
         this.accountRepository = accountRepository;
+        this.userResponseMapper = userResponseMapper;
     }
 
-    public IcesiUser save(UserCreateDTO user){
+    public ResponseUserDTO save(UserCreateDTO user){
 
         if(user.getRoleName().isEmpty()){
             throw new RuntimeException("El usuario no tiene rol");
@@ -58,7 +63,7 @@ public class UserService {
         roleService.addUser(role,icesiUser.getUserId());
         icesiUser.setRole(role);
 
-        return userRepository.save(icesiUser);
+        return userResponseMapper.fromIcesUser(userRepository.save(icesiUser));
     }
 
 

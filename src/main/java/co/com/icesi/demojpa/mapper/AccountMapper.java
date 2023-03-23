@@ -10,6 +10,4 @@ public interface AccountMapper {
 
     IcesiAccount fromIcesiAccountDTO(AccountCreateDTO accountCreateDTO);
 
-    AccountCreateDTO fromIcesiAccount(IcesiAccount icesiAccount);
-
 }

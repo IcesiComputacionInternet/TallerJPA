@@ -1,6 +1,7 @@
 package co.com.icesi.demojpa.controller;
 
 import co.com.icesi.demojpa.dto.AccountCreateDTO;
+import co.com.icesi.demojpa.dto.response.ResponseAccountDTO;
 import co.com.icesi.demojpa.model.IcesiAccount;
 import co.com.icesi.demojpa.repository.AccountRepository;
 import co.com.icesi.demojpa.servicio.AccountService;
@@ -23,8 +24,8 @@ public class AccountController {
         this.accountRepository = accountRepository1;
     }
 
-    @PostMapping("/accounts")
-    public IcesiAccount createIcesiAccount(@RequestBody AccountCreateDTO accountCreateDTO){
+    @PostMapping("/")
+    public ResponseAccountDTO createIcesiAccount(@RequestBody AccountCreateDTO accountCreateDTO){
         return accountService.save(accountCreateDTO);
     }
 
@@ -33,14 +34,6 @@ public class AccountController {
         accountService.disableAccount(accountNumber);
     }
 
-    @PostMapping ("/accounts/{id}")
-    public Optional<IcesiAccount> showAccountsById(@PathVariable String id){
-        return accountRepository.findById(UUID.fromString(id));
-    }
 
-    @GetMapping ("/all")
-    public List<IcesiAccount> showAccounts(){
-        return accountRepository.findAll();
-    }
 
 }

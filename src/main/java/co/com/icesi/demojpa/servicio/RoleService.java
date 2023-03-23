@@ -16,7 +16,6 @@ public class RoleService {
 
     private final RoleRepository roleRepository;
     private final RoleMapper roleMapper;
-
     private final UserRepository userRepository;
 
     public RoleService(RoleRepository roleRepository, RoleMapper roleMapper, UserRepository userRepository) {
@@ -25,14 +24,14 @@ public class RoleService {
         this.userRepository = userRepository;
     }
 
-    public IcesiRole save(RoleCreateDTO role){
+    public RoleCreateDTO save(RoleCreateDTO role){
         if(roleRepository.findByName(role.getName()).isPresent()){
             throw new RuntimeException("Ya existe un rol con este nombre");
         }
 
         IcesiRole icesiRole = roleMapper.fromIcesiRoleDTO(role);
         icesiRole.setRoleId(UUID.randomUUID());
-        return roleRepository.save(icesiRole);
+        return role;
     }
 
     public void addUser(IcesiRole role, UUID userid){

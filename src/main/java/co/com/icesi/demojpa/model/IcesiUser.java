@@ -43,10 +43,4 @@ public class IcesiUser {
     private List<IcesiAccount> accounts;
 
 
-/*
-    @OneToMany(mappedBy = "user")
-    private List<IcesiBlogPost> post;
-
-     */
-
 }

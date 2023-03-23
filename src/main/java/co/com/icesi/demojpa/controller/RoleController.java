@@ -14,13 +14,10 @@ public class RoleController {
 
     private final RoleService roleService;
 
-    @PostMapping("/roles")
-    public IcesiRole createIcesiRole(@RequestBody RoleCreateDTO role){
+    @PostMapping("/")
+    public RoleCreateDTO createIcesiRole(@RequestBody RoleCreateDTO role){
         return roleService.save(role);
     }
 
-    @GetMapping("/roles/{id}")
-    public IcesiRole returnRole(@PathVariable String id){
-        return roleService.findById(UUID.fromString(id)).orElseThrow();
-    }
+
 }

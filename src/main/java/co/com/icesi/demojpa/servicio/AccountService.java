@@ -1,7 +1,9 @@
 package co.com.icesi.demojpa.servicio;
 
 import co.com.icesi.demojpa.dto.AccountCreateDTO;
+import co.com.icesi.demojpa.dto.response.ResponseAccountDTO;
 import co.com.icesi.demojpa.mapper.AccountMapper;
+import co.com.icesi.demojpa.mapper.response.AccountResponseMapper;
 import co.com.icesi.demojpa.model.IcesiAccount;
 import co.com.icesi.demojpa.model.IcesiUser;
 import co.com.icesi.demojpa.repository.AccountRepository;
@@ -25,14 +27,17 @@ public class AccountService {
     private final UserService userService;
     private final AccountMapper accountMapper;
 
-    public AccountService(AccountRepository accountRepository, UserRepository userRepository, UserService userService, AccountMapper accountMapper) {
+    private final AccountResponseMapper accountResponseMapper;
+
+    public AccountService(AccountRepository accountRepository, UserRepository userRepository, UserService userService, AccountMapper accountMapper, AccountResponseMapper accountResponseMapper) {
         this.accountRepository = accountRepository;
         this.userRepository = userRepository;
         this.userService = userService;
         this.accountMapper = accountMapper;
+        this.accountResponseMapper = accountResponseMapper;
     }
 
-    public IcesiAccount save(AccountCreateDTO account){
+    public ResponseAccountDTO save(AccountCreateDTO account){
         if(account.getBalance()<0){
             throw new RuntimeException("El balance no puede ser menor a 0");
         }
@@ -49,7 +54,7 @@ public class AccountService {
         icesiAccount.setAccountNumber(number);
         userService.addAccount(icesiAccount.getAccount(), icesiAccount.getAccountNumber());
         icesiAccount.setAccountId(UUID.randomUUID());
-        return accountRepository.save(icesiAccount);
+        return accountResponseMapper.fromIcesiAccount( accountRepository.save(icesiAccount));
     }
 
     public String genNumber(){
@@ -123,7 +128,7 @@ public class AccountService {
 
         IcesiAccount sendIcesiAccount = accountRepository.findByAccountNumber(sendAccNum).orElseThrow(()->new RuntimeException("La cuenta que manda el dinero no existe"));
 
-        IcesiAccount receiveIcesiAccount = accountRepository.findByAccountNumber(receiveAccNum).orElseThrow(()->new RuntimeException("La cuenta que manda el dinero no existe"));
+        IcesiAccount receiveIcesiAccount = accountRepository.findByAccountNumber(receiveAccNum).orElseThrow(()->new RuntimeException("La cuenta que recibe el dinero no existe"));
 
         if (sendValue<=0) {
             throw new RuntimeException("La cantidad de dinero que se quiere enviar debe ser mayor que 0");
