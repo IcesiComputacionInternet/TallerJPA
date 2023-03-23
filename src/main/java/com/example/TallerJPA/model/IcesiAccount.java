@@ -3,6 +3,7 @@ package com.example.TallerJPA.model;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
+import lombok.NoArgsConstructor;
 import org.springframework.beans.factory.annotation.Value;
 
 import javax.persistence.Entity;
@@ -15,6 +16,7 @@ import java.util.UUID;
 @Entity
 @Builder
 @AllArgsConstructor
+@NoArgsConstructor
 public class IcesiAccount {
     @Id
     private UUID accountId;
@@ -26,6 +28,4 @@ public class IcesiAccount {
     @JoinColumn(name = "icesi_user_user_id")
     private IcesiUser user;
 
-    public IcesiAccount() {
-    }
 }

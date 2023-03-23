@@ -11,6 +11,7 @@ import java.util.UUID;
 @Data
 @Entity
 @AllArgsConstructor
+@NoArgsConstructor
 public class IcesiUser {
 
 
@@ -27,8 +28,6 @@ public class IcesiUser {
     @JoinColumn(name = "icesi_role_role_id")
     private IcesiRole role;
 
-    public IcesiUser() {
-    }
 
 
 }
