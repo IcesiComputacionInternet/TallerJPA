@@ -20,8 +20,10 @@ public class IcesiRoleService {
         if(!isRoleNameUnique(icesiRoleDTO.getName())){
             throw new RuntimeException("There is already a role with the name: " + icesiRoleDTO.getName());
         }
+
         IcesiRole icesiRole = icesiRoleMapper.fromCreateIcesiRoleDTO(icesiRoleDTO);
         icesiRole.setRoleId(UUID.randomUUID());
+
         return icesiRoleMapper.fromIcesiRoleToShowDTO(icesiRoleRepository.save(icesiRole));
     }
 

@@ -1,5 +1,6 @@
 package co.edu.icesi.tallerjpa.dto;
 
+import co.edu.icesi.tallerjpa.enums.TypeIcesiAccount;
 import lombok.Builder;
 import lombok.Data;
 
@@ -9,7 +10,7 @@ import java.util.UUID;
 @Builder
 public class IcesiAccountCreateDTO {
     private long balance;
-    private String type;
+    private TypeIcesiAccount type;
     private boolean active;
     private IcesiUserCreateDTO icesiUserDTO;
 }

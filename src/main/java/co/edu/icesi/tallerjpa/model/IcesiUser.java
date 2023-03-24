@@ -25,7 +25,7 @@ public class IcesiUser {
     private String password;
     @NotNull(message = "The icesi role can not be null")
     @ManyToOne
-    @JoinColumn(name = "IcesiRole_roleId", nullable = false)
+    @JoinColumn(name = "icesiRole_roleId", nullable = false)
     private IcesiRole icesiRole;
     @OneToMany(mappedBy = "icesiUser")
     private List<IcesiAccount> icesiAccounts;

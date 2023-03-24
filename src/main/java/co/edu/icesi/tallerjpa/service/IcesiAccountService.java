@@ -2,6 +2,8 @@ package co.edu.icesi.tallerjpa.service;
 
 import co.edu.icesi.tallerjpa.dto.IcesiAccountCreateDTO;
 import co.edu.icesi.tallerjpa.dto.IcesiAccountShowDTO;
+import co.edu.icesi.tallerjpa.dto.TransactionCreateDTO;
+import co.edu.icesi.tallerjpa.dto.TransactionResultDTO;
 import co.edu.icesi.tallerjpa.mapper.IcesiAccountMapper;
 import co.edu.icesi.tallerjpa.model.IcesiAccount;
 import co.edu.icesi.tallerjpa.model.IcesiUser;
@@ -12,6 +14,8 @@ import org.springframework.stereotype.Service;
 
 import java.util.Optional;
 import java.util.UUID;
+import java.util.stream.Collectors;
+import java.util.stream.IntStream;
 
 @Service
 @AllArgsConstructor
@@ -22,12 +26,16 @@ public class IcesiAccountService {
     private final IcesiUserRepository icesiUserRepository;
     public IcesiAccountShowDTO save(IcesiAccountCreateDTO icesiAccountCreateDTO){
         checkConditionsToCreateAccount(icesiAccountCreateDTO);
-        IcesiAccount icesiAccount = icesiAccountMapper.fromCreateIcesiAccountDTO(icesiAccountCreateDTO);
+
         IcesiUser icesiUser = icesiUserRepository.findByEmail(icesiAccountCreateDTO.getIcesiUserDTO().getEmail())
-                .orElseThrow(() -> new RuntimeException("There is no user"));
+                .orElseThrow(() -> new RuntimeException("There is no user with the email "+icesiAccountCreateDTO.getIcesiUserDTO().getEmail()));
+
+        String accountNumber = createAccountNumber(100)
+                .orElseThrow(() -> new RuntimeException("There were errors creating the account number, please try again later"));
+
+        IcesiAccount icesiAccount = icesiAccountMapper.fromCreateIcesiAccountDTO(icesiAccountCreateDTO);
         icesiAccount.setIcesiUser(icesiUser);
-        icesiAccount.setAccountNumber(createAccountNumber()
-                .orElseThrow(() -> new RuntimeException("The user entered does not exist")));
+        icesiAccount.setAccountNumber(accountNumber);
         icesiAccount.setAccountId(UUID.randomUUID());
         return icesiAccountMapper.fromIcesiAccountToShowDTO(icesiAccountRepository.save(icesiAccount));
     }
@@ -41,22 +49,30 @@ public class IcesiAccountService {
         }
     }
 
-    private Optional<String> createAccountNumber(){
+    private Optional<String> createAccountNumber(int maximumAttempts){
         boolean isUnique = false;
         String accountNumber = null;
-        while (!isUnique){
-            int firstDigits = (int) (Math.random() * 1000);
-            int secondDigits = (int) (Math.random() * 1000000);
-            int thirdDigits = (int) (Math.random() * 100);
-            accountNumber = firstDigits+"-"+secondDigits+"-"+thirdDigits;
-            if(!icesiAccountRepository.findByAccountNumber(accountNumber).isPresent()){
+        int minDigit = 0, maxDigit = 9;
+        int attempts = 0;
+        while (!isUnique && attempts < maximumAttempts){
+            String possibleAccountNumber = createRandomDigits(3, minDigit, maxDigit)+"-"+createRandomDigits(6, minDigit, maxDigit)+"-"+createRandomDigits(2, minDigit, maxDigit);
+            if(!icesiAccountRepository.findByAccountNumber(possibleAccountNumber).isPresent()){
                 isUnique = true;
+                accountNumber = possibleAccountNumber;
             }
+            attempts++;
         }
         return Optional.ofNullable(accountNumber);
     }
 
+    private String createRandomDigits(int length, int minDigit, int maxDigit){
+        return IntStream.range(0, length)
+                .mapToObj(i -> Integer.toString(minDigit + (int)(Math.random()*((maxDigit - minDigit) + 1))))
+                .collect(Collectors.joining(""));
+    }
+
     public void enableAccount(String accountId){
+        getAccountById(accountId);
         icesiAccountRepository.enableAccount(accountId);
     }
 
@@ -67,42 +83,52 @@ public class IcesiAccountService {
         icesiAccountRepository.disableAccount(accountId);
     }
 
-    public long withdrawalMoney(String accountId, long moneyToWithdraw){
-        IcesiAccount icesiAccount = getAccountById(accountId);
-        if(icesiAccount.isThereEnoughMoney(moneyToWithdraw)){
-            long newBalance = icesiAccount.getBalance() - moneyToWithdraw;
-            icesiAccountRepository.updateBalance(newBalance, accountId);
-            return newBalance;
-        }else{
+    public TransactionResultDTO withdrawalMoney(TransactionCreateDTO transactionCreateDTO){
+        IcesiAccount icesiAccount = getAccountById(transactionCreateDTO.getSenderAccountId());
+        checkIfTheAccountIsDisabled(icesiAccount);
+        if(!icesiAccount.isThereEnoughMoney(transactionCreateDTO.getAmount())){
             throw new RuntimeException("Not enough money to withdraw. At most you can withdraw: " + icesiAccount.getBalance());
         }
+        long newBalance = icesiAccount.getBalance() - transactionCreateDTO.getAmount();
+        icesiAccountRepository.updateBalance(newBalance, transactionCreateDTO.getSenderAccountId());
+        TransactionResultDTO transactionResultDTO = icesiAccountMapper.fromTransactionCreateDTO(transactionCreateDTO);
+        transactionResultDTO.setBalance(newBalance);
+        transactionResultDTO.setResult("The withdrawal was successful");
+        return transactionResultDTO;
+
     }
-
-
 
     private IcesiAccount getAccountById(String accountId){
         return icesiAccountRepository.findById(UUID.fromString(accountId))
                 .orElseThrow(() -> new RuntimeException("There is no account with the id: " + accountId));
     }
 
-    public long depositMoney(String accountId, long moneyToDeposit){
-        IcesiAccount icesiAccount = getAccountById(accountId);
-        long newBalance = icesiAccount.getBalance() + moneyToDeposit;
-        icesiAccountRepository.updateBalance(newBalance, accountId);
-        return newBalance;
+    public TransactionResultDTO depositMoney(TransactionCreateDTO transactionCreateDTO){
+        IcesiAccount icesiAccount = getAccountById(transactionCreateDTO.getReceiverAccountId());
+        checkIfTheAccountIsDisabled(icesiAccount);
+        long newBalance = icesiAccount.getBalance() + transactionCreateDTO.getAmount();
+        icesiAccountRepository.updateBalance(newBalance, transactionCreateDTO.getReceiverAccountId());
+        TransactionResultDTO transactionResultDTO = icesiAccountMapper.fromTransactionCreateDTO(transactionCreateDTO);
+        transactionResultDTO.setBalance(newBalance);
+        transactionResultDTO.setResult("The deposit was successful");
+        return transactionResultDTO;
     }
 
-    public long transferMoney(String senderAccountId, String receiverAccountId, long moneyToTransfer){
-        checkConditionsToTransfer(senderAccountId, receiverAccountId, moneyToTransfer);
-        long fromAccountNewBalance = getAccountById(senderAccountId).getBalance() - moneyToTransfer;
-        long toAccountNewBalance = getAccountById(receiverAccountId).getBalance() + moneyToTransfer;
-        icesiAccountRepository.updateBalance(fromAccountNewBalance, senderAccountId);
-        icesiAccountRepository.updateBalance(toAccountNewBalance, receiverAccountId);
-        return fromAccountNewBalance;
+    public TransactionResultDTO transferMoney(TransactionCreateDTO transactionCreateDTO){
+        checkConditionsToTransfer(transactionCreateDTO.getSenderAccountId(), transactionCreateDTO.getReceiverAccountId(), transactionCreateDTO.getAmount());
+        long senderAccountNewBalance = getAccountById(transactionCreateDTO.getSenderAccountId()).getBalance() - transactionCreateDTO.getAmount();
+        long receiverAccountNewBalance = getAccountById(transactionCreateDTO.getReceiverAccountId()).getBalance() + transactionCreateDTO.getAmount();
+        icesiAccountRepository.updateBalance(senderAccountNewBalance, transactionCreateDTO.getSenderAccountId());
+        icesiAccountRepository.updateBalance(receiverAccountNewBalance, transactionCreateDTO.getReceiverAccountId());
+        TransactionResultDTO transactionResultDTO = icesiAccountMapper.fromTransactionCreateDTO(transactionCreateDTO);
+        transactionResultDTO.setBalance(senderAccountNewBalance);
+        transactionResultDTO.setResult("The transfer was successful");
+        return transactionResultDTO;
     }
 
     private void checkConditionsToTransfer(String senderAccountId, String receiverAccountId, long moneyToTransfer){
         IcesiAccount senderIcesiAccount = getAccountById(senderAccountId);
+        checkIfTheAccountIsDisabled(senderIcesiAccount);
         if(senderIcesiAccount.isMarkedAsDepositOnly()){
             throw new RuntimeException("The account with id " + senderIcesiAccount.getAccountId() + " is marked as deposit only so it can't transfers money");
         }
@@ -110,8 +136,15 @@ public class IcesiAccountService {
             throw new RuntimeException("Not enough money to transfer. At most you can transfer: " + senderIcesiAccount.getBalance());
         }
         IcesiAccount receiverIcesiAccount = getAccountById(receiverAccountId);
+        checkIfTheAccountIsDisabled(receiverIcesiAccount);
         if(getAccountById(receiverAccountId).isMarkedAsDepositOnly()){
             throw new RuntimeException("The account with id " + receiverIcesiAccount.getAccountId() + " is marked as deposit only so no money can be transferred");
+        }
+    }
+
+    private void checkIfTheAccountIsDisabled(IcesiAccount icesiAccount){
+        if (icesiAccount.isDisable()){
+            throw new RuntimeException("The account "+icesiAccount.getAccountId()+" is disabled");
         }
     }
 }

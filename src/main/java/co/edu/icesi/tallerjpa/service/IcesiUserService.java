@@ -11,7 +11,7 @@ import co.edu.icesi.tallerjpa.repository.IcesiUserRepository;
 import lombok.AllArgsConstructor;
 import org.springframework.stereotype.Service;
 
-import javax.management.relation.Role;
+import java.util.ArrayList;
 import java.util.UUID;
 
 @Service
@@ -22,21 +22,27 @@ public class IcesiUserService {
     private final IcesiUserMapper icesiUserMapper;
 
     public IcesiUserShowDTO save(IcesiUserCreateDTO icesiUserCreateDTO){
-        String messageError = "";
+        ArrayList<String> errors = new ArrayList<>();
+
         if(!isEmailUnique(icesiUserCreateDTO.getEmail())){
-            messageError += "There is already a user with the email " + icesiUserCreateDTO.getEmail() + "\n";
+            errors.add("There is already a user with the email " + icesiUserCreateDTO.getEmail() + "\n");
         }
+
         if(!isPhoneNumberUnique(icesiUserCreateDTO.getPhoneNumber())){
-            messageError += "There is already a user with the phone number " + icesiUserCreateDTO.getPhoneNumber() + "\n";
+            errors.add("There is already a user with the phone number " + icesiUserCreateDTO.getPhoneNumber() + "\n");
         }
-        if(!messageError.equals("")){
-            throw new RuntimeException(messageError);
+
+        if(!errors.isEmpty()){
+            throw new RuntimeException(errors.stream().reduce("", (errorMessage, error) -> errorMessage + error));
         }
+
         IcesiRole icesiRole = icesiRoleRepository.findByName(icesiUserCreateDTO.getIcesiRoleCreateDTO().getName())
                 .orElseThrow(() -> new RuntimeException(("There is no role with that name")));
+
         IcesiUser icesiUser = icesiUserMapper.fromCreateIcesiUserDTO(icesiUserCreateDTO);
         icesiUser.setIcesiRole(icesiRole);
         icesiUser.setUserId(UUID.randomUUID());
+
         return icesiUserMapper.fromIcesiUserToShow(icesiUserRepository.save(icesiUser));
     }
     private boolean isEmailUnique(String email){

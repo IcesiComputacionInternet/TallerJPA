@@ -1,5 +1,6 @@
 package co.edu.icesi.tallerjpa.model;
 
+import co.edu.icesi.tallerjpa.enums.TypeIcesiAccount;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
@@ -9,6 +10,7 @@ import javax.persistence.Entity;
 import javax.persistence.Id;
 import javax.persistence.JoinColumn;
 import javax.persistence.ManyToOne;
+import javax.validation.constraints.NotNull;
 import java.util.UUID;
 
 @Data
@@ -23,12 +25,13 @@ public class IcesiAccount {
     private long balance;
     private String type;
     private boolean active;
+    @NotNull(message = "The icesi user can not be null")
     @ManyToOne
-    @JoinColumn(name = "IcesiUser_userId", nullable = false)
+    @JoinColumn(name = "icesiUser_userId", nullable = false)
     private IcesiUser icesiUser;
 
     public boolean isMarkedAsDepositOnly(){
-        if(type.toLowerCase().equals("deposit only")){
+        if(type.equals(TypeIcesiAccount.DEPOSIT_ONLY.toString())){
             return true;
         }else {
             return false;
@@ -40,5 +43,9 @@ public class IcesiAccount {
             return false;
         }
         return true;
+    }
+
+    public boolean isDisable(){
+        return !active;
     }
 }
