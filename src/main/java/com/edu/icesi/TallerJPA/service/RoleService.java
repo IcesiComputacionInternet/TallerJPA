@@ -19,9 +19,7 @@ public class RoleService {
 
     public RoleCreateDTO save(RoleCreateDTO roleCreateDTO){
 
-        if(roleRepository.findByName(roleCreateDTO.getName()).isPresent()){
-            throw new RuntimeException("Role already exists");
-        }
+        roleRepository.findByName(roleCreateDTO.getName()).orElseThrow(() -> new RuntimeException("The role "+roleCreateDTO.getName()+" already exists"));
 
         IcesiRole icesiRole = roleMapper.fromIcesiRoleDTO(roleCreateDTO);
         icesiRole.setRoleId(UUID.randomUUID());
