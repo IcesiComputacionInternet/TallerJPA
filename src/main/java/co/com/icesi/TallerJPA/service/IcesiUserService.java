@@ -17,39 +17,40 @@ import java.util.stream.Collectors;
 @Service
 @AllArgsConstructor
 public class IcesiUserService {
-    private final IcesiUserRepository mainRepository;
+    private final IcesiUserRepository userRepository;
     private final IcesiRoleRepository roleRepository;
     private final IcesiUserMapper mapper;
 
-    public boolean save(IcesiUserDTO dto){
-
-        if(mainRepository.findByEmail(dto.getEmail()).isPresent() && mainRepository.findByPhoneNumber(dto.getPhoneNumber()).isPresent()){
-           throw new RuntimeException("This email and phone  already exist");
-        }else if(mainRepository.findByEmail(dto.getEmail()).isPresent()){
-            throw new RuntimeException("Email already exist");
-        }else if(mainRepository.findByPhoneNumber(dto.getPhoneNumber()).isPresent()){
-            throw new RuntimeException("Phone already exist");
-        }else{
-            IcesiUser user = mapper.fromUserDto(dto);
-            user.setUserID(UUID.randomUUID());
-            user.setAccounts(new ArrayList<>());
-
-            if (user.getRole()!=null && roleRepository.findByName(user.getRole().getName()).isPresent()) {
-                IcesiRole relation  = roleRepository.findByName(user.getRole().getName()).get();
-                relation.getUsers().add(user);
-                user.setRole(relation);
-                mainRepository.save(user);
-                roleRepository.save(relation);
-                return true;
-            } else {
-                throw new RuntimeException("This role doesn't exist or is null");
-            }
-
+    public IcesiUserDTO save(IcesiUserDTO dto){
+        boolean haveBothRestrictions = userRepository.findByEmail(dto.getEmail()).isPresent() && userRepository.findByPhoneNumber(dto.getPhoneNumber()).isPresent();
+        if(haveBothRestrictions){
+            throw new RuntimeException("This email and phone already exist: "+dto.getEmail()+" and "+dto.getPhoneNumber());
         }
+        userRepository.findByEmail((dto.getEmail())).ifPresent(e ->{
+            throw new RuntimeException("This email already exist: "+dto.getEmail());
+        });
+        userRepository.findByPhoneNumber((dto.getPhoneNumber())).ifPresent(e ->{
+            throw new RuntimeException("This phone already exist: "+dto.getPhoneNumber());
+        });
+
+
+        IcesiUser user = mapper.fromUserDto(dto);
+        user.setUserID(UUID.randomUUID());
+        user.setAccounts(new ArrayList<>());
+
+        IcesiRole roleRelation  = roleRepository.findByName(user.getRole().getName()).orElseThrow(() -> new RuntimeException("This role doesn't exist") );
+
+
+        roleRelation.getUsers().add(user);
+        user.setRole(roleRelation);
+        userRepository.save(user);
+        roleRepository.save(roleRelation);
+        return mapper.fromIcesiUser(user);
+
     }
 
     public List<IcesiUserDTO> getUsers(){
-        return mainRepository.findAll().stream().map(mapper::fromIcesiUser).collect(Collectors.toList());
+        return userRepository.findAll().stream().map(mapper::fromIcesiUser).collect(Collectors.toList());
     }
 
 

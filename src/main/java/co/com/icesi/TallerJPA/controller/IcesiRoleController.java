@@ -15,14 +15,6 @@ public class IcesiRoleController {
     private final IcesiRoleService service;
 
 
-    @PostMapping
-    public IcesiRole createRole(@RequestBody IcesiRoleDTO dto){
-        return service.save(dto);
-    }
 
-    @GetMapping
-    public List<IcesiRoleDTO> getRoles(){
-        return service.getRoles();
-    }
 
 }

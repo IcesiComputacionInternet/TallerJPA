@@ -1,11 +1,10 @@
 package co.com.icesi.TallerJPA.service;
 
-import co.com.icesi.TallerJPA.dto.IcesiAccountDTO;
-import co.com.icesi.TallerJPA.dto.IcesiRoleDTO;
-import co.com.icesi.TallerJPA.dto.IcesiUserDTO;
+import co.com.icesi.TallerJPA.dto.*;
 import co.com.icesi.TallerJPA.mapper.IcesiAccountMapper;
 import co.com.icesi.TallerJPA.mapper.IcesiAccountMapperImpl;
 import co.com.icesi.TallerJPA.matcher.IcesiAccountMatcher;
+import co.com.icesi.TallerJPA.matcher.IcesiUserMatcher;
 import co.com.icesi.TallerJPA.model.IcesiAccount;
 import co.com.icesi.TallerJPA.model.IcesiRole;
 import co.com.icesi.TallerJPA.model.IcesiUser;
@@ -16,46 +15,48 @@ import org.junit.jupiter.api.Test;
 
 import java.util.ArrayList;
 import java.util.Optional;
+import java.util.Random;
 import java.util.UUID;
+import java.util.stream.Collectors;
+import java.util.stream.IntStream;
 
 import static org.junit.jupiter.api.Assertions.*;
 import static org.mockito.Mockito.*;
 
 public class IcesiAccountServiceTest {
-    private IcesiAccountService service;
-    private IcesiAccountRespository respository;
+    private IcesiAccountService accountService;
+    private IcesiAccountRespository accountRespository;
     private IcesiAccountMapper mapper;
-    private IcesiAccount account;
 
     private IcesiUserRepository userRepository;
 
-    @BeforeEach
-    private void init(){
-        respository = mock(IcesiAccountRespository.class);
+    @BeforeEach()
+    public void init(){
+        accountRespository = mock(IcesiAccountRespository.class);
         mapper = spy(IcesiAccountMapperImpl.class);
         userRepository = mock(IcesiUserRepository.class);
-        service = new IcesiAccountService(mapper,respository,userRepository);
-        account = defaultAccount("NORMAL");
+        accountService = new IcesiAccountService(mapper, accountRespository,userRepository);
+
     }
 
     @Test
     public void createAccount(){
         when(userRepository.findbyName(any())).thenReturn(Optional.ofNullable(defaultUser()));
-        service.save(defaultDTO("NORMAL"));
+        accountService.save(defaultDTO("NORMAL"));
         verify(mapper,times(1)).fromAccountDTO(any());
-        verify(userRepository,times(2)).findbyName(any());
-        verify(respository,times(1)).save(argThat(new IcesiAccountMatcher(defaultAccount("NORMAL"))));
-        verify(userRepository,times(1)).save(any());
+        verify(userRepository,times(1)).findbyName(any());
+        verify(accountRespository,times(1)).save(argThat(new IcesiAccountMatcher(defaultAccount("NORMAL"))));
+        verify(userRepository,times(1)).save(argThat(new IcesiUserMatcher(defaultUser())));
 
     }
 
     @Test
     public void createAccountWhenTheBalanceIsBellowZero(){
-        account.setBalance(-1L);
+       IcesiAccountDTO accountDTO = defaultDTO("NORMAL");
+        accountDTO.setBalance(-1L);
         when(userRepository.findbyName(any())).thenReturn(Optional.ofNullable(defaultUser()));
-        when(mapper.fromAccountDTO(any())).thenReturn(account);
         try {
-            service.save(defaultDTO("NORMAL"));
+            accountService.save(accountDTO);
             fail();
         }catch (Exception e){
             assertEquals("You can't create an account with balance below to  0",e.getMessage());
@@ -66,7 +67,7 @@ public class IcesiAccountServiceTest {
     public void createAccountWhenTheUserDoesNotExist(){
         when(userRepository.findbyName(any())).thenReturn(Optional.empty());
         try {
-            service.save(defaultDTO("NORMAL"));
+            accountService.save(defaultDTO("NORMAL"));
             fail();
         }catch (Exception e){
             assertEquals("The user doesn't exist",e.getMessage());
@@ -75,186 +76,230 @@ public class IcesiAccountServiceTest {
 
     @Test
     public void disableAccount(){
-        account.setBalance(0L);
-        when(respository.findByAccountNumber(any())).thenReturn(Optional.of(account));
-        assertTrue(service.manageAccount(anyString(),"disable"));
-        verify(respository,times(2)).findByAccountNumber(any());
-        verify(respository,times(1)).save(any(IcesiAccount.class));
-        if(respository.findByAccountNumber(any()).isPresent()){
-           assertFalse(respository.findByAccountNumber(any()).get().isActive());
-        }else {
-            fail();
-        }
+        IcesiAccount accountToDesable = defaultAccount("NORMAL");
+        accountToDesable.setBalance(0L);
+        when(accountRespository.findByAccountNumber(any())).thenReturn(Optional.of(accountToDesable));
+        assertEquals("The account was disabled", accountService.disableAccount(any()));
+        verify(accountRespository,times(1)).save(argThat(new IcesiAccountMatcher(accountToDesable)));
+
     }
 
     @Test
     public void disableAccountWhenBalanceIsNotZero(){
-        when(respository.findByAccountNumber(any())).thenReturn(Optional.ofNullable(defaultAccount("NORMAL")));
-        assertFalse(service.manageAccount(anyString(),"disable"));
-        verify(respository,times(0)).save(any());
+        when(accountRespository.findByAccountNumber(any())).thenReturn(Optional.ofNullable(defaultAccount("NORMAL")));
+        try{
+            accountService.disableAccount(defaultAccount("NORMAL").getAccountNumber());
+            fail();
+        }catch (Exception e){
+            assertEquals("The account "+defaultAccount("NORMAL").getAccountNumber()+" can not be disabled",e.getMessage());
+        }
     }
 
     @Test
     public void disableAccountWhenTheAccountDoesNotExist(){
-        when(respository.findByAccountNumber(any())).thenReturn(Optional.empty());
-        assertFalse(service.manageAccount(anyString(),"disable"));
-        verify(respository,times(0)).save(any());
+        when(accountRespository.findByAccountNumber(any())).thenReturn(Optional.empty());
+        try{
+            accountService.disableAccount(defaultAccount("NORMAL").getAccountNumber());
+            fail();
+        }catch (Exception e){
+            assertEquals("The account: "+defaultAccount("NORMAL").getAccountNumber()+" was not found",e.getMessage());
+        }
     }
 
     @Test
     public void enableAccount(){
-        account.setActive(false);
-        when(respository.findByAccountNumber(any())).thenReturn(Optional.of(account));
-        assertTrue(service.manageAccount(anyString(),"enable"));
-        verify(respository,times(2)).findByAccountNumber(any());
-        verify(respository,times(1)).save(argThat(new IcesiAccountMatcher(account)));
+        IcesiAccount accountToEnable = defaultAccount("NORMAL");
+        accountToEnable.setActive(false);
+        when(accountRespository.findByAccountNumber(any())).thenReturn(Optional.of(accountToEnable));
+        assertEquals("The account was enabled",accountService.enableAccount(accountToEnable.getAccountNumber()));
+        verify(accountRespository, times(1)).save(argThat(new IcesiAccountMatcher(accountToEnable)));
     }
 
     @Test
     public void enableAccountWhenTheAccountNotExist(){
-        when(respository.findByAccountNumber(any())).thenReturn(Optional.empty());
-        assertFalse(service.manageAccount(anyString(),"enable"));
-        verify(respository,times(0)).save(any());
+        when(accountRespository.findByAccountNumber(any())).thenReturn(Optional.empty());
+        try {
+            accountService.enableAccount(defaultAccount("NORMAL").getAccountNumber());
+            fail();
+        }catch (Exception e){
+            assertEquals("The account: "+ defaultAccount("NORMAL").getAccountNumber() +" was not found",e.getMessage());
+        }
     }
 
     @Test
-    public void enableAccountWhenTheAccountIsNotDisable(){
-        when(respository.findByAccountNumber(any())).thenReturn(Optional.ofNullable(defaultAccount("NORMAL")));
-        assertFalse(service.manageAccount(anyString(),"enable"));
-        verify(respository,times(0)).save(any());
+    public void enableAccountWhenTheAccountIsNotDisabled(){
+        when(accountRespository.findByAccountNumber(any())).thenReturn(Optional.of(defaultAccount("NORMAL")));
+        try {
+            accountService.enableAccount(defaultAccount("NORMAL").getAccountNumber());
+            fail();
+        }catch (Exception e){
+            assertEquals("This account was enabled already",e.getMessage());
+        }
     }
 
     @Test
     public void withdrawalMoney(){
-        IcesiAccount icesiAccountExpected = defaultAccount("NORMAL");
-        icesiAccountExpected.setBalance(icesiAccountExpected.getBalance()-1L);
-        when(respository.findByAccountNumber(any())).thenReturn(Optional.ofNullable(defaultAccount("NORMAL")));
-        assertTrue(service.withdrawalMoney(anyString(),1L));
-        verify(respository,times(1)).save(argThat(new IcesiAccountMatcher(icesiAccountExpected)));
+        IcesiAccount accountTest = defaultAccount("NORMAL");
+        TransactionRequestDTO transactionDTO = TransactionRequestDTO.builder()
+                .accountNumberFrom(accountTest.getAccountNumber())
+                .amount(5L)
+                .build();
+        when(accountRespository.findByAccountNumber(any())).thenReturn(Optional.of(accountTest));
+        accountService.withdrawalMoney(transactionDTO);
+        assertEquals(5L,accountTest.getBalance());
+        verify(accountRespository,times(1)).save(argThat(new IcesiAccountMatcher(accountTest)));
+
+
     }
 
     @Test
     public void withdrawalMoneyWhenTheBalanceIsLess(){
-        when(respository.findByAccountNumber(any())).thenReturn(Optional.ofNullable(defaultAccount("NORMAL")));
-        assertFalse(service.withdrawalMoney(anyString(),12L));
-        verify(respository,times(0)).save(any());
+        TransactionRequestDTO transactionDTO = TransactionRequestDTO.builder()
+                .accountNumberFrom(defaultAccount("NORMAL").getAccountNumber())
+                .amount(12L)
+                .build();
+
+        when(accountRespository.findByAccountNumber(any())).thenReturn(Optional.of(defaultAccount("NORMAL")));
+        try {
+            accountService.withdrawalMoney(transactionDTO);
+            fail();
+        }catch (Exception e){
+            assertEquals("The balance is Less your current balance is" + defaultAccount("NORMAL").getBalance(),e.getMessage());
+        }
     }
 
     @Test
     public void withdrawalMoneyWhenTheAccountDoesNotExist(){
-        when(respository.findByAccountNumber(any())).thenReturn(Optional.empty());
-        assertFalse(service.withdrawalMoney(anyString(),1L));
-        verify(respository,times(0)).save(any());
+        TransactionRequestDTO transactionDTO = TransactionRequestDTO.builder()
+                .accountNumberFrom(defaultAccount("NORMAL").getAccountNumber())
+                .amount(12L)
+                .build();
+        when(accountRespository.findByAccountNumber(any())).thenReturn(Optional.empty());
+        try {
+            accountService.withdrawalMoney(transactionDTO);
+            fail();
+        }catch (Exception e){
+            assertEquals("The account: "+ defaultAccount("NORMAL").getAccountNumber() +" was not found",e.getMessage());
+        }
     }
 
     @Test
     public void depositMoney(){
-        IcesiAccount icesiAccountExpected = defaultAccount("NORMAL");
-        icesiAccountExpected.setBalance(icesiAccountExpected.getBalance()+1L);
-
-        when(respository.findByAccountNumber(any())).thenReturn(Optional.ofNullable(defaultAccount("NORMAL")));
-        assertTrue(service.depositMoney(anyString(),1L));
-        verify(respository,times(1)).save(argThat(new IcesiAccountMatcher(icesiAccountExpected)));
+        IcesiAccount accountTest = defaultAccount("NORMAL");
+        TransactionRequestDTO transactionDTO = TransactionRequestDTO.builder()
+                .accountNumberFrom(accountTest.getAccountNumber())
+                .amount(5L)
+                .build();
+        when(accountRespository.findByAccountNumber(any())).thenReturn(Optional.of(accountTest));
+        accountService.depositMoney(transactionDTO);
+        assertEquals(15L,accountTest.getBalance());
+        verify(accountRespository,times(1)).save(argThat(new IcesiAccountMatcher(accountTest)));
     }
 
     @Test
     public void depositMoneyWhenTheAccountDoesNotExist(){
-        when(respository.findByAccountNumber(any())).thenReturn(Optional.empty());
-        assertFalse(service.depositMoney(anyString(), 1L));
-        verify(respository,times(0)).save(any());
-    }
-
-    @Test
-    public void transferMoney(){
-        IcesiAccount accountTestExpected = defaultAccount("NORMAL");
-        IcesiAccount anotherAccountTestExpected = defaultAccount("NORMAL");
-        anotherAccountTestExpected.setAccountNumber("233-121219-21");
-
-        when(respository.findByAccountNumber("897-887868-67")).thenReturn(Optional.ofNullable(defaultAccount("NORMAL")));
-        when(respository.findByAccountNumber("233-121219-21")).thenReturn(Optional.of(anotherAccountTestExpected));
-
-        accountTestExpected.setBalance(accountTestExpected.getBalance()- 5L);
-        anotherAccountTestExpected.setBalance(anotherAccountTestExpected.getBalance()+5L);
-
-        assertTrue(service.transferMoney("897-887868-67","233-121219-21",5L));
-        verify(respository,times(2)).save(any(IcesiAccount.class));
-
-        if(respository.findByAccountNumber("897-887868-67").isPresent() && respository.findByAccountNumber("233-121219-21").isPresent()){
-            assertEquals(respository.findByAccountNumber("897-887868-67").get().getBalance(),accountTestExpected.getBalance());
-            assertEquals(respository.findByAccountNumber("233-121219-21").get().getBalance(),anotherAccountTestExpected.getBalance());
-        }else{
+        TransactionRequestDTO transactionDTO = TransactionRequestDTO.builder()
+                .accountNumberFrom(defaultAccount("NORMAL").getAccountNumber())
+                .amount(12L)
+                .build();
+        when(accountRespository.findByAccountNumber(any())).thenReturn(Optional.empty());
+        try {
+            accountService.depositMoney(transactionDTO);
             fail();
+        }catch (Exception e){
+            assertEquals("The account: "+ defaultAccount("NORMAL").getAccountNumber() +" was not found",e.getMessage());
         }
+    }
 
+    @Test
 
+    public void transferMoney(){
+        IcesiAccount accountSource = defaultAccount("NORMAL");
+        IcesiAccount accountDestination =defaultAccount("NORMAL");
+        accountDestination.setAccountNumber("232-123132-24");
+        TransactionRequestDTO transactionDTO = TransactionRequestDTO.builder()
+                .accountNumberFrom(defaultAccount("NORMAL").getAccountNumber())
+                .accountNumberTo(accountDestination.getAccountNumber())
+                .amount(5L)
+                .build();
+        when(accountRespository.findByAccountNumber("897-887868-67")).thenReturn(Optional.of(accountSource));
+        when(accountRespository.findByAccountNumber("232-123132-24")).thenReturn(Optional.of(accountDestination));
 
+        accountService.transferMoney(transactionDTO);
+
+        assertEquals(5L,accountSource.getBalance());
+        assertEquals(15L, accountDestination.getBalance());
+
+        verify(accountRespository,times(1)).save(argThat(new IcesiAccountMatcher(accountSource)));
+        verify(accountRespository,times(1)).save(argThat(new IcesiAccountMatcher(accountDestination)));
 
     }
 
     @Test
-    public void transferMoneyWhenBothAccountsDoesNotExist(){
-        when(respository.findByAccountNumber(any())).thenReturn(Optional.empty());
-        when(respository.findByAccountNumber(any())).thenReturn(Optional.empty());
-        assertFalse(service.transferMoney("","",0L));
-        verify(respository,times(0)).save(any());
+    public void transferMoneyWhenBothAccountsDoNotExist(){
+        TransactionRequestDTO transactionDTO = TransactionRequestDTO.builder().build();
+       when(accountRespository.findByAccountNumber(any())).thenReturn(Optional.empty(),Optional.empty());
+       assertThrows(RuntimeException.class, () -> accountService.transferMoney(transactionDTO));
+       verify(accountRespository,times(0)).save(any());
+
     }
 
     @Test
     public void transferMoneyWhenAnAccountDoesNotExist(){
-        when(respository.findByAccountNumber("897-887868-67")).thenReturn(Optional.ofNullable(defaultAccount("NORMAL")));
-        when(respository.findByAccountNumber(any())).thenReturn(Optional.empty());
-        assertFalse(service.transferMoney("897-887868-67",any(),0L));
-        verify(respository,times(0)).save(any());
+        TransactionRequestDTO transactionDTO = TransactionRequestDTO.builder()
+                .accountNumberFrom(defaultAccount("NORMAL").getAccountNumber())
+                .accountNumberTo("121-121212-12")
+                .amount(5L)
+                .build();
+        when(accountRespository.findByAccountNumber("897-887868-67")).thenReturn(Optional.of(defaultAccount("NORMAL")));
+        when(accountRespository.findByAccountNumber("121-121212-12")).thenReturn(Optional.empty());
+
+        try {
+            accountService.transferMoney(transactionDTO);
+            fail();
+        }catch (Exception e){
+            assertEquals("The account: 121-121212-12 was not found", e.getMessage());
+        }
+
+
     }
 
     @Test
     public void transferMoneyWhenAnAccountIsDeposit(){
-        IcesiAccount depositTestAccount = defaultAccount("deposit");
-        depositTestAccount.setAccountNumber("233-121219-21");
+        IcesiAccount accountSource = defaultAccount("NORMAL");
+        IcesiAccount accountDestination =defaultAccount("deposit");
+        accountDestination.setAccountNumber("137-123332-74");
+        TransactionRequestDTO transactionDTO = TransactionRequestDTO.builder()
+                .accountNumberFrom(defaultAccount("NORMAL").getAccountNumber())
+                .accountNumberTo(accountDestination.getAccountNumber())
+                .amount(5L)
+                .build();
 
-        when(respository.findByAccountNumber("233-121219-21")).thenReturn(Optional.of(depositTestAccount));
-        when(respository.findByAccountNumber("897-887868-67")).thenReturn(Optional.ofNullable(defaultAccount("NORMAL")));
+        when(accountRespository.findByAccountNumber("897-887868-67")).thenReturn(Optional.of(accountSource));
+        when(accountRespository.findByAccountNumber("137-123332-74")).thenReturn(Optional.of(accountDestination));
 
         try {
-            service.transferMoney("233-121219-21","897-887868-67",0L);
-            fail();
+            accountService.transferMoney(transactionDTO);
         }catch (Exception e){
-            assertEquals("One of the accounts can't perform the transaction or one of them has is type deposit",e.getMessage());
-            verify(respository,times(0)).save(any());
+            assertEquals("The account: "+accountDestination.getAccountNumber()+" is type deposit", e.getMessage());
         }
 
 
     }
-    @Test
-    public void transferMoneyWhenBothAccountsAreDeposit(){
-        IcesiAccount depositTestAccount = defaultAccount("deposit");
-        depositTestAccount.setAccountNumber("233-121219-21");
-        IcesiAccount anotherDepositTestAccount = defaultAccount("deposit");
-
-        when(respository.findByAccountNumber("233-121219-21")).thenReturn(Optional.of(depositTestAccount));
-        when(respository.findByAccountNumber("897-887868-67")).thenReturn(Optional.ofNullable(anotherDepositTestAccount));
-
-        try {
-            service.transferMoney("233-121219-21","897-887868-67",0L);
-            fail();
-        }catch (Exception e){
-            assertEquals("One of the accounts can't perform the transaction or one of them has is type deposit",e.getMessage());
-            verify(respository,times(0)).save(any());
-        }
-
-    }
 
     @Test
-    public void testTransactionWithAnInactiveAccount(){
+    public void testAnyTransactionWithAnInactiveAccount(){
+        TransactionRequestDTO transactionDTO = TransactionRequestDTO.builder().build();
+        IcesiAccount account = defaultAccount("NORMAL");
         account.setActive(false);
         account.setAccountNumber("123-456789-11");
-        when(respository.findByAccountNumber("123-456789-11")).thenReturn(Optional.empty());
+        when(accountRespository.findByAccountNumber("123-456789-11")).thenReturn(Optional.empty());
 
-        assertFalse(service.depositMoney(account.getAccountNumber(),1L));
-        assertFalse(service.withdrawalMoney(account.getAccountNumber(),1L));
-        assertFalse(service.transferMoney(account.getAccountNumber(),defaultAccount("NORMAL").getAccountNumber(),1L));
+        assertThrows(RuntimeException.class, () -> accountService.depositMoney(transactionDTO));
+        assertThrows(RuntimeException.class, () -> accountService.withdrawalMoney(transactionDTO));
+        assertThrows(RuntimeException.class, () -> accountService.transferMoney(transactionDTO));
 
-        verify(respository,times(0)).save(any());
+        verify(accountRespository,times(0)).save(any());
 
     }
 
@@ -262,12 +307,31 @@ public class IcesiAccountServiceTest {
     @Test
     public void testUniqueAccountNumber(){
         when(userRepository.findbyName(any())).thenReturn(Optional.ofNullable(defaultUser()));
-        when(respository.findByAccountNumber(any())).thenReturn(Optional.ofNullable(defaultAccount("normal")),Optional.empty());
-        service.save(defaultDTO("NORMAL"));
-        verify(respository,times(2)).findByAccountNumber(any());
+        when(accountRespository.findByAccountNumber(any())).thenReturn(Optional.ofNullable(defaultAccount("normal")),Optional.empty());
+        accountService.save(defaultDTO("NORMAL"));
+        verify(accountRespository,times(2)).findByAccountNumber(any());
 
     }
 
+    @Test
+    public void testAccountNumberMatchPattern(){
+        String pattern = "^[0-9]{3}-[0-9]{6}-[0-9]{2}$";
+        String accountNumberGenerated = generateRamdomAccountNumber();
+        assertTrue(accountNumberGenerated.matches(pattern)
+                && accountNumberGenerated.chars().filter(c -> c!='-').allMatch(Character::isDigit));
+
+    }
+
+
+    private String generateRamdomAccountNumber(){
+        //This is the same way the account numbers are generated at the service
+        Random random = new Random();
+        String accountNumber = IntStream.range(0,11)
+                .mapToObj(x -> String.valueOf(random.nextInt(10)))
+                .collect(Collectors.joining());
+        accountNumber = accountNumber.substring(0,3) + "-" + accountNumber.substring(3,9)+"-"+accountNumber.substring(9,11);
+        return accountNumber;
+    }
 
     private IcesiAccount defaultAccount(String type){
         return IcesiAccount.builder()

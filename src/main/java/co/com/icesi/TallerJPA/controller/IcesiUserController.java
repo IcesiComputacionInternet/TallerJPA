@@ -9,19 +9,7 @@ import java.util.List;
 
 @RestController
 @AllArgsConstructor
-@RequestMapping("/users")
 public class IcesiUserController {
     private final IcesiUserService service;
 
-
-    @PostMapping
-    public String create(@RequestBody IcesiUserDTO userDTO){
-        return  service.save(userDTO) ? "User created succesfully" : "";
-
-    }
-
-    @GetMapping
-    public List<IcesiUserDTO> getIcesiUser(){
-        return service.getUsers();
-    }
 }

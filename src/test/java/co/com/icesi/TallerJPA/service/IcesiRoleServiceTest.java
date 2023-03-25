@@ -15,30 +15,30 @@ import static org.junit.jupiter.api.Assertions.*;
 import static org.mockito.Mockito.*;
 
 public class IcesiRoleServiceTest {
-    private IcesiRoleService service;
-    private IcesiRoleRepository repository;
+    private IcesiRoleService roleService;
+    private IcesiRoleRepository roleRepository;
 
-    private IcesiRoleMapper mapper;
+    private IcesiRoleMapper roleMapper;
 
     @BeforeEach
-    private void Init(){
-        repository= mock(IcesiRoleRepository.class);
-        mapper= spy(IcesiRoleMapperImpl.class);
-        service = new IcesiRoleService(repository,mapper);
+    public void init(){
+        roleRepository = mock(IcesiRoleRepository.class);
+        roleMapper = spy(IcesiRoleMapperImpl.class);
+        roleService = new IcesiRoleService(roleRepository, roleMapper);
     }
 
     @Test
     public void testSave(){
-        when(repository.findByName(any())).thenReturn(Optional.empty());
-        service.save(defaultDTO());
-        verify(repository, times(1)).save(argThat(new IcesiRoleMatcher(defaultRole())));
-        verify(mapper, times(1)).fromRoleDTO(any());
+        when(roleRepository.findByName(any())).thenReturn(Optional.empty());
+        roleService.save(defaultDTO());
+        verify(roleRepository, times(1)).save(argThat(new IcesiRoleMatcher(defaultRole())));
+        verify(roleMapper, times(1)).fromRoleDTO(any());
     }
 
     @Test
-    public void testCreateAroleWhenNameAlreadyExist(){
-        when(repository.findByName(any())).thenReturn(Optional.of(defaultRole()));
-       assertThrows(RuntimeException.class, () -> service.save(defaultDTO()));
+    public void testCreateARoleWhenNameAlreadyExist(){
+        when(roleRepository.findByName(any())).thenReturn(Optional.of(defaultRole()));
+       assertThrows(RuntimeException.class, () -> roleService.save(defaultDTO()));
 
     }
 

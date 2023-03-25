@@ -4,6 +4,8 @@ import co.com.icesi.TallerJPA.model.IcesiAccount;
 import lombok.AllArgsConstructor;
 import org.mockito.ArgumentMatcher;
 
+import java.util.Objects;
+
 @AllArgsConstructor
 public class IcesiAccountMatcher implements ArgumentMatcher<IcesiAccount> {
 
@@ -12,7 +14,7 @@ public class IcesiAccountMatcher implements ArgumentMatcher<IcesiAccount> {
     public boolean matches(IcesiAccount icesiAccountRight) {
         return icesiAccountRight.getBalance().equals(icesiAccountLeft.getBalance()) &&
                icesiAccountRight.getType().equals(icesiAccountLeft.getType()) &&
-                (icesiAccountLeft.isActive() && icesiAccountRight.isActive())  &&
+                (Objects.equals(icesiAccountRight.isActive(),icesiAccountLeft.isActive()))  &&
                 icesiAccountRight.getUser().getUserID().equals(icesiAccountLeft.getUser().getUserID());
 
     }

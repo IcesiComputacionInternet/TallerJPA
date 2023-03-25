@@ -4,7 +4,6 @@ import co.com.icesi.TallerJPA.dto.IcesiRoleDTO;
 import co.com.icesi.TallerJPA.dto.IcesiUserDTO;
 import co.com.icesi.TallerJPA.mapper.IcesiUserMapper;
 import co.com.icesi.TallerJPA.mapper.IcesiUserMapperImpl;
-import co.com.icesi.TallerJPA.matcher.IcesiRoleMatcher;
 import co.com.icesi.TallerJPA.matcher.IcesiUserMatcher;
 import co.com.icesi.TallerJPA.model.IcesiRole;
 import co.com.icesi.TallerJPA.model.IcesiUser;
@@ -21,78 +20,80 @@ import static org.junit.jupiter.api.Assertions.fail;
 import static org.mockito.Mockito.*;
 
 public class IcesiUserServiceTest {
-    private IcesiUserService service;
-    private IcesiUserRepository repository;
+    private IcesiUserService userService;
+    private IcesiUserRepository userRepository;
 
-    private IcesiUserMapper mapper;
+    private IcesiUserMapper userMapper;
     private IcesiRoleRepository roleRepository;
 
     @BeforeEach
-    private void init(){
-        repository = mock(IcesiUserRepository.class);
+    public void init(){
+        userRepository = mock(IcesiUserRepository.class);
         roleRepository = mock(IcesiRoleRepository.class);
-        mapper = spy(IcesiUserMapperImpl.class);
-        service = new IcesiUserService(repository,roleRepository,mapper);
+        userMapper = spy(IcesiUserMapperImpl.class);
+        userService = new IcesiUserService(userRepository,roleRepository, userMapper);
     }
 
 
     @Test
     public void createUser(){
         when(roleRepository.findByName(any())).thenReturn(Optional.ofNullable(defaultRole()));
-        service.save(defaultDTO());
-        verify(roleRepository,times(2)).findByName(any());
-        verify(repository,times(1)).save(argThat(new IcesiUserMatcher(defaultUser())));
+        userService.save(defaultDTO());
+        verify(roleRepository,times(1)).findByName(any());
+        verify(userRepository,times(1)).save(argThat(new IcesiUserMatcher(defaultUser())));
         verify(roleRepository,times(1)).save(any());
-        verify(mapper,times(1)).fromUserDto(any());
+        verify(userMapper,times(1)).fromUserDto(any());
     }
 
     @Test
     public void createUserWhenEmailAndPhoneAlreadyExist(){
-        when(repository.findByEmail(any())).thenReturn(Optional.ofNullable(defaultUser()));
-        when(repository.findByPhoneNumber(any())).thenReturn(Optional.ofNullable(defaultUser()));
+        when(userRepository.findByEmail(any())).thenReturn(Optional.ofNullable(defaultUser()));
+        when(userRepository.findByPhoneNumber(any())).thenReturn(Optional.ofNullable(defaultUser()));
         try {
-            service.save(defaultDTO());
+            userService.save(defaultDTO());
             fail();
         }catch (Exception e){
             String exceptionMessage = e.getMessage();
-            assertEquals("This email and phone  already exist",exceptionMessage);
-            verify(repository, times(0)).save(any());
+            assertEquals("This email and phone already exist: "+defaultDTO().getEmail()+" and "+defaultDTO().getPhoneNumber(),exceptionMessage);
+            verify(userRepository, times(0)).save(any());
         }
     }
 
     @Test
     public void createUserWhenEmailAlreadyExist(){
-        when(repository.findByEmail(any())).thenReturn(Optional.ofNullable(defaultUser()));
+        when(userRepository.findByEmail(any())).thenReturn(Optional.ofNullable(defaultUser()));
         try {
-            service.save(defaultDTO());
+            userService.save(defaultDTO());
             fail();
         }catch (Exception e){
             String exceptionMessage = e.getMessage();
-            assertEquals("Email already exist",exceptionMessage);
+            assertEquals("This email already exist: "+defaultDTO().getEmail(),exceptionMessage);
+            verify(userRepository, times(0)).save(any());
         }
     }
 
     @Test
     public void createUserWhenPhoneAlreadyExist(){
-        when(repository.findByPhoneNumber(any())).thenReturn(Optional.ofNullable(defaultUser()));
+        when(userRepository.findByPhoneNumber(any())).thenReturn(Optional.ofNullable(defaultUser()));
         try {
-            service.save(defaultDTO());
+            userService.save(defaultDTO());
             fail();
         }catch (Exception e){
             String exceptionMessage = e.getMessage();
-            assertEquals("Phone already exist",exceptionMessage);
+            assertEquals("This phone already exist: "+defaultDTO().getPhoneNumber(),exceptionMessage);
+            verify(userRepository, times(0)).save(any());
         }
     }
 
     @Test
-    public void createUserWhenRoleIsNull(){
+    public void createUserWhenRoleDoesNotExist(){
         when(roleRepository.findByName(any())).thenReturn(Optional.empty());
         try {
-            service.save(defaultDTO());
+            userService.save(defaultDTO());
             fail();
         }catch (Exception e){
             String exceptionMessage = e.getMessage();
-            assertEquals("This role doesn't exist or is null",exceptionMessage);
+            assertEquals("This role doesn't exist",exceptionMessage);
         }
     }
 

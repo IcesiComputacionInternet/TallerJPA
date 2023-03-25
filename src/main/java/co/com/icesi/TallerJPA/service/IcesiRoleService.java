@@ -14,21 +14,20 @@ import java.util.stream.Collectors;
 @Service
 @AllArgsConstructor
 public class IcesiRoleService {
-    private final IcesiRoleRepository repository;
+    private final IcesiRoleRepository roleRepository;
     private final IcesiRoleMapper mapper;
 
-    public IcesiRole save(IcesiRoleDTO dto){
-        if(repository.findByName(dto.getName()).isPresent()){
-            throw new RuntimeException("This name's role already exists");
-        }else{
-            IcesiRole role = mapper.fromRoleDTO(dto);
-            role.setRoleId(UUID.randomUUID());
-            role.setUsers(new ArrayList<>());
-            return  repository.save(role);
-        }
+    public IcesiRoleDTO save(IcesiRoleDTO dto){
+        roleRepository.findByName(dto.getName()).ifPresent(
+                e -> {throw new RuntimeException("This name's role already exists");}
+        );
+        IcesiRole role = mapper.fromRoleDTO(dto);
+        role.setRoleId(UUID.randomUUID());
+        role.setUsers(new ArrayList<>());
+        return  mapper.fromIcesiRole(roleRepository.save(role));
     }
 
     public List<IcesiRoleDTO> getRoles(){
-        return repository.findAll().stream().map(mapper::fromIcesiRole).collect(Collectors.toList());
+        return roleRepository.findAll().stream().map(mapper::fromIcesiRole).collect(Collectors.toList());
     }
 }
