@@ -4,6 +4,7 @@ import co.edu.icesi.demo.dto.RoleCreateDTO;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.RequestBody;
 
 import java.util.List;
 
@@ -18,6 +19,6 @@ public interface RoleAPI {
     List<RoleCreateDTO> getAllRoles();
 
     @PostMapping
-    RoleCreateDTO addRole(RoleCreateDTO roleCreateDTO);
+    RoleCreateDTO addRole(@RequestBody RoleCreateDTO roleCreateDTO);
 
 }

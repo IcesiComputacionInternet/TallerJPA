@@ -15,5 +15,5 @@ public class AccountCreateDTO {
 
     private boolean active;
 
-    private UserCreateDTO userCreateDTO;
+    private String userEmail;
 }

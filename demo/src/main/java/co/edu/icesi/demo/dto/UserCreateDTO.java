@@ -18,5 +18,5 @@ public class UserCreateDTO {
 
     private String password;
 
-    private RoleCreateDTO roleCreateDTO;
+    private String roleName;
 }

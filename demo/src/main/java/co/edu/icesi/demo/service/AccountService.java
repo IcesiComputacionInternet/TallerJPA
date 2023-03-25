@@ -32,8 +32,8 @@ public class AccountService {
         if(!account.isActive() && account.getBalance()>0){
             throw new RuntimeException("Account can only be disable if the balance is 0");
         }
-        validateNullUser(account);
-        IcesiUser icesiUser= userRepository.findByEmail(account.getUserCreateDTO().getEmail()).orElseThrow(()-> new RuntimeException("User does not exists"));
+
+        IcesiUser icesiUser= userRepository.findByEmail(account.getUserEmail()).orElseThrow(()-> new RuntimeException("User does not exists"));
         IcesiAccount icesiAccount= accountMapper.fromIcesiAccountDTO(account);
         icesiAccount.setAccountId(UUID.randomUUID());
         icesiAccount.setAccountNumber(accountNumberSupplier().get());
@@ -43,13 +43,7 @@ public class AccountService {
 
     }
 
-    public void validateNullUser(AccountCreateDTO account){
-        if(account.getUserCreateDTO()==null){
-            throw new RuntimeException("Account needs a user");
-        }
-    }
-
-    private Supplier<String> accountNumberSupplier(){
+   private Supplier<String> accountNumberSupplier(){
         return ()->uniqueAccountNumber();
     }
 
@@ -57,7 +51,7 @@ public class AccountService {
         String accountNumber="";
        do{
            accountNumber=generateAccountNumber();
-       }while(accountRepository.findByAccountNumber(accountNumber).isPresent());
+       }while(accountRepository.findByAccountNumber(accountNumber,true).isPresent());
 
        return accountNumber;
    }
@@ -75,7 +69,7 @@ public class AccountService {
     }
 
     public void validateAccountNumber(String accountNumber){
-        if(!accountRepository.findByAccountNumber(accountNumber).isPresent()){
+        if(!accountRepository.findByAccountNumber(accountNumber,true).isPresent()){
             throw new RuntimeException("Account "+accountNumber+" does not exists");
         }
     }
@@ -95,7 +89,7 @@ public class AccountService {
         validateAccountNumber(accountNumber);
         validateMoney(money);
 
-        IcesiAccount icesiAccount=accountRepository.findByAccountNumber(accountNumber).get();
+        IcesiAccount icesiAccount=accountRepository.findByAccountNumber(accountNumber,true).get();
         validateAccountEnable(icesiAccount);
 
         if(icesiAccount.getBalance()<money){
@@ -109,7 +103,7 @@ public class AccountService {
     public void depositMoney(String accountNumber, long money){
         validateAccountNumber(accountNumber);
         validateMoney(money);
-        IcesiAccount icesiAccount=accountRepository.findByAccountNumber(accountNumber).get();
+        IcesiAccount icesiAccount=accountRepository.findByAccountNumber(accountNumber,true).get();
         validateAccountEnable(icesiAccount);
 
         icesiAccount.setBalance(icesiAccount.getBalance()+money);
@@ -124,8 +118,8 @@ public class AccountService {
         validateAccountNumber(accountNumberFrom);
         validateAccountNumber(accountNumberTo);
         validateMoney(money);
-        IcesiAccount icesiAccountFrom=accountRepository.findByAccountNumber(accountNumberFrom).get();
-        IcesiAccount icesiAccountTo=accountRepository.findByAccountNumber(accountNumberTo).get();
+        IcesiAccount icesiAccountFrom=accountRepository.findByAccountNumber(accountNumberFrom,true).get();
+        IcesiAccount icesiAccountTo=accountRepository.findByAccountNumber(accountNumberTo,true).get();
         validateTypeToTransfer(icesiAccountFrom);
         validateTypeToTransfer(icesiAccountTo);
         validateAccountEnable(icesiAccountFrom);
@@ -141,7 +135,7 @@ public class AccountService {
 
     public void changeState(String accountNumber, boolean active){ //enable/disable
        validateAccountNumber(accountNumber);
-        IcesiAccount icesiAccount=accountRepository.findByAccountNumber(accountNumber).get();
+        IcesiAccount icesiAccount=accountRepository.findByAccountNumber(accountNumber,true).get();
         if(!active && icesiAccount.getBalance()>0){
             throw new RuntimeException("Balance is not 0. Account can't be disabled");
         }

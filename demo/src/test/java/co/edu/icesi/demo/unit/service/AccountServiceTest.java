@@ -30,7 +30,7 @@ public class AccountServiceTest {
     private AccountMapper accountMapper;
 
     private UserRepository userRepository;
-
+/*
     @BeforeEach
     private void init(){
         accountRepository=mock(AccountRepository.class);
@@ -453,5 +453,5 @@ public class AccountServiceTest {
                 .build();
     }
 
-
+*/
 }

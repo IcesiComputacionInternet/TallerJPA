@@ -21,15 +21,15 @@ public class UserService {
 
     private RoleRepository roleRepository;
 
-    public IcesiUser save(UserCreateDTO user){
+    public UserCreateDTO save(UserCreateDTO user){
 
         validateEmailAndPhoneNumber(user);
-        validateNullRole(user);
-        IcesiRole icesiRole=roleRepository.findByName(user.getRoleCreateDTO().getName()).orElseThrow( ()-> new RuntimeException("User role does not exists"));
+
+        IcesiRole icesiRole=roleRepository.findByName(user.getRoleName()).orElseThrow( ()-> new RuntimeException("User role does not exists"));
         IcesiUser icesiUser=userMapper.fromIcesiUserDTO(user);
         icesiUser.setRole(icesiRole);
         icesiUser.setUserId(UUID.randomUUID());
-        return userRepository.save(icesiUser);
+        return userMapper.fromIcesiUser(userRepository.save(icesiUser));
 
     }
 
@@ -42,12 +42,5 @@ public class UserService {
             throw new RuntimeException("User phone number is in use");
         }
     }
-
-    public void validateNullRole(UserCreateDTO user){
-        if(user.getRoleCreateDTO()==null){
-            throw new RuntimeException("User needs a role");
-        }
-    }
-
 
 }

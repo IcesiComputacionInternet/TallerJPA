@@ -4,6 +4,7 @@ import co.edu.icesi.demo.dto.UserCreateDTO;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.RequestBody;
 
 import java.util.List;
 
@@ -18,7 +19,7 @@ public interface UserAPI {
     List<UserCreateDTO> getAllUsers();
 
     @PostMapping
-    UserCreateDTO addUser(UserCreateDTO userCreateDTO);
+    UserCreateDTO addUser(@RequestBody UserCreateDTO userCreateDTO);
 
 
 }

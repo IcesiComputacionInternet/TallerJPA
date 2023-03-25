@@ -19,13 +19,15 @@ public class RoleService {
 
     private RoleMapper roleMapper;
 
-    public IcesiRole save(RoleCreateDTO role){
+    public RoleCreateDTO save(RoleCreateDTO role){
         if(roleRepository.findByName(role.getName()).isPresent()){
             throw new RuntimeException("Role name already exists");
         }
+
         IcesiRole icesiRole=roleMapper.fromIcesiRoleDTO(role);
         icesiRole.setRoleId(UUID.randomUUID());
-        return roleRepository.save(icesiRole);
+
+        return roleMapper.fromIcesiRole(roleRepository.save(icesiRole));
     }
 
 

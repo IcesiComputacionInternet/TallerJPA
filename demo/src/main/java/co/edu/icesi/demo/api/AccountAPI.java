@@ -17,16 +17,16 @@ public interface AccountAPI {
     List<AccountCreateDTO> getAllAccounts();
 
     @PostMapping
-    AccountCreateDTO addAccount(AccountCreateDTO accountCreateDTO);
+    AccountCreateDTO addAccount(@RequestBody AccountCreateDTO accountCreateDTO);
 
     @PutMapping("/withdrawal")
-    TransactionDTO withdrawalMoney(TransactionDTO transactionDTO);
+    TransactionDTO withdrawalMoney(@RequestBody TransactionDTO transactionDTO);
 
     @PutMapping("/deposit")
-    TransactionDTO depositMoney(TransactionDTO transactionDTO);
+    TransactionDTO depositMoney(@RequestBody TransactionDTO transactionDTO);
 
     @PutMapping("/transfer")
-    TransactionDTO transferMoney(TransactionDTO transactionDTO);
+    TransactionDTO transferMoney(@RequestBody TransactionDTO transactionDTO);
 
     @PutMapping("/enable/{accountNumber}")
     AccountCreateDTO enableAccount(@PathVariable String accountNumber);
