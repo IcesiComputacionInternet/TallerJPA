@@ -17,7 +17,7 @@ public class RoleService {
 
     private final RoleMapper roleMapper;
 
-    public IcesiRole save(RoleCreateDTO roleCreateDTO){
+    public RoleCreateDTO save(RoleCreateDTO roleCreateDTO){
 
         if(roleRepository.findByName(roleCreateDTO.getName()).isPresent()){
             throw new RuntimeException("Role already exists");
@@ -26,6 +26,10 @@ public class RoleService {
         IcesiRole icesiRole = roleMapper.fromIcesiRoleDTO(roleCreateDTO);
         icesiRole.setRoleId(UUID.randomUUID());
 
-        return roleRepository.save(icesiRole);
+        return roleMapper.fromIcesiRole(roleRepository.save(icesiRole));
+    }
+
+    public RoleCreateDTO getRoleByName(String name){
+        return roleMapper.fromIcesiRole(roleRepository.findByName(name).orElseThrow(()-> new RuntimeException("Role not found")));
     }
 }

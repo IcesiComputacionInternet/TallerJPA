@@ -1,6 +1,7 @@
 package com.edu.icesi.TallerJPA.mapper;
 
 import com.edu.icesi.TallerJPA.dto.AccountCreateDTO;
+import com.edu.icesi.TallerJPA.dto.TransactionDTO;
 import com.edu.icesi.TallerJPA.model.IcesiAccount;
 import org.mapstruct.Mapper;
 
@@ -8,4 +9,6 @@ import org.mapstruct.Mapper;
 public interface AccountMapper {
 
     IcesiAccount fromIcesiAccountDTO(AccountCreateDTO accountCreateDTO);
+
+    AccountCreateDTO fromIcesiAccount(IcesiAccount icesiAccount);
 }

@@ -8,4 +8,6 @@ import org.mapstruct.Mapper;
 public interface RoleMapper {
 
     IcesiRole fromIcesiRoleDTO(RoleCreateDTO roleCreateDTO);
+
+    RoleCreateDTO fromIcesiRole(IcesiRole icesiRole);
 }

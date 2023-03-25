@@ -9,4 +9,5 @@ public interface UserMapper {
 
     IcesiUser fromIcesiUserDTO(UserCreateDTO userCreateDTO);
 
+    UserCreateDTO fromIcesiUser(IcesiUser icesiUser);
 }

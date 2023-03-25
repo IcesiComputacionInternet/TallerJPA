@@ -1,6 +1,7 @@
 package com.edu.icesi.TallerJPA.service;
 
 import com.edu.icesi.TallerJPA.dto.AccountCreateDTO;
+import com.edu.icesi.TallerJPA.dto.TransactionDTO;
 import com.edu.icesi.TallerJPA.mapper.AccountMapper;
 import com.edu.icesi.TallerJPA.model.IcesiAccount;
 import com.edu.icesi.TallerJPA.repository.AccountRepository;
@@ -19,7 +20,7 @@ public class AccountService {
 
     private final AccountMapper accountMapper;
 
-    public IcesiAccount save(AccountCreateDTO accountCreateDTO) {
+    public AccountCreateDTO save(AccountCreateDTO accountCreateDTO) {
 
         accountCreateDTO.setAccountNumber(sendToGenerateAccountNumbers());
 
@@ -27,14 +28,11 @@ public class AccountService {
             throw new RuntimeException("Account already exists, try again");
         }
 
-        if (validateBalance(accountCreateDTO.getBalance())) {
-            throw new RuntimeException("Balance can't be below 0");
-        }
-
+        validateBalance(accountCreateDTO.getBalance());
         IcesiAccount icesiAccount = accountMapper.fromIcesiAccountDTO(accountCreateDTO);
         icesiAccount.setAccountId(UUID.randomUUID());
 
-        return accountRepository.save(icesiAccount);
+        return accountMapper.fromIcesiAccount(accountRepository.save(icesiAccount));
     }
 
     public String sendToGenerateAccountNumbers(){
@@ -65,92 +63,141 @@ public class AccountService {
         return stringWithId;
     }
 
-    public boolean validateBalance(long balance) {
-
-        return balance < 0;
-    }
-
-    public void setStateAccount(AccountCreateDTO account, String accountNumber) {
-
-        if (accountRepository.findByAccountNumber(accountNumber).isPresent()){
-            if (account.getBalance() == 0 && account.isActive()){
-                account.setActive(false);
-
-            } else if (!account.isActive()) {
-                account.setActive(true);
-
-            }else{
-                throw new RuntimeException("Account can't change status");
-            }
-        }else {
-            throw new RuntimeException("Account not found");
-        }
-
-    }
-
-    public void withdrawals(AccountCreateDTO account, String accountNumber, int moneyToWithdraw) {
-
-        if (accountRepository.findByAccountNumber(accountNumber).isPresent()) {
-            long balance = account.getBalance();
-
-            if (balance > moneyToWithdraw) {
-                account.setBalance(balance - moneyToWithdraw);
-
-            } else {
-                throw new RuntimeException("Insufficient money");
-            }
-        } else {
-            throw new RuntimeException("Account not found");
-        }
-
-    }
-
-    public void depositMoney(AccountCreateDTO account, String accountNumber,int moneyToDeposit) {
-
-        if (accountRepository.findByAccountNumber(accountNumber).isPresent() && moneyToDeposit > 0){
-            account.setBalance(account.getBalance() + moneyToDeposit);
-
-        }else if (moneyToDeposit <= 0){
-            throw new RuntimeException("Invalid value");
-        }
-        else {
-            throw new RuntimeException("Account not found");
+    public void validateBalance(long balance) {
+        if (balance < 0){
+            throw new RuntimeException("Balance can't be below 0");
         }
     }
 
-    public void transferMoney(AccountCreateDTO sourceAccount, AccountCreateDTO destinationAccount, int moneyToTransfer) {
+    public TransactionDTO withdrawals(TransactionDTO transactionDTO) {
 
-        if (accountRepository.findByAccountNumber(sourceAccount.getAccountNumber()).isPresent() &&
-                accountRepository.findByAccountNumber(destinationAccount.getAccountNumber()).isPresent() &&
-                validateAccountType(sourceAccount, destinationAccount)){
+        AccountCreateDTO accountToWithdraw = findByAccountNumber(transactionDTO.getSourceAccount());
 
-            if (sourceAccount.getBalance() >= moneyToTransfer ){
-                sourceAccount.setBalance(sourceAccount.getBalance() - moneyToTransfer);
-                destinationAccount.setBalance(destinationAccount.getBalance() + moneyToTransfer);
+        long balance = transactionDTO.getAmountMoney();
 
-            } else if (moneyToTransfer < 0) {
-                throw new RuntimeException("Invalid value");
+        validateTransactionBalance(accountToWithdraw, balance);
 
-            } else{
-                throw new RuntimeException("Insufficient money to make a transfer");
-            }
-        }else {
-            validateAccountType(sourceAccount, destinationAccount);
+        accountToWithdraw.setBalance(accountToWithdraw.getBalance() - balance);
+
+        transactionDTO.setResult("Successful withdrawal");
+
+        accountRepository.save(accountMapper.fromIcesiAccountDTO(accountToWithdraw));
+
+        return transactionDTO;
+    }
+
+    public AccountCreateDTO findByAccountNumber(String accountNumber){
+
+        if (accountRepository.findByAccountNumber(accountNumber).isEmpty()){
+            throw new RuntimeException("Account "+accountNumber+" not found");
+        }
+
+        return accountMapper.fromIcesiAccount(accountRepository.findByAccountNumber(accountNumber).get());
+    }
+
+    public void validateTransactionBalance(AccountCreateDTO accountToTransaction, long moneyToTransaction) {
+
+        if (accountToTransaction.getBalance() < moneyToTransaction){
+            throw new RuntimeException("The account "+accountToTransaction.getAccountNumber()+" cannot perform the transaction. Insufficient money");
         }
     }
 
-    private boolean validateAccountType(AccountCreateDTO accountCreateDTO, AccountCreateDTO accountCreateDTO1) {
+    public TransactionDTO depositMoney(TransactionDTO transactionDTO) {
 
-        boolean verificationOfType = true;
+        AccountCreateDTO accountToDeposit = findByAccountNumber(transactionDTO.getDestinationAccount());
 
-        if (accountCreateDTO == null || accountCreateDTO1 == null) {
-            throw new RuntimeException("It is not possible to make the transfer. At least one account not exists");
+        long moneyToDeposit = transactionDTO.getAmountMoney();
+
+        validateMoneyForTransaction(moneyToDeposit);
+
+        accountToDeposit.setBalance(accountToDeposit.getBalance() + moneyToDeposit);
+
+        accountRepository.save(accountMapper.fromIcesiAccountDTO(accountToDeposit));
+
+        transactionDTO.setResult("Successful deposit");
+
+        return transactionDTO;
+    }
+
+    public void validateMoneyForTransaction(long moneyToTransaction){
+
+        if (moneyToTransaction < 0){
+            throw new RuntimeException("Invalid value for transaction. Value can't be less than zero");
         }
-        else if(accountCreateDTO.getType().equalsIgnoreCase("Deposit Only") || accountCreateDTO1.getType().equalsIgnoreCase("Deposit Only")){
+    }
+
+    public TransactionDTO transferMoney(TransactionDTO transactionDTO) {
+
+        AccountCreateDTO sourceAccountToTransfer = findByAccountNumber(transactionDTO.getSourceAccount());
+
+        AccountCreateDTO destinationAccountToTransfer = findByAccountNumber(transactionDTO.getDestinationAccount());
+
+        validateAccountType(sourceAccountToTransfer, destinationAccountToTransfer);
+
+        long moneyToTransfer = transactionDTO.getAmountMoney();
+
+        validateMoneyForTransaction(moneyToTransfer);
+
+        validateTransactionBalance(sourceAccountToTransfer, moneyToTransfer);
+
+        sourceAccountToTransfer.setBalance(sourceAccountToTransfer.getBalance() - moneyToTransfer);
+
+        destinationAccountToTransfer.setBalance(destinationAccountToTransfer.getBalance() + moneyToTransfer);
+
+        accountRepository.save(accountMapper.fromIcesiAccountDTO(sourceAccountToTransfer));
+        accountRepository.save(accountMapper.fromIcesiAccountDTO(destinationAccountToTransfer));
+
+        transactionDTO.setResult("Successful transfer");
+
+        return transactionDTO;
+    }
+
+    public void validateAccountType(AccountCreateDTO sourceAccount, AccountCreateDTO destinationAccount){
+
+        if (sourceAccount.getType().equals("Deposit only") || destinationAccount.getType().equals("Deposit only")){
             throw new RuntimeException("It is not possible to make the transfer. At least one account is deposit only");
         }
+    }
 
-        return verificationOfType;
+
+    public AccountCreateDTO setToEnableState(String accountNumber) {
+
+        AccountCreateDTO accountToEnable = findByAccountNumber(accountNumber);
+
+        validateStatusOfAccount(accountToEnable, true);
+
+        accountToEnable.setActive(true);
+
+        accountRepository.save(accountMapper.fromIcesiAccountDTO(accountToEnable));
+
+        return accountToEnable;
+    }
+
+    public void validateStatusOfAccount(AccountCreateDTO accountCreateDTO, boolean state){
+        if (accountCreateDTO.isActive() == state){
+            throw new RuntimeException("The account is already in that status");
+        }
+    }
+
+    public AccountCreateDTO setToDisableState(String accountNumber) {
+
+        AccountCreateDTO accountToEnable = findByAccountNumber(accountNumber);
+
+        validateStatusOfAccount(accountToEnable, false);
+
+        validateBalanceForDisableAccount(accountToEnable.getBalance());
+
+        accountToEnable.setActive(false);
+
+        accountRepository.save(accountMapper.fromIcesiAccountDTO(accountToEnable));
+
+        return accountToEnable;
+    }
+
+    public void validateBalanceForDisableAccount(long balance){
+        if (balance != 0){
+            throw new RuntimeException("The account balance is not zero");
+        }
     }
 
 }
