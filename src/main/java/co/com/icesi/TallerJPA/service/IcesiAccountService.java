@@ -107,17 +107,20 @@ public class IcesiAccountService {
         IcesiAccount accountSource = getIcesiAccount(transactionRequestDTO.getAccountNumberFrom());
         IcesiAccount accountDestination = getIcesiAccount(transactionRequestDTO.getAccountNumberTo());
 
+
         isDeposit(accountSource);
         isDeposit(accountDestination);
         validateAmount(transactionRequestDTO.getAmount(), accountSource);
+        Long accountSourceOldBalance = accountSource.getBalance();
+        Long accounntDestinationOldBalance = accountDestination.getBalance();
 
         accountSource.setBalance(accountSource.getBalance()- transactionRequestDTO.getAmount());
         accountDestination.setBalance(accountDestination.getBalance()+ transactionRequestDTO.getAmount());
         accountRespository.save(accountSource);
         accountRespository.save(accountDestination);
        return  TransactionResponseDTO.builder()
-               .oldStateOfTheAccount("The balance of the account of origin  "+accountSource.getAccountNumber()+" was: "+accountSource.getBalance()+"\n"+
-                                      "The balance of the account of destination "+accountDestination.getAccountNumber()+" was: "+accountDestination.getBalance()+"\n")
+               .oldStateOfTheAccount("The balance of the account of origin  "+accountSource.getAccountNumber()+" was: "+accountSourceOldBalance+"\n"+
+                                      "The balance of the account of destination "+accountDestination.getAccountNumber()+" was: "+accounntDestinationOldBalance+"\n")
                .newStateOfTheAccount("The new balance the account  of origin"+accountSource.getAccountNumber()+" is:  "+accountSource.getBalance()+"\n"+
                                         "The new balance the account "+accountDestination.getAccountNumber()+" is:  "+accountDestination.getBalance())
                .result("Transfer was made successfully")

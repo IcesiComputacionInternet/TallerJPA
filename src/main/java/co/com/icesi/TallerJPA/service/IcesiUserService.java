@@ -27,10 +27,10 @@ public class IcesiUserService {
             throw new RuntimeException("This email and phone already exist: "+dto.getEmail()+" and "+dto.getPhoneNumber());
         }
         userRepository.findByEmail((dto.getEmail())).ifPresent(e ->{
-            throw new RuntimeException("This email already exist: "+dto.getEmail());
+            throw new RuntimeException("This email already exist: "+e.getEmail());
         });
         userRepository.findByPhoneNumber((dto.getPhoneNumber())).ifPresent(e ->{
-            throw new RuntimeException("This phone already exist: "+dto.getPhoneNumber());
+            throw new RuntimeException("This phone already exist: "+e.getPhoneNumber());
         });
 
 
