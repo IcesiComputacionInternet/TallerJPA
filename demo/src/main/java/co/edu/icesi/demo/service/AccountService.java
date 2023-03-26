@@ -115,7 +115,7 @@ public class AccountService {
     }
 
     public AccountCreateDTO enableAccount(String accountNumber){
-        validateAccountNumber(accountNumber);
+
         IcesiAccount icesiAccount=accountRepository.findByAccountNumber(accountNumber,false).orElseThrow( ()-> new RuntimeException("Inactive account not found"));
         icesiAccount.setActive(true);
 
@@ -126,7 +126,7 @@ public class AccountService {
     }
 
     public AccountCreateDTO disableAccount(String accountNumber){
-        validateAccountNumber(accountNumber);
+
         IcesiAccount icesiAccount=accountRepository.findByAccountNumber(accountNumber,true).orElseThrow( ()-> new RuntimeException("Active account not found"));
 
         if(icesiAccount.getBalance()>0){

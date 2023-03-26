@@ -6,6 +6,7 @@ import co.edu.icesi.demo.mapper.RoleMapperImpl;
 import co.edu.icesi.demo.model.IcesiRole;
 import co.edu.icesi.demo.repository.RoleRepository;
 import co.edu.icesi.demo.service.RoleService;
+import co.edu.icesi.demo.unit.service.matcher.IcesiRoleMatcher;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 
@@ -37,7 +38,9 @@ public class RoleServiceTest {
         roleService.save(defaultRoleCreateDTO());
         IcesiRole icesiRole= defaultIcesiRole();
 
+        verify(roleMapper,times(1)).fromIcesiRoleDTO(defaultRoleCreateDTO());
         verify(roleRepository,times(1)).save(argThat(new IcesiRoleMatcher(icesiRole)));
+        verify(roleMapper,times(1)).fromIcesiRole(any());
     }
 
     @Test
@@ -49,6 +52,10 @@ public class RoleServiceTest {
         }catch(RuntimeException exception){
             String message= exception.getMessage();
             assertEquals("Role name already exists",message);
+
+            verify(roleMapper,never()).fromIcesiRoleDTO(any());
+            verify(roleRepository,never()).save(any());
+            verify(roleMapper,never()).fromIcesiRole(any());
         }
     }
 

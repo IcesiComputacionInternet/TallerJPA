@@ -1,4 +1,4 @@
-package co.edu.icesi.demo.unit.service;
+package co.edu.icesi.demo.unit.service.matcher;
 
 import co.edu.icesi.demo.model.IcesiUser;
 import org.mockito.ArgumentMatcher;
@@ -16,6 +16,7 @@ public class IcesiUserMatcher implements ArgumentMatcher<IcesiUser> {
     @Override
     public boolean matches(IcesiUser icesiUserRight) {
         return icesiUserRight.getUserId()!=null &&
+                icesiUserRight.getRole()!=null &&
                 Objects.equals(icesiUserRight.getFirstName(),icesiUserLeft.getFirstName()) &&
                 Objects.equals(icesiUserRight.getLastName(),icesiUserLeft.getLastName()) &&
                 Objects.equals(icesiUserRight.getPassword(),icesiUserLeft.getPassword()) &&

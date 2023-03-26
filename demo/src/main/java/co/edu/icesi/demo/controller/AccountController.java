@@ -33,36 +33,36 @@ public class AccountController implements AccountAPI {
     @Override
     public AccountCreateDTO addAccount(AccountCreateDTO accountCreateDTO) {
 
-        return null;
+        return accountService.save(accountCreateDTO);
     }
 
     @Override
     public TransactionDTO withdrawalMoney(TransactionDTO transactionDTO) {
 
-        return null;
+        return accountService.withdrawalMoney(transactionDTO);
     }
 
     @Override
     public TransactionDTO depositMoney(TransactionDTO transactionDTO) {
 
-        return null;
+        return accountService.depositMoney(transactionDTO);
     }
 
     @Override
     public TransactionDTO transferMoney(TransactionDTO transactionDTO) {
 
-        return null;
+        return accountService.transferMoney(transactionDTO);
     }
 
     @Override
     public AccountCreateDTO enableAccount(String accountNumber) {
 
-        return null;
+        return accountService.enableAccount(accountNumber);
     }
 
     @Override
     public AccountCreateDTO disableAccount(String accountNumber) {
 
-        return null;
+        return accountService.disableAccount(accountNumber);
     }
 }
