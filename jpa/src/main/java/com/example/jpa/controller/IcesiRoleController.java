@@ -24,4 +24,9 @@ public class IcesiRoleController {
     public List<RoleDTO> getRoles(){
         return roleService.getRoles();
     }
+
+    @GetMapping("/{roleId}")
+    public RoleDTO getRole(@PathVariable String roleId){
+        return roleService.getRole(roleId);
+    }
 }

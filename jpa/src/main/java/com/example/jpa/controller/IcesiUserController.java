@@ -8,9 +8,11 @@ import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
 
+import static com.example.jpa.api.UserAPI.BASE_USER_URL;
+
 @RestController
 @AllArgsConstructor
-@RequestMapping("/users")
+@RequestMapping(BASE_USER_URL)
 public class IcesiUserController {
 
     UserService userService;
@@ -21,7 +23,12 @@ public class IcesiUserController {
     }
 
     @GetMapping
-    public List<UserResponseDTO> getIcesiUser(){
+    public List<UserResponseDTO> getAllUsers(){
         return userService.getUsers();
+    }
+
+    @GetMapping("/{userEmail}")
+    public UserResponseDTO getUser(@PathVariable String userEmail){
+        return userService.getUser(userEmail);
     }
 }
