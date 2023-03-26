@@ -1,6 +1,5 @@
 package co.edu.icesi.demo.dto;
 
-import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
 
@@ -10,7 +9,5 @@ public class RoleCreateDTO {
 
     private String name;
     private String description;
-
-
 
 }

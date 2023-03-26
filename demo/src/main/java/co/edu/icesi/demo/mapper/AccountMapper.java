@@ -11,7 +11,7 @@ public interface AccountMapper {
 
     IcesiAccount fromIcesiAccountDTO(AccountCreateDTO accountCreateDTO);
 
-    @Mapping(target = "userEmail", expression = "java(icesiAccount.getIcesiUser().getEmail())")
+    @Mapping(target = "userEmail", expression = "java(icesiAccount.getUser().getEmail())")
     AccountCreateDTO fromIcesiAccount(IcesiAccount icesiAccount);
 
 
