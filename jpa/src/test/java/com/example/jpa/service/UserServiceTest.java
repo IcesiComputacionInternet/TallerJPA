@@ -15,6 +15,7 @@ import org.junit.jupiter.api.Test;
 import java.util.ArrayList;
 import java.util.Optional;
 
+import static org.junit.jupiter.api.Assertions.*;
 import static org.mockito.Mockito.*;
 
 public class UserServiceTest {
@@ -36,10 +37,65 @@ public class UserServiceTest {
     public void testSaveUser() {
         when(roleRepository.getByName(any())).thenReturn(Optional.ofNullable(defaultRole()));
         userService.save(defaultUserDTO());
-        verify(roleRepository, times(2)).getByName(any());
+        verify(roleRepository, times(1)).getByName(any());
         verify(userRepository, times(1)).save(argThat(new UserMatcher(defaultUser())));
         verify(roleRepository, times(1)).save(any());
         verify(userMapper, times(1)).fromUserRequestDTO(any());
+    }
+
+    @Test
+    public void saveUserWhenEmailAndPhoneAlreadyExist(){
+        when(userRepository.findByEmail(any())).thenReturn(Optional.ofNullable(defaultUser()));
+        when(userRepository.findByPhoneNumber(any())).thenReturn(Optional.ofNullable(defaultUser()));
+        try {
+            userService.save(defaultUserDTO());
+            fail();
+        }catch (Exception e){
+            String exceptionMessage = e.getMessage();
+            assertEquals("Already exists an user with the same email and phone number",exceptionMessage);
+            verify(userRepository, times(0)).save(any());
+        }
+    }
+
+    @Test
+    public void saveUserWhenEmailAlreadyExist(){
+        when(userRepository.findByEmail(any())).thenReturn(Optional.ofNullable(defaultUser()));
+        when(userRepository.findByPhoneNumber(any())).thenReturn(Optional.empty());
+        try {
+            userService.save(defaultUserDTO());
+            fail();
+        }catch (Exception e){
+            String exceptionMessage = e.getMessage();
+            assertEquals("Already exists an user with the same email",exceptionMessage);
+            verify(userRepository, times(0)).save(any());
+        }
+    }
+
+    @Test
+    public void saveUserWhenPhoneAlreadyExist(){
+        when(userRepository.findByEmail(any())).thenReturn(Optional.empty());
+        when(userRepository.findByPhoneNumber(any())).thenReturn(Optional.ofNullable(defaultUser()));
+        try {
+            userService.save(defaultUserDTO());
+            fail();
+        }catch (Exception e){
+            String exceptionMessage = e.getMessage();
+            assertEquals("Already exists an user with the same phone number",exceptionMessage);
+            verify(userRepository, times(0)).save(any());
+        }
+    }
+
+    @Test
+    public void saveUserWhenRoleDoesNotExistOrIsNull(){
+        when(roleRepository.getByName(any())).thenReturn(Optional.empty());
+        try {
+            userService.save(defaultUserDTO());
+            fail();
+        }catch (Exception e){
+            String exceptionMessage = e.getMessage();
+            assertEquals("Role " + defaultUserDTO().getRole().getName() + " not found or is null",exceptionMessage);
+            verify(userRepository, times(0)).save(any());
+        }
     }
 
     private UserRequestDTO defaultUserDTO() {

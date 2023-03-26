@@ -16,4 +16,7 @@ public interface RoleRepository extends JpaRepository<IcesiRole, UUID> {
 
     @Query("SELECT r FROM IcesiRole r WHERE r.name = :name")
     Optional<IcesiRole> getByName(String name);
+
+    @Query("SELECT r FROM IcesiRole r WHERE r.roleId = :roleId")
+    Optional<IcesiRole> findById(String roleId);
 }

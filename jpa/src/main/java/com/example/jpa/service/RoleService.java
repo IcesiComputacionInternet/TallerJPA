@@ -1,6 +1,7 @@
 package com.example.jpa.service;
 
 import com.example.jpa.dto.RoleDTO;
+import com.example.jpa.exceptions.NotFoundRoleException;
 import com.example.jpa.mapper.RoleMapper;
 import com.example.jpa.model.IcesiRole;
 import com.example.jpa.repository.RoleRepository;
@@ -31,6 +32,11 @@ public class RoleService {
             role.setIcesiUserList(new ArrayList<>());
             return roleRepository.save(role);
         }
+    }
+
+    //We'll validate if is necessary to handle the ID like String or UUID
+    public RoleDTO getRole(String roleId){
+        return roleRepository.findById(roleId).map(roleMapper::fromRole).orElseThrow(() -> new NotFoundRoleException("Role not found"));
     }
 
     public List<RoleDTO> getRoles(){
