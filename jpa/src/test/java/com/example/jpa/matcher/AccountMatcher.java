@@ -4,6 +4,8 @@ import com.example.jpa.model.IcesiAccount;
 import lombok.AllArgsConstructor;
 import org.mockito.ArgumentMatcher;
 
+import java.util.Objects;
+
 @AllArgsConstructor
 public class AccountMatcher implements ArgumentMatcher<IcesiAccount> {
 
@@ -11,9 +13,9 @@ public class AccountMatcher implements ArgumentMatcher<IcesiAccount> {
 
     @Override
     public boolean matches(IcesiAccount accountRight) {
-        return accountRight.getBalance() == accountLeft.getBalance() &&
+        return accountRight.getBalance().equals(accountLeft.getBalance()) &&
                 accountRight.getType().equals(accountLeft.getType()) &&
-                (accountLeft.isActive() && accountRight.isActive())  &&
+                (Objects.equals(accountRight.isActive(),accountLeft.isActive()))  &&
                 accountRight.getUser().getUserId().equals(accountLeft.getUser().getUserId());
     }
 }
