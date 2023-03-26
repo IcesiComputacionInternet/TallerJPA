@@ -21,7 +21,7 @@ public class IcesiAccount {
     private String accountNumber;
 
     @Column(nullable = false)
-    private long balance;
+    private Long balance;
 
     @Column(nullable = false)
     private boolean active;
