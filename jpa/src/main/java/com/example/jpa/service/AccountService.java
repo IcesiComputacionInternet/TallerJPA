@@ -81,7 +81,8 @@ public class AccountService {
 
     //Validate if an account exists
     private IcesiAccount validateAccountExists(String accountNumber){
-        return accountRepository.getByAccountNumber(accountNumber).orElseThrow(() -> new AccountNotFoundException("Account not found"));
+        return accountRepository.getByAccountNumber(accountNumber).orElseThrow(
+                () -> new AccountNotFoundException("Account " + accountNumber + " not found"));
     }
 
     //Validate if the user of a new account exists
