@@ -1,7 +1,7 @@
 package com.example.jpa.service;
 
 import com.example.jpa.dto.RoleDTO;
-import com.example.jpa.dto.UserRequestDTO;
+import com.example.jpa.dto.UserDTO;
 import com.example.jpa.mapper.UserMapper;
 import com.example.jpa.mapper.UserMapperImpl;
 import com.example.jpa.matcher.UserMatcher;
@@ -98,8 +98,8 @@ public class UserServiceTest {
         }
     }
 
-    private UserRequestDTO defaultUserDTO() {
-        return UserRequestDTO.builder()
+    private UserDTO defaultUserDTO() {
+        return UserDTO.builder()
                 .firstName("Juan")
                 .lastName("Perez")
                 .password("123456")
