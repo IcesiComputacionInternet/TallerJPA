@@ -1,9 +1,7 @@
 package co.edu.icesi.demo.unit.service;
 
 import co.edu.icesi.demo.dto.AccountCreateDTO;
-import co.edu.icesi.demo.dto.RoleCreateDTO;
 import co.edu.icesi.demo.dto.TransactionDTO;
-import co.edu.icesi.demo.dto.UserCreateDTO;
 import co.edu.icesi.demo.mapper.AccountMapper;
 import co.edu.icesi.demo.mapper.AccountMapperImpl;
 import co.edu.icesi.demo.model.IcesiAccount;
@@ -65,7 +63,7 @@ public class AccountServiceTest {
 
     @Test
     public void testCreateAccountWhenUserDoesNotExist(){
-        when(userRepository.findByEmail(any())).thenReturn(Optional.empty());
+
         try {
             accountService.save(newAccountCreateDTO());
             fail();
@@ -109,8 +107,6 @@ public class AccountServiceTest {
     @Test
     public void testEnableAccountWhenAccountNotFound() {
 
-        when(accountRepository.findByAccountNumber(any(),eq(false))).thenReturn(Optional.empty());
-
         try {
             accountService.enableAccount("111-222222-33");
             fail();
@@ -141,8 +137,6 @@ public class AccountServiceTest {
 
     @Test
     public void testDisableAccountWhenAccountNotFound() {
-
-        when(accountRepository.findByAccountNumber(any(),eq(true))).thenReturn(Optional.empty());
 
         try {
             accountService.disableAccount("111-222222-33");
@@ -187,189 +181,161 @@ public class AccountServiceTest {
        assertEquals("Withdrawal successfully completed",transactionDTO.getResult());
 
     }
-/*
+
+    @Test
+    public void testWithdrawalMoneyWhenAccountDoesNotExists() {
+
+        try {
+            accountService.withdrawalMoney(defaultTransactionDTO());
+            fail();
+        }catch (RuntimeException exception){
+            String message= exception.getMessage();
+            assertEquals("Transaction can't be made, active account "+defaultTransactionDTO().getAccountNumberFrom()+" not found",message);
+
+            verify(accountRepository,times(1)).findByAccountNumber(any(),eq(true));
+            verify(accountRepository,never()).save(any());
+        }
+
+    }
+
     @Test
     public void testWithdrawalMoneyWhenAmountGreaterThanBalance() {
-        when(userRepository.findByEmail(any())).thenReturn(Optional.of(defaultIcesiUser()));
-        when(accountRepository.save(any())).thenReturn(defaultIcesiAccount());
-        IcesiAccount icesiAccount = accountService.save(defaultAccountCreateDTO());
-        when(accountRepository.findByAccountNumber(any())).thenReturn(Optional.of(icesiAccount));
-        try {
-            accountService.withdrawalMoney(icesiAccount.getAccountNumber(), 600000);
-            fail();
-        }catch(RuntimeException exception){
-            String message= exception.getMessage();
-            assertEquals("Not enough money to withdrawal in the account",message);
+        when(accountRepository.findByAccountNumber(any(),eq(true))).thenReturn(Optional.of(accountEnabled()));
 
+        try {
+            accountService.withdrawalMoney(transactionDTOWithAccountFromBalanceInZero());
+            fail();
+        }catch (RuntimeException exception){
+            String message= exception.getMessage();
+            assertEquals("Not enough money in the account to do this transaction",message);
+
+            verify(accountRepository,times(1)).findByAccountNumber(any(),eq(true));
+            verify(accountRepository,never()).save(any());
         }
 
     }
 
-    @Test
-    public void testWithdrawalMoneyWhenAccountIsDisable() {
-        when(userRepository.findByEmail(any())).thenReturn(Optional.of(defaultIcesiUser()));
-        when(accountRepository.save(any())).thenReturn(accountDisabled());
-        IcesiAccount icesiAccount = accountService.save(accountCreateDTODisabled());
-        when(accountRepository.findByAccountNumber(any())).thenReturn(Optional.of(icesiAccount));
-        try {
-            accountService.withdrawalMoney(icesiAccount.getAccountNumber(), 600000);
-            fail();
-        }catch(RuntimeException exception){
-            String message= exception.getMessage();
-            assertEquals("Transaction can't be made, account 123-123456-12 is disabled",message);
-
-        }
-
-    }
 
     @Test
     public void testDepositMoney() {
-        when(userRepository.findByEmail(any())).thenReturn(Optional.of(defaultIcesiUser()));
-        when(accountRepository.save(any())).thenReturn(defaultIcesiAccount());
-        IcesiAccount icesiAccount = accountService.save(defaultAccountCreateDTO());
-        when(accountRepository.findByAccountNumber(any())).thenReturn(Optional.of(icesiAccount));
-        accountService.depositMoney(icesiAccount.getAccountNumber(), 100000);
+        when(accountRepository.findByAccountNumber(any(),eq(true))).thenReturn(Optional.of(accountEnabled()));
 
-        assertEquals(600000, icesiAccount.getBalance());
+        TransactionDTO transactionDTO= accountService.depositMoney(defaultTransactionDTO());
+        verify(accountRepository,times(1)).findByAccountNumber(any(),eq(true));
+        verify(accountRepository,times(1)).save(argThat(a->a.getBalance()==10000));
+        assertEquals("Deposit successfully completed",transactionDTO.getResult());
+
 
     }
 
     @Test
-    public void testDepositMoneyWhenAccountIsDisable() {
-        when(userRepository.findByEmail(any())).thenReturn(Optional.of(defaultIcesiUser()));
-        when(accountRepository.save(any())).thenReturn(accountDisabled());
-        IcesiAccount icesiAccount = accountService.save(accountCreateDTODisabled());
-        when(accountRepository.findByAccountNumber(any())).thenReturn(Optional.of(icesiAccount));
-        try {
-            accountService.depositMoney(icesiAccount.getAccountNumber(), 600000);
-            fail();
-        }catch(RuntimeException exception){
-            String message= exception.getMessage();
-            assertEquals("Transaction can't be made, account 123-123456-12 is disabled",message);
+    public void testDepositMoneyWhenAccountDoesNotExists() {
 
+        try {
+            accountService.depositMoney(defaultTransactionDTO());
+            fail();
+        }catch (RuntimeException exception){
+            String message= exception.getMessage();
+            assertEquals("Transaction can't be made, active account "+defaultTransactionDTO().getAccountNumberTo()+" not found",message);
+
+            verify(accountRepository,times(1)).findByAccountNumber(any(),eq(true));
+            verify(accountRepository,never()).save(any());
         }
 
     }
 
     @Test
     public void testTransferMoney() {
-        when(userRepository.findByEmail(any())).thenReturn(Optional.of(defaultIcesiUser()));
-        when(accountRepository.save(any())).thenReturn(defaultIcesiAccount());
-        IcesiAccount icesiAccountFrom = accountService.save(defaultAccountCreateDTO());
+        when(accountRepository.findByAccountNumber(any(),eq(true))).thenReturn(Optional.of(accountNormalWithBalanceNotInZero()),Optional.of(accountEnabled()));
 
-        when(userRepository.findByEmail(any())).thenReturn(Optional.of(defaultIcesiUser()));
-        when(accountRepository.save(any())).thenReturn(accountToDisable());
+        TransactionDTO transactionDTO= accountService.transferMoney(defaultTransactionDTO());
+        verify(accountRepository,times(2)).findByAccountNumber(any(),eq(true));
+        verify(accountRepository,times(2)).save(argThat(a->(a.getBalance()==10000 && a.getAccountNumber().equals(accountEnabled().getAccountNumber())) || (a.getBalance()==490000 && a.getAccountNumber().equals(accountNormalWithBalanceNotInZero().getAccountNumber()))));
+        assertEquals("Transfer successfully completed",transactionDTO.getResult());
 
-        IcesiAccount icesiAccountTo = accountService.save(accountCreateDTOToDisable());
-        when(accountRepository.findByAccountNumber("123-123456-12")).thenReturn(Optional.of(icesiAccountFrom));
-        when(accountRepository.findByAccountNumber("123-123456-21")).thenReturn(Optional.of(icesiAccountTo));
+    }
 
-        accountService.transferMoney(icesiAccountFrom.getAccountNumber(), icesiAccountTo.getAccountNumber(),100000);
+    @Test
+    public void testTransferMoneyWhenAccountFromDoesNotExists() {
 
-        assertEquals(400000, icesiAccountFrom.getBalance());
+        try {
+            accountService.transferMoney(defaultTransactionDTO());
+            fail();
+        }catch (RuntimeException exception){
+            String message= exception.getMessage();
+            assertEquals("Transaction can't be made, active account "+defaultTransactionDTO().getAccountNumberFrom()+" not found",message);
 
-        assertEquals(100000, icesiAccountTo.getBalance());
+            verify(accountRepository,times(1)).findByAccountNumber(any(),eq(true));
+            verify(accountRepository,never()).save(any());
+        }
 
+    }
+    @Test
+    public void testTransferMoneyWhenAccountToDoesNotExists() {
+        when(accountRepository.findByAccountNumber(defaultTransactionDTO().getAccountNumberFrom(),true)).thenReturn(Optional.of(accountNormalWithBalanceNotInZero()));
+
+        try {
+            accountService.transferMoney(defaultTransactionDTO());
+            fail();
+        }catch (RuntimeException exception){
+            String message= exception.getMessage();
+            assertEquals("Transaction can't be made, active account "+defaultTransactionDTO().getAccountNumberTo()+" not found",message);
+
+            verify(accountRepository,times(2)).findByAccountNumber(any(),eq(true));
+            verify(accountRepository,never()).save(any());
+        }
     }
 
     @Test
     public void testTransferMoneyWhenComesFromDepositOnlyAccount() {
-        when(userRepository.findByEmail(any())).thenReturn(Optional.of(defaultIcesiUser()));
-        when(accountRepository.save(any())).thenReturn(accountDepositOnly());
-        IcesiAccount icesiAccountFrom = accountService.save(accountCreateDTODepositOnly());
-
-        when(userRepository.findByEmail(any())).thenReturn(Optional.of(defaultIcesiUser()));
-        when(accountRepository.save(any())).thenReturn(accountToDisable());
-        IcesiAccount icesiAccountTo = accountService.save(accountCreateDTOToDisable());
-
-        when(accountRepository.findByAccountNumber("123-123456-22")).thenReturn(Optional.of(icesiAccountFrom));
-        when(accountRepository.findByAccountNumber("123-123456-21")).thenReturn(Optional.of(icesiAccountTo));
+        when(accountRepository.findByAccountNumber(any(),eq(true))).thenReturn(Optional.of(accountDepositOnly()),Optional.of(accountEnabled()));
 
         try {
-            accountService.transferMoney(icesiAccountFrom.getAccountNumber(), icesiAccountTo.getAccountNumber(), 100000);
+            accountService.transferMoney(transactionDTOWithAccountDepositOnlyFrom());
             fail();
         }catch (RuntimeException exception){
             String message= exception.getMessage();
-            assertEquals("Deposit only accounts can't transfer or be transferred money",message);
-            assertEquals("deposit only", icesiAccountFrom.getType());
-        }
+            assertEquals("Deposit only account "+transactionDTOWithAccountDepositOnlyFrom().getAccountNumberFrom()+" can't transfer or be transferred money",message);
 
+            verify(accountRepository,times(2)).findByAccountNumber(any(),eq(true));
+            verify(accountRepository,never()).save(any());
+        }
     }
 
     @Test
     public void testTransferMoneyWhenGoesToDepositOnlyAccount() {
-        when(userRepository.findByEmail(any())).thenReturn(Optional.of(defaultIcesiUser()));
-        when(accountRepository.save(any())).thenReturn(defaultIcesiAccount());
-        IcesiAccount icesiAccountFrom = accountService.save(defaultAccountCreateDTO());
-
-
-        when(userRepository.findByEmail(any())).thenReturn(Optional.of(defaultIcesiUser()));
-        when(accountRepository.save(any())).thenReturn(accountDepositOnly());
-        IcesiAccount icesiAccountTo = accountService.save(accountCreateDTODepositOnly());
-
-
-        when(accountRepository.findByAccountNumber("123-123456-12")).thenReturn(Optional.of(icesiAccountFrom));
-        when(accountRepository.findByAccountNumber("123-123456-22")).thenReturn(Optional.of(icesiAccountTo));
+        when(accountRepository.findByAccountNumber(any(),eq(true))).thenReturn(Optional.of(accountNormalWithBalanceNotInZero()) ,Optional.of(accountDepositOnly()));
 
         try {
-            accountService.transferMoney(icesiAccountFrom.getAccountNumber(), icesiAccountTo.getAccountNumber(), 100000);
+            accountService.transferMoney(transactionDTOWithAccountDepositOnlyTo());
             fail();
         }catch (RuntimeException exception){
             String message= exception.getMessage();
-            assertEquals("Deposit only accounts can't transfer or be transferred money",message);
-            assertEquals("deposit only", icesiAccountTo.getType());
+            assertEquals("Deposit only account "+transactionDTOWithAccountDepositOnlyTo().getAccountNumberTo()+" can't transfer or be transferred money",message);
+
+            verify(accountRepository,times(2)).findByAccountNumber(any(),eq(true));
+            verify(accountRepository,never()).save(any());
         }
 
     }
 
     @Test
     public void testTransferMoneyWhenAmountGreaterThanBalance() {
-        when(userRepository.findByEmail(any())).thenReturn(Optional.of(defaultIcesiUser()));
-        when(accountRepository.save(any())).thenReturn(defaultIcesiAccount());
-        IcesiAccount icesiAccountFrom = accountService.save(defaultAccountCreateDTO());
-
-
-        when(userRepository.findByEmail(any())).thenReturn(Optional.of(defaultIcesiUser()));
-        when(accountRepository.save(any())).thenReturn(accountToDisable());
-        IcesiAccount icesiAccountTo = accountService.save(accountCreateDTOToDisable());
-
-        when(accountRepository.findByAccountNumber("123-123456-12")).thenReturn(Optional.of(icesiAccountFrom));
-        when(accountRepository.findByAccountNumber("123-123456-21")).thenReturn(Optional.of(icesiAccountTo));
+        when(accountRepository.findByAccountNumber(any(),eq(true))).thenReturn(Optional.of(accountEnabled()) ,Optional.of(accountNormalWithBalanceNotInZero()));
 
         try {
-            accountService.transferMoney(icesiAccountFrom.getAccountNumber(), icesiAccountTo.getAccountNumber(), 600000);
+            accountService.transferMoney(transactionDTOWithAccountFromBalanceInZero());
             fail();
         }catch (RuntimeException exception){
             String message= exception.getMessage();
-            assertEquals("Not enough money to transfer in the account 123-123456-12",message);
+            assertEquals("Not enough money in the account to do this transaction",message);
 
+            verify(accountRepository,times(2)).findByAccountNumber(any(),eq(true));
+            verify(accountRepository,never()).save(any());
         }
 
     }
-    @Test
-    public void testTransferMoneyWhenAccountIsDisable() {
-        when(userRepository.findByEmail(any())).thenReturn(Optional.of(defaultIcesiUser()));
-        when(accountRepository.save(any())).thenReturn(accountDisabled());
-        IcesiAccount icesiAccountFrom = accountService.save(accountCreateDTODisabled());
 
-        when(userRepository.findByEmail(any())).thenReturn(Optional.of(defaultIcesiUser()));
-        when(accountRepository.save(any())).thenReturn(accountToDisable());
-        IcesiAccount icesiAccountTo = accountService.save(accountCreateDTOToDisable());
-
-        when(accountRepository.findByAccountNumber("123-123456-12")).thenReturn(Optional.of(icesiAccountFrom));
-        when(accountRepository.findByAccountNumber("123-123456-21")).thenReturn(Optional.of(icesiAccountTo));
-
-        try {
-            accountService.transferMoney(icesiAccountFrom.getAccountNumber(), icesiAccountTo.getAccountNumber(), 100000);
-            fail();
-        }catch(RuntimeException exception){
-            String message= exception.getMessage();
-            assertEquals("Transaction can't be made, account 123-123456-12 is disabled",message);
-
-        }
-
-    }
-*/
     private IcesiAccount newIcesiAccount(){
         return IcesiAccount.builder()
                 .type("normal")
@@ -481,11 +447,5 @@ public class AccountServiceTest {
                 .build();
     }
 
-    private TransactionDTO transactionDTOWithAccountFromDisabled(){
-        return TransactionDTO.builder()
-                .accountNumberFrom(accountDisabled().getAccountNumber())
-                .accountNumberTo(accountNormalWithBalanceNotInZero().getAccountNumber())
-                .money(10000)
-                .build();
-    }
+
 }

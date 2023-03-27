@@ -41,8 +41,6 @@ public class UserServiceTest {
     @Test
     public void testCreateUser() {
         when(roleRepository.findByName(any())).thenReturn(Optional.of(defaultIcesiRole()));
-        when(userRepository.findByEmail(any())).thenReturn(Optional.empty());
-        when(userRepository.findByPhoneNumber(any())).thenReturn(Optional.empty());
 
         userService.save(defaultUserCreateDTO());
         IcesiUser icesiUser = defaultIcesiUser();
@@ -76,7 +74,6 @@ public class UserServiceTest {
     @Test
     public void testCreateUserWhenPhoneNumberAlreadyExists(){
 
-        when(userRepository.findByEmail(any())).thenReturn(Optional.empty());
         when(userRepository.findByPhoneNumber(any())).thenReturn(Optional.of(defaultIcesiUser()));
         try{
             userService.save(defaultUserCreateDTO());
@@ -116,9 +113,6 @@ public class UserServiceTest {
 
     @Test
     public void testCreateUserWhenRoleDoesNotExists(){
-
-        when(userRepository.findByEmail(any())).thenReturn(Optional.empty());
-        when(userRepository.findByPhoneNumber(any())).thenReturn(Optional.empty());
 
         try {
             userService.save(defaultUserCreateDTO());

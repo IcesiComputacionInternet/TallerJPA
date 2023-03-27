@@ -71,7 +71,7 @@ public class AccountService {
 
     public TransactionDTO depositMoney(TransactionDTO transactionDTO){
 
-        IcesiAccount icesiAccount=getAccountFromRepository(transactionDTO.getAccountNumberFrom());
+        IcesiAccount icesiAccount=getAccountFromRepository(transactionDTO.getAccountNumberTo());
 
         icesiAccount.setBalance(icesiAccount.getBalance()+transactionDTO.getMoney());
 
