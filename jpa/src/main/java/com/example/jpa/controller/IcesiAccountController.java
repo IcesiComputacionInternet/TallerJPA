@@ -2,6 +2,8 @@ package com.example.jpa.controller;
 
 import com.example.jpa.dto.AccountRequestDTO;
 import com.example.jpa.dto.AccountResponseDTO;
+import com.example.jpa.dto.TransactionRequestDTO;
+import com.example.jpa.dto.TransactionResponseDTO;
 import com.example.jpa.service.AccountService;
 import lombok.AllArgsConstructor;
 import org.springframework.web.bind.annotation.*;
@@ -36,17 +38,17 @@ public class IcesiAccountController {
     }
 
     @PatchMapping("/deposit")
-    public String deposit(@RequestBody String accountNumber, @RequestBody String amount) {
-        return accountService.deposit(accountNumber, Long.parseLong(amount)) ? "Deposit successful" : "Account not found";
+    public TransactionResponseDTO deposit(@RequestBody TransactionRequestDTO transactionRequestDTO) {
+        return accountService.deposit(transactionRequestDTO);
     }
 
     @PatchMapping("/withdraw")
-    public String withdraw(@RequestBody String accountNumber, @RequestBody String amount) {
-        return accountService.withdraw(accountNumber, Long.parseLong(amount)) ? "Withdraw successful" : "Account not found";
+    public TransactionResponseDTO withdraw(@RequestBody TransactionRequestDTO transactionRequestDTO) {
+        return accountService.withdraw(transactionRequestDTO);
     }
 
     @PatchMapping("/transfer")
-    public String transfer(@RequestBody String accountNumberFrom, @RequestBody String accountNumberTo, @RequestBody String amount) {
-        return accountService.transfer(accountNumberFrom, accountNumberTo, Long.parseLong(amount)) ? "Transfer successful" : "Account not found";
+    public TransactionResponseDTO transfer(@RequestBody TransactionRequestDTO transactionRequestDTO) {
+        return accountService.transfer(transactionRequestDTO);
     }
 }
