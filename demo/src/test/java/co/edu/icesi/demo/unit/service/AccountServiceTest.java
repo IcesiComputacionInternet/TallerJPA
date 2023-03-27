@@ -2,6 +2,7 @@ package co.edu.icesi.demo.unit.service;
 
 import co.edu.icesi.demo.dto.AccountCreateDTO;
 import co.edu.icesi.demo.dto.RoleCreateDTO;
+import co.edu.icesi.demo.dto.TransactionDTO;
 import co.edu.icesi.demo.dto.UserCreateDTO;
 import co.edu.icesi.demo.mapper.AccountMapper;
 import co.edu.icesi.demo.mapper.AccountMapperImpl;
@@ -11,6 +12,7 @@ import co.edu.icesi.demo.model.IcesiUser;
 import co.edu.icesi.demo.repository.AccountRepository;
 import co.edu.icesi.demo.repository.UserRepository;
 import co.edu.icesi.demo.service.AccountService;
+import co.edu.icesi.demo.unit.service.matcher.IcesiAccountMatcher;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 
@@ -30,7 +32,7 @@ public class AccountServiceTest {
     private AccountMapper accountMapper;
 
     private UserRepository userRepository;
-/*
+
     @BeforeEach
     private void init(){
         accountRepository=mock(AccountRepository.class);
@@ -38,107 +40,154 @@ public class AccountServiceTest {
         userRepository=mock(UserRepository.class);
         accountService=new AccountService(accountRepository,accountMapper,userRepository);
 
-        userRepository.save(defaultIcesiUser());
     }
 
     @Test
     public void testCreateAccount(){
         when(userRepository.findByEmail(any())).thenReturn(Optional.of(defaultIcesiUser()));
-        accountService.save(defaultAccountCreateDTO());
-        IcesiAccount icesiAccount= defaultIcesiAccount();
 
+        accountService.save(newAccountCreateDTO());
+        IcesiAccount icesiAccount= newIcesiAccount();
+
+        verify(accountMapper,times(1)).fromIcesiAccountDTO(any());
+        verify(accountRepository,times(1)).findByAccountNumber(any());
         verify(accountRepository,times(1)).save(argThat(new IcesiAccountMatcher(icesiAccount)));
+        verify(accountMapper,times(1)).fromIcesiAccount(any());
     }
 
     @Test
     public void testAccountNumberFormat(){
         when(userRepository.findByEmail(any())).thenReturn(Optional.of(defaultIcesiUser()));
-        accountService.save(defaultAccountCreateDTO());
+        accountService.save(newAccountCreateDTO());
         verify(accountRepository,times(1)).save(argThat(a-> a.getAccountNumber().matches("[0-9]{3}-[0-9]{6}-[0-9]{2}")));
 
     }
 
     @Test
-    public void testCreateAccountWithBalanceBelow0(){
-       try{
-           accountService.save(accountCreateDTOWithBalanceBelow0());
-           fail();
-       }catch(RuntimeException exception){
-           String message= exception.getMessage();
-           assertEquals("Account balance can't be below 0",message);
-       }
-
-      }
-
-    @Test
-    public void testCreateAccountWithBalanceNotIn0AndDisable(){
-        try{
-            accountService.save(accountCreateDTOWithBalanceNotIn0AndDisable());
+    public void testCreateAccountWhenUserDoesNotExist(){
+        when(userRepository.findByEmail(any())).thenReturn(Optional.empty());
+        try {
+            accountService.save(newAccountCreateDTO());
             fail();
         }catch(RuntimeException exception){
             String message= exception.getMessage();
-            assertEquals("Account can only be disable if the balance is 0",message);
-        }
+            assertEquals("User does not exists",message);
 
+            verify(accountMapper,never()).fromIcesiAccountDTO(any());
+            verify(accountRepository,never()).findByAccountNumber(any());
+            verify(accountRepository,never()).save(any());
+            verify(accountMapper,never()).fromIcesiAccount(any());
+        }
+    }
+
+    @Test
+    public void testCreateAccountUniqueAccountNumber(){
+        when(userRepository.findByEmail(any())).thenReturn(Optional.of(defaultIcesiUser()));
+        when(accountRepository.findByAccountNumber(any())).thenReturn(Optional.of(accountDisabled()),Optional.empty());
+
+        accountService.save(newAccountCreateDTO());
+
+        verify(accountMapper,times(1)).fromIcesiAccountDTO(any());
+        verify(accountRepository,times(2)).findByAccountNumber(any());
+        verify(accountRepository,times(1)).save(any());
+        verify(accountMapper,times(1)).fromIcesiAccount(any());
     }
 
     @Test
     public void testEnableAccount() {
-        when(userRepository.findByEmail(any())).thenReturn(Optional.of(defaultIcesiUser()));
-        when(accountRepository.save(any())).thenReturn(accountDisabled());
-        IcesiAccount icesiAccount = accountService.save(accountCreateDTODisabled());
-        when(accountRepository.findByAccountNumber(any())).thenReturn(Optional.of(icesiAccount));
-        accountService.changeState(icesiAccount.getAccountNumber(), true);
 
+        when(accountRepository.findByAccountNumber(any(),eq(false))).thenReturn(Optional.of(accountDisabled()));
 
-        assertTrue(icesiAccount.isActive());
+        accountService.enableAccount(accountDisabled().getAccountNumber());
+
+        verify(accountRepository,times(1)).findByAccountNumber(accountDisabled().getAccountNumber(),false);
+        verify(accountRepository,times(1)).save(any());
+        verify(accountMapper,times(1)).fromIcesiAccount(argThat(IcesiAccount::isActive));
+
+    }
+
+    @Test
+    public void testEnableAccountWhenAccountNotFound() {
+
+        when(accountRepository.findByAccountNumber(any(),eq(false))).thenReturn(Optional.empty());
+
+        try {
+            accountService.enableAccount("111-222222-33");
+            fail();
+        }catch(RuntimeException exception){
+            String message= exception.getMessage();
+            assertEquals("Inactive account not found",message);
+
+            verify(accountRepository,times(1)).findByAccountNumber(any(),eq(false));
+            verify(accountRepository,never()).save(any());
+            verify(accountMapper,never()).fromIcesiAccount(any());
+
+        }
 
     }
 
     @Test
     public void testDisableAccount() {
-        when(userRepository.findByEmail(any())).thenReturn(Optional.of(defaultIcesiUser()));
-        when(accountRepository.save(any())).thenReturn(accountToDisable());
-        IcesiAccount icesiAccount = accountService.save(accountCreateDTOToDisable());
-        when(accountRepository.findByAccountNumber(any())).thenReturn(Optional.of(icesiAccount));
-        accountService.changeState(icesiAccount.getAccountNumber(), false);
 
+        when(accountRepository.findByAccountNumber(any(),eq(true))).thenReturn(Optional.of(accountEnabled()));
 
-        assertFalse(icesiAccount.isActive());
+        accountService.disableAccount(accountEnabled().getAccountNumber());
+
+        verify(accountRepository,times(1)).findByAccountNumber(accountEnabled().getAccountNumber(),true);
+        verify(accountRepository,times(1)).save(any());
+        verify(accountMapper,times(1)).fromIcesiAccount(argThat(a->!a.isActive()));
 
     }
 
     @Test
-    public void testDisableAccountWhenCannotDoIt() {
-        when(userRepository.findByEmail(any())).thenReturn(Optional.of(defaultIcesiUser()));
-        when(accountRepository.save(any())).thenReturn(defaultIcesiAccount());
-        IcesiAccount icesiAccount = accountService.save(defaultAccountCreateDTO());
-        when(accountRepository.findByAccountNumber(any())).thenReturn(Optional.of(icesiAccount));
+    public void testDisableAccountWhenAccountNotFound() {
+
+        when(accountRepository.findByAccountNumber(any(),eq(true))).thenReturn(Optional.empty());
+
         try {
-            accountService.changeState(icesiAccount.getAccountNumber(), false);
+            accountService.disableAccount("111-222222-33");
             fail();
         }catch(RuntimeException exception){
             String message= exception.getMessage();
-            assertEquals("Balance is not 0. Account can't be disabled",message);
+            assertEquals("Active account not found",message);
+
+            verify(accountRepository,times(1)).findByAccountNumber(any(),eq(true));
+            verify(accountRepository,never()).save(any());
+            verify(accountMapper,never()).fromIcesiAccount(any());
 
         }
 
     }
 
     @Test
-    public void testWithdrawalMoney() {
-        when(userRepository.findByEmail(any())).thenReturn(Optional.of(defaultIcesiUser()));
-        when(accountRepository.save(any())).thenReturn(defaultIcesiAccount());
-        IcesiAccount icesiAccount = accountService.save(defaultAccountCreateDTO());
-        when(accountRepository.findByAccountNumber(any())).thenReturn(Optional.of(icesiAccount));
-        accountService.withdrawalMoney(icesiAccount.getAccountNumber(), 100000);
+    public void testDisableAccountWhenBalanceIsNotZero() {
+        when(accountRepository.findByAccountNumber(any(),eq(true))).thenReturn(Optional.of(accountNormalWithBalanceNotInZero()));
 
+        try {
+            accountService.disableAccount(accountNormalWithBalanceNotInZero().getAccountNumber());
+            fail();
+        }catch(RuntimeException exception){
+            String message= exception.getMessage();
+            assertEquals("Balance is not 0. Account can't be disabled",message);
 
-        assertEquals(400000, icesiAccount.getBalance());
+            verify(accountRepository,times(1)).findByAccountNumber(any(),eq(true));
+            verify(accountRepository,never()).save(any());
+            verify(accountMapper,never()).fromIcesiAccount(any());
 
-
+        }
     }
 
+    @Test
+    public void testWithdrawalMoney() {
+        when(accountRepository.findByAccountNumber(any(),eq(true))).thenReturn(Optional.of(accountNormalWithBalanceNotInZero()));
+
+       TransactionDTO transactionDTO= accountService.withdrawalMoney(defaultTransactionDTO());
+       verify(accountRepository,times(1)).findByAccountNumber(any(),eq(true));
+       verify(accountRepository,times(1)).save(argThat(a->a.getBalance()==490000));
+       assertEquals("Withdrawal successfully completed",transactionDTO.getResult());
+
+    }
+/*
     @Test
     public void testWithdrawalMoneyWhenAmountGreaterThanBalance() {
         when(userRepository.findByEmail(any())).thenReturn(Optional.of(defaultIcesiUser()));
@@ -320,14 +369,22 @@ public class AccountServiceTest {
         }
 
     }
-
-    private IcesiAccount defaultIcesiAccount(){
+*/
+    private IcesiAccount newIcesiAccount(){
         return IcesiAccount.builder()
                 .type("normal")
                 .active(true)
-                .balance(500000)
+                .balance(0)
                 .user(defaultIcesiUser())
-                .accountNumber("123-123456-12")
+                .build();
+    }
+
+    private AccountCreateDTO newAccountCreateDTO(){
+        return AccountCreateDTO.builder()
+                .type("normal")
+                .active(true)
+                .balance(0)
+                .userEmail("julietav@example.com")
                 .build();
     }
 
@@ -351,54 +408,6 @@ public class AccountServiceTest {
                 .roleId(UUID.randomUUID())
                 .build();
     }
-    private AccountCreateDTO defaultAccountCreateDTO(){
-        return AccountCreateDTO.builder()
-                .type("normal")
-                .active(true)
-                .balance(500000)
-                .userCreateDTO(defaultUserCreateDTO())
-                .build();
-    }
-
-
-    private AccountCreateDTO accountCreateDTOWithBalanceNotIn0AndDisable(){
-        return AccountCreateDTO.builder()
-                .type("normal")
-                .active(false)
-                .balance(500000)
-                .userCreateDTO(defaultUserCreateDTO())
-                .build();
-    }
-
-    private AccountCreateDTO accountCreateDTOWithBalanceBelow0(){
-        return AccountCreateDTO.builder()
-                .type("normal")
-                .active(true)
-                .balance(-1000)
-                .userCreateDTO(defaultUserCreateDTO())
-                .build();
-    }
-
-    private UserCreateDTO defaultUserCreateDTO(){
-        RoleCreateDTO roleCreateDTO= defaultRoleCreateDTO();
-        return UserCreateDTO.builder()
-                .firstName("Julieta")
-                .lastName("Venegas")
-                .email("julietav@example.com")
-                .phoneNumber("3184441232")
-                .password("julieta123")
-                .roleCreateDTO(roleCreateDTO)
-                .build();
-    }
-
-    private AccountCreateDTO accountCreateDTODisabled(){
-        return AccountCreateDTO.builder()
-                .type("normal")
-                .active(false)
-                .balance(0)
-                .userCreateDTO(defaultUserCreateDTO())
-                .build();
-    }
 
     private IcesiAccount accountDisabled(){
         return IcesiAccount.builder()
@@ -410,30 +419,13 @@ public class AccountServiceTest {
                 .build();
     }
 
-    private AccountCreateDTO accountCreateDTOToDisable(){
-        return AccountCreateDTO.builder()
-                .type("normal")
-                .active(true)
-                .balance(0)
-                .userCreateDTO(defaultUserCreateDTO())
-                .build();
-    }
-
-    private IcesiAccount accountToDisable(){
+    private IcesiAccount accountEnabled() {
         return IcesiAccount.builder()
                 .type("normal")
                 .active(true)
                 .balance(0)
                 .user(defaultIcesiUser())
                 .accountNumber("123-123456-21")
-                .build();
-    }
-    private AccountCreateDTO accountCreateDTODepositOnly(){
-        return AccountCreateDTO.builder()
-                .type("deposit only")
-                .active(true)
-                .balance(500000)
-                .userCreateDTO(defaultUserCreateDTO())
                 .build();
     }
 
@@ -446,12 +438,54 @@ public class AccountServiceTest {
                 .accountNumber("123-123456-22")
                 .build();
     }
-    private RoleCreateDTO defaultRoleCreateDTO(){
-        return RoleCreateDTO.builder()
-                .name("administrator")
-                .description("is an administrator")
+
+    private IcesiAccount accountNormalWithBalanceNotInZero(){
+        return IcesiAccount.builder()
+                .type("normal")
+                .active(true)
+                .balance(500000)
+                .user(defaultIcesiUser())
+                .accountNumber("123-123456-33")
                 .build();
     }
 
-*/
+    private TransactionDTO defaultTransactionDTO(){
+        return TransactionDTO.builder()
+                .accountNumberFrom(accountNormalWithBalanceNotInZero().getAccountNumber())
+                .accountNumberTo(accountEnabled().getAccountNumber())
+                .money(10000)
+                .build();
+    }
+
+    private TransactionDTO transactionDTOWithAccountDepositOnlyFrom(){
+        return TransactionDTO.builder()
+                .accountNumberFrom(accountDepositOnly().getAccountNumber())
+                .accountNumberTo(accountEnabled().getAccountNumber())
+                .money(10000)
+                .build();
+    }
+
+    private TransactionDTO transactionDTOWithAccountDepositOnlyTo(){
+        return TransactionDTO.builder()
+                .accountNumberFrom(accountNormalWithBalanceNotInZero().getAccountNumber())
+                .accountNumberTo(accountDepositOnly().getAccountNumber())
+                .money(10000)
+                .build();
+    }
+
+    private TransactionDTO transactionDTOWithAccountFromBalanceInZero(){
+        return TransactionDTO.builder()
+                .accountNumberFrom(accountEnabled().getAccountNumber())
+                .accountNumberTo(accountNormalWithBalanceNotInZero().getAccountNumber())
+                .money(10000)
+                .build();
+    }
+
+    private TransactionDTO transactionDTOWithAccountFromDisabled(){
+        return TransactionDTO.builder()
+                .accountNumberFrom(accountDisabled().getAccountNumber())
+                .accountNumberTo(accountNormalWithBalanceNotInZero().getAccountNumber())
+                .money(10000)
+                .build();
+    }
 }

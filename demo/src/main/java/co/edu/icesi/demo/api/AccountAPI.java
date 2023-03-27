@@ -28,10 +28,10 @@ public interface AccountAPI {
     @PutMapping("/transfer")
     TransactionDTO transferMoney(@RequestBody TransactionDTO transactionDTO);
 
-    @PutMapping("/enable/{accountNumber}")
+    @PutMapping("/{accountNumber}/enable")
     AccountCreateDTO enableAccount(@PathVariable String accountNumber);
 
-    @PutMapping("/disable/{accountNumber}")
+    @PutMapping("/{accountNumber}/disable")
     AccountCreateDTO disableAccount(@PathVariable String accountNumber);
 
 }

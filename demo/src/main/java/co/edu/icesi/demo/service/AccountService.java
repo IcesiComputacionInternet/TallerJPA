@@ -56,17 +56,10 @@ public class AccountService {
         return String.format("%s-%s-%s", str.substring(0,3),str.substring(3,9),str.substring(9));
     }
 
-    public void validateAccountNumber(String accountNumber){
-        if(!accountRepository.findByAccountNumber(accountNumber,true).isPresent()){
-            throw new RuntimeException("Account "+accountNumber+" does not exists");
-        }
-    }
-
     public TransactionDTO withdrawalMoney(TransactionDTO transactionDTO){
-        validateAccountNumber(transactionDTO.getAccountNumberFrom());
 
         IcesiAccount icesiAccount=getAccountFromRepository(transactionDTO.getAccountNumberFrom());
-        validateAccountBalanceWithAmountToPull(icesiAccount,transactionDTO.getMoney());
+        validateAccountBalanceWithAmountToPull(icesiAccount.getBalance(),transactionDTO.getMoney());
 
         icesiAccount.setBalance(icesiAccount.getBalance()-transactionDTO.getMoney());
 
@@ -77,7 +70,6 @@ public class AccountService {
     }
 
     public TransactionDTO depositMoney(TransactionDTO transactionDTO){
-        validateAccountNumber(transactionDTO.getAccountNumberFrom());
 
         IcesiAccount icesiAccount=getAccountFromRepository(transactionDTO.getAccountNumberFrom());
 
@@ -94,15 +86,13 @@ public class AccountService {
         }
     }
     public TransactionDTO transferMoney(TransactionDTO transactionDTO){
-        validateAccountNumber(transactionDTO.getAccountNumberFrom());
-        validateAccountNumber(transactionDTO.getAccountNumberTo());
 
         IcesiAccount icesiAccountFrom=getAccountFromRepository(transactionDTO.getAccountNumberFrom());
         IcesiAccount icesiAccountTo=getAccountFromRepository(transactionDTO.getAccountNumberTo());
         validateTypeToTransfer(icesiAccountFrom);
         validateTypeToTransfer(icesiAccountTo);
 
-        validateAccountBalanceWithAmountToPull(icesiAccountFrom,transactionDTO.getMoney());
+        validateAccountBalanceWithAmountToPull(icesiAccountFrom.getBalance(),transactionDTO.getMoney());
 
         icesiAccountFrom.setBalance(icesiAccountFrom.getBalance()-transactionDTO.getMoney());
         icesiAccountTo.setBalance(icesiAccountTo.getBalance()+transactionDTO.getMoney());
@@ -141,8 +131,8 @@ public class AccountService {
 
     }
 
-    public void validateAccountBalanceWithAmountToPull(IcesiAccount icesiAccount, long money){
-        if(icesiAccount.getBalance()<money){
+    public void validateAccountBalanceWithAmountToPull(long balance, long money){
+        if(balance<money){
             throw new RuntimeException("Not enough money in the account to do this transaction");
         }
     }
