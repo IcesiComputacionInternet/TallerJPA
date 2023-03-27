@@ -2,7 +2,9 @@ package com.example.jpa.service;
 
 import com.example.jpa.dto.AccountRequestDTO;
 import com.example.jpa.dto.AccountResponseDTO;
-import com.example.jpa.dto.InactiveAccountException;
+import com.example.jpa.dto.TransactionRequestDTO;
+import com.example.jpa.dto.TransactionResponseDTO;
+import com.example.jpa.exceptions.InactiveAccountException;
 import com.example.jpa.exceptions.AccountNotFoundException;
 import com.example.jpa.exceptions.AccountTypeException;
 import com.example.jpa.exceptions.BalanceNegativeException;
@@ -72,15 +74,14 @@ public class AccountService {
             throw new BalanceNegativeException("Low balance: " + account.getBalance()
                     + "/n" + "Balance can't be negative");
         }
+        if(amount < 0){
+            throw new RuntimeException("Amount can't be negative");
+        }
     }
 
     //Validate if an account exists
     private IcesiAccount validateAccountExists(String accountNumber){
-        if(accountRepository.getByAccountNumber(accountNumber).isPresent()){
-            return accountRepository.getByAccountNumber(accountNumber).get();
-        }else {
-            throw new AccountNotFoundException("Account not found");
-        }
+        return accountRepository.getByAccountNumber(accountNumber).orElseThrow(() -> new AccountNotFoundException("Account not found"));
     }
 
     //Validate if the user of a new account exists
@@ -115,38 +116,38 @@ public class AccountService {
 
     //Deposit money to an account
     @Transactional
-    public boolean deposit(String accountNumber, Long amount){
-        validateAccountExists(accountNumber);
-        IcesiAccount account = accountRepository.getByAccountNumber(accountNumber).get();
-        account.setBalance(account.getBalance() + amount);
+    public TransactionResponseDTO deposit(TransactionRequestDTO transactionRequestDTO){
+        IcesiAccount account = validateAccountExists(transactionRequestDTO.getTargetAccount());
+        validateAccountBalance(account, transactionRequestDTO.getAmount());
+        account.setBalance(account.getBalance() + transactionRequestDTO.getAmount());
         accountRepository.save(account);
-        return true;
+        return accountMapper.fromTransactionRequest(transactionRequestDTO, "Deposit successful");
     }
 
     //Withdraw money from an account
     @Transactional
-    public boolean withdraw(String accountNumber, Long amount){
-        IcesiAccount account = validateAccountExists(accountNumber);
-        validateAccountBalance(account, amount);
-        account.setBalance(account.getBalance() - amount);
+    public TransactionResponseDTO withdraw(TransactionRequestDTO transactionRequestDTO){
+        IcesiAccount account = validateAccountExists(transactionRequestDTO.getSourceAccount());
+        validateAccountBalance(account, transactionRequestDTO.getAmount());
+        account.setBalance(account.getBalance() - transactionRequestDTO.getAmount());
         accountRepository.save(account);
-        return true;
+        return accountMapper.fromTransactionRequest(transactionRequestDTO, "Withdraw successful");
     }
 
     /* Transfer money from one account to another, if the accounts are active,
      the balance is positive and the amount is less than the balance, and the type
      of the accounts is different from "deposit" */
     @Transactional
-    public boolean transfer(String accountNumberFrom, String accountNumberTo, Long amount){
-        IcesiAccount accountFrom = validateAccountExists(accountNumberFrom);
-        IcesiAccount accountTo = validateAccountExists(accountNumberTo);
+    public TransactionResponseDTO transfer(TransactionRequestDTO transactionRequestDTO){
+        IcesiAccount accountFrom = validateAccountExists(transactionRequestDTO.getSourceAccount());
+        IcesiAccount accountTo = validateAccountExists(transactionRequestDTO.getTargetAccount());
         isEnableToTransfer(accountFrom, accountTo);
-        validateAccountBalance(accountFrom, amount);
-        accountFrom.setBalance(accountFrom.getBalance() - amount);
-        accountTo.setBalance(accountTo.getBalance() + amount);
+        validateAccountBalance(accountFrom, transactionRequestDTO.getAmount());
+        accountFrom.setBalance(accountFrom.getBalance() - transactionRequestDTO.getAmount());
+        accountTo.setBalance(accountTo.getBalance() + transactionRequestDTO.getAmount());
         accountRepository.save(accountFrom);
         accountRepository.save(accountTo);
-        return true;
+        return accountMapper.fromTransactionRequest(transactionRequestDTO, "Transfer successful");
     }
 
     private void isEnableToTransfer(IcesiAccount accountFrom, IcesiAccount accountTo){
