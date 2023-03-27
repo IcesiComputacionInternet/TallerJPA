@@ -1,7 +1,6 @@
 package com.example.jpa.mapper;
 
-import com.example.jpa.dto.UserRequestDTO;
-import com.example.jpa.dto.UserResponseDTO;
+import com.example.jpa.dto.UserDTO;
 import com.example.jpa.model.IcesiUser;
 import org.mapstruct.Mapper;
 //import org.mapstruct.Mapping;
@@ -10,8 +9,8 @@ import org.mapstruct.Mapper;
 public interface UserMapper {
 
     //@Mapping(target = "role", source = "role", ignore = true)
-    IcesiUser fromUserRequestDTO(UserRequestDTO icesiUserDTO);
+    IcesiUser fromUserRequestDTO(UserDTO icesiUserDTO);
 
     //@Mapping(target = "role", source = "role", ignore = true)
-    UserResponseDTO fromUserToUserResponseDTO(IcesiUser icesiUser);
+    UserDTO fromUserToUserResponseDTO(IcesiUser icesiUser);
 }

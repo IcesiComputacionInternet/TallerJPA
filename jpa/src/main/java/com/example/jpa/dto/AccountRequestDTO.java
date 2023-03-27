@@ -7,9 +7,9 @@ import lombok.Data;
 @Builder
 public class AccountRequestDTO {
 
-    private long balance;
+    private Long balance;
 
     private String type;
 
-    private UserRequestDTO user;
+    private UserDTO user;
 }

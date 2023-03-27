@@ -1,7 +1,6 @@
 package com.example.jpa.controller;
 
-import com.example.jpa.dto.UserRequestDTO;
-import com.example.jpa.dto.UserResponseDTO;
+import com.example.jpa.dto.UserDTO;
 import com.example.jpa.service.UserService;
 import lombok.AllArgsConstructor;
 import org.springframework.web.bind.annotation.*;
@@ -18,17 +17,17 @@ public class IcesiUserController {
     UserService userService;
 
     @PostMapping
-    public UserResponseDTO create(@RequestBody UserRequestDTO userDTO){
+    public UserDTO create(@RequestBody UserDTO userDTO){
         return userService.save(userDTO);
     }
 
     @GetMapping
-    public List<UserResponseDTO> getAllUsers(){
+    public List<UserDTO> getAllUsers(){
         return userService.getUsers();
     }
 
     @GetMapping("/{userEmail}")
-    public UserResponseDTO getUser(@PathVariable String userEmail){
+    public UserDTO getUser(@PathVariable String userEmail){
         return userService.getUser(userEmail);
     }
 }
