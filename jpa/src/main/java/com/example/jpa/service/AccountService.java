@@ -142,7 +142,7 @@ public class AccountService {
     public TransactionResponseDTO transfer(TransactionRequestDTO transactionRequestDTO){
         IcesiAccount accountFrom = validateAccountExists(transactionRequestDTO.getSourceAccount());
         IcesiAccount accountTo = validateAccountExists(transactionRequestDTO.getTargetAccount());
-        isEnableToTransfer(accountFrom, accountTo);
+        validateTransferConditions(accountFrom, accountTo);
         validateAccountBalance(accountFrom, transactionRequestDTO.getAmount());
         accountFrom.setBalance(accountFrom.getBalance() - transactionRequestDTO.getAmount());
         accountTo.setBalance(accountTo.getBalance() + transactionRequestDTO.getAmount());
@@ -151,7 +151,7 @@ public class AccountService {
         return accountMapper.fromTransactionRequest(transactionRequestDTO, "Transfer successful");
     }
 
-    private void isEnableToTransfer(IcesiAccount accountFrom, IcesiAccount accountTo){
+    private void validateTransferConditions(IcesiAccount accountFrom, IcesiAccount accountTo){
         if(!(accountFrom.isActive()) || !(accountTo.isActive())) {
             throw new InactiveAccountException("One or both accounts are not active");
         }
