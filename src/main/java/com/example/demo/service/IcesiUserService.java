@@ -1,11 +1,9 @@
 package com.example.demo.service;
 import java.util.Optional;
 import java.util.UUID;
-
 import org.springframework.stereotype.Service;
-
 import com.example.demo.DTO.IcesiUserCreateDTO;
-
+import com.example.demo.DTO.ResponseIcesiUserDTO;
 import com.example.demo.mapper.IcesiUserMapper;
 import com.example.demo.model.IcesiRole;
 import com.example.demo.model.IcesiUser;
@@ -24,7 +22,7 @@ public class IcesiUserService {
 
     private final IcesiRoleRepository icesiRoleRepository;
 
-    public  IcesiUser create(IcesiUserCreateDTO user) {
+    public  ResponseIcesiUserDTO create(IcesiUserCreateDTO user) {
         Optional<IcesiUser> userWithEmail = icesiUserRepository.findByEmail(user.getEmail());
         Optional<IcesiUser> userWithPhone = icesiUserRepository.findByPhoneNumber(user.getPhoneNumber());
         
@@ -42,7 +40,7 @@ public class IcesiUserService {
         IcesiUser icesiUser = icesiUserMapper.fromIcesiUserDTO(user);
         icesiUser.setIcesiRole(icesiRole);
         icesiUser.setUserId(UUID.randomUUID());
-        return icesiUserRepository.save(icesiUser);
+        return icesiUserMapper.fromIcesiUserToIcesiUserDTO(icesiUserRepository.save(icesiUser));
     }
 
 }

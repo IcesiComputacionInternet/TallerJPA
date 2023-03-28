@@ -7,6 +7,7 @@ import java.util.function.Supplier;
 import org.springframework.stereotype.Service;
 
 import com.example.demo.DTO.IcesiAccountCreateDTO;
+import com.example.demo.DTO.ResponseIcesiAccountDTO;
 import com.example.demo.mapper.IcesiAccountMapper;
 import com.example.demo.model.IcesiAccount;
 import com.example.demo.model.IcesiUser;
@@ -25,7 +26,7 @@ public class IcesiAccountService {
 
     private final IcesiUserRepository icesiUserRepository;
 
-    public IcesiAccount create(IcesiAccountCreateDTO account) {
+    public ResponseIcesiAccountDTO create(IcesiAccountCreateDTO account) {
         if(account.getBalance() < 0) {
             throw new RuntimeException("The account balance cannot be negative");
         }
@@ -37,7 +38,7 @@ public class IcesiAccountService {
         icesiAccount.setIcesiUser(icesiUser);
         icesiAccount.setAccountId(UUID.randomUUID());
         icesiAccount.setAccountNumber(generateAccountNumber());
-        return icesiAccountRepository.save(icesiAccount);
+        return IcesiAccountMapper.fromIcesiAcountToIcesiAccountDTO(icesiAccountRepository.save(icesiAccount));
     }
 
     public static String generateAccountNumber() {

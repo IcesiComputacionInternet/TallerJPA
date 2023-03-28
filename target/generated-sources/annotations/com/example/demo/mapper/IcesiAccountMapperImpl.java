@@ -1,14 +1,15 @@
 package com.example.demo.mapper;
 
 import com.example.demo.DTO.IcesiAccountCreateDTO;
+import com.example.demo.DTO.ResponseIcesiAccountDTO;
 import com.example.demo.model.IcesiAccount;
 import javax.annotation.processing.Generated;
 import org.springframework.stereotype.Component;
 
 @Generated(
     value = "org.mapstruct.ap.MappingProcessor",
-    date = "2023-03-18T10:47:24-0500",
-    comments = "version: 1.5.3.Final, compiler: Eclipse JDT (IDE) 3.33.0.v20230218-1114, environment: Java 17.0.6 (Eclipse Adoptium)"
+    date = "2023-03-28T15:41:29-0500",
+    comments = "version: 1.5.3.Final, compiler: Eclipse JDT (IDE) 3.33.0.v20230213-1046, environment: Java 17.0.6 (Eclipse Adoptium)"
 )
 @Component
 public class IcesiAccountMapperImpl implements IcesiAccountMapper {
@@ -45,5 +46,16 @@ public class IcesiAccountMapperImpl implements IcesiAccountMapper {
         icesiAccountCreateDTO.type( icesiAccount.getType() );
 
         return icesiAccountCreateDTO.build();
+    }
+
+    @Override
+    public ResponseIcesiAccountDTO fromIcesiAcountToIcesiAccountDTO(IcesiAccount icesiAccount) {
+        if ( icesiAccount == null ) {
+            return null;
+        }
+
+        ResponseIcesiAccountDTO responseIcesiAccountDTO = new ResponseIcesiAccountDTO();
+
+        return responseIcesiAccountDTO;
     }
 }

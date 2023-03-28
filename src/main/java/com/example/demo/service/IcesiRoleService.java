@@ -19,12 +19,12 @@ public class IcesiRoleService {
 
     private final IcesiRoleMapper icesiRoleMapper;
 
-    public IcesiRole create(IcesiRoleCreateDTO role) {
+    public IcesiRoleCreateDTO create(IcesiRoleCreateDTO role) {
         if(icesiRoleRepository.findByName(role.getName()).isPresent()) {
             throw new RuntimeException("This role name is already in use");
         }
         IcesiRole icesiRole = icesiRoleMapper.fromIcesiRoleDTO(role);
         icesiRole.setRoleId(UUID.randomUUID());
-        return icesiRoleRepository.save(icesiRole);
+        return icesiRoleMapper.fromIcesiRole(icesiRoleRepository.save(icesiRole));
     }
 }
