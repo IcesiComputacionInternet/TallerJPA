@@ -13,6 +13,11 @@ public class ColombianNumberValidator implements ConstraintValidator<ColombianNu
 
     @Override
     public boolean isValid(String value, ConstraintValidatorContext context) {
+
+        if(value.isBlank()){
+            return true;
+        }
+
         return value.matches("\\+573[0-9]{9}");
     }
 }

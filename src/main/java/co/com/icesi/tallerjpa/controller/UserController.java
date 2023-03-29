@@ -5,7 +5,6 @@ import co.com.icesi.tallerjpa.dto.RequestUserDTO;
 import co.com.icesi.tallerjpa.dto.ResponseUserDTO;
 import co.com.icesi.tallerjpa.service.UserService;
 import lombok.AllArgsConstructor;
-import org.springframework.validation.BindingResult;
 import org.springframework.web.bind.annotation.*;
 
 import javax.validation.Valid;

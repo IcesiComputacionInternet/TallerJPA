@@ -8,50 +8,40 @@ import co.com.icesi.tallerjpa.service.AccountService;
 import lombok.AllArgsConstructor;
 import org.springframework.web.bind.annotation.*;
 
+import javax.validation.Valid;
+
 @RestController
-@RequestMapping(AccountApi.ACCOUNT_BASE_URL)
 @AllArgsConstructor
 public class AccountController implements AccountApi {
-
     private final AccountService accountService;
 
     @Override
-    public ResponseAccountDTO add(RequestAccountDTO account) {
+    public ResponseAccountDTO add(@Valid @RequestBody RequestAccountDTO account) {
         return accountService.save(account);
     }
 
     @Override
-    public String withdraw(@RequestBody TransactionDTO transactionDTO){
-        return accountService.withdraw(
-                transactionDTO.getAmount(),
-                transactionDTO.getAccountNumberOrigin()
-        );
+    public TransactionDTO withdraw(@Valid @RequestBody TransactionDTO transactionDTO){
+        return accountService.withdraw(transactionDTO);
     }
 
     @Override
-    public String deposit(@RequestBody TransactionDTO transactionDTO){
-        return accountService.deposit(
-                transactionDTO.getAmount(),
-                transactionDTO.getAccountNumberOrigin()
-        );
+    public TransactionDTO deposit(@Valid @RequestBody TransactionDTO transactionDTO){
+        return accountService.deposit(transactionDTO);
     }
 
     @Override
-    public String transfer(@RequestBody TransactionDTO transactionDTO){
-        return accountService.transfer(
-                transactionDTO.getAmount(),
-                transactionDTO.getAccountNumberOrigin(),
-                transactionDTO.getAccountNumberDestination()
-        );
+    public TransactionDTO transfer(@Valid @RequestBody TransactionDTO transactionDTO){
+        return accountService.transfer(transactionDTO);
     }
 
     @Override
-    public String enableAccount(@PathVariable String accountNumber){
+    public TransactionDTO enableAccount(@PathVariable String accountNumber){
         return accountService.enableAccount(accountNumber);
     }
 
     @Override
-    public String disableAccount(@PathVariable String accountNumber){
+    public TransactionDTO disableAccount(@PathVariable String accountNumber){
         return accountService.disableAccount(accountNumber);
     }
 }

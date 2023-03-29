@@ -1,7 +1,7 @@
 package co.com.icesi.tallerjpa.unit.service;
 
 import co.com.icesi.tallerjpa.dto.RequestUserDTO;
-import co.com.icesi.tallerjpa.exception.ExistsException;
+import co.com.icesi.tallerjpa.exception.custom.ExistsException;
 import co.com.icesi.tallerjpa.mapper.UserMapper;
 import co.com.icesi.tallerjpa.mapper.UserMapperImpl;
 import co.com.icesi.tallerjpa.model.IcesiUser;

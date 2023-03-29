@@ -1,8 +1,8 @@
 package co.com.icesi.tallerjpa.service;
 
-import co.com.icesi.tallerjpa.controller.api.UserApi;
 import co.com.icesi.tallerjpa.dto.RequestAccountDTO;
 import co.com.icesi.tallerjpa.dto.ResponseAccountDTO;
+import co.com.icesi.tallerjpa.dto.TransactionDTO;
 import co.com.icesi.tallerjpa.mapper.AccountMapper;
 import co.com.icesi.tallerjpa.model.Account;
 import co.com.icesi.tallerjpa.repository.AccountRepository;
@@ -27,11 +27,11 @@ public class AccountService {
     public ResponseAccountDTO save(RequestAccountDTO accountDTO) {
         Account account = accountMapper.fromAccountDTO(accountDTO);
 
+        account.setUser(userRepository.findByEmail(accountDTO.getUser())
+                .orElseThrow(() -> new RuntimeException("User not found")));
         account.setAccountId(UUID.randomUUID());
         account.setAccountNumber(validateAccountNumber(generateAccountNumber()));
         account.setActive(true);
-        account.setUser(userRepository.findByEmail(accountDTO.getUser())
-                .orElseThrow(() -> new RuntimeException("User not found")));
 
         return accountMapper.fromAccountToSendAccountDTO(accountRepository.save(account));
     }
@@ -42,43 +42,52 @@ public class AccountService {
     }
 
     @Transactional
-    public String withdraw(Long amount, String accountNumber) {
-        Account account = getAccountByAccountNumber(accountNumber);
-        account.getType().getStrategy().withdraw(amount, account);
-        accountRepository.updateBalance(account.getBalance(), accountNumber);
-        return "The withdrawal was successful";
+    public TransactionDTO withdraw(TransactionDTO transactionDTO) {
+        Account account = getAccountByAccountNumber(transactionDTO.getAccountNumberOrigin());
+        account.getType().getStrategy().withdraw(transactionDTO.getAmount(), account);
+        accountRepository.updateBalance(account.getBalance(), transactionDTO.getAccountNumberOrigin());
+        transactionDTO.setMessage("The withdrawal was successful");
+        return transactionDTO;
     }
 
     @Transactional
-    public String deposit(Long amount, String accountNumber) {
-        Account account = getAccountByAccountNumber(accountNumber);
-        account.getType().getStrategy().deposit(amount, account);
-        accountRepository.updateBalance(account.getBalance(), accountNumber);
-        return "The deposit was successful";
+    public TransactionDTO deposit(TransactionDTO transactionDTO) {
+        Account account = getAccountByAccountNumber(transactionDTO.getAccountNumberOrigin());
+        account.getType().getStrategy().deposit(transactionDTO.getAmount(), account);
+        accountRepository.updateBalance(account.getBalance(), transactionDTO.getAccountNumberOrigin());
+        transactionDTO.setMessage("The deposit was successful");
+        return transactionDTO;
     }
 
     @Transactional
-    public String transfer(Long amount, String accountNumberOrigin, String accountNumberDestination) {
-        Account accountOrigin = getAccountByAccountNumber(accountNumberOrigin);
-        Account accountDestination = getAccountByAccountNumber(accountNumberDestination);
+    public TransactionDTO transfer(TransactionDTO transactionDTO) {
+        Account accountOrigin = getAccountByAccountNumber(transactionDTO.getAccountNumberOrigin());
+        Account accountDestination = getAccountByAccountNumber(transactionDTO.getAccountNumberDestination());
 
-        accountOrigin.getType().getStrategy().transfer(amount, accountOrigin, accountDestination);
+        accountOrigin.getType().getStrategy().transfer(transactionDTO.getAmount(), accountOrigin, accountDestination);
 
-        accountRepository.updateBalance(accountOrigin.getBalance(), accountNumberOrigin);
-        accountRepository.updateBalance(accountDestination.getBalance(), accountNumberDestination);
-        return "The transfer was successful";
+        accountRepository.updateBalance(accountOrigin.getBalance(), transactionDTO.getAccountNumberOrigin());
+        accountRepository.updateBalance(accountDestination.getBalance(), transactionDTO.getAccountNumberDestination());
+        transactionDTO.setMessage("The transfer was successful");
+        return transactionDTO;
     }
 
     @Transactional
-    public String enableAccount(String accountNumber){
+    public TransactionDTO enableAccount(String accountNumber){
         accountRepository.enableAccount(accountNumber);
-        return accountRepository.isActive(accountNumber) ? "The account was enabled" : "The account can't be enabled";
+        return TransactionDTO.builder()
+                .accountNumberOrigin(accountNumber)
+                .message(accountRepository.isActive(accountNumber) ? "The account was enabled" : "The account can't be enabled")
+                .build();
     }
 
     @Transactional
-    public String disableAccount(String accountNumber){
+    public TransactionDTO disableAccount(String accountNumber){
         accountRepository.disableAccount(accountNumber);
-        return accountRepository.isActive(accountNumber) ? "The account can't be disabled" : "The account was disabled";
+        return TransactionDTO.builder()
+                .accountNumberOrigin(accountNumber)
+                .message(accountRepository.isActive(accountNumber) ? "The account can't be disabled" : "The account was disabled")
+                .build();
     }
 
     private String validateAccountNumber(String accountNumber){

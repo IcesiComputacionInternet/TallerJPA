@@ -1,6 +1,7 @@
 package co.com.icesi.tallerjpa.unit.service;
 
 import co.com.icesi.tallerjpa.dto.RequestAccountDTO;
+import co.com.icesi.tallerjpa.dto.TransactionDTO;
 import co.com.icesi.tallerjpa.enums.TypeAccount;
 import co.com.icesi.tallerjpa.mapper.AccountMapper;
 import co.com.icesi.tallerjpa.mapper.AccountMapperImpl;
@@ -89,7 +90,12 @@ public class AccountServiceTest {
         Account account = defaultAccount();
         when(accountRepository.findByAccountNumber(any())).thenReturn(Optional.of(account));
 
-        accountService.withdraw(5L,"12345");
+        accountService.withdraw(TransactionDTO.builder()
+                .accountNumberOrigin("12345")
+                .amount(5L)
+                .build()
+        );
+
 
         assertEquals(95L, account.getBalance());
         verify(accountRepository, times(1)).findByAccountNumber(any());
@@ -101,7 +107,11 @@ public class AccountServiceTest {
         when(accountRepository.findByAccountNumber(any())).thenReturn(Optional.empty());
 
         try {
-            accountService.withdraw(5L,"12345");
+            accountService.withdraw(TransactionDTO.builder()
+                    .accountNumberOrigin("12345")
+                    .amount(5L)
+                    .build()
+            );
         } catch (RuntimeException e) {
             assertEquals("Account not found", e.getMessage());
         }
@@ -116,7 +126,11 @@ public class AccountServiceTest {
         when(accountRepository.findByAccountNumber(any())).thenReturn(Optional.of(account));
 
         try {
-            accountService.withdraw(105L,"12345");
+            accountService.withdraw(TransactionDTO.builder()
+                    .accountNumberOrigin("12345")
+                    .amount(105L)
+                    .build()
+            );
         } catch (RuntimeException e) {
             assertEquals("Insufficient funds", e.getMessage());
         }
@@ -132,7 +146,11 @@ public class AccountServiceTest {
         when(accountRepository.findByAccountNumber(any())).thenReturn(Optional.of(account));
 
         try {
-            accountService.withdraw(5L,"12345");
+            accountService.withdraw(TransactionDTO.builder()
+                    .accountNumberOrigin("12345")
+                    .amount(5L)
+                    .build()
+            );
         } catch (RuntimeException e) {
             assertEquals("The account 12345 is not active", e.getMessage());
         }
@@ -146,7 +164,11 @@ public class AccountServiceTest {
         Account account = defaultAccount();
         when(accountRepository.findByAccountNumber(any())).thenReturn(Optional.of(account));
 
-        accountService.deposit(5L,"12345");
+        accountService.deposit(TransactionDTO.builder()
+                .accountNumberOrigin("12345")
+                .amount(5L)
+                .build()
+        );
 
         assertEquals(105L, account.getBalance());
         verify(accountRepository, times(1)).findByAccountNumber(any());
@@ -158,7 +180,11 @@ public class AccountServiceTest {
         when(accountRepository.findByAccountNumber(any())).thenReturn(Optional.empty());
 
         try {
-            accountService.deposit(5L,"12345");
+            accountService.deposit(TransactionDTO.builder()
+                    .accountNumberOrigin("12345")
+                    .amount(5L)
+                    .build()
+            );
         } catch (RuntimeException e) {
             assertEquals("Account not found", e.getMessage());
         }
@@ -173,7 +199,11 @@ public class AccountServiceTest {
         when(accountRepository.findByAccountNumber(any())).thenReturn(Optional.of(account));
 
         try {
-            accountService.deposit(5L,"12345");
+            accountService.deposit(TransactionDTO.builder()
+                    .accountNumberOrigin("12345")
+                    .amount(5L)
+                    .build()
+            );
         } catch (RuntimeException e) {
             assertEquals("The account 12345 is not active", e.getMessage());
         }
@@ -196,7 +226,12 @@ public class AccountServiceTest {
         when(accountRepository.findByAccountNumber("12345")).thenReturn(Optional.of(account));
         when(accountRepository.findByAccountNumber("54321")).thenReturn(Optional.of(account2));
 
-        accountService.transfer(5L,"12345", "54321");
+        accountService.transfer(TransactionDTO.builder()
+                .accountNumberOrigin("12345")
+                .accountNumberDestination("54321")
+                .amount(5L)
+                .build()
+        );
 
         assertEquals(95L, account.getBalance());
         assertEquals(105L, account2.getBalance());
@@ -219,7 +254,12 @@ public class AccountServiceTest {
         when(accountRepository.findByAccountNumber("54321")).thenReturn(Optional.of(account2));
 
         try {
-            accountService.transfer(5L,"12345", "54321");
+            accountService.transfer(TransactionDTO.builder()
+                    .accountNumberOrigin("12345")
+                    .accountNumberDestination("54321")
+                    .amount(5L)
+                    .build()
+            );
         } catch (RuntimeException e) {
             assertEquals("The account 54321 is not active", e.getMessage());
         }
@@ -244,7 +284,12 @@ public class AccountServiceTest {
         when(accountRepository.findByAccountNumber("54321")).thenReturn(Optional.of(account2));
 
         try {
-            accountService.transfer(5L,"12345", "54321");
+            accountService.transfer(TransactionDTO.builder()
+                    .accountNumberOrigin("12345")
+                    .accountNumberDestination("54321")
+                    .amount(5L)
+                    .build()
+            );
         } catch (RuntimeException e) {
             assertEquals("The account type does not allow transfers", e.getMessage());
         }
@@ -260,7 +305,12 @@ public class AccountServiceTest {
         when(accountRepository.findByAccountNumber(any())).thenReturn(Optional.of(account));
 
         try {
-            accountService.transfer(5L,"12345", "54321");
+            accountService.transfer(TransactionDTO.builder()
+                    .accountNumberOrigin("12345")
+                    .accountNumberDestination("54321")
+                    .amount(5L)
+                    .build()
+            );
         } catch (UnsupportedOperationException e) {
             assertEquals("This account type does not transfer", e.getMessage());
         }
@@ -273,9 +323,9 @@ public class AccountServiceTest {
     @Test
     public void testDisableAccountCantBeDisabled() {
         when(accountRepository.isActive(any())).thenReturn(true);
-        String msg = accountService.disableAccount(any());
+        TransactionDTO msg = accountService.disableAccount(any());
 
-        assertEquals("The account can't be disabled", msg);
+        assertEquals("The account can't be disabled", msg.getMessage());
         verify(accountRepository, times(1)).disableAccount(any());
         verify(accountRepository, times(1)).isActive(any());
     }
@@ -283,9 +333,9 @@ public class AccountServiceTest {
     @Test
     public void testDisableAccount() {
         when(accountRepository.isActive(any())).thenReturn(false);
-        String msg = accountService.disableAccount(any());
+        TransactionDTO msg = accountService.disableAccount(any());
 
-        assertEquals("The account was disabled", msg);
+        assertEquals("The account was disabled", msg.getMessage());
         verify(accountRepository, times(1)).disableAccount(any());
         verify(accountRepository, times(1)).isActive(any());
     }
@@ -293,9 +343,9 @@ public class AccountServiceTest {
     @Test
     public void testEnableAccountCantBeEnabled() {
         when(accountRepository.isActive(any())).thenReturn(false);
-        String msg = accountService.enableAccount(any());
+        TransactionDTO msg = accountService.enableAccount(any());
 
-        assertEquals("The account can't be enabled", msg);
+        assertEquals("The account can't be enabled", msg.getMessage());
         verify(accountRepository, times(1)).enableAccount(any());
         verify(accountRepository, times(1)).isActive(any());
     }
@@ -303,9 +353,9 @@ public class AccountServiceTest {
     @Test
     public void testEnableAccount() {
         when(accountRepository.isActive(any())).thenReturn(true);
-        String msg = accountService.enableAccount(any());
+        TransactionDTO msg = accountService.enableAccount(any());
 
-        assertEquals("The account was enabled", msg);
+        assertEquals("The account was enabled", msg.getMessage());
         verify(accountRepository, times(1)).enableAccount(any());
         verify(accountRepository, times(1)).isActive(any());
     }
