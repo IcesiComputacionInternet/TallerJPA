@@ -20,7 +20,6 @@ import java.util.stream.IntStream;
 @Service
 @AllArgsConstructor
 public class IcesiAccountService {
-
     private final IcesiAccountRepository icesiAccountRepository;
     private final IcesiAccountMapper icesiAccountMapper;
     private final IcesiUserRepository icesiUserRepository;
@@ -72,7 +71,9 @@ public class IcesiAccountService {
     }
 
     public void enableAccount(String accountId){
-        getAccountById(accountId);
+        if(getAccountById(accountId).isActive()){
+            throw new RuntimeException("The account was already enabled");
+        }
         icesiAccountRepository.enableAccount(accountId);
     }
 
@@ -115,9 +116,11 @@ public class IcesiAccountService {
     }
 
     public TransactionResultDTO transferMoney(TransactionCreateDTO transactionCreateDTO){
-        checkConditionsToTransfer(transactionCreateDTO.getSenderAccountId(), transactionCreateDTO.getReceiverAccountId(), transactionCreateDTO.getAmount());
-        long senderAccountNewBalance = getAccountById(transactionCreateDTO.getSenderAccountId()).getBalance() - transactionCreateDTO.getAmount();
-        long receiverAccountNewBalance = getAccountById(transactionCreateDTO.getReceiverAccountId()).getBalance() + transactionCreateDTO.getAmount();
+        IcesiAccount senderIcesiAccount = getAccountById(transactionCreateDTO.getSenderAccountId());
+        IcesiAccount receiverIcesiAccount = getAccountById(transactionCreateDTO.getReceiverAccountId());
+        checkConditionsToTransfer(senderIcesiAccount, receiverIcesiAccount, transactionCreateDTO.getAmount());
+        long senderAccountNewBalance = senderIcesiAccount.getBalance() - transactionCreateDTO.getAmount();
+        long receiverAccountNewBalance = receiverIcesiAccount.getBalance() + transactionCreateDTO.getAmount();
         icesiAccountRepository.updateBalance(senderAccountNewBalance, transactionCreateDTO.getSenderAccountId());
         icesiAccountRepository.updateBalance(receiverAccountNewBalance, transactionCreateDTO.getReceiverAccountId());
         TransactionResultDTO transactionResultDTO = icesiAccountMapper.fromTransactionCreateDTO(transactionCreateDTO);
@@ -126,8 +129,7 @@ public class IcesiAccountService {
         return transactionResultDTO;
     }
 
-    private void checkConditionsToTransfer(String senderAccountId, String receiverAccountId, long moneyToTransfer){
-        IcesiAccount senderIcesiAccount = getAccountById(senderAccountId);
+    private void checkConditionsToTransfer(IcesiAccount senderIcesiAccount, IcesiAccount receiverIcesiAccount, long moneyToTransfer){
         checkIfTheAccountIsDisabled(senderIcesiAccount);
         if(senderIcesiAccount.isMarkedAsDepositOnly()){
             throw new RuntimeException("The account with id " + senderIcesiAccount.getAccountId() + " is marked as deposit only so it can't transfers money");
@@ -135,9 +137,8 @@ public class IcesiAccountService {
         if(!senderIcesiAccount.isThereEnoughMoney(moneyToTransfer)){
             throw new RuntimeException("Not enough money to transfer. At most you can transfer: " + senderIcesiAccount.getBalance());
         }
-        IcesiAccount receiverIcesiAccount = getAccountById(receiverAccountId);
         checkIfTheAccountIsDisabled(receiverIcesiAccount);
-        if(getAccountById(receiverAccountId).isMarkedAsDepositOnly()){
+        if(receiverIcesiAccount.isMarkedAsDepositOnly()){
             throw new RuntimeException("The account with id " + receiverIcesiAccount.getAccountId() + " is marked as deposit only so no money can be transferred");
         }
     }
@@ -146,5 +147,11 @@ public class IcesiAccountService {
         if (icesiAccount.isDisable()){
             throw new RuntimeException("The account "+icesiAccount.getAccountId()+" is disabled");
         }
+    }
+
+    public IcesiAccountShowDTO getAccountByAccountNumber(String accountNumber){
+        return icesiAccountMapper.fromIcesiAccountToShowDTO(icesiAccountRepository.findByAccountNumber(accountNumber).orElseThrow(
+                () -> new RuntimeException("There is no account with the number: " + accountNumber)
+        ));
     }
 }

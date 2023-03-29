@@ -114,7 +114,7 @@ public class IcesiUserServiceTest {
     }
 
     @Test
-    public void testCreateIcesiUserWithNullIcesiRole(){
+    public void testCreateIcesiUserWithNotExistingIcesiRole(){
         when(icesiRoleRepository.findByName(any())).thenReturn(Optional.ofNullable((null)));
         Exception exception = assertThrows(RuntimeException.class, () -> icesiUserService.save(defaultIcesiUserCreateDTO()));
         assertEquals("There is no role with that name", exception.getMessage());

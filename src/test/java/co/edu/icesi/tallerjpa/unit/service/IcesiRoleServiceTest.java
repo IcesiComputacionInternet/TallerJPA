@@ -5,7 +5,6 @@ import co.edu.icesi.tallerjpa.mapper.IcesiRoleMapper;
 import co.edu.icesi.tallerjpa.mapper.IcesiRoleMapperImpl;
 import co.edu.icesi.tallerjpa.model.IcesiRole;
 import co.edu.icesi.tallerjpa.repository.IcesiRoleRepository;
-import co.edu.icesi.tallerjpa.repository.IcesiUserRepository;
 import co.edu.icesi.tallerjpa.service.IcesiRoleService;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
