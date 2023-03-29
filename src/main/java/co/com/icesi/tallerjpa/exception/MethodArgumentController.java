@@ -16,15 +16,12 @@ public class MethodArgumentController{
     @ExceptionHandler(value = MethodArgumentNotValidException.class)
     @ResponseStatus(value= HttpStatus.BAD_REQUEST)
     public Map<String, String> handleMethodArgumentNotValid(MethodArgumentNotValidException ex) {
-        Map<String, String> errors = new HashMap<>();
-
-        ex.getBindingResult().getAllErrors().forEach((error) -> {
-            String fieldName = ((DefaultMessageSourceResolvable) error.getArguments()[0]).getDefaultMessage();
-            String errorMessage = error.getDefaultMessage();
-            errors.put(fieldName, errorMessage);
-        });
-
-        return errors;
+        return ex.getAllErrors().stream()
+                .collect(
+                        HashMap::new,
+                        (m, e) -> m.put(((DefaultMessageSourceResolvable) e.getArguments()[0]).getDefaultMessage(), e.getDefaultMessage()),
+                        HashMap::putAll
+                );
     }
 
 }

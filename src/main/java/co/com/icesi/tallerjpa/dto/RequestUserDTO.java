@@ -21,6 +21,7 @@ public class RequestUserDTO {
     @NotNull
     private String email;
     @NotNull
+    @NotBlank
     private String password;
     @NotNull
     @ColombianNumber
