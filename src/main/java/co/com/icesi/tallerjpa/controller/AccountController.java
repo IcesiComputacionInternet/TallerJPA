@@ -8,24 +8,35 @@ import co.com.icesi.tallerjpa.service.AccountService;
 import lombok.AllArgsConstructor;
 import org.springframework.web.bind.annotation.*;
 
-@RestController(AccountApi.BASE_URL)
+@RestController
+@RequestMapping(AccountApi.ACCOUNT_BASE_URL)
 @AllArgsConstructor
 public class AccountController implements AccountApi {
 
     private final AccountService accountService;
 
-    public ResponseAccountDTO save(@RequestBody RequestAccountDTO account){
-       return accountService.save(account);
+    @Override
+    public ResponseAccountDTO add(RequestAccountDTO account) {
+        return accountService.save(account);
     }
 
+    @Override
     public String withdraw(@RequestBody TransactionDTO transactionDTO){
-        return accountService.withdraw(transactionDTO.getAmount(), transactionDTO.getAccountNumberOrigin());
+        return accountService.withdraw(
+                transactionDTO.getAmount(),
+                transactionDTO.getAccountNumberOrigin()
+        );
     }
 
+    @Override
     public String deposit(@RequestBody TransactionDTO transactionDTO){
-        return accountService.deposit(transactionDTO.getAmount(), transactionDTO.getAccountNumberOrigin());
+        return accountService.deposit(
+                transactionDTO.getAmount(),
+                transactionDTO.getAccountNumberOrigin()
+        );
     }
 
+    @Override
     public String transfer(@RequestBody TransactionDTO transactionDTO){
         return accountService.transfer(
                 transactionDTO.getAmount(),
@@ -34,10 +45,12 @@ public class AccountController implements AccountApi {
         );
     }
 
+    @Override
     public String enableAccount(@PathVariable String accountNumber){
         return accountService.enableAccount(accountNumber);
     }
-    
+
+    @Override
     public String disableAccount(@PathVariable String accountNumber){
         return accountService.disableAccount(accountNumber);
     }

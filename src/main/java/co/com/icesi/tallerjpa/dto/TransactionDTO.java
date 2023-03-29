@@ -10,4 +10,5 @@ public class TransactionDTO {
     private String accountNumberOrigin;
     private String accountNumberDestination;
     private Long amount;
+    private String message;
 }
