@@ -1,6 +1,6 @@
 package co.edu.icesi.tallerjpa.runableartefact.service;
 
-import co.edu.icesi.tallerjpa.runableartefact.dto.IcesiAccountDTO;
+import co.edu.icesi.tallerjpa.runableartefact.dto.request.IcesiAccountDTO;
 import co.edu.icesi.tallerjpa.runableartefact.exception.implementation.InsufficientBalance;
 import co.edu.icesi.tallerjpa.runableartefact.exception.implementation.OperationNotAvailable;
 import co.edu.icesi.tallerjpa.runableartefact.exception.implementation.ParameterRequired;
@@ -10,6 +10,7 @@ import co.edu.icesi.tallerjpa.runableartefact.repository.IcesiAccountRepository;
 import co.edu.icesi.tallerjpa.runableartefact.repository.IcesiUserRepository;
 import lombok.AllArgsConstructor;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.util.*;
 
@@ -22,6 +23,7 @@ public class IcesiAccountService {
 
     private final IcesiAccountMapper icesiAccountMapper;
 
+    @Transactional
     public String saveNewAccount(IcesiAccountDTO icesiAccountDTO) {
         isAValidBalance(icesiAccountDTO.getBalance());
         IcesiAccount icesiAccount = icesiAccountMapper.toIcesiAccount(icesiAccountDTO);
@@ -45,6 +47,7 @@ public class IcesiAccountService {
         icesiAccount.setUser(icesiUserRepository.findByEmail(icesiAccount.getUser().getEmail()).get());
     }
 
+    @Transactional
     public String activateAccount(String accountNumber) {
         Optional<IcesiAccount> icesiAccount = icesiAccountRepository.findByAccountNumber(accountNumber);
         if (icesiAccount.isPresent()) {
@@ -55,6 +58,7 @@ public class IcesiAccountService {
         return "Account not activated";
     }
 
+    @Transactional
     public String deactivateAccount(String accountNumber){
         Optional<IcesiAccount> icesiAccount = icesiAccountRepository.findByAccountNumber(accountNumber);
         if (icesiAccount.isPresent() && validateAccountBalanceToDeactivate(icesiAccount.get())) {
@@ -65,6 +69,7 @@ public class IcesiAccountService {
         return "Account not deactivated";
     }
 
+    @Transactional
     public String withdrawal(String accountNumber, Long amount) {
         Optional<IcesiAccount> icesiAccount = icesiAccountRepository.findByAccountNumber(accountNumber);
         if (icesiAccount.isPresent()
@@ -83,15 +88,22 @@ public class IcesiAccountService {
         return true;
     }
 
+    @Transactional
     public String transfer(String accountNumberOrigin, String accountNumberDestination, Long amount) {
         Optional<IcesiAccount> icesiAccountOrigin = icesiAccountRepository.findByAccountNumber(accountNumberOrigin);
         Optional<IcesiAccount> icesiAccountDestination = icesiAccountRepository.findByAccountNumber(accountNumberDestination);
-        if (icesiAccountOrigin.isPresent()
-                && icesiAccountDestination.isPresent()
-                && validateAccountBalanceToWithdrawal(icesiAccountOrigin.get())
-                && canTransfer(icesiAccountOrigin.get())
-                && canTransfer(icesiAccountDestination.get())
-                && icesiAccountOrigin.get().getBalance() >= amount) {
+
+        if (icesiAccountOrigin.isEmpty()){
+            throw new ParameterRequired("Origin account not found");
+        }
+        if (icesiAccountDestination.isEmpty()){
+            throw new ParameterRequired("Destination account not found");
+        }
+
+        canTransfer(icesiAccountOrigin.get());
+        canTransfer(icesiAccountDestination.get());
+
+        if (icesiAccountOrigin.get().getBalance() >= amount && validateAccountBalanceToWithdrawal(icesiAccountOrigin.get())) {
             withdrawal(accountNumberOrigin, amount);
             deposit(accountNumberDestination, amount);
             return "Transfer successful";
@@ -99,14 +111,14 @@ public class IcesiAccountService {
         return "Transfer not successful";
     }
 
-    private boolean canTransfer(IcesiAccount icesiAccount){
+    private void canTransfer(IcesiAccount icesiAccount){
         if (icesiAccount.getType().equals("deposit")){
             throw new OperationNotAvailable("Can't transfer from/to a deposit account");
         }
-        return true;
     }
 
 
+    @Transactional
     public String deposit(String accountNumber, Long amount) {
         Optional<IcesiAccount> icesiAccount = icesiAccountRepository.findByAccountNumber(accountNumber);
         if (icesiAccount.isPresent() && icesiAccount.get().isActive()) {

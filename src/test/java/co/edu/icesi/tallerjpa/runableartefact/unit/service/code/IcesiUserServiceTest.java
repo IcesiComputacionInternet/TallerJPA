@@ -1,7 +1,7 @@
 package co.edu.icesi.tallerjpa.runableartefact.unit.service.code;
 
 
-import co.edu.icesi.tallerjpa.runableartefact.dto.IcesiUserDTO;
+import co.edu.icesi.tallerjpa.runableartefact.dto.request.IcesiUserDTO;
 import co.edu.icesi.tallerjpa.runableartefact.exception.implementation.DataAlreadyExist;
 import co.edu.icesi.tallerjpa.runableartefact.exception.implementation.ParameterRequired;
 import co.edu.icesi.tallerjpa.runableartefact.mapper.IcesiUserMapper;

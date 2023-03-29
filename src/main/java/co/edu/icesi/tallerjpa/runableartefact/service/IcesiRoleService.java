@@ -1,6 +1,6 @@
 package co.edu.icesi.tallerjpa.runableartefact.service;
 
-import co.edu.icesi.tallerjpa.runableartefact.dto.IcesiRoleDTO;
+import co.edu.icesi.tallerjpa.runableartefact.dto.request.IcesiRoleDTO;
 import co.edu.icesi.tallerjpa.runableartefact.exception.implementation.DataAlreadyExist;
 import co.edu.icesi.tallerjpa.runableartefact.mapper.IcesiRoleMapper;
 import co.edu.icesi.tallerjpa.runableartefact.model.IcesiRole;
@@ -12,7 +12,7 @@ import java.util.UUID;
 
 @Service
 @AllArgsConstructor
-public class IcesiRoleService {
+public class IcesiRoleService{
 
     private final IcesiRoleRepository icesiRoleRepository;
 

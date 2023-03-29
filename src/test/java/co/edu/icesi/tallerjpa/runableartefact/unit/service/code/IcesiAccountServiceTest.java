@@ -1,6 +1,6 @@
 package co.edu.icesi.tallerjpa.runableartefact.unit.service.code;
 
-import co.edu.icesi.tallerjpa.runableartefact.dto.IcesiAccountDTO;
+import co.edu.icesi.tallerjpa.runableartefact.dto.request.IcesiAccountDTO;
 import co.edu.icesi.tallerjpa.runableartefact.exception.implementation.InsufficientBalance;
 import co.edu.icesi.tallerjpa.runableartefact.exception.implementation.OperationNotAvailable;
 import co.edu.icesi.tallerjpa.runableartefact.mapper.IcesiAccountMapper;

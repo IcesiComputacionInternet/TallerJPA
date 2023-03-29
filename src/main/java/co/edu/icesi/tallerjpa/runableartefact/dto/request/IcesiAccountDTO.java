@@ -1,4 +1,4 @@
-package co.edu.icesi.tallerjpa.runableartefact.dto;
+package co.edu.icesi.tallerjpa.runableartefact.dto.request;
 
 import lombok.Builder;
 import lombok.Data;

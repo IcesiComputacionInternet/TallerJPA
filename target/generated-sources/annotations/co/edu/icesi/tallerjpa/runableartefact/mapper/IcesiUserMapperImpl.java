@@ -1,13 +1,13 @@
 package co.edu.icesi.tallerjpa.runableartefact.mapper;
 
-import co.edu.icesi.tallerjpa.runableartefact.dto.IcesiUserDTO;
+import co.edu.icesi.tallerjpa.runableartefact.dto.request.IcesiUserDTO;
 import co.edu.icesi.tallerjpa.runableartefact.model.IcesiUser;
 import javax.annotation.processing.Generated;
 import org.springframework.stereotype.Component;
 
 @Generated(
     value = "org.mapstruct.ap.MappingProcessor",
-    date = "2023-03-09T14:45:07-0500",
+    date = "2023-03-28T15:17:28-0500",
     comments = "version: 1.5.3.Final, compiler: javac, environment: Java 17.0.6 (Eclipse Adoptium)"
 )
 @Component
@@ -19,15 +19,15 @@ public class IcesiUserMapperImpl implements IcesiUserMapper {
             return null;
         }
 
-        IcesiUser icesiUser = new IcesiUser();
+        IcesiUser.IcesiUserBuilder icesiUser = IcesiUser.builder();
 
-        icesiUser.setFirstName( icesiUserDTO.getFirstName() );
-        icesiUser.setLastName( icesiUserDTO.getLastName() );
-        icesiUser.setEmail( icesiUserDTO.getEmail() );
-        icesiUser.setPhoneNumber( icesiUserDTO.getPhoneNumber() );
-        icesiUser.setPassword( icesiUserDTO.getPassword() );
+        icesiUser.firstName( icesiUserDTO.getFirstName() );
+        icesiUser.lastName( icesiUserDTO.getLastName() );
+        icesiUser.email( icesiUserDTO.getEmail() );
+        icesiUser.phoneNumber( icesiUserDTO.getPhoneNumber() );
+        icesiUser.password( icesiUserDTO.getPassword() );
 
-        return icesiUser;
+        return icesiUser.build();
     }
 
     @Override
@@ -42,7 +42,6 @@ public class IcesiUserMapperImpl implements IcesiUserMapper {
         icesiUserDTO.lastName( icesiUser.getLastName() );
         icesiUserDTO.email( icesiUser.getEmail() );
         icesiUserDTO.phoneNumber( icesiUser.getPhoneNumber() );
-        icesiUserDTO.password( icesiUser.getPassword() );
 
         return icesiUserDTO.build();
     }

@@ -1,6 +1,6 @@
 package co.edu.icesi.tallerjpa.runableartefact.service;
 
-import co.edu.icesi.tallerjpa.runableartefact.dto.IcesiUserDTO;
+import co.edu.icesi.tallerjpa.runableartefact.dto.request.IcesiUserDTO;
 import co.edu.icesi.tallerjpa.runableartefact.exception.implementation.DataAlreadyExist;
 import co.edu.icesi.tallerjpa.runableartefact.exception.implementation.ParameterRequired;
 import co.edu.icesi.tallerjpa.runableartefact.mapper.IcesiUserMapper;
@@ -10,7 +10,6 @@ import co.edu.icesi.tallerjpa.runableartefact.repository.IcesiUserRepository;
 import lombok.AllArgsConstructor;
 import org.springframework.stereotype.Service;
 
-import java.util.Optional;
 import java.util.UUID;
 
 @Service

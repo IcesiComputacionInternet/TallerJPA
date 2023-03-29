@@ -1,6 +1,6 @@
 package co.edu.icesi.tallerjpa.runableartefact.unit.service.code;
 
-import co.edu.icesi.tallerjpa.runableartefact.dto.IcesiRoleDTO;
+import co.edu.icesi.tallerjpa.runableartefact.dto.request.IcesiRoleDTO;
 import co.edu.icesi.tallerjpa.runableartefact.exception.implementation.DataAlreadyExist;
 import co.edu.icesi.tallerjpa.runableartefact.mapper.IcesiRoleMapper;
 import co.edu.icesi.tallerjpa.runableartefact.model.IcesiRole;

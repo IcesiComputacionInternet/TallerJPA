@@ -1,6 +1,6 @@
 package co.edu.icesi.tallerjpa.runableartefact.mapper;
 
-import co.edu.icesi.tallerjpa.runableartefact.dto.IcesiRoleDTO;
+import co.edu.icesi.tallerjpa.runableartefact.dto.request.IcesiRoleDTO;
 import co.edu.icesi.tallerjpa.runableartefact.model.IcesiRole;
 import org.mapstruct.Mapper;
 
