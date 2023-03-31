@@ -8,6 +8,7 @@ import co.com.icesi.TallerJPA.repository.RoleRepository;
 import lombok.AllArgsConstructor;
 import org.springframework.stereotype.Service;
 
+import java.util.List;
 import java.util.UUID;
 
 @Service
@@ -24,5 +25,13 @@ public class RoleService {
         IcesiRole icesiRole = roleMapper.fromIcesiRoleDTO(role);
         icesiRole.setRoleId(UUID.randomUUID());
         return roleRepository.save(icesiRole);
+    }
+
+    public IcesiRole getRoleByName(String roleName) {
+        return roleRepository.returnRole(roleName).orElse(null);
+    }
+
+    public List<IcesiRole> getAllRoles() {
+        return roleRepository.findAll();
     }
 }

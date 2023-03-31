@@ -2,11 +2,13 @@ package co.com.icesi.TallerJPA.service;
 
 import co.com.icesi.TallerJPA.Enum.AccountType;
 import co.com.icesi.TallerJPA.dto.AccountCreateDTO;
+import co.com.icesi.TallerJPA.dto.TransactionOperationDTO;
 import co.com.icesi.TallerJPA.dto.response.AccountResponseDTO;
 import co.com.icesi.TallerJPA.exception.ArgumentsException;
 import co.com.icesi.TallerJPA.mapper.AccountMapper;
 import co.com.icesi.TallerJPA.mapper.responseMapper.AccountResponseMapper;
 import co.com.icesi.TallerJPA.model.IcesiAccount;
+import co.com.icesi.TallerJPA.model.IcesiUser;
 import co.com.icesi.TallerJPA.repository.AccountRepository;
 import co.com.icesi.TallerJPA.repository.UserRepository;
 import lombok.AllArgsConstructor;
@@ -14,6 +16,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 
+import java.util.List;
 import java.util.Random;
 import java.util.UUID;
 import java.util.stream.Collectors;
@@ -21,6 +24,7 @@ import java.util.stream.IntStream;
 
 @Service
 @AllArgsConstructor
+
 public class AccountService {
     private final AccountRepository accountRepository;
     private final UserRepository userRepository;
@@ -28,103 +32,130 @@ public class AccountService {
     private final AccountResponseMapper accountResponseMapper;
 
     public AccountResponseDTO save(AccountCreateDTO account){
-        String accountNumber = generateAccountNumber();
         if (account.getBalance()<0){
-            throw new ArgumentsException("Balance can't be negative");
+            throw new RuntimeException("Balance can't be negative");
         }
-        setAccountType(account);
+
+        IcesiUser user = userRepository.findUserByEmail(account.getUser()).orElseThrow(() -> new RuntimeException("User not found"));
+
         IcesiAccount icesiAccount = accountMapper.fromIcesiAccountDTO(account);
-        icesiAccount.setUser(userRepository.findUserByEmail(account.getUser()).orElseThrow(() -> new RuntimeException("User not found")));
-        icesiAccount.setAccountNumber(accountNumber);
         icesiAccount.setAccountId(UUID.randomUUID());
+        icesiAccount.setAccountNumber(validateAccountNumber(generateAccountNumber()));
+        icesiAccount.setActive(true);
+        icesiAccount.setUser(user);
+
         return accountResponseMapper.fromIcesiAccount(accountRepository.save(icesiAccount));
 
     }
-    public String generateAccountNumber(){
+
+    public IcesiAccount getAccountByAccountNumber(String accountNumber){
+        return accountRepository.findAccount(accountNumber)
+                .orElseThrow(()-> new RuntimeException("Account not found"));
+    }
+
+    private void validateAccountBalance(IcesiAccount account, long amount){
+        if (account.getBalance()<amount){
+            throw new RuntimeException("Insufficient funds: "+account.getBalance());
+        }
+    }
+
+    private void validateAccountState(IcesiAccount account){
+        if (!account.isActive()){
+            throw new RuntimeException("The account "+ account.getAccountNumber()+" is disabled");
+        }
+    }
+
+    private void validaAccountType(IcesiAccount account){
+        if (account.getType() == AccountType.DEPOSIT_ONLY){
+            throw new RuntimeException("The account "+ account.getAccountNumber()+" is deposit only");
+        }
+    }
+    @Transactional
+    public String enableAccount(String accountNumber){
+        IcesiAccount account = getAccountByAccountNumber(accountNumber);
+        account.setActive(true);
+        accountRepository.updateState(accountNumber,true);
+        return "The account is enabled";
+    }
+
+    @Transactional
+    public String disableAccount(String accountNumber){
+        IcesiAccount account = getAccountByAccountNumber(accountNumber);
+        account.setActive(false);
+        accountRepository.updateState(accountNumber,false);
+        return "The account was disabled";
+
+    }
+
+    @Transactional
+    public TransactionOperationDTO withdraw(TransactionOperationDTO transaction){
+        IcesiAccount account = getAccountByAccountNumber(transaction.getAccountFrom());
+        validateAccountBalance(account,transaction.getAmount());
+        validateAccountState(account);
+        validaAccountType(account);
+        account.setBalance(account.getBalance()-transaction.getAmount());
+        accountRepository.updateAccount(account.getAccountNumber(), account.getBalance());
+        transaction.setResult("Withdraw successful");
+        return accountResponseMapper.fromTransactionOperationDTO(transaction);
+    }
+
+    @Transactional
+    public TransactionOperationDTO deposit(TransactionOperationDTO transaction){
+        IcesiAccount account = getAccountByAccountNumber(transaction.getAccountTo());
+        validateAccountState(account);
+        validaAccountType(account);
+        account.setBalance(account.getBalance() + transaction.getAmount());
+        accountRepository.updateAccount(account.getAccountNumber(), account.getBalance());
+        transaction.setResult("Deposit successful");
+        return accountResponseMapper.fromTransactionOperationDTO(transaction);
+    }
+
+    @Transactional
+    public TransactionOperationDTO transfer(TransactionOperationDTO transaction){
+        IcesiAccount accountOrigin = getAccountByAccountNumber(transaction.getAccountFrom());
+        IcesiAccount accountDestination = getAccountByAccountNumber(transaction.getAccountTo());
+        validaAccountType(accountOrigin);
+        validaAccountType(accountDestination);
+        validateAccountState(accountOrigin);
+        validateAccountState(accountDestination);
+        validateAccountBalance(accountOrigin,transaction.getAmount());
+
+        accountOrigin.setBalance(accountOrigin.getBalance()-transaction.getAmount());
+        accountDestination.setBalance(accountDestination.getBalance()+transaction.getAmount());
+
+        accountRepository.updateAccount(accountOrigin.getAccountNumber(), accountOrigin.getBalance());
+        accountRepository.updateAccount(accountDestination.getAccountNumber(), accountDestination.getBalance());
+
+        transaction.setResult("Transfer successful");
+
+        return accountResponseMapper.fromTransactionOperationDTO(transaction);
+    }
+
+    public AccountResponseDTO getAccountByNumber(String accountNumber){
+        return accountResponseMapper.fromIcesiAccount(getAccountByAccountNumber(accountNumber));
+    }
+
+    public List<AccountResponseDTO> getAllAccounts(){
+        List<IcesiAccount> accounts = accountRepository.findAll();
+        return accounts.stream().map(accountResponseMapper::fromIcesiAccount).collect(Collectors.toList());
+    }
+
+    private String validateAccountNumber(String accountNumber){
+        if(accountRepository.findByAccountNumber(accountNumber)){
+            return validateAccountNumber(generateAccountNumber());
+        }
+        return accountNumber;
+    }
+
+    private String generateAccountNumber(){
         Random random = new Random();
+
         IntStream stream = random.ints(11,0, 10);
+
         String formattedStream = stream.mapToObj(String::valueOf).collect(Collectors.joining());
-        String account = String.format("%s-%s-%s", formattedStream.substring(0, 3),
+        return String.format("%s-%s-%s", formattedStream.substring(0, 3),
                 formattedStream.substring(3, 9),
                 formattedStream.substring(9, 11));
-
-        boolean exist = accountRepository.findByAccountNumber(account);
-        if (exist){
-            return generateAccountNumber();
-        }
-        return account;
-    }
-
-    private void setAccountType(AccountCreateDTO account){
-        if(account.getType().equals("deposit only")){
-            account.setType(AccountType.DEPOSIT_ONLY.name());
-        }
-    }
-
-    public IcesiAccount findAccountByAccountNumber(String accountNumber){
-        return accountRepository.findAccount(accountNumber).orElseThrow(()-> new RuntimeException("Account not found"));
-    }
-
-    @Transactional
-    public String changeState(String accountNumber){
-        IcesiAccount account = findAccountByAccountNumber(accountNumber);
-        if (account.getBalance()==0){
-            accountRepository.updateState(accountNumber);
-        }else{
-            return "The account can't be deactivated because it has money";
-        }
-        return "Account state changed";
-    }
-
-    @Transactional
-    public String withdraw(String accountNumber, long amount){
-        IcesiAccount account = findAccountByAccountNumber(accountNumber);
-        if ( account.isActive() && account.getBalance()>=amount){
-            //account.setBalance(account.getBalance()-amount);
-            accountRepository.updateAccount(accountNumber, account.getBalance()-amount);
-            return "Withdrawal successful";
-        }else if (!account.isActive()){
-            throw new ArgumentsException("Account must be active to withdraw money");
-
-        }else{
-            throw new ArgumentsException("Insufficient funds");
-        }
-    }
-
-    @Transactional
-    public String deposit(String accountNumber, long amount){
-        IcesiAccount account = findAccountByAccountNumber(accountNumber);
-        if (account.isActive()){
-            //account.setBalance(account.getBalance()+amount);
-            accountRepository.updateAccount(accountNumber, account.getBalance()+amount);
-        }else{
-            throw new ArgumentsException("Account must be active to deposit money");
-        }
-        return "Deposit successful";
-    }
-
-    @Transactional
-    public String transferMoney(String accountNumberOrigin, String accountNumberDestination, long amount){
-        IcesiAccount accountOrigin = findAccountByAccountNumber(accountNumberOrigin);
-        IcesiAccount accountDestination = findAccountByAccountNumber(accountNumberDestination);
-
-        if(accountOrigin.getType().equals(AccountType.DEPOSIT_ONLY.name()) || accountDestination.getType().equals(AccountType.DEPOSIT_ONLY.name())){
-            throw new ArgumentsException("Accounts marked as deposit only can't transfer or be transferred money, only withdrawal and deposit");
-        }
-        if(!accountOrigin.isActive() || !accountDestination.isActive()){
-            throw new ArgumentsException("Accounts must be active to transfer money");
-        }
-
-
-        if (accountOrigin.getBalance()>=amount){
-            //accountOrigin.setBalance(accountOrigin.getBalance()-amount);
-            //accountDestination.setBalance(accountDestination.getBalance()+amount);
-            accountRepository.updateAccount(accountNumberOrigin, accountOrigin.getBalance()-amount);
-            accountRepository.updateAccount(accountNumberDestination, accountDestination.getBalance()+amount);
-            return "Transfer successful";
-        }else{
-            throw new ArgumentsException("Insufficient funds");
-        }
     }
 
 

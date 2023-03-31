@@ -11,6 +11,7 @@ import co.com.icesi.TallerJPA.repository.UserRepository;
 import lombok.AllArgsConstructor;
 import org.springframework.stereotype.Service;
 
+import java.util.List;
 import java.util.UUID;
 
 @Service
@@ -47,5 +48,15 @@ public class UserService {
         userResponseDTO.setUserId(icesiUser.getUserId());
 
         return userResponseDTO;
+    }
+
+    public UserResponseDTO getUserByEmail(String userEmail) {
+        return userResponseMapper.fromICesiUSer(userRepository.findUserByEmail(userEmail).orElseThrow(() -> new RuntimeException("User not found")));
+    }
+
+    public List<UserResponseDTO> getAllUsers() {
+        List<IcesiUser> users = userRepository.findAll();
+
+        return users.stream().map(userResponseMapper::fromICesiUSer).toList();
     }
 }

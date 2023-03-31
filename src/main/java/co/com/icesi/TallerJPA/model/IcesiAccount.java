@@ -1,5 +1,6 @@
 package co.com.icesi.TallerJPA.model;
 
+import co.com.icesi.TallerJPA.Enum.AccountType;
 import lombok.*;
 
 import javax.persistence.*;
@@ -14,8 +15,8 @@ public class IcesiAccount {
     @Id
     private UUID accountId;
     private String accountNumber;
-    private long balance;
-    private String type;
+    private Long balance;
+    private AccountType type;
     private boolean active;
 
     //Muchas cuentas pertenecen a un solo usuario

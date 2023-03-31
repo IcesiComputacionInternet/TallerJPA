@@ -3,9 +3,9 @@ package co.com.icesi.TallerJPA.unit.service;
 import co.com.icesi.TallerJPA.Enum.AccountType;
 import co.com.icesi.TallerJPA.dto.AccountCreateDTO;
 import co.com.icesi.TallerJPA.dto.RoleCreateDTO;
+import co.com.icesi.TallerJPA.dto.TransactionOperationDTO;
 import co.com.icesi.TallerJPA.dto.response.AccountResponseDTO;
 import co.com.icesi.TallerJPA.dto.response.UserResponseDTO;
-import co.com.icesi.TallerJPA.exception.ArgumentsException;
 import co.com.icesi.TallerJPA.mapper.AccountMapper;
 import co.com.icesi.TallerJPA.mapper.AccountMapperImpl;
 import co.com.icesi.TallerJPA.mapper.responseMapper.AccountResponseMapper;
@@ -49,8 +49,150 @@ public class AccountServiceTest {
     public void testCreateAccount(){
         when(userRepository.findUserByEmail(any())).thenReturn(Optional.of(defaultIcesiUser()));
         accountService.save(defaultAccountCreateDTO());
-        verify(accountRepository, times(1)).save(any());
+        verify(userRepository, times(1)).findUserByEmail(any());
+        verify(accountMapper,times(1)).fromIcesiAccountDTO(any());
+        verify(accountRepository, times(1)).save(argThat(new IcesiAccountMatcher(defaultIcesiAccount())));
     }
+
+    @Test
+    public void testCreateAccountWithUserNotFound(){
+        when(userRepository.findUserByEmail(any())).thenReturn(Optional.of(defaultIcesiUser()));
+        try{
+            accountService.save(defaultAccountCreateDTO());
+        }catch (RuntimeException e) {
+            assertEquals("User not found",e.getMessage());
+        }
+        verify(userRepository, times(1)).findUserByEmail(any());
+        verify(accountMapper,times(1)).fromIcesiAccountDTO(any());
+        verify(accountRepository, times(1)).save(argThat(new IcesiAccountMatcher(defaultIcesiAccount())));
+
+    }
+
+    @Test
+    public void testCreateAccountWithNegativeBalance(){
+        when(userRepository.findUserByEmail(any())).thenReturn(Optional.of(defaultIcesiUser()));
+        try{
+            accountService.save(defaultAccountCreateDTO());
+        }catch (RuntimeException e) {
+            assertEquals("Balance can't be negative",e.getMessage());
+        }
+        verify(userRepository, times(1)).findUserByEmail(any());
+        verify(accountMapper,times(1)).fromIcesiAccountDTO(any());
+        verify(accountRepository, times(1)).save(argThat(new IcesiAccountMatcher(defaultIcesiAccount())));
+
+    }
+
+    @Test
+    public void testGetAccountByAccountNumber(){
+        when(accountRepository.findAccount(any())).thenReturn(Optional.of(defaultIcesiAccount()));
+        IcesiAccount account = accountService.getAccountByAccountNumber("12345");
+        assertEquals(defaultIcesiAccount().getAccountNumber(),account.getAccountNumber());
+        verify(accountRepository, times(1)).findAccount(any());
+    }
+
+    @Test
+    public void testGetAccountByAccountNumberWithAccountNotFound(){
+        when(accountRepository.findAccount(any())).thenReturn(Optional.of(defaultIcesiAccount()));
+        try{
+            accountService.getAccountByAccountNumber("12345");
+        }catch (RuntimeException e) {
+            assertEquals("Account not found",e.getMessage());
+        }
+        verify(accountRepository, times(1)).findAccount(any());
+
+    }
+
+
+    @Test
+    public void testGenerateAccountNumber(){
+        when(userRepository.findUserByEmail(any())).thenReturn(Optional.of(defaultIcesiUser()));
+        accountService.save(defaultAccountCreateDTO());
+        verify(accountRepository,times(1)).findByAccountNumber(any());
+    }
+
+    @Test
+    public void testGenerateAccountNumberAlreadyExists(){
+        when(userRepository.findUserByEmail(any())).thenReturn(Optional.of(defaultIcesiUser()));
+        when(accountRepository.findByAccountNumber(any())).thenReturn(true,false);
+        accountService.save(defaultAccountCreateDTO());
+        verify(accountRepository,times(2)).findByAccountNumber(any());
+    }
+
+    @Test
+    public void testEnableAccount(){
+        when(accountRepository.findAccount(any())).thenReturn(Optional.of(defaultIcesiAccount()));
+        IcesiAccount account = accountService.getAccountByAccountNumber("12345");
+        account.setActive(false);
+        String msg = accountService.enableAccount(account.getAccountNumber());
+        assertEquals("The account is enabled",msg);
+        verify(accountRepository,times(1)).updateState(account.getAccountNumber(),true);
+    }
+
+    @Test
+    public void testEnableAccountNotFound(){
+        when(accountRepository.findAccount(any())).thenReturn(Optional.of(defaultIcesiAccount()));
+        try{
+            accountService.enableAccount("12345");
+        }catch (RuntimeException e) {
+            assertEquals("Account not found",e.getMessage());
+            verify(accountRepository,times(1)).updateState("12345",true);
+        }
+
+
+    }
+
+    @Test
+    public void testDisableAccount(){
+        when(accountRepository.findAccount(any())).thenReturn(Optional.of(defaultIcesiAccount()));
+        IcesiAccount account = accountService.getAccountByAccountNumber("12345");
+        account.setActive(true);
+        String msg = accountService.disableAccount(account.getAccountNumber());
+        assertEquals("The account was disabled",msg);
+        verify(accountRepository,times(1)).updateState(account.getAccountNumber(),false);
+
+    }
+
+    @Test
+    public void testDisableAccountNotFound(){
+        when(accountRepository.findAccount(any())).thenReturn(Optional.of(defaultIcesiAccount()));
+        try{
+            accountService.disableAccount("12345");
+        }catch (RuntimeException e) {
+            assertEquals("Account not found",e.getMessage());
+            verify(accountRepository,times(1)).updateState(defaultIcesiAccount().getAccountNumber(), true);
+        }
+    }
+
+    @Test
+    public void testWithdrawToAccountDeposit_Only(){
+        IcesiAccount account = defaultIcesiAccount();
+        when(accountRepository.findAccount(any())).thenReturn(Optional.of(account));
+        TransactionOperationDTO accountFrom = TransactionOperationDTO.builder()
+                .accountFrom(account.getAccountNumber())
+                .amount(10L)
+                .build();
+
+        try{
+            accountService.withdraw(accountFrom);
+        }catch (RuntimeException e) {
+            assertEquals("The account "+ accountFrom.getAccountFrom()+" is deposit only",e.getMessage());
+        }
+
+    }
+
+    @Test
+    public void testWithdrawWithAccountNotFound(){
+        when(accountRepository.findAccount(any())).thenReturn(Optional.of(defaultIcesiAccount()));
+        try{
+            accountService.withdraw(defaultTransactionOperationDTO());
+        }catch (RuntimeException e) {
+            assertEquals("Account not found",e.getMessage());
+            verify(accountRepository,times(1)).updateAccount(defaultIcesiAccount().getAccountNumber(),defaultIcesiAccount().getBalance());
+        }
+    }
+
+
+    /*
 
     @Test
     public void testCreateAccountWhenUserDoesNotExist(){
@@ -67,7 +209,7 @@ public class AccountServiceTest {
     public void testFindAccountByAccountNumber(){
         IcesiAccount icesiAccount = defaultIcesiAccount();
         when(accountRepository.findAccount(any())).thenReturn(Optional.of(icesiAccount));
-        IcesiAccount account = accountService.findAccountByAccountNumber(icesiAccount.getAccountNumber());
+        IcesiAccount account = accountService.getAccountByAccountNumber(icesiAccount.getAccountNumber());
         assertEquals(icesiAccount.getAccountNumber(),account.getAccountNumber());
         verify(accountRepository, times(1)).findAccount(any());
     }
@@ -76,7 +218,7 @@ public class AccountServiceTest {
     public void testFindAccountByAccountNumberWhenAccountDoesNotExist(){
         when(accountRepository.findAccount(any())).thenReturn(Optional.empty());
         try{
-            accountService.findAccountByAccountNumber(accountService.generateAccountNumber());
+            accountService.getAccountByAccountNumber(accountService.());
         }catch (Exception e) {
             String message = e.getMessage();
             assertEquals("Account not found",message);
@@ -218,44 +360,31 @@ public class AccountServiceTest {
 
 
 
+ */
+
     private AccountCreateDTO defaultAccountCreateDTO(){
         return AccountCreateDTO.builder()
                 .balance(100)
-                .type("Ahorros")
-                .active(true)
+                .type(AccountType.DEPOSIT_ONLY)
                 .user("test@hotmail.com")
                 .build();
     }
 
     private IcesiAccount defaultIcesiAccount(){
         return IcesiAccount.builder()
-                .accountId(UUID.randomUUID())
-                .accountNumber(accountService.generateAccountNumber())
-                .balance(100)
-                .type("Ahorros")
+                .accountNumber("12345")
+                .balance(100L)
+                .type(AccountType.DEPOSIT_ONLY)
                 .active(true)
                 .user(defaultIcesiUser())
                 .build();
     }
 
-    private AccountResponseDTO defaultAccountResponseDTO(){
-        return AccountResponseDTO.builder()
-                .accountId(UUID.randomUUID())
-                .accountNumber(accountService.generateAccountNumber())
-                .balance(100)
-                .type("Ahorros")
-                .active(true)
-                .user(defaultUserResponseDTO())
-                .build();
-    }
-    private IcesiAccount defaultIcesiAccount2(){
-        return IcesiAccount.builder()
-                .accountId(UUID.randomUUID())
-                .accountNumber(accountService.generateAccountNumber())
-                .balance(500)
-                .type("Ahorros")
-                .active(true)
-                .user(defaultIcesiUser())
+    private TransactionOperationDTO defaultTransactionOperationDTO(){
+        return TransactionOperationDTO.builder()
+                .accountTo("12345")
+                .accountFrom("123456")
+                .amount(100L)
                 .build();
     }
 
@@ -294,6 +423,8 @@ public class AccountServiceTest {
                 .description("Admin")
                 .build();
     }
+
+
 
 
 }

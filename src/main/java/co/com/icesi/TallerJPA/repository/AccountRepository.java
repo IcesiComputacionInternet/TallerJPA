@@ -22,6 +22,6 @@ public interface AccountRepository extends JpaRepository<IcesiAccount, UUID> {
     void updateAccount(String accountNumber,Long balance);
 
     @Modifying
-    @Query(value = "UPDATE IcesiAccount a SET a.active = CASE WHEN a.balance>0 THEN true ELSE false END WHERE a.accountNumber = :accountNumber")
-    void updateState(String accountNumber);
+    @Query(value = "UPDATE IcesiAccount a SET a.active = :state WHERE a.accountNumber = :accountNumber")
+    void updateState(String accountNumber,boolean state);
 }

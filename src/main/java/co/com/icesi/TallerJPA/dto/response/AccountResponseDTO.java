@@ -1,5 +1,6 @@
 package co.com.icesi.TallerJPA.dto.response;
 
+import co.com.icesi.TallerJPA.Enum.AccountType;
 import lombok.Builder;
 import lombok.Data;
 
@@ -10,7 +11,7 @@ public class AccountResponseDTO {
     private UUID accountId;
     private String accountNumber;
     private long balance;
-    private String type;
+    private AccountType type;
     private boolean active;
     private UserResponseDTO user;
 
