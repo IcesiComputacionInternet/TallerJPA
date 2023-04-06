@@ -8,7 +8,7 @@ import co.edu.icesi.demo.model.IcesiUser;
 import co.edu.icesi.demo.repository.RoleRepository;
 import co.edu.icesi.demo.repository.UserRepository;
 import co.edu.icesi.demo.service.UserService;
-import co.edu.icesi.demo.unit.service.matcher.IcesiUserMatcher;
+import co.edu.icesi.demo.unit.matcher.IcesiUserMatcher;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 

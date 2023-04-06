@@ -6,7 +6,7 @@ import co.edu.icesi.demo.mapper.RoleMapperImpl;
 import co.edu.icesi.demo.model.IcesiRole;
 import co.edu.icesi.demo.repository.RoleRepository;
 import co.edu.icesi.demo.service.RoleService;
-import co.edu.icesi.demo.unit.service.matcher.IcesiRoleMatcher;
+import co.edu.icesi.demo.unit.matcher.IcesiRoleMatcher;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 

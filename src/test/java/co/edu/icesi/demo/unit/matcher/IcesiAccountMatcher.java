@@ -1,4 +1,4 @@
-package co.edu.icesi.demo.unit.service.matcher;
+package co.edu.icesi.demo.unit.matcher;
 
 import co.edu.icesi.demo.model.IcesiAccount;
 import org.mockito.ArgumentMatcher;

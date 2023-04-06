@@ -10,7 +10,7 @@ import co.edu.icesi.demo.model.IcesiUser;
 import co.edu.icesi.demo.repository.AccountRepository;
 import co.edu.icesi.demo.repository.UserRepository;
 import co.edu.icesi.demo.service.AccountService;
-import co.edu.icesi.demo.unit.service.matcher.IcesiAccountMatcher;
+import co.edu.icesi.demo.unit.matcher.IcesiAccountMatcher;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 
