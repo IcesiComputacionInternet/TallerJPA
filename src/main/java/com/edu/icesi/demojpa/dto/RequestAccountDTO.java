@@ -5,9 +5,10 @@ import lombok.Data;
 
 @Data
 @Builder
-public class AccountCreateDTO {
+public class RequestAccountDTO {
     private long balance;
     private String type;
     private boolean active;
     private String icesiUserId;
+    private String accountNumber;
 }

@@ -12,10 +12,10 @@ import java.util.UUID;
 public interface UserRepository extends JpaRepository<IcesiUser, UUID> {
 
     @Query("SELECT user FROM IcesiUser user WHERE user.email = :email")
-    Optional<IcesiUser> findUserByEmail(String email);
+    Optional<IcesiUser> isEmailInUse(String email);
 
     @Query("SELECT user FROM IcesiUser user WHERE user.phoneNumber = :phoneNumber")
-    Optional<IcesiUser> finUserByPhoneNumber(String phoneNumber);
+    Optional<IcesiUser> isPhoneNumberInUse(String phoneNumber);
 
     @Query("SELECT user FROM IcesiUser user WHERE user.id = :id")
     Optional<IcesiUser> findUserById(String id);

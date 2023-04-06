@@ -1,14 +1,11 @@
 package com.edu.icesi.demojpa.unit.service.Test;
 
-import com.edu.icesi.demojpa.dto.RoleCreateDTO;
+import com.edu.icesi.demojpa.dto.RoleDTO;
 import com.edu.icesi.demojpa.mapper.RoleMapper;
 import com.edu.icesi.demojpa.mapper.RoleMapperImpl;
-import com.edu.icesi.demojpa.mapper.UserMapperImpl;
 import com.edu.icesi.demojpa.model.IcesiRole;
 import com.edu.icesi.demojpa.repository.RoleRepository;
-import com.edu.icesi.demojpa.repository.UserRepository;
 import com.edu.icesi.demojpa.service.RoleService;
-import com.edu.icesi.demojpa.service.UserService;
 import com.edu.icesi.demojpa.unit.service.Matcher.IcesiRoleMatcher;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -34,6 +31,7 @@ public class RoleServiceTest {
     public void testCreateRole(){
         IcesiRole icesiRole = roleService.save(defaultRoleDTO());
         IcesiRole icesiRoleToCompare = defaultIcesiRole();
+        verify(roleMapper, times(1)).fromIcesiRoleDTO(any());
         verify(roleRepository, times(1)).save(argThat(new IcesiRoleMatcher(icesiRoleToCompare)));
     }
 
@@ -44,7 +42,7 @@ public class RoleServiceTest {
             roleService.save(defaultRoleDTO());
         }catch (RuntimeException exception){
             String message = exception.getMessage();
-            assertEquals("The name is already in use", message);
+            assertEquals("This role is already in use", message);
         }
     }
 
@@ -55,8 +53,8 @@ public class RoleServiceTest {
                 .build();
     }
 
-    private RoleCreateDTO defaultRoleDTO(){
-        return RoleCreateDTO.builder()
+    private RoleDTO defaultRoleDTO(){
+        return RoleDTO.builder()
                 .name("Student")
                 .description("Loreno Insomnio, nunca supe como se dice")
                 .build();

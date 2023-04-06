@@ -5,7 +5,7 @@ import lombok.Data;
 
 @Data
 @Builder
-public class RoleCreateDTO {
+public class RoleDTO {
     private String description;
     private String name;
 }

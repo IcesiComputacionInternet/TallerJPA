@@ -1,6 +1,6 @@
 package com.edu.icesi.demojpa.service;
 
-import com.edu.icesi.demojpa.dto.UserCreateDTO;
+import com.edu.icesi.demojpa.dto.RequestUserDTO;
 import com.edu.icesi.demojpa.mapper.UserMapper;
 import com.edu.icesi.demojpa.model.IcesiRole;
 import com.edu.icesi.demojpa.model.IcesiUser;
@@ -9,9 +9,9 @@ import com.edu.icesi.demojpa.repository.UserRepository;
 import lombok.AllArgsConstructor;
 import org.springframework.stereotype.Service;
 
-import java.util.Optional;
+import java.util.ArrayList;
+import java.util.List;
 import java.util.UUID;
-import java.util.function.Predicate;
 
 @Service
 @AllArgsConstructor
@@ -20,63 +20,28 @@ public class UserService {
     private final RoleRepository roleRepository;
     private final UserMapper userMapper;
 
-    public IcesiUser save(UserCreateDTO user){
-        verifyFields(user);
-        IcesiUser icesiUser = userMapper.fromIcesiUserDTO(user);
-        icesiUser.setUserId(idGenerator());
-        icesiUser.setRole(findRole(user.getRoleType()));
-        return userRepository.save(icesiUser);
-    }
+    public IcesiUser save(RequestUserDTO user){
+        boolean emailInUse = userRepository.isEmailInUse(user.getEmail()).isPresent();
+        boolean phoneNumberInUse = userRepository.isPhoneNumberInUse(user.getPhoneNumber()).isPresent();
+        IcesiRole role = roleRepository.findRoleByName(user.getRoleType()).orElseThrow(() -> new RuntimeException("The role "+ user.getRoleType() +" doesn't exist"));
 
-    public void verifyFields(UserCreateDTO user){
-        String email = user.getEmail();
-        String phoneNumber = user.getPhoneNumber();
-        String role = user.getRoleType();
-        boolean emailIsUsed = isEmailInUse().test(email);
-        boolean phoneNumberIsUsed = isPhoneNumberInUse().test(phoneNumber);
-        boolean roleDontExists = isInvalidRole().test(role);
+        List<RuntimeException> errors = new ArrayList<>();
 
-        if(emailIsUsed && phoneNumberIsUsed){
-            fieldsAreRepeatedException("email", "phone-number");
-        } else if(emailIsUsed) {
-            fieldIsRepeatedException("email");
-        } else if(phoneNumberIsUsed){
-            fieldIsRepeatedException("phone-number");
-        } else if(roleDontExists) {
-            invalidRoleException(role);
+        if(emailInUse){
+            errors.add(new RuntimeException("The email is already in use"));
         }
-    }
 
-    public IcesiRole findRole(String roleName){
-        Optional<IcesiRole> icesiRole = roleRepository.findRoleByName(roleName);
-        return icesiRole.orElseThrow(() -> new RuntimeException("The role doesn't exist"));
-    }
+        if(phoneNumberInUse){
+            errors.add(new RuntimeException("The phone-number is already in use"));
+        }
 
-    public UUID idGenerator(){
-        return UUID.randomUUID();
-    }
+        if (!errors.isEmpty()){
+            errors.stream().map(RuntimeException::getMessage).forEach(System.out::println);
+        }
 
-    public Predicate<String> isEmailInUse(){
-        return (email) -> userRepository.findUserByEmail(email).isPresent();
-    }
-
-    public Predicate<String> isPhoneNumberInUse(){
-        return (phoneNumber) -> userRepository.finUserByPhoneNumber(phoneNumber).isPresent();
-    }
-
-    public Predicate<String> isInvalidRole(){
-        return (role) -> roleRepository.findRoleByName(role).isEmpty();
-    }
-
-    private void fieldsAreRepeatedException(String firstField, String secondField) {
-        throw new RuntimeException("The "+firstField+" and "+secondField+" are already in use");
-    }
-
-    private void fieldIsRepeatedException(String field) {
-        throw new RuntimeException("The "+field+" is already in use");
-    }
-
-    private void invalidRoleException(String role){
-        throw new RuntimeException("The role with name "+role+" doesn't exist");
+        IcesiUser icesiUser = userMapper.fromIcesiUserDTO(user);
+        icesiUser.setUserId(UUID.randomUUID());
+        icesiUser.setRole(role);
+        return userRepository.save(icesiUser);
     }
 }
