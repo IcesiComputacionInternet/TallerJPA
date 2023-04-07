@@ -1,6 +1,7 @@
 package co.com.icesi.TallerJPA.service;
 
 import co.com.icesi.TallerJPA.dto.IcesiUserCreateDTO;
+import co.com.icesi.TallerJPA.dto.responseDTO.IcesiUserCreateResponseDTO;
 import co.com.icesi.TallerJPA.mapper.IcesiUserMapper;
 import co.com.icesi.TallerJPA.model.IcesiRole;
 import co.com.icesi.TallerJPA.model.IcesiUser;
@@ -9,47 +10,34 @@ import co.com.icesi.TallerJPA.repository.IcesiUserRepository;
 import lombok.AllArgsConstructor;
 import org.springframework.stereotype.Service;
 
-import java.util.ArrayList;
-import java.util.Optional;
 import java.util.UUID;
 
 @Service
 @AllArgsConstructor
 public class IcesiUserService {
-    private final IcesiUserRepository iur;
-    private final IcesiRoleRepository irr;
-    private final IcesiUserMapper im;
+    private final IcesiUserRepository userRepository;
+    private final IcesiRoleRepository roleRepository;
+    private final IcesiUserMapper userMapper;
 
-    public IcesiUser save(IcesiUserCreateDTO userDTO) {
-        validateEmailAndPhoneNumber(userDTO);
-        validateRole(userDTO);
-
-        IcesiRole ir = irr.findByRoleName(userDTO.getRole().getName())
-                .orElseThrow(() -> new RuntimeException("Not exist this user role in the database"));
-
-        IcesiUser iu = im.fromIcesiUserCreateDTO(userDTO);
-        iu.setRole(ir);
-        iu.setUserId(UUID.randomUUID());
-        iu.setAccounts(new ArrayList<>());
-        ir.getUsers().add(iu);
-
-        return iur.save(iu);
-    }
-    public void validateEmailAndPhoneNumber(IcesiUserCreateDTO userDTO){
-        boolean emailExists = iur.findByEmail(userDTO.getEmail()).isPresent();
-        boolean phoneExists = iur.findByPhoneNumber(userDTO.getPhoneNumber()).isPresent();
-
-        if(emailExists && phoneExists){
-            throw new RuntimeException("User email and phone number is already in use");
-        }else if (emailExists){
-            throw new RuntimeException("User email is already in use");
-        }else if(phoneExists){
-            throw new RuntimeException("User phone number is already in use");
+    public IcesiUserCreateResponseDTO save(IcesiUserCreateDTO userDTO){
+        if(userRepository.findByEmail(userDTO.getEmail()).isPresent() && userRepository.findByPhoneNumber(userDTO.getPhoneNumber()).isPresent()){
+            throw new RuntimeException("This user email "+userDTO.getEmail()+" and this phone number "+userDTO.getPhoneNumber()+" already exists in the database");
         }
-    }
-    public void validateRole(IcesiUserCreateDTO userDTO){
-        Optional.ofNullable(userDTO.getRole())
-                .orElseThrow(() -> new RuntimeException("user role is required to continue"));
+
+        else if (userRepository.findByEmail(userDTO.getEmail()).isPresent()){
+            throw new RuntimeException("This user email "+userDTO.getEmail()+" already exists in the database");
+        }
+
+        else if(userRepository.findByPhoneNumber(userDTO.getPhoneNumber()).isPresent()){
+            throw new RuntimeException("This user phone number "+userDTO.getPhoneNumber()+" already exists in the database");
+        }
+
+        IcesiRole role  = roleRepository.findByName(userDTO.getRole()).orElseThrow(() -> new RuntimeException("This role doesn't exist: "+userDTO.getRole()));
+
+        IcesiUser user = userMapper.fromIcesiUserDTO(userDTO);
+        user.setUserId(UUID.randomUUID());
+        user.setRole(role);
+        return userMapper.userToUserDTO(userRepository.save(user));
     }
 }
 

@@ -6,6 +6,6 @@ import org.mapstruct.Mapper;
 
 @Mapper(componentModel = "spring")
 public interface IcesiRoleMapper {
-    IcesiRole fromIcesiRoleCreateDTO(IcesiRoleCreateDTO icesiUserCreateDTO);
-    IcesiRoleCreateDTO fromIcesiRole(IcesiRole icesiRole);
+    IcesiRole fromIcesiRoleDTO(IcesiRoleCreateDTO icesiUserRoleDTO);
+    IcesiRoleCreateDTO fromIcesiRole(IcesiRole icesiUserRole);
 }

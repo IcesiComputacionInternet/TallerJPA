@@ -11,6 +11,5 @@ public class IcesiUserCreateDTO {
     private String email;
     private String phoneNumber;
     private String password;
-    //Referenciando el role con IcesiRoleCreateDTO, se asegura que los datos se mantengan consistentes y normalizados.
-    private IcesiRoleCreateDTO role;
+    private String role;
 }

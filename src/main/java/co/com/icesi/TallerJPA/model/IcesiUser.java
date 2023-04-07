@@ -15,11 +15,6 @@ import java.util.UUID;
 @AllArgsConstructor
 @NoArgsConstructor
 public class IcesiUser {
-    @OneToMany(mappedBy = "user")
-    private List<IcesiAccount> accounts;
-    @ManyToOne
-    @JoinColumn(name = "role_id")
-    private IcesiRole role;
     @Id
     private UUID userId;
     private String firstName;
@@ -27,4 +22,9 @@ public class IcesiUser {
     private String email;
     private String phoneNumber;
     private String password;
+    @OneToMany(mappedBy = "user")
+    private List<IcesiAccount> accounts;
+    @ManyToOne
+    @JoinColumn(name = "icesi_role_role_id")
+    private IcesiRole role;
 }

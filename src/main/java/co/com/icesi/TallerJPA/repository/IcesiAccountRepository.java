@@ -10,7 +10,6 @@ import java.util.UUID;
 
 @Repository
 public interface IcesiAccountRepository extends JpaRepository<IcesiAccount, UUID> {
-    Optional<IcesiAccount> findAccountByNumber(String accountNumber);
-    @Query("SELECT ic FROM IcesiAccount ic WHERE ic.accountNumber = :accountNumber")
-    Optional<IcesiAccount> findAccountByAccountNumber(String accountNumber);
+    @Query("SELECT account FROM IcesiAccount account WHERE account.accountNumber= :accountNumber AND account.active= :isActive")
+    Optional<IcesiAccount> findAccountByAccountNumber(String accountNumber, boolean isActive);
 }
