@@ -1,4 +1,4 @@
-package co.com.icesi.TallerJPA.unit.service;
+package co.com.icesi.TallerJPA.unit.service.matcher;
 
 import co.com.icesi.TallerJPA.model.IcesiUser;
 import org.mockito.ArgumentMatcher;
@@ -15,6 +15,7 @@ public class IcesiUserMatcher implements ArgumentMatcher<IcesiUser> {
     @Override
     public boolean matches(IcesiUser icesiUserRight) {
         return icesiUserRight.getUserId()!=null &&
+                icesiUserRight.getRole()!=null &&
                 Objects.equals(icesiUserRight.getFirstName(),icesiUserLeft.getFirstName()) &&
                 Objects.equals(icesiUserRight.getLastname(),icesiUserLeft.getLastname()) &&
                 Objects.equals(icesiUserRight.getPassword(),icesiUserLeft.getPassword()) &&

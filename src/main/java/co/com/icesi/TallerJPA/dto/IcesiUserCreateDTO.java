@@ -11,5 +11,5 @@ public class IcesiUserCreateDTO {
     private String email;
     private String phoneNumber;
     private String password;
-    private String role;
+    private IcesiRoleCreateDTO role;
 }

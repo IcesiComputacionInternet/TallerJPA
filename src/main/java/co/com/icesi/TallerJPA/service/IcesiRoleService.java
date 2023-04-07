@@ -7,6 +7,7 @@ import co.com.icesi.TallerJPA.repository.IcesiRoleRepository;
 import lombok.AllArgsConstructor;
 import org.springframework.stereotype.Service;
 
+import java.util.Optional;
 import java.util.UUID;
 
 @Service
@@ -16,8 +17,9 @@ public class IcesiRoleService {
     private final IcesiRoleMapper roleMapper;
 
     public IcesiRoleCreateDTO save(IcesiRoleCreateDTO roleDTO){
-        if(roleRepository.findByName(roleDTO.getName()).isPresent()){
-            throw new RuntimeException("Role name already exists in the database: "+roleDTO.getName());
+        Optional<IcesiRole> existingRole = roleRepository.findByName(roleDTO.getName());
+        if(existingRole.isPresent()){
+            throw new RuntimeException("Role name already exists in the database: "+ roleDTO.getName());
         }
         IcesiRole role = roleMapper.fromIcesiRoleDTO(roleDTO);
         role.setRoleId(UUID.randomUUID());

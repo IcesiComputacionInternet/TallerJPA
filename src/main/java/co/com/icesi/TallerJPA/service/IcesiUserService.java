@@ -32,8 +32,7 @@ public class IcesiUserService {
             throw new RuntimeException("This user phone number "+userDTO.getPhoneNumber()+" already exists in the database");
         }
 
-        IcesiRole role  = roleRepository.findByName(userDTO.getRole()).orElseThrow(() -> new RuntimeException("This role doesn't exist: "+userDTO.getRole()));
-
+        IcesiRole role  = roleRepository.findByName(userDTO.getRole().getName()).orElseThrow(() -> new RuntimeException("This role doesn't exist: "+userDTO.getRole()));
         IcesiUser user = userMapper.fromIcesiUserDTO(userDTO);
         user.setUserId(UUID.randomUUID());
         user.setRole(role);
