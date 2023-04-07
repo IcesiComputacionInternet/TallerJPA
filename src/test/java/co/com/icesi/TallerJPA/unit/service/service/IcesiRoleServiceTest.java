@@ -35,7 +35,7 @@ public class IcesiRoleServiceTest {
     }
 
     @Test
-    public void testCreateRoleWhenItExists(){
+    public void testCreateAnExistingRole(){
         when(roleRepository.findByName(any())).thenReturn(Optional.ofNullable(defaultRole()));
         try{
             roleService.save(defaultRoleDTO());
@@ -58,6 +58,5 @@ public class IcesiRoleServiceTest {
                 .description("prueba de la creación de un role")
                 .build();
     }
-
 }
 

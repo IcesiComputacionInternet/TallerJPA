@@ -18,7 +18,7 @@ public class IcesiUser {
     @Id
     private UUID userId;
     private String firstName;
-    private String lastname;
+    private String lastName;
     private String email;
     private String phoneNumber;
     private String password;
