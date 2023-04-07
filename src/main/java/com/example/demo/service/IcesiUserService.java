@@ -17,30 +17,30 @@ import lombok.AllArgsConstructor;
 public class IcesiUserService {
 
     private final IcesiUserRepository icesiUserRepository;
-
     private final IcesiUserMapper icesiUserMapper;
-
     private final IcesiRoleRepository icesiRoleRepository;
 
     public  ResponseIcesiUserDTO create(IcesiUserCreateDTO user) {
+
         Optional<IcesiUser> userWithEmail = icesiUserRepository.findByEmail(user.getEmail());
         Optional<IcesiUser> userWithPhone = icesiUserRepository.findByPhoneNumber(user.getPhoneNumber());
         
         if (userWithEmail.isPresent() && userWithPhone.isPresent()) {
             throw new RuntimeException("These email and phone number are already in use");
-        } else {
-            userWithEmail.ifPresent(u -> {
-                throw new RuntimeException("This email is already in use");
-            });
-            userWithPhone.ifPresent(u -> {
-                throw new RuntimeException("This phone number is already in use");
-            });
         }
-        IcesiRole icesiRole = icesiRoleRepository.findByName(user.getIcesiRole().getName()).orElseThrow(() -> new RuntimeException("This role is not present in the database"));
+
+        userWithEmail.ifPresent(u -> {throw new RuntimeException("This email is already in use");});
+        userWithPhone.ifPresent(u -> {throw new RuntimeException("This phone number is already in use");});
+        
+        IcesiRole icesiRole = icesiRoleRepository.findByName(user.getIcesiRole().getName())
+            .orElseThrow(() -> new RuntimeException("This role is not present in the database"));
         IcesiUser icesiUser = icesiUserMapper.fromIcesiUserDTO(user);
+
         icesiUser.setIcesiRole(icesiRole);
         icesiUser.setUserId(UUID.randomUUID());
-        return icesiUserMapper.fromIcesiUserToIcesiUserDTO(icesiUserRepository.save(icesiUser));
+
+        return icesiUserMapper.fromIcesiUserToIcesiUserCreateDTO(icesiUserRepository.save(icesiUser));
+
     }
 
 }

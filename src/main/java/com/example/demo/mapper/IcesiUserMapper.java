@@ -11,5 +11,5 @@ public interface IcesiUserMapper {
     
     IcesiUser fromIcesiUserDTO(IcesiUserCreateDTO userCreateDTO);
     IcesiUserCreateDTO fromIcesiUser(IcesiUser icesiUser);
-    ResponseIcesiUserDTO fromIcesiUserToIcesiUserDTO(IcesiUser icesiUser);
+    ResponseIcesiUserDTO fromIcesiUserToIcesiUserCreateDTO(IcesiUser icesiUser);
 }
