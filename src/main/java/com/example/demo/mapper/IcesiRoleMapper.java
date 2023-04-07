@@ -9,6 +9,6 @@ import com.example.demo.model.IcesiRole;
 @Mapper(componentModel = "spring")
 public interface IcesiRoleMapper {
     
-    IcesiRole fromIcesiRoleDTO(IcesiRoleCreateDTO icesiRoleCreateDTO);
+    IcesiRole fromIcesiRoleCreateDTO(IcesiRoleCreateDTO icesiRoleCreateDTO);
     IcesiRoleCreateDTO fromIcesiRole(IcesiRole icesiRole);
 }
