@@ -9,7 +9,7 @@ import com.example.demo.model.IcesiAccount;
 @Mapper(componentModel = "spring")
 public interface IcesiAccountMapper {
     
-    IcesiAccount fromIcesiAccountDTO(IcesiAccountCreateDTO IcesiAccountCreateDTO);
+    IcesiAccount fromIcesiAccountCreateDTO(IcesiAccountCreateDTO IcesiAccountCreateDTO);
     IcesiAccountCreateDTO fromIcesiAccount(IcesiAccount icesiAccount);
-    ResponseIcesiAccountDTO fromIcesiAcountToIcesiAccountDTO(IcesiAccount icesiAccount);
+    ResponseIcesiAccountDTO fromIcesiAcountToIcesiAccountCreateDTO(IcesiAccount icesiAccount);
 }

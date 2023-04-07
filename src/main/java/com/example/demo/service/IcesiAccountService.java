@@ -1,8 +1,10 @@
 package com.example.demo.service;
 
+import java.util.Optional;
 import java.util.Random;
 import java.util.UUID;
-import java.util.function.Supplier;
+import java.util.stream.Collectors;
+import java.util.stream.IntStream;
 
 import org.springframework.stereotype.Service;
 
@@ -11,6 +13,7 @@ import com.example.demo.DTO.ResponseIcesiAccountDTO;
 import com.example.demo.mapper.IcesiAccountMapper;
 import com.example.demo.model.IcesiAccount;
 import com.example.demo.model.IcesiUser;
+import com.example.demo.model.TypeIcesiAccount;
 import com.example.demo.repository.IcesiAccountRepository;
 import com.example.demo.repository.IcesiUserRepository;
 
@@ -27,41 +30,40 @@ public class IcesiAccountService {
     private final IcesiUserRepository icesiUserRepository;
 
     public ResponseIcesiAccountDTO create(IcesiAccountCreateDTO account) {
-        if(account.getBalance() < 0) {
-            throw new RuntimeException("The account balance cannot be negative");
-        }
-        IcesiAccount icesiAccount = IcesiAccountMapper.fromIcesiAccountDTO(account);
-        if(icesiAccountRepository.findByAccountNumber(icesiAccount.getAccountNumber()).isPresent()){
-            throw new RuntimeException("This account number is already in use");
-        }
-        IcesiUser icesiUser = icesiUserRepository.findByEmail(account.getIcesiUser().getEmail()).orElseThrow(() -> new RuntimeException("This icesi user is not present in the database "));
+        Optional<IcesiAccount> existingIcesiAccount = icesiAccountRepository.findByAccountNumber(account.getAccountNumber());
+
+        existingIcesiAccount.ifPresent(u -> {throw new RuntimeException("This account number is already in use");});
+        if(account.getBalance() < 0) {throw new RuntimeException("The account balance cannot be negative");}
+        IcesiUser icesiUser = icesiUserRepository.findByEmail(account.getIcesiUser().getEmail())
+            .orElseThrow(() -> new RuntimeException("This icesi user is not present in the database "));
+
+        IcesiAccount icesiAccount = IcesiAccountMapper.fromIcesiAccountCreateDTO(account);
+
         icesiAccount.setIcesiUser(icesiUser);
         icesiAccount.setAccountId(UUID.randomUUID());
         icesiAccount.setAccountNumber(generateAccountNumber());
-        return IcesiAccountMapper.fromIcesiAcountToIcesiAccountDTO(icesiAccountRepository.save(icesiAccount));
+        icesiAccount.setActive(true);
+
+        return IcesiAccountMapper.fromIcesiAcountToIcesiAccountCreateDTO(icesiAccountRepository.save(icesiAccount));
     }
 
+    /*The following method is used to generate a random account number whose format is XXX-XXXXXX-XX
+    where X is a random digit between 0 and 9*/
+    
     public static String generateAccountNumber() {
-        // Use a Supplier lambda function to generate random digits
-        Supplier<Integer> digitSupplier = () -> new Random().nextInt(10);
+        
+        //The following line creates a IntStream of 11 digits with values between 0(inclusive) and 10(exclusive)
+        IntStream intStream = new Random().ints(11,0,10); 
 
-        // Use StringBuilder to build the account number
-        StringBuilder accountNumberBuilder = new StringBuilder();
-        accountNumberBuilder.append(generateDigits(digitSupplier, 3));
-        accountNumberBuilder.append("-");
-        accountNumberBuilder.append(generateDigits(digitSupplier, 6));
-        accountNumberBuilder.append("-");
-        accountNumberBuilder.append(generateDigits(digitSupplier, 2));
+        String digits = intStream.mapToObj(Integer::toString).collect(Collectors.joining());
 
-        return accountNumberBuilder.toString();
-    }
+        //Each %a, %b, %c corresponds to each one of the following substrings
+        String accountNumber = String.format("%a-%b-%c", 
+            digits.substring(0, 3),
+            digits.substring(3, 9),
+            digits.substring(9, 11));
 
-    private static String generateDigits(Supplier<Integer> digitSupplier, int count) {
-        StringBuilder digitsBuilder = new StringBuilder();
-        for (int i = 0; i < count; i++) {
-            digitsBuilder.append(digitSupplier.get());
-        }
-        return digitsBuilder.toString();
+        return accountNumber;
     }
 
     public void enableAccount(IcesiAccountCreateDTO account) {
@@ -81,17 +83,19 @@ public class IcesiAccountService {
         if(!account.isActive()) {
             throw new RuntimeException("Account is disabled, it is not possible to withdraw form it");
         } 
-        else {
-            if((account.getBalance() - amountToWithdraw) < 0) {
-                throw new RuntimeException("This account does not have enough funds");
-            }
-            else {
-                account.setBalance(account.getBalance()- amountToWithdraw);
-            }
+        
+        if((account.getBalance() - amountToWithdraw) < 0) {
+            throw new RuntimeException("This account does not have enough funds");
         }
+  
+        account.setBalance(account.getBalance() - amountToWithdraw);
     }
 
     public void depositMoney(long amountToDeposit, IcesiAccountCreateDTO account) {
+        if(!account.isActive()) {
+            throw new RuntimeException("Account is disabled, it is not possible to deposit money to it");
+        }
+
         account.setBalance(account.getBalance() + amountToDeposit);
     }
 
@@ -99,27 +103,24 @@ public class IcesiAccountService {
         if(!originAccount.isActive()) {
             throw new RuntimeException("The origin account is disabled");
         }
-        else if(!destinationAccount.isActive()) {
+
+        if(!destinationAccount.isActive()) {
             throw new RuntimeException("The destination account is disabled");
         }
-        else {
-            if(originAccount.getType().equals("deposit")) {
-                throw new RuntimeException("The origin account is not allowed to be transfer money");
-            }
-            else {
-                if(destinationAccount.getType().equals("deposit")) {
-                    throw new RuntimeException("The destination account is not allowed to be transferred money");
-                }
-                else {
-                    if((originAccount.getBalance() - amountToTransfer) < 0) {
-                        throw new RuntimeException("The origin account does not have enough funds");
-                    }
-                    else {
-                        originAccount.setBalance(originAccount.getBalance() - amountToTransfer);
-                        destinationAccount.setBalance(destinationAccount.getBalance() + amountToTransfer);
-                    }
-                }
-            }
+
+        if(originAccount.getType() == TypeIcesiAccount.deposit.name()) {
+            throw new RuntimeException("The origin account is not allowed to be transfer money");
         }
+    
+        if(destinationAccount.getType() == TypeIcesiAccount.deposit.name()) {
+            throw new RuntimeException("The destination account is not allowed to be transferred money");
+        }
+        
+        if((originAccount.getBalance() - amountToTransfer) < 0) {
+            throw new RuntimeException("The origin account does not have enough funds");
+        }
+    
+        originAccount.setBalance(originAccount.getBalance() - amountToTransfer);
+        destinationAccount.setBalance(destinationAccount.getBalance() + amountToTransfer);
     }
 }
