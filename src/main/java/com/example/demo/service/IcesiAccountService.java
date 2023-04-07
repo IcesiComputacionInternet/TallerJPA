@@ -1,5 +1,6 @@
 package com.example.demo.service;
 
+import java.lang.StackWalker.Option;
 import java.util.Optional;
 import java.util.Random;
 import java.util.UUID;
@@ -18,6 +19,7 @@ import com.example.demo.repository.IcesiAccountRepository;
 import com.example.demo.repository.IcesiUserRepository;
 
 import lombok.AllArgsConstructor;
+import net.bytebuddy.asm.Advice.Return;
 
 @Service
 @AllArgsConstructor
@@ -41,7 +43,7 @@ public class IcesiAccountService {
 
         icesiAccount.setIcesiUser(icesiUser);
         icesiAccount.setAccountId(UUID.randomUUID());
-        icesiAccount.setAccountNumber(generateAccountNumber());
+        icesiAccount.setAccountNumber(checkAccountNumber(generateAccountNumber()));
         icesiAccount.setActive(true);
 
         return IcesiAccountMapper.fromIcesiAcountToIcesiAccountCreateDTO(icesiAccountRepository.save(icesiAccount));
@@ -63,6 +65,17 @@ public class IcesiAccountService {
             digits.substring(3, 9),
             digits.substring(9, 11));
 
+        return accountNumber;
+    }
+
+    //This method checks if the generated account number is actually unique
+    private String checkAccountNumber(String accountNumber) {
+        Optional<IcesiAccount> existingIcesiAccount = icesiAccountRepository.findByAccountNumber(accountNumber);
+        
+        if(existingIcesiAccount.isPresent()) {
+            return checkAccountNumber(generateAccountNumber());
+        }
+        
         return accountNumber;
     }
 
