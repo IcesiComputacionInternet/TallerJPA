@@ -1,4 +1,4 @@
-package co.com.icesi.demojpa.unit.service;
+package co.com.icesi.demojpa.unit.matcher;
 
 import co.com.icesi.demojpa.model.IcesiUser;
 import org.mockito.ArgumentMatcher;

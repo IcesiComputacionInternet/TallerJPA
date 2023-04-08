@@ -2,6 +2,7 @@ package co.com.icesi.demojpa.unit.service;
 
 import co.com.icesi.demojpa.dto.AccountCreateDTO;
 import co.com.icesi.demojpa.dto.RoleCreateDTO;
+import co.com.icesi.demojpa.dto.TransactionOperationDTO;
 import co.com.icesi.demojpa.dto.UserCreateDTO;
 import co.com.icesi.demojpa.mapper.AccountMapper;
 import co.com.icesi.demojpa.model.IcesiAccount;
@@ -10,6 +11,7 @@ import co.com.icesi.demojpa.model.IcesiUser;
 import co.com.icesi.demojpa.repository.AccountRepository;
 import co.com.icesi.demojpa.repository.UserRepository;
 import co.com.icesi.demojpa.service.AccountService;
+import co.com.icesi.demojpa.unit.matcher.AccountMatcher;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 
@@ -74,7 +76,7 @@ public class AccountServiceTest {
         when(accountRepository.findByNumber(any())).thenReturn(Optional.ofNullable(createDefault0BalanceAccount()));
         accountService.disableAccount(createDefaultDTO0BalanceAccount().getAccountNumber());
         IcesiAccount expectedAccount= accountRepository.findByNumber(createDefaultDTO0BalanceAccount().getAccountNumber()).get();
-        assertEquals(expectedAccount.isActive(), false);
+        assertFalse(expectedAccount.isActive());
     }
 
     @Test
@@ -104,7 +106,7 @@ public class AccountServiceTest {
     @Test
     public void withdraw(){
         when(accountRepository.findByNumber(any())).thenReturn(Optional.ofNullable(createDefaultPositiveBalanceAccount()));
-        accountService.withdraw(createDefaultDTOPositiveBalanceAccount().getAccountNumber(), 1000);
+        accountService.withdraw(createTransactionOperationDTO());
         IcesiAccount expectedAccount= accountRepository.findByNumber(createDefaultDTOPositiveBalanceAccount().getAccountNumber()).get();
         assertEquals(expectedAccount.getBalance(), 999000);
     }
@@ -113,7 +115,7 @@ public class AccountServiceTest {
     public void withdrawNotExistentAccount(){
         when(accountRepository.findByNumber(any())).thenReturn(Optional.empty());
         try{
-            accountService.withdraw(createDefaultDTOPositiveBalanceAccount().getAccountNumber(), 1000);
+            accountService.withdraw(createTransactionOperationDTO());
             fail();
         }catch (RuntimeException exception){
             String message= exception.getMessage();
@@ -125,7 +127,7 @@ public class AccountServiceTest {
     public void withdrawNotActiveAccount(){
         when(accountRepository.findByNumber(any())).thenReturn(Optional.ofNullable(createDefaultDisabledAccount()));
         try{
-            accountService.withdraw(createDefaultDTODisabledAccount().getAccountNumber(), 1000);
+            accountService.withdraw(createTransactionOperationDTO());
             fail();
         }catch (RuntimeException exception){
             String message= exception.getMessage();
@@ -137,7 +139,10 @@ public class AccountServiceTest {
     public void withdrawMoreThanBalance(){
         when(accountRepository.findByNumber(any())).thenReturn(Optional.ofNullable(createDefaultPositiveBalanceAccount()));
         try{
-            accountService.withdraw(createDefaultDTOPositiveBalanceAccount().getAccountNumber(), 1000001);
+            accountService.withdraw(TransactionOperationDTO.builder()
+                            .accountFrom("")
+                            .amount(1000001L)
+                            .build());
             fail();
         }catch (RuntimeException exception){
             String message= exception.getMessage();
@@ -148,7 +153,7 @@ public class AccountServiceTest {
     @Test
     public void deposit(){
         when(accountRepository.findByNumber(any())).thenReturn(Optional.ofNullable(createDefaultPositiveBalanceAccount()));
-        accountService.deposit(createDefaultDTOPositiveBalanceAccount().getAccountNumber(), 1000);
+        accountService.deposit(createTransactionOperationDTO());
         IcesiAccount expectedAccount= accountRepository.findByNumber(createDefaultDTOPositiveBalanceAccount().getAccountNumber()).get();
         assertEquals(expectedAccount.getBalance(), 1001000);
     }
@@ -157,7 +162,7 @@ public class AccountServiceTest {
     public void depositNotExistentAccount(){
         when(accountRepository.findByNumber(any())).thenReturn(Optional.empty());
         try{
-            accountService.deposit(createDefaultDTOPositiveBalanceAccount().getAccountNumber(), 1000);
+            accountService.deposit(createTransactionOperationDTO());
             fail();
         }catch (RuntimeException exception){
             String message= exception.getMessage();
@@ -169,7 +174,7 @@ public class AccountServiceTest {
     public void depositNotActiveAccount(){
         when(accountRepository.findByNumber(any())).thenReturn(Optional.ofNullable(createDefaultDisabledAccount()));
         try{
-            accountService.deposit(createDefaultDTODisabledAccount().getAccountNumber(), 1000);
+            accountService.deposit(createTransactionOperationDTO());
             fail();
         }catch (RuntimeException exception){
             String message= exception.getMessage();
@@ -181,7 +186,10 @@ public class AccountServiceTest {
     public void depositNegativeAmount(){
         when(accountRepository.findByNumber(any())).thenReturn(Optional.ofNullable(createDefaultPositiveBalanceAccount()));
         try{
-            accountService.deposit(createDefaultDTOPositiveBalanceAccount().getAccountNumber(), -1000);
+            accountService.deposit(TransactionOperationDTO.builder()
+                    .accountFrom("")
+                    .amount(-1000L)
+                    .build());
             fail();
         }catch (RuntimeException exception){
             String message= exception.getMessage();
@@ -198,7 +206,7 @@ public class AccountServiceTest {
 
         IcesiAccount sourceAccount = accountRepository.findByNumber(createDefaultPositiveBalanceAccount().getAccountNumber()).get();
         IcesiAccount targetAccount = accountRepository.findByNumber(createDefault0BalanceAccount().getAccountNumber()).get();
-        accountService.transferMoney(sourceAccount.getAccountNumber(),targetAccount.getAccountNumber() ,1000);
+        accountService.transferMoney(createTransactionOperationDTO());
 
         verify(accountRepository, times(2)).save(any());
 
@@ -212,7 +220,7 @@ public class AccountServiceTest {
     public void transferNotExistentSourceAccount(){
         when(accountRepository.findByNumber(any())).thenReturn(Optional.empty());
         try{
-            accountService.transferMoney(createDefaultDTOPositiveBalanceAccount().getAccountNumber(), createDefaultDTO0BalanceAccount().getAccountNumber(), 1000);
+            accountService.transferMoney(createTransactionOperationDTO());
             fail();
         }catch (RuntimeException exception){
             String message= exception.getMessage();
@@ -223,7 +231,7 @@ public class AccountServiceTest {
     @Test void transferDepositAccount(){
         when(accountRepository.findByNumber(any())).thenReturn(Optional.ofNullable(createDepositAccount()));
         try{
-            accountService.transferMoney(createDepositAccount().getAccountNumber(), createDefaultDTO0BalanceAccount().getAccountNumber(), 1000);
+            accountService.transferMoney(createTransactionOperationDTO());
             fail();
         }catch (RuntimeException exception){
             String message= exception.getMessage();
@@ -236,7 +244,10 @@ public class AccountServiceTest {
     public void testTransferNotEnoughBalance(){
         when(accountRepository.findByNumber(any())).thenReturn(Optional.ofNullable(createDefaultPositiveBalanceAccount()));
         try{
-            accountService.transferMoney(createDefaultDTOPositiveBalanceAccount().getAccountNumber(), createDefaultDTO0BalanceAccount().getAccountNumber(), 1000001);
+            accountService.transferMoney(TransactionOperationDTO.builder()
+                    .accountFrom("")
+                    .amount(1000001L)
+                    .build());
             fail();
         }catch (RuntimeException exception){
             String message= exception.getMessage();
@@ -253,6 +264,13 @@ public class AccountServiceTest {
                 .user(defaultCreateUser())
                 .balance(1000000)
                 .active(true)
+                .build();
+    }
+
+    private TransactionOperationDTO createTransactionOperationDTO(){
+        return TransactionOperationDTO.builder()
+                .accountFrom("123-456789-10")
+                .amount(1000L)
                 .build();
     }
 

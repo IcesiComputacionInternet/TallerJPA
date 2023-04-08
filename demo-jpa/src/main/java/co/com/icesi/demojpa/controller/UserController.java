@@ -1,8 +1,8 @@
 package co.com.icesi.demojpa.controller;
 
 import co.com.icesi.demojpa.api.UserAPI;
-import co.com.icesi.demojpa.dto.RequestUserDTO;
 import co.com.icesi.demojpa.dto.ResponseUserDTO;
+import co.com.icesi.demojpa.dto.UserCreateDTO;
 import co.com.icesi.demojpa.service.UserService;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RestController;
@@ -25,7 +25,7 @@ public class UserController implements UserAPI {
     }
 
     @Override
-    public ResponseUserDTO addUser(RequestUserDTO requestUserDTO) {
+    public ResponseUserDTO addUser(UserCreateDTO requestUserDTO) {
         return null;
     }
 }

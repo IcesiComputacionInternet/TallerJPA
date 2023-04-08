@@ -5,6 +5,7 @@ import co.com.icesi.demojpa.mapper.RoleMapper;
 import co.com.icesi.demojpa.model.IcesiRole;
 import co.com.icesi.demojpa.repository.RoleRepository;
 import co.com.icesi.demojpa.service.RoleService;
+import co.com.icesi.demojpa.unit.matcher.RoleMatcher;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 

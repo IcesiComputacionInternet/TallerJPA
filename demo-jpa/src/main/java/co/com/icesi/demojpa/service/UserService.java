@@ -25,7 +25,19 @@ public class UserService {
 
     public IcesiUser save(UserCreateDTO user){
 
-        validateEmailAndPhone(user);
+        boolean email = validateEmail(user.getEmail());
+        boolean phone = validatePhone(user.getPhoneNumber());
+
+        if(email && phone){
+            throw new RuntimeException("User with both e-mail and phone already exists");
+        }
+        if (email){
+            throw new RuntimeException("User with this e-mail already exists");
+        }
+        if (phone){
+            throw new RuntimeException("User with this phone already exists");
+        }
+
         validateRole(user.getRole());
 
         IcesiUser icesiUser = userMapper.fromIcesiUserDTO(user);
@@ -34,24 +46,12 @@ public class UserService {
         return userRepository.save(icesiUser);
     }
 
-    public void validateEmailAndPhone(UserCreateDTO user){
-        if(validatePhone(user.getPhoneNumber()) && validateEmail(user.getEmail())){
-            throw new RuntimeException("User with both e-mail and phone already exists");
-        }
-    }
-
     public boolean validateEmail(String email){
-        userRepository.findByEmail(email).ifPresent(user -> {
-            throw new RuntimeException("User with this e-mail already exists");
-        });
-        return true;
+        return userRepository.findByEmail(email).isPresent();
     }
 
     public boolean validatePhone(String phone){
-        userRepository.findByPhone(phone).ifPresent(user -> {
-            throw new RuntimeException("User with this phone number already exists");
-        });
-        return true;
+        return userRepository.findByPhone(phone).isPresent();
     }
 
     public void validateRole(RoleCreateDTO roleName){

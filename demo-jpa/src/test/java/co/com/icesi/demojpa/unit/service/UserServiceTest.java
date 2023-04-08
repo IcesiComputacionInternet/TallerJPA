@@ -2,13 +2,14 @@ package co.com.icesi.demojpa.unit.service;
 
 import co.com.icesi.demojpa.dto.RoleCreateDTO;
 import co.com.icesi.demojpa.dto.UserCreateDTO;
-import co.com.icesi.demojpa.mapper.RoleMapper;
 import co.com.icesi.demojpa.mapper.UserMapper;
+import co.com.icesi.demojpa.mapper.UserMapperImpl;
 import co.com.icesi.demojpa.model.IcesiRole;
 import co.com.icesi.demojpa.model.IcesiUser;
 import co.com.icesi.demojpa.repository.RoleRepository;
 import co.com.icesi.demojpa.repository.UserRepository;
 import co.com.icesi.demojpa.service.UserService;
+import co.com.icesi.demojpa.unit.matcher.UserMatcher;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 
@@ -30,7 +31,7 @@ public class UserServiceTest {
     public void init(){
         userRepository = mock(UserRepository.class);
         roleRepository = mock(RoleRepository.class);
-        userMapper = spy(UserMapper.class);
+        userMapper = spy(UserMapperImpl.class);
         userService = new UserService(userRepository, userMapper, roleRepository);
     }
 
@@ -38,16 +39,17 @@ public class UserServiceTest {
     public void testSaveUser(){
 
         when(roleRepository.findByName(any())).thenReturn(Optional.of(defaultCreateRole()));
-        userService.save(defaultCreateUserDTO());
-        IcesiUser expectedUser = defaultCreateUser();
 
-        verify(userRepository, times(1)).save(argThat(new UserMatcher(expectedUser)));
+        userService.save(defaultCreateUserDTO());
+
+        verify(roleRepository, times(1)).findByName(any());
+        verify(userMapper, times(1)).fromIcesiUserDTO(any());
+        verify(userRepository, times(1)).save(argThat(new UserMatcher(defaultCreateUser())));
     }
 
     @Test
     public void testSaveUserEmailAlreadyExists(){
         when(roleRepository.findByName(any())).thenReturn(Optional.of(defaultCreateRole()));
-
         when(userRepository.findByEmail(any())).thenReturn(Optional.of(defaultCreateUser()));
         try{
             userService.save(defaultCreateUserDTO());
@@ -68,7 +70,7 @@ public class UserServiceTest {
             fail();
         }catch (RuntimeException exception){
             String message= exception.getMessage();
-            assertEquals("User with this phone number already exists",message);
+            assertEquals("User with this phone already exists",message);
         }
     }
 

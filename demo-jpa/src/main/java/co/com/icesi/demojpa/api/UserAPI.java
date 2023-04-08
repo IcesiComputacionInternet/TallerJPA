@@ -1,7 +1,7 @@
 package co.com.icesi.demojpa.api;
 
-import co.com.icesi.demojpa.dto.RequestUserDTO;
 import co.com.icesi.demojpa.dto.ResponseUserDTO;
+import co.com.icesi.demojpa.dto.UserCreateDTO;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
@@ -18,6 +18,6 @@ public interface UserAPI {
     List<ResponseUserDTO> getAllUsers();
 
     @PostMapping
-    ResponseUserDTO addUser(RequestUserDTO requestUserDTO);
+    ResponseUserDTO addUser(UserCreateDTO requestUserDTO);
 
 }
