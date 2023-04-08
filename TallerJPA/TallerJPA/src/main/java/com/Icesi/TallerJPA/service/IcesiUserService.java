@@ -23,7 +23,6 @@ public class IcesiUserService  {
 
     public  String newUser(IcesiUserDTO icesiUserDTO){
         String out = "saved User";
-
         IcesiUser icesiUser = icesiUserMapper.fromIcesiUserDTO(icesiUserDTO);
         save(icesiUserDTO);
         foundRoleName(icesiUser);
@@ -38,24 +37,28 @@ public class IcesiUserService  {
     }
 
 
-    public IcesiUser save(IcesiUserDTO icesiUserDTO) {
-        boolean foundPhone = icesiUserRepository.finByPhoneNumber(icesiUserDTO.getPhoneNumber());
-        boolean foundEmail = icesiUserRepository.finByEmail(icesiUserDTO.getEmail());
+    public IcesiUserDTO save(IcesiUserDTO icesiUserDTO) {
+
+        boolean foundPhone = icesiUserRepository.finByPhoneNumber(icesiUserDTO.getPhoneNumber()).isPresent();
+        boolean foundEmail = icesiUserRepository.finByEmail(icesiUserDTO.getEmail()).isPresent();
         if(foundEmail && foundPhone){
             throw  new RuntimeException(String.valueOf( ErrorConstants.CODE_UD_03.getMessage()));
 
-        }else if(foundEmail){
+        }
+        if(foundEmail){
             throw new RuntimeException(String.valueOf( ErrorConstants.CODE_UD_01.getMessage()));
-        }else if(foundPhone){
+        }
+        if(foundPhone){
             throw new RuntimeException(String.valueOf( ErrorConstants.CODE_UD_02.getMessage()));
 
-        } else if (icesiUserDTO.getIcesiRole() == null) {
+        }
+        if (icesiUserDTO.getIcesiRole() == null) {
             throw new RuntimeException(String.valueOf( ErrorConstants.CODE_UD_04.getMessage()));
         }
         IcesiUser icesiUser = icesiUserMapper.fromIcesiUserDTO(icesiUserDTO);
         icesiUser.setUserId(UUID.randomUUID());
-
-        return icesiUserRepository.save(icesiUser);
+        icesiUserRepository.save(icesiUser);
+        return icesiUserMapper.fromIcesiUser(icesiUser);
     }
 
 

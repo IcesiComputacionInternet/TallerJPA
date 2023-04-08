@@ -21,32 +21,16 @@ public class IcesiRoleService {
     private final IcesiRoleMapper icesiRoleMapper;
 
 
-    public String saveRole(IcesiRoleDTO icesiRoleDTO) {
-
-        IcesiRole icesiRole = icesiRoleMapper.fromIcesiRoleDTO(icesiRoleDTO);
-        nameRole(icesiRole);
-
-        icesiRole.setRoleId(UUID.randomUUID());
-        icesiRoleRepository.save(icesiRole);
-        return "Role saved";
-
-    }
-    public IcesiRole save(IcesiRoleDTO roleCreateDTO){
-
-        if(icesiRoleRepository.findExistName(roleCreateDTO.getName())){
+    public IcesiRoleDTO save(IcesiRoleDTO roleCreateDTO){
+        boolean  nameExist = icesiRoleRepository.findByName(roleCreateDTO.getName()).isPresent();
+        if(nameExist){
             throw new RuntimeException(String.valueOf( ErrorConstants.CODE_UD_05.getMessage()));
         }
 
         IcesiRole icesiRole = icesiRoleMapper.fromIcesiRoleDTO(roleCreateDTO);
         icesiRole.setRoleId(UUID.randomUUID());
-
-        return icesiRoleRepository.save(icesiRole);
+        icesiRoleRepository.save(icesiRole);
+        return icesiRoleMapper.fromIcesiRole(icesiRole);
     }
-    private void nameRole(IcesiRole icesiRole) {
-        boolean foundName = icesiRoleRepository.findExistName(icesiRole.getName());
-        if (foundName)
-            throw new RuntimeException(String.valueOf( ErrorConstants.CODE_UD_05.getMessage()));
-    }
-
 
 }

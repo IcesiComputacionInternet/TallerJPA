@@ -34,7 +34,7 @@ public class RoleServiceTest {
 
     @Test
     public void testCreateRole(){
-        String icesiRole = roleService.saveRole(icesiRoleDTO());
+         roleService.save(icesiRoleDTO());
         IcesiRole icesRole1 = IcesiRole.builder()
                 .name("Teacher")
                 .description("Is a teacher the university Icesi")
@@ -44,13 +44,12 @@ public class RoleServiceTest {
 
     @Test
     public void testCreateRoleWithExistingName(){
-        IcesiRole icesiRole = roleService.save(icesiRoleDTO());
-        IcesiRole icesiRol = IcesiRole.builder()
-                .name("Teacher")
-                .description("Is a teacher the university Icesi")
-                .build();
-        verify(roleRepository, times(1)).save(argThat(new IcesiRoleMatcher(icesiRol)));
-
+        when(roleRepository.findExistName(any())).thenReturn(true);
+        try{
+            roleService.save(icesiRoleDTO());
+        }catch (RuntimeException exception){
+            assertEquals("Name already exist", exception.getMessage());
+        }
     }
 
     public IcesiRoleDTO icesiRoleDTO(){

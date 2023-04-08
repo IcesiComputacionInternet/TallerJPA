@@ -15,12 +15,10 @@ import java.util.UUID;
 @Builder
 public class IcesiRole {
     @Id
-   // @Type(type = "org.hibernate.type.PostgresUUIDType")
     private UUID roleId;
     private String description;
     private String name;
-   /* @OneToMany
-    private List<IcesiUser> icesiUsers;*/
+
    @OneToMany(mappedBy = "icesiRole")
    private List<IcesiUser> icesiUsers;
     @PrePersist

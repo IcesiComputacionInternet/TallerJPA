@@ -11,9 +11,8 @@ import java.util.UUID;
 
 public interface IcesiRoleRepository extends JpaRepository<IcesiRole, UUID> {
 
-    @Query("SELECT role FROM IcesiRole role WHERE role.name =: name")
+    @Query("SELECT role FROM IcesiRole role WHERE role.name = :name")
    boolean findExistName(String name);
 
-    @Query("SELECT role FROM IcesiRole role WHERE role.name = :name")
     Optional<IcesiRole> findByName(String name);
 }

@@ -1,6 +1,7 @@
 package com.Icesi.TallerJPA.unit.service;
 
 import com.Icesi.TallerJPA.dto.IcesiAccountDTO;
+import com.Icesi.TallerJPA.dto.IcesiTransactionsDTO;
 import com.Icesi.TallerJPA.mapper.IcesiAccountMapper;
 
 import com.Icesi.TallerJPA.model.IcesiAccount;
@@ -80,51 +81,19 @@ public class IcesiAccountServiceTest {
         when(icesiAccountRepository.findByAccountNumber(accountNumber)).thenReturn(Optional.of(icesiAccount));
 
         verify(icesiAccountRepository, times(1)).save(any());
-
-        icesiAccountService.modifyStateAccount( accountNumber,icesiDtoWithBalanceZero);
-
-        assertFalse(icesiDtoWithBalanceZero.isActive());
+        assertFalse(icesiAccountService.disableAccount( icesiDtoWithBalanceZero.getAccountNumber()).isActive());
 
     }
 
-    @Test
-    public void testWithBalanceThanZero() {
-
-        IcesiAccountDTO icesiWithBalanceZero = icesiAccountDTO();
-
-        icesiAccountService.save(icesiWithBalanceZero);
-
-        String accountNumber = icesiWithBalanceZero.getAccountNumber();
-
-        when(icesiAccountRepository.findByAccountNumber(accountNumber)).thenReturn(Optional.of(icesiAccount));
-
-        verify(icesiAccountRepository, times(1)).save(any());
-
-        try {
-            icesiAccountService.modifyStateAccount( accountNumber,icesiWithBalanceZero);
-            fail();
-        } catch (RuntimeException exception) {
-            String messageOfException = exception.getMessage();
-            assertEquals("IT IS NOT POSSIBLE TO CHANGE THE STATUS OF THE ACCOUNT", messageOfException);
-        }
-    }
 
     @Test
     public void testEnableExistingAccount() {
 
         IcesiAccountDTO icesiAccountDisableDto = createicesiAccountDisableDto();
-
         icesiAccountService.save(icesiAccountDisableDto);
-
         String accountNumber = icesiAccountDisableDto.getAccountNumber();
-
         when(icesiAccountRepository.findByAccountNumber(accountNumber)).thenReturn(Optional.of(icesiAccount));
-
-        verify(icesiAccountRepository, times(1)).save(any());
-
-        icesiAccountService.modifyStateAccount( accountNumber,icesiAccountDisableDto);
-
-        assertTrue(icesiAccountDisableDto.isActive());
+        assertTrue(icesiAccountService.enableAccount( icesiAccountDisableDto.getAccountNumber()).isActive());
     }
 
     @Test
@@ -137,7 +106,7 @@ public class IcesiAccountServiceTest {
         verify(icesiAccountRepository, times(0)).save(any());
 
         try {
-            icesiAccountService.modifyStateAccount( anyString(),icesiAccountCreateDto);
+            icesiAccountService.enableAccount(icesiAccountCreateDto.getAccountNumber());
             fail();
         } catch (RuntimeException exception) {
             String messageOfException = exception.getMessage();
@@ -169,6 +138,22 @@ public class IcesiAccountServiceTest {
     }
 
 
+    @Test
+    public void testDepositMoneyDepositWhenTheAccountNumberDoesNotExist() {
+
+        IcesiAccountDTO icesiAccountDeposit = createicesiDtoWithBalanceZero();
+        icesiAccountService.save(icesiAccountDeposit);
+        verify(icesiAccountRepository, times(1)).save(any());
+        icesiAccountService.save(icesiAccountDeposit);
+        String accountNumberOficesiAccountDeposit =null;
+        try {
+            icesiAccountService.depositCash(icesiAccountDeposit, accountNumberOficesiAccountDeposit, 8000);
+        } catch (RuntimeException exception) {
+            String messageOfException = exception.getMessage();
+            assertEquals("ACCOUNT NOT FOUND", messageOfException);
+
+        }
+    }
 
 
     @Test
@@ -190,7 +175,80 @@ public class IcesiAccountServiceTest {
             icesiAccountService.sendMoney(sourceAccount, destinationAccount, 0);
         } catch (RuntimeException exception) {
             String messageOfException = exception.getMessage();
-            assertEquals("Invalid value", messageOfException);
+            assertEquals("INVALID VALUE", messageOfException);
+
+        }
+    }
+
+
+    @Test
+    public void tesTransferInvalidTypeAccount() {
+
+        IcesiAccountDTO sourceAccount = createicesiAccountDTONTypeInvalid();
+        IcesiAccountDTO destinationAccount = createicesiAccountDTONormal1();
+
+        icesiAccountService.save(sourceAccount);
+        icesiAccountService.save(destinationAccount);
+
+        verify(icesiAccountRepository, times(2)).save(any());
+
+        when(icesiAccountRepository.findByAccountNumber(sourceAccount.getAccountNumber())).thenReturn(Optional.of(createIcesiAccount()));
+
+        when(icesiAccountRepository.findByAccountNumber(destinationAccount.getAccountNumber())).thenReturn(Optional.of(createIcesiAccount()));
+
+        try {
+            icesiAccountService.sendMoney(sourceAccount, destinationAccount, 1000);
+        } catch (RuntimeException exception) {
+            String messageOfException = exception.getMessage();
+            assertEquals("THIS TYPE OF ACCOUNT DOES NOT ALLOW TO MAKE TRANSFERS", messageOfException);
+
+        }
+    }
+
+    @Test
+    public void testTransferValueValid() {
+
+        IcesiAccountDTO sourceAccount = createicesiAccountDTONormal();
+        IcesiAccountDTO destinationAccount = createicesiAccountDTONormal1();
+
+        icesiAccountService.save(sourceAccount);
+        icesiAccountService.save(destinationAccount);
+
+        verify(icesiAccountRepository, times(2)).save(any());
+
+        when(icesiAccountRepository.findByAccountNumber(sourceAccount.getAccountNumber())).thenReturn(Optional.of(createIcesiAccount()));
+
+        when(icesiAccountRepository.findByAccountNumber(destinationAccount.getAccountNumber())).thenReturn(Optional.of(createIcesiAccount()));
+
+        try {
+            icesiAccountService.sendMoney(sourceAccount, destinationAccount, 1000);
+        } catch (RuntimeException exception) {
+            String messageOfException = exception.getMessage();
+            assertEquals(6000, sourceAccount.getBalance());
+
+        }
+    }
+
+    @Test
+    public void testTransferInsufficientBalance() {
+
+        IcesiAccountDTO sourceAccount = createicesiAccountDTONormal();
+        IcesiAccountDTO destinationAccount = createicesiAccountDTONormal1();
+
+        icesiAccountService.save(sourceAccount);
+        icesiAccountService.save(destinationAccount);
+
+        verify(icesiAccountRepository, times(2)).save(any());
+
+        when(icesiAccountRepository.findByAccountNumber(sourceAccount.getAccountNumber())).thenReturn(Optional.of(createIcesiAccount()));
+
+        when(icesiAccountRepository.findByAccountNumber(destinationAccount.getAccountNumber())).thenReturn(Optional.of(createIcesiAccount()));
+
+        try {
+            icesiAccountService.sendMoney(sourceAccount, destinationAccount, 80000);
+        } catch (RuntimeException exception) {
+            String messageOfException = exception.getMessage();
+            assertEquals("INSUFFICIENT BALANCE", messageOfException);
 
         }
     }
@@ -252,10 +310,17 @@ public class IcesiAccountServiceTest {
                 .active(true)
                 .build();
     }
+    public IcesiAccountDTO createicesiAccountDTONTypeInvalid() {
+        return IcesiAccountDTO.builder()
+                .balance(Long.valueOf(7000))
+                .type("Deposit Only")
+                .active(true)
+                .build();
+    }
 
     public IcesiAccountDTO createicesiAccountDisableDto() {
         return IcesiAccountDTO.builder()
-                .balance(Long.valueOf(5000))
+                .balance(5L)
                 .type("Deposit Only")
                 .active(false)
                 .build();

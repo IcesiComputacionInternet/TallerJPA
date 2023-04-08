@@ -12,13 +12,11 @@ import java.util.UUID;
 public interface IcesiUserRepository extends JpaRepository<IcesiUser, UUID> {
 
     @Query("SELECT user FROM IcesiUser user WHERE user.email =: email")
-    boolean finByEmail(String email);
+    Optional<IcesiUser> finByEmail(String email);
     @Query("SELECT user FROM IcesiUser user WHERE user.phoneNumber =: phoneNumber")
-    boolean finByPhoneNumber(String phoneNumber);
-    @Query("SELECT user FROM IcesiUser user WHERE user.phoneNumber = :phoneNumber")
-    Optional<IcesiUser> findByPhoneNum(String phoneNumber);
+    Optional<IcesiUser> finByPhoneNumber(String phoneNumber);
 
-    @Query("SELECT user FROM IcesiUser user WHERE user.email = :email")
-    Optional<IcesiUser> findEmail(String email);
 
+    @Query("SELECT EXISTS (SELECT 1 FROM IcesiUser u WHERE u.phoneNumber = :phoneNumber)")
+    boolean existsByPhoneNumber(String phoneNumber);
 }

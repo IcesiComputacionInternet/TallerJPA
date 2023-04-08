@@ -8,13 +8,13 @@ import com.Icesi.TallerJPA.repository.IcesiRoleRepository;
 import com.Icesi.TallerJPA.repository.IcesiUserRepository;
 import com.Icesi.TallerJPA.service.IcesiUserService;
 import com.Icesi.TallerJPA.unit.matcher.IcesiUserMatcher;
+import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import com.Icesi.TallerJPA.mapper.IcesiUserMapperImpl;
 import java.util.Optional;
 
-import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.junit.jupiter.api.Assertions.fail;
+import static org.junit.jupiter.api.Assertions.*;
 import static org.mockito.Mockito.*;
 
 public class UserServiceTest {
@@ -27,48 +27,65 @@ public class UserServiceTest {
 
     @BeforeEach
     private void init() {
+        icesiRoleRepository =mock(IcesiRoleRepository.class);
         icesiUserRepository = mock(IcesiUserRepository.class);
         userMapper = spy(IcesiUserMapperImpl.class);
 
         userService = new IcesiUserService(icesiUserRepository, icesiRoleRepository,userMapper);
     }
 
-
     @Test
-    public void testExistingEail() {
-        when(icesiUserRepository.findEmail(any())).thenReturn(Optional.of(createIcesiUser()));
+    public void testCreateUser(){
+        assertEquals("1288567",userService.save(icesiUserDTO1()).getPhoneNumber());
+    }
+    @Test
+    public void testExistingEmail() {
+        when(icesiUserRepository.finByEmail(any())).thenReturn(Optional.of(createIcesiUser()));
 
         try {
             userService.save(icesiUserDTO());
-            fail();
+
         } catch (RuntimeException exception) {
             String messageOfException = exception.getMessage();
-            assertEquals("User with this email already exists", messageOfException);
+            assertEquals("EMAIL ALREADY EXIST", messageOfException);
         }
     }
+    @Test
+    public void testCreateUserWhenRoleIsNull(){
+        IcesiUserDTO userDTO = createIcesiUserDTOWithoutRole();
 
+
+        try{
+            userService.save(userDTO);
+        }catch (Exception e){
+            assertEquals("USER ROLE CANNOT BE NULL", e.getMessage());
+        }
+
+    }
     @Test
     public void testIcesiUserWithPhoneNumberAlreadyExists() {
-        when(icesiUserRepository.findByPhoneNum(any())).thenReturn(Optional.of(createIcesiUser()));
-
+        when(icesiRoleRepository.findByName(any())).thenReturn(Optional.of(createRole()));
+        when(icesiUserRepository.finByPhoneNumber(any())).thenReturn(Optional.of(createIcesiUser()));
         try {
             userService.save(icesiUserDTO1());
             fail();
         } catch (RuntimeException exception) {
+
             String messageOfException = exception.getMessage();
-            assertEquals("User with this phone number already exists", messageOfException);
+
+            assertEquals("PHONE NUMBER ALREADY EXIST", messageOfException);
         }
     }
 
     @Test
     public void testIcesiUserWithPhoneNumberAndEmailAlreadyExists() {
-        userService.save(icesiUserDTO1());
+        when(icesiUserRepository.finByEmail(any())).thenReturn(Optional.of(createIcesiUser()));
+        when(icesiUserRepository.finByPhoneNumber(any())).thenReturn(Optional.of(createIcesiUser()));
         try {
-            userService.save(icesiUserDTO());
-
+            userService.save(icesiUserDTO1());
         } catch (RuntimeException exception) {
             String messageOfException = exception.getMessage();
-            assertEquals("User with this email and phone number already exists", messageOfException);
+            assertEquals("PHONE NUMBER AND EMAIL ALREADY EXIST", messageOfException);
         }
     }
 
@@ -110,6 +127,7 @@ public class UserServiceTest {
                 .lastName("AR")
                 .email("example@exampleEmail.com")
                 .phoneNumber("1288567")
+                .icesiRole(null)
                 .build();
     }
 

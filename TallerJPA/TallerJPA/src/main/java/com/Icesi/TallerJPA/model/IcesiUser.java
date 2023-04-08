@@ -24,15 +24,8 @@ public class IcesiUser {
     private String phoneNumber;
     private String password;
     @OneToMany
-    private List<IcesiAccount> icesiAccounts;
-    /*
-        @ManyToOne
-        @JoinColumn(name = "icesi_role_role_id")
-        private IcesiRole icesiRole;
-        @PrePersist
-        public void generateId() {
-            this.userId = UUID.randomUUID();
-        }**/
+      private List<IcesiAccount> icesiAccounts;
+
     @OneToMany(mappedBy = "icesiUser")
     private List<IcesiAccount> accounts;
 

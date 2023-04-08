@@ -1,6 +1,7 @@
 package com.Icesi.TallerJPA.service;
 
 import com.Icesi.TallerJPA.dto.IcesiAccountDTO;
+import com.Icesi.TallerJPA.dto.IcesiTransactionsDTO;
 import com.Icesi.TallerJPA.enums.ErrorConstants;
 import com.Icesi.TallerJPA.mapper.IcesiAccountMapper;
 import com.Icesi.TallerJPA.model.IcesiAccount;
@@ -12,6 +13,8 @@ import java.util.Random;
 import java.util.UUID;
 import java.util.function.Supplier;
 
+
+
 @Service
 @AllArgsConstructor
 public class IcesiAccountService {
@@ -21,17 +24,13 @@ public class IcesiAccountService {
 
 
     public IcesiAccount save(IcesiAccountDTO icesiAccountCreateDto) {
-
         icesiAccountCreateDto.setAccountNumber(generateAccountNumbers());
-
         if (icesiAccountRepository.findByAccountNumber(icesiAccountCreateDto.getAccountNumber()).isPresent()) {
             throw new RuntimeException(String.valueOf(ErrorConstants.CODE_UD_06.getMessage()));
         }
-
         if (accountBalance(icesiAccountCreateDto.getBalance())) {
-            throw new  RuntimeException(String.valueOf(ErrorConstants.CODE_UD_14.getMessage()));
+            throw new RuntimeException(String.valueOf(ErrorConstants.CODE_UD_14.getMessage()));
         }
-
         IcesiAccount icesiAccount = icesiAccountMapper.fromIcesiAccountDTO(icesiAccountCreateDto);
         icesiAccount.setAccountId(UUID.randomUUID());
 
@@ -41,11 +40,9 @@ public class IcesiAccountService {
     private void validInformation(IcesiAccountDTO icesiAccountCreateDto) {
         if (icesiAccountRepository.findByAccountNumber(icesiAccountCreateDto.getAccountNumber()).isPresent()) {
             throw new RuntimeException(String.valueOf(ErrorConstants.CODE_UD_06.getMessage()));
-
         }
-
         if (accountBalance(icesiAccountCreateDto.getBalance())) {
-            throw new RuntimeException(String.valueOf( ErrorConstants.CODE_UD_07.getMessage()));
+            throw new RuntimeException(String.valueOf(ErrorConstants.CODE_UD_07.getMessage()));
         }
     }
 
@@ -59,109 +56,87 @@ public class IcesiAccountService {
     }
 
 
-
     public boolean accountBalance(long balance) {
-        if (0 > balance) {
-            return true;
-        } else {
-            return false;
-        }
-
+        return 0 > balance;
     }
 
-    public void modifyStateAccount(String numberAccount, IcesiAccountDTO icesiAccountDTO) {
-
-        if (icesiAccountRepository.findByAccountNumber(numberAccount).isPresent()) {
-            if (icesiAccountDTO.getBalance() == 0 && icesiAccountDTO.isActive()) {
-                icesiAccountDTO.setActive(false);
-
-            } else if (!icesiAccountDTO.isActive()) {
-                icesiAccountDTO.setActive(true);
-
-            } else {
-                throw new RuntimeException(String.valueOf(ErrorConstants.CODE_UD_09.getMessage()));
-            }
-        } else {
+    public IcesiAccountDTO enableAccount(String accountNumber){
+        boolean foundAccount = icesiAccountRepository.findByAccountNumber(accountNumber).isPresent();
+        if(!foundAccount){
             throw new RuntimeException(String.valueOf(ErrorConstants.CODE_UD_08.getMessage()));
         }
-
+        icesiAccountRepository.enableAccount(accountNumber);
+        return IcesiAccountDTO.builder().accountNumber(accountNumber).active(true).build();
     }
+
+
+    public IcesiAccountDTO disableAccount(String accountNumber){
+        boolean foundAccount = icesiAccountRepository.findByAccountNumber(accountNumber).isPresent();
+        if(!foundAccount){
+            throw new RuntimeException(String.valueOf(ErrorConstants.CODE_UD_08.getMessage()));
+        }
+        icesiAccountRepository.disableAccount(accountNumber);
+        return IcesiAccountDTO.builder().accountNumber(accountNumber).build();
+    }
+
+
     public String generateParts(int size) {
 
-        String idAccount = "";
+        StringBuilder idAccount = new StringBuilder();
         for (int i = 0; i < size; i++) {
             Random random = new Random();
-            idAccount += random.nextInt(10);
+            idAccount.append(random.nextInt(10));
         }
 
-        return idAccount;
+        return idAccount.toString();
     }
-    public void withdrawals(IcesiAccountDTO icesiAccountDTO,String numberAccount, int value) {
-        if (icesiAccountRepository.findByAccountNumber(numberAccount).isPresent()) {
-            long balance = icesiAccountDTO.getBalance();
 
-            if (balance > value) {
-                icesiAccountDTO.setBalance(balance - value);
-
-            } else {
-
-                throw new  RuntimeException(String.valueOf( ErrorConstants.CODE_UD_10.getMessage()));
-            }
-        } else {
-            throw new  RuntimeException(String.valueOf( ErrorConstants.CODE_UD_08.getMessage()));
+    public void withdrawals(IcesiAccountDTO icesiAccountDTO, String numberAccount, int value) {
+        boolean accountExists =icesiAccountRepository.findByAccountNumber(numberAccount).isPresent();
+        if (!accountExists) {
+            throw new RuntimeException(String.valueOf(ErrorConstants.CODE_UD_08.getMessage()));
         }
-
+        long balance = icesiAccountDTO.getBalance();
+        if (balance < value) {
+            throw new RuntimeException(String.valueOf(ErrorConstants.CODE_UD_10.getMessage()));
+        }
+        icesiAccountDTO.setBalance(balance - value);
     }
 
     public void depositCash(IcesiAccountDTO account, String numberAccount, int depositCash) {
-
-        if (icesiAccountRepository.findByAccountNumber(numberAccount).isPresent() && depositCash > 0){
-            account.setBalance(account.getBalance() + depositCash);
-
-        }else if (depositCash <= 0){
-
-            throw new RuntimeException(String.valueOf( ErrorConstants.CODE_UD_12.getMessage()));
+        boolean accountExists = icesiAccountRepository.findByAccountNumber(numberAccount).isPresent();
+        if (!accountExists) {
+            throw new RuntimeException(String.valueOf(ErrorConstants.CODE_UD_08.getMessage()));
         }
-        else {
-
-            throw new RuntimeException(String.valueOf( ErrorConstants.CODE_UD_08.getMessage()));
+        if (depositCash <= 0) {
+            throw new RuntimeException(String.valueOf(ErrorConstants.CODE_UD_12.getMessage()));
         }
+        account.setBalance(account.getBalance() + depositCash);
     }
 
     public void sendMoney(IcesiAccountDTO sourceAccount, IcesiAccountDTO destinationAccount, int cashToTransfer) {
+        if (cashToTransfer <= 0) {throw new RuntimeException(String.valueOf(ErrorConstants.CODE_UD_12.getMessage()));}
 
-        if (icesiAccountRepository.findByAccountNumber(sourceAccount.getAccountNumber()).isPresent() &&
-                icesiAccountRepository.findByAccountNumber(destinationAccount.getAccountNumber()).isPresent()) {
+        boolean existAccountSource = icesiAccountRepository.findByAccountNumber(sourceAccount.getAccountNumber()).isPresent();
+        boolean existAccountDestination = icesiAccountRepository.findByAccountNumber(destinationAccount.getAccountNumber()).isPresent();
 
+        if (!existAccountSource && !existAccountDestination) {throw new RuntimeException(String.valueOf(ErrorConstants.CODE_UD_08.getMessage()));}
+        validateAccountTypeOrigin(sourceAccount, destinationAccount);
+        if (sourceAccount.getBalance() < cashToTransfer) {throw new RuntimeException(String.valueOf(ErrorConstants.CODE_UD_10.getMessage()));}
+        sourceAccount.setBalance(sourceAccount.getBalance() - cashToTransfer);
+        destinationAccount.setBalance(destinationAccount.getBalance() + cashToTransfer);
 
-            if (validateAccountTypeOrigin(sourceAccount, destinationAccount)) {
-                if (sourceAccount.getBalance() >= cashToTransfer) {
-                    sourceAccount.setBalance(sourceAccount.getBalance() - cashToTransfer);
-                    destinationAccount.setBalance(destinationAccount.getBalance() + cashToTransfer);
-
-                } else if (cashToTransfer < 0) {
-                    throw new RuntimeException(String.valueOf( ErrorConstants.CODE_UD_12.getMessage()));
-
-                } else {
-                    throw new RuntimeException(String.valueOf( ErrorConstants.CODE_UD_11.getMessage()));
-                }
-            }
-        }else {
-            validateAccountTypeOrigin(sourceAccount,destinationAccount);
-        }
     }
 
-    private boolean validateAccountTypeOrigin(IcesiAccountDTO icesiAccountCreateDto, IcesiAccountDTO destinationAccount) {
-        boolean verificationOfType = true;
+    private void validateAccountTypeOrigin(IcesiAccountDTO icesiAccountCreateDto, IcesiAccountDTO destinationAccount) {
+        icesiAccountRepository.findByAccountNumber(icesiAccountCreateDto.getAccountNumber()).orElseThrow(() -> new RuntimeException(String.valueOf(ErrorConstants.CODE_UD_08.getMessage())));
+        icesiAccountRepository.findByAccountNumber(destinationAccount.getAccountNumber()).orElseThrow(() -> new RuntimeException(String.valueOf(ErrorConstants.CODE_UD_08.getMessage())));
 
-        if (icesiAccountCreateDto == null || destinationAccount == null) {
-            throw new RuntimeException(String.valueOf(ErrorConstants.CODE_UD_08.getMessage()));
-        }
-        else if(icesiAccountCreateDto.getType().equalsIgnoreCase("Deposit Only") || destinationAccount.getType().equalsIgnoreCase("Deposit Only")){
-            throw new  RuntimeException(String.valueOf( ErrorConstants.CODE_UD_13.getMessage()));
+        if (icesiAccountCreateDto.getType().equalsIgnoreCase("Deposit Only") || destinationAccount.getType().equalsIgnoreCase("Deposit Only")) {
+            throw new RuntimeException(String.valueOf(ErrorConstants.CODE_UD_13.getMessage()));
         }
 
-        return verificationOfType;
+
     }
 
 }

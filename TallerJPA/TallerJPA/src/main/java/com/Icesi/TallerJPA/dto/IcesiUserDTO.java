@@ -23,6 +23,6 @@ public class IcesiUserDTO {
     private String lastName;
     private String email;
     private String phoneNumber;
-    //private List<IcesiAccount> icesiAccounts;
+
     private IcesiRole icesiRole;
 }
