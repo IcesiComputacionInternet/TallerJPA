@@ -12,6 +12,7 @@ import lombok.AllArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
 
+import java.util.Optional;
 import java.util.UUID;
 
 @Service
@@ -26,13 +27,14 @@ public class IcesiUserService  {
         IcesiUser icesiUser = icesiUserMapper.fromIcesiUserDTO(icesiUserDTO);
         save(icesiUserDTO);
         foundRoleName(icesiUser);
-        if(icesiUserDTO.getIcesiRole().getName() != null){
+            Optional<IcesiUserDTO> userDTO = Optional.ofNullable(icesiUserDTO);
+            String roleName = userDTO.flatMap(dto -> Optional.ofNullable(dto.getIcesiRole()))
+                    .map(role -> role.getName()).orElseThrow(() ->new IcesiException(HttpStatus.BAD_REQUEST, new IcesiError(ErrorConstants.CODE_UD_04, ErrorConstants.CODE_UD_04.getMessage())));
+
         icesiUser.setIcesiRole(icesiUserDTO.getIcesiRole());
         icesiUser.setUserId(UUID.randomUUID());
         icesiUserRepository.save(icesiUser);
-        }else{
-            throw new IcesiException(HttpStatus.BAD_REQUEST, new IcesiError(ErrorConstants.CODE_UD_04, ErrorConstants.CODE_UD_04.getMessage()));
-            }
+
         return out;
     }
 
@@ -63,9 +65,7 @@ public class IcesiUserService  {
 
 
     public void foundRoleName(IcesiUser icesiUser) throws IcesiException {
-
-        boolean foundNameRole=   icesiRoleRepository.findExistName(icesiUser.getIcesiRole().getName());
-        if(foundNameRole){
+        if(icesiRoleRepository.findExistName(icesiUser.getIcesiRole().getName())){
             throw new IcesiException(HttpStatus.BAD_REQUEST, new IcesiError(ErrorConstants.CODE_UD_05, ErrorConstants.CODE_UD_05.getMessage()));
         }
 

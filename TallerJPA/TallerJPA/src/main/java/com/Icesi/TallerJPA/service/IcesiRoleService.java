@@ -20,10 +20,8 @@ public class IcesiRoleService {
 
     private final IcesiRoleMapper icesiRoleMapper;
 
-
     public IcesiRoleDTO save(IcesiRoleDTO roleCreateDTO){
-        boolean  nameExist = icesiRoleRepository.findByName(roleCreateDTO.getName()).isPresent();
-        if(nameExist){
+        if(icesiRoleRepository.findByName(roleCreateDTO.getName()).isPresent()){
             throw new RuntimeException(String.valueOf( ErrorConstants.CODE_UD_05.getMessage()));
         }
 

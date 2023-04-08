@@ -8,10 +8,11 @@ import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
 
-@RequestMapping("/account")
-@CrossOrigin(origins = "*")
-public interface AccountAPI {
 
+@CrossOrigin(origins = "*")
+@RequestMapping(AccountAPI.BASE_ACCOUNT_URL)
+public interface AccountAPI {
+    String BASE_ACCOUNT_URL = "/accounts";
     @PostMapping("/users")
     IcesiUserDTO createUser(@RequestBody IcesiUserDTO icesiUserDTO);
 

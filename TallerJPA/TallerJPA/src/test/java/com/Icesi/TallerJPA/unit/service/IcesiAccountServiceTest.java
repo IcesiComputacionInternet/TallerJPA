@@ -5,6 +5,7 @@ import com.Icesi.TallerJPA.dto.IcesiTransactionsDTO;
 import com.Icesi.TallerJPA.mapper.IcesiAccountMapper;
 
 import com.Icesi.TallerJPA.model.IcesiAccount;
+import com.Icesi.TallerJPA.model.IcesiRole;
 import com.Icesi.TallerJPA.model.IcesiUser;
 import com.Icesi.TallerJPA.repository.IcesiAccountRepository;
 import com.Icesi.TallerJPA.service.IcesiAccountService;
@@ -14,6 +15,7 @@ import org.junit.jupiter.api.Test;
 import com.Icesi.TallerJPA.mapper.IcesiAccountMapperImpl;
 import java.util.Arrays;
 import java.util.Optional;
+import java.util.UUID;
 import java.util.regex.Pattern;
 
 import static org.junit.jupiter.api.Assertions.*;
@@ -28,7 +30,8 @@ public class IcesiAccountServiceTest {
     private IcesiAccountMapper accountMapper;
 
     private IcesiAccount icesiAccount;
-    private  IcesiAccountMapper icesiAccountMapper;
+    private IcesiAccountMapper icesiAccountMapper;
+
     @BeforeEach
     private void init() {
         icesiAccountRepository = mock(IcesiAccountRepository.class);
@@ -36,11 +39,10 @@ public class IcesiAccountServiceTest {
         icesiAccountService = new IcesiAccountService(icesiAccountRepository, accountMapper);
         icesiAccount = createIcesiAccount();
     }
-    
 
 
     @Test
-    public void validateAccountNumber(){
+    public void validateAccountNumber() {
         when(accountMapper.fromIcesiAccountDTO(any())).thenReturn(createIcesiAccount());
 
         IcesiAccountDTO accountDTO = icesiAccountDTO();
@@ -51,10 +53,11 @@ public class IcesiAccountServiceTest {
 
         String accountNumber = accountDTO.getAccountNumber();
 
-        boolean verificationOfAccountNumber = Arrays.stream(accountNumber.split("-")).allMatch(symbol -> Pattern.matches("\\d+",symbol));
+        boolean verificationOfAccountNumber = Arrays.stream(accountNumber.split("-")).allMatch(symbol -> Pattern.matches("\\d+", symbol));
 
         assertTrue(verificationOfAccountNumber);
     }
+
     @Test
     public void testCreateAccountWithBalanceBelowZero() {
 
@@ -81,7 +84,7 @@ public class IcesiAccountServiceTest {
         when(icesiAccountRepository.findByAccountNumber(accountNumber)).thenReturn(Optional.of(icesiAccount));
 
         verify(icesiAccountRepository, times(1)).save(any());
-        assertFalse(icesiAccountService.disableAccount( icesiDtoWithBalanceZero.getAccountNumber()).isActive());
+        assertFalse(icesiAccountService.disableAccount(icesiDtoWithBalanceZero.getAccountNumber()).isActive());
 
     }
 
@@ -93,7 +96,7 @@ public class IcesiAccountServiceTest {
         icesiAccountService.save(icesiAccountDisableDto);
         String accountNumber = icesiAccountDisableDto.getAccountNumber();
         when(icesiAccountRepository.findByAccountNumber(accountNumber)).thenReturn(Optional.of(icesiAccount));
-        assertTrue(icesiAccountService.enableAccount( icesiAccountDisableDto.getAccountNumber()).isActive());
+        assertTrue(icesiAccountService.enableAccount(icesiAccountDisableDto.getAccountNumber()).isActive());
     }
 
     @Test
@@ -114,7 +117,6 @@ public class IcesiAccountServiceTest {
         }
 
     }
-
 
 
     @Test
@@ -145,7 +147,7 @@ public class IcesiAccountServiceTest {
         icesiAccountService.save(icesiAccountDeposit);
         verify(icesiAccountRepository, times(1)).save(any());
         icesiAccountService.save(icesiAccountDeposit);
-        String accountNumberOficesiAccountDeposit =null;
+        String accountNumberOficesiAccountDeposit = null;
         try {
             icesiAccountService.depositCash(icesiAccountDeposit, accountNumberOficesiAccountDeposit, 8000);
         } catch (RuntimeException exception) {
@@ -204,6 +206,86 @@ public class IcesiAccountServiceTest {
 
         }
     }
+
+
+
+
+
+
+
+
+    @Test
+    public void tesTransferValid() {
+        IcesiAccount account = defaultAccount();
+        IcesiAccount account2 = defaultAccount2();
+        when(icesiAccountRepository.findByAccountNumber(any())).thenReturn(Optional.of(account));
+        when(icesiAccountRepository.findByAccountNumber(any())).thenReturn(Optional.of(account2));
+        try {
+            icesiAccountService.transfer(IcesiTransactionsDTO.builder()
+                    .accountOrigin("1234567")
+                    .accountDestination("12345678")
+                    .amount(5L)
+                    .build()
+            );
+        } catch (RuntimeException e) {
+            assertEquals("THIS TYPE OF ACCOUNT DOES NOT ALLOW TO MAKE TRANSFERS", e.getMessage());
+        }
+
+        assertEquals(account.getBalance(), account.getBalance());
+
+    }
+    @Test
+    public void tesTransferTypeInvalid() {
+        IcesiAccount account = accountInvalid();
+
+        when(icesiAccountRepository.findByAccountNumber(any())).thenReturn(Optional.of(account));
+        try {
+            icesiAccountService.transfer(IcesiTransactionsDTO.builder()
+                    .accountOrigin("1234567")
+                    .amount(5L)
+                    .build()
+            );
+        } catch (RuntimeException e) {
+            assertEquals("THIS TYPE OF ACCOUNT DOES NOT ALLOW TO MAKE TRANSFERS", e.getMessage());
+        }
+
+
+
+    }
+
+    @Test
+    public void tesTransferInsufficientMoney() {
+        IcesiAccount account = defaultAccount();
+        IcesiAccount account2 = defaultAccount2();
+        when(icesiAccountRepository.findByAccountNumber(any())).thenReturn(Optional.of(account));
+        when(icesiAccountRepository.findByAccountNumber(any())).thenReturn(Optional.of(account2));
+        try {
+            icesiAccountService.transfer(IcesiTransactionsDTO.builder()
+                    .accountOrigin("1234567")
+                    .accountDestination("12345678")
+                    .amount(50000000L)
+                    .build()
+            );
+        } catch (RuntimeException e) {
+            assertEquals("INSUFFICIENT BALANCE", e.getMessage());
+        }
+
+        assertEquals(account.getBalance(), account.getBalance());
+    }
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 
     @Test
     public void testTransferValueValid() {
@@ -278,6 +360,9 @@ public class IcesiAccountServiceTest {
         }
     }
 
+
+
+
     public IcesiAccountDTO icesiAccountDTO() {
         return IcesiAccountDTO.builder()
                 .balance(Long.valueOf(5000))
@@ -350,6 +435,71 @@ public class IcesiAccountServiceTest {
                 .email("example@exampleEmail.com")
                 .phoneNumber("1234567")
                 .password("1234")
+                .build();
+    }
+    private IcesiAccount accountInvalid() {
+        return IcesiAccount.builder()
+                .accountNumber("1234567")
+                .balance(50L)
+                .type("Deposit only")
+                .active(true)
+                .icesiUser(defaultIcesiUser())
+                .build();
+    }
+    private IcesiAccount defaultAccount() {
+        return IcesiAccount.builder()
+                .accountNumber("1234567")
+                .balance(50L)
+                .type("Normal")
+                .active(true)
+                .icesiUser(defaultIcesiUser())
+                .build();
+    }
+    private IcesiUser defaultIcesiUser(){
+        return IcesiUser.builder()
+                .userId(UUID.fromString("c0a81201-0000-0000-0000-000000000000"))
+                .firstName("Luis")
+                .lastName("David")
+                .email("example@exampleEmail.com")
+                .phoneNumber("1234545")
+                .password("1234125")
+                .icesiRole(defaultRole())
+                .build();
+    }
+    private IcesiRole defaultRole(){
+        return IcesiRole.builder()
+                .roleId(UUID.fromString("c0a81201-0000-0000-0000-000000000000"))
+                .name("Estudiante")
+                .description("Sistemas")
+                .build();
+    }
+
+
+    private IcesiAccount defaultAccount2() {
+        return IcesiAccount.builder()
+                .accountNumber("12345678")
+                .balance(50L)
+                .type("Normal")
+                .active(true)
+                .icesiUser(defaultIcesiUser2())
+                .build();
+    }
+    private IcesiUser defaultIcesiUser2(){
+        return IcesiUser.builder()
+                .userId(UUID.fromString("c0a80101-0000-0000-0000-000000200000"))
+                .firstName("Luis")
+                .lastName("David")
+                .email("examplea@exampleEmail.com")
+                .phoneNumber("1234545")
+                .password("1234125")
+                .icesiRole(defaultRole2())
+                .build();
+    }
+    private IcesiRole defaultRole2(){
+        return IcesiRole.builder()
+                .roleId(UUID.fromString("c0a80101-0000-0000-0000-000000200000"))
+                .name("Estudiante")
+                .description("Sistemas")
                 .build();
     }
 }

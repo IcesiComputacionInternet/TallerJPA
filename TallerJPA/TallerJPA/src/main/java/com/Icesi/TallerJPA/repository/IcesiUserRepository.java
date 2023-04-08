@@ -16,7 +16,4 @@ public interface IcesiUserRepository extends JpaRepository<IcesiUser, UUID> {
     @Query("SELECT user FROM IcesiUser user WHERE user.phoneNumber =: phoneNumber")
     Optional<IcesiUser> finByPhoneNumber(String phoneNumber);
 
-
-    @Query("SELECT EXISTS (SELECT 1 FROM IcesiUser u WHERE u.phoneNumber = :phoneNumber)")
-    boolean existsByPhoneNumber(String phoneNumber);
 }

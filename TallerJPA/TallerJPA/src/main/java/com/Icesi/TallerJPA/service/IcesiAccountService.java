@@ -61,8 +61,7 @@ public class IcesiAccountService {
     }
 
     public IcesiAccountDTO enableAccount(String accountNumber){
-        boolean foundAccount = icesiAccountRepository.findByAccountNumber(accountNumber).isPresent();
-        if(!foundAccount){
+        if(icesiAccountRepository.findByAccountNumber(accountNumber).isEmpty()){
             throw new RuntimeException(String.valueOf(ErrorConstants.CODE_UD_08.getMessage()));
         }
         icesiAccountRepository.enableAccount(accountNumber);
@@ -71,8 +70,8 @@ public class IcesiAccountService {
 
 
     public IcesiAccountDTO disableAccount(String accountNumber){
-        boolean foundAccount = icesiAccountRepository.findByAccountNumber(accountNumber).isPresent();
-        if(!foundAccount){
+
+        if(icesiAccountRepository.findByAccountNumber(accountNumber).isEmpty()){
             throw new RuntimeException(String.valueOf(ErrorConstants.CODE_UD_08.getMessage()));
         }
         icesiAccountRepository.disableAccount(accountNumber);
@@ -92,8 +91,7 @@ public class IcesiAccountService {
     }
 
     public void withdrawals(IcesiAccountDTO icesiAccountDTO, String numberAccount, int value) {
-        boolean accountExists =icesiAccountRepository.findByAccountNumber(numberAccount).isPresent();
-        if (!accountExists) {
+        if (icesiAccountRepository.findByAccountNumber(numberAccount).isEmpty()) {
             throw new RuntimeException(String.valueOf(ErrorConstants.CODE_UD_08.getMessage()));
         }
         long balance = icesiAccountDTO.getBalance();
@@ -104,8 +102,7 @@ public class IcesiAccountService {
     }
 
     public void depositCash(IcesiAccountDTO account, String numberAccount, int depositCash) {
-        boolean accountExists = icesiAccountRepository.findByAccountNumber(numberAccount).isPresent();
-        if (!accountExists) {
+        if (icesiAccountRepository.findByAccountNumber(numberAccount).isEmpty()) {
             throw new RuntimeException(String.valueOf(ErrorConstants.CODE_UD_08.getMessage()));
         }
         if (depositCash <= 0) {
@@ -128,6 +125,29 @@ public class IcesiAccountService {
 
     }
 
+    public IcesiTransactionsDTO transfer(IcesiTransactionsDTO transactionDTO) {
+
+        if (transactionDTO.getAmount() <= 0) {throw new RuntimeException(String.valueOf(ErrorConstants.CODE_UD_12.getMessage()));}
+
+        boolean existAccountSource = icesiAccountRepository.findByAccountNumber(transactionDTO.getAccountOrigin()).isPresent();
+        boolean existAccountDestination = icesiAccountRepository.findByAccountNumber(transactionDTO.getAccountDestination()).isPresent();
+
+        if (!existAccountSource || !existAccountDestination) {throw new RuntimeException(String.valueOf(ErrorConstants.CODE_UD_08.getMessage()));}
+
+        IcesiAccountDTO accountOrigin = icesiAccountMapper.fromIcesiAccount(getAccountByAccountNumber(transactionDTO.getAccountOrigin()));
+        IcesiAccountDTO accountDestination = icesiAccountMapper.fromIcesiAccount(getAccountByAccountNumber(transactionDTO.getAccountDestination()));
+
+        validateAccountTypeOrigin(accountOrigin,accountDestination);
+        if (accountOrigin.getBalance() < transactionDTO.getAmount()) {throw new RuntimeException(String.valueOf(ErrorConstants.CODE_UD_10.getMessage()));}
+        accountOrigin.setBalance(accountOrigin.getBalance() - transactionDTO.getAmount());
+        accountDestination.setBalance(accountDestination.getBalance() + transactionDTO.getAmount());
+
+        return transactionDTO;
+    }
+    public IcesiAccount getAccountByAccountNumber(String accountNumber){
+        return icesiAccountRepository.findByAccountNumber(accountNumber).orElseThrow(() ->  new RuntimeException(String.valueOf(ErrorConstants.CODE_UD_08.getMessage())));
+    }
+
     private void validateAccountTypeOrigin(IcesiAccountDTO icesiAccountCreateDto, IcesiAccountDTO destinationAccount) {
         icesiAccountRepository.findByAccountNumber(icesiAccountCreateDto.getAccountNumber()).orElseThrow(() -> new RuntimeException(String.valueOf(ErrorConstants.CODE_UD_08.getMessage())));
         icesiAccountRepository.findByAccountNumber(destinationAccount.getAccountNumber()).orElseThrow(() -> new RuntimeException(String.valueOf(ErrorConstants.CODE_UD_08.getMessage())));
@@ -135,7 +155,6 @@ public class IcesiAccountService {
         if (icesiAccountCreateDto.getType().equalsIgnoreCase("Deposit Only") || destinationAccount.getType().equalsIgnoreCase("Deposit Only")) {
             throw new RuntimeException(String.valueOf(ErrorConstants.CODE_UD_13.getMessage()));
         }
-
 
     }
 
