@@ -1,6 +1,8 @@
 package co.com.icesi.demojpa.service;
 
 import co.com.icesi.demojpa.dto.AccountCreateDTO;
+import co.com.icesi.demojpa.dto.TransactionOperationDTO;
+import co.com.icesi.demojpa.dto.TransactionResultDTO;
 import co.com.icesi.demojpa.mapper.AccountMapper;
 import co.com.icesi.demojpa.model.IcesiAccount;
 import co.com.icesi.demojpa.model.IcesiUser;
@@ -23,13 +25,13 @@ public class AccountService {
     private final AccountRepository accountRepository;
     private final AccountMapper accountMapper;
 
-    public IcesiAccount save(AccountCreateDTO account){
 
-        Optional<IcesiUser> userOptional = userRepository.findById(account.getUser().getUserId());
+    //@Transaccional asegura que las consultas se realicen una sola vez
+    public AccountCreateDTO save(AccountCreateDTO account){
 
-        if(userOptional.isEmpty()){
-            throw new RuntimeException("User does not exist");
-        }
+        userRepository.findById(account.getUser().getUserId()).orElseThrow(
+                () -> new RuntimeException("User does not exist"));
+
         if(account.getBalance()<0){
             throw new RuntimeException("Balance must be greater than 0");
         }
@@ -37,93 +39,99 @@ public class AccountService {
         IcesiAccount icesiAccount = accountMapper.fromIcesiAccountDTO(account);
         account.setAccountId(UUID.randomUUID());
         account.setAccountNumber(generateAccountNumber());
-        //userOptional.get().getAccounts().add(icesiAccount);
-        return accountRepository.save(icesiAccount);
+        account.setActive(true);
+        return accountMapper.fromIcesiAccount(accountRepository.save(icesiAccount));
     }
 
     public void disableAccount(String accountNumber){
-        Optional<IcesiAccount> accountOptional = accountRepository.findByNumber(accountNumber);
-        if(accountOptional.isEmpty()){
-            throw new RuntimeException("Account does not exist");
-        }
-        if(accountOptional.get().getBalance()>0){
+        IcesiAccount account = getAccount(accountNumber);
+
+        if(account.getBalance()>0){
             throw new RuntimeException("Account must have 0 balance to be disabled");
-        }else{
-            accountOptional.get().setActive(false);
-            accountRepository.save(accountOptional.get());
         }
+
+        account.setActive(false);
+        accountRepository.save(account);
+
     }
 
     public void enableAccount(String accountNumber){
-        Optional<IcesiAccount> accountOptional = accountRepository.findByNumber(accountNumber);
-        if(accountOptional.isEmpty()){
-            throw new RuntimeException("Account does not exist");
-        }else{
-            accountOptional.get().setActive(true);
-            accountRepository.save(accountOptional.get());
+        IcesiAccount account = getAccount(accountNumber);
+        account.setActive(true);
+        accountRepository.save(account);
+    }
+
+    public TransactionResultDTO transferMoney(TransactionOperationDTO transaction){
+
+        IcesiAccount sourceAccount = getAccount(transaction.getAccountFrom());
+        IcesiAccount targetAccount = getAccount(transaction.getAccountTo());
+        long amount = transaction.getAmount();
+
+        validateAccountType(sourceAccount);
+        validateAccountType(targetAccount);
+        validateBalance(amount, sourceAccount.getBalance());
+
+        sourceAccount.setBalance(sourceAccount.getBalance()-amount);
+        targetAccount.setBalance(targetAccount.getBalance()+amount);
+        accountRepository.save(sourceAccount);
+        accountRepository.save(targetAccount);
+
+        return accountMapper.fromTransactionOperation(transaction, "Success");
+    }
+
+    public IcesiAccount getAccount(String accountNumber) {
+        return accountRepository.findByNumber(accountNumber)
+                .orElseThrow(() -> new RuntimeException("Account does not exist"));
+    }
+
+    public void validateAccountType(IcesiAccount account){
+        if(account.getType().equals("Deposit")){
+            throw new RuntimeException("You can't transfer money to this type of accounts");
         }
     }
 
-    public void transferMoney(String sourceAccountNumber, String targetAccountNumber, long amount){
-        Optional<IcesiAccount> sourceAccountOptional = accountRepository.findByNumber(sourceAccountNumber);
-        Optional<IcesiAccount> targetAccountOptional = accountRepository.findByNumber(targetAccountNumber);
-
-        if(sourceAccountOptional.isEmpty() || targetAccountOptional.isEmpty()){
-            throw new RuntimeException("One or both accounts do not exist");
+    public void validateBalance(long amount, long balance){
+        if(amount>balance){
+            throw new RuntimeException("Account must have balance greater than the amount to transfer");
         }
-        if(sourceAccountOptional.get().getBalance()<=0){
-            throw new RuntimeException("Source account must have balance greater than 0");
-        }
-        if(!sourceAccountOptional.get().isActive() || !targetAccountOptional.get().isActive()){
-            throw new RuntimeException("One or both accounts are disabled");
-        }
-        if(sourceAccountOptional.get().getType().equals("Deposit") || targetAccountOptional.get().getType().equals("Deposit")){
-            throw new RuntimeException("One or both accounts are deposit accounts, " +
-                    "you can't transfer money to this type of accounts");
-        }
-        if(sourceAccountOptional.get().getBalance()<amount){
-            throw new RuntimeException("Source account must have balance greater than the amount to transfer");
-        }
-
-        sourceAccountOptional.get().setBalance(sourceAccountOptional.get().getBalance()-amount);
-        targetAccountOptional.get().setBalance(targetAccountOptional.get().getBalance()+amount);
-        accountRepository.save(sourceAccountOptional.get());
-        accountRepository.save(targetAccountOptional.get());
     }
 
-    public void withdraw(String accountNumber, long amount){
-        Optional<IcesiAccount> accountOptional = accountRepository.findByNumber(accountNumber);
-
-        if (accountOptional.isEmpty()) {
-            throw new RuntimeException("Account does not exist");
-        } else if (!accountOptional.get().isActive()) {
+    public void validateStatus(IcesiAccount account){
+        if(!account.isActive()){
             throw new RuntimeException("Account is disabled");
-        } else if (amount < 0) {
-            throw new RuntimeException("Amount must be greater than 0");
-        } else if (accountOptional.get().getBalance() < amount) {
-            throw new RuntimeException("Account must have balance greater than the amount to withdraw");
-        } else {
-            IcesiAccount account = accountOptional.get();
-            account.setBalance(account.getBalance() - amount);
-            accountRepository.save(account);
         }
-
     }
 
-    public void deposit(String accountNumber, long amount){
-        Optional<IcesiAccount> accountOptional = accountRepository.findByNumber(accountNumber);
 
-        if (accountOptional.isEmpty()) {
-            throw new RuntimeException("Account does not exist");
-        } else if (!accountOptional.get().isActive()) {
-            throw new RuntimeException("Account is disabled");
-        } else if (amount < 0) {
+    //Crear un DTO para la transacción
+    public TransactionResultDTO withdraw(TransactionOperationDTO transaction){
+        IcesiAccount account = getAccount(transaction.getAccountFrom());
+        long amount = transaction.getAmount();
+
+        validateStatus(account);
+        validateBalance(amount, account.getBalance());
+
+        if (amount < 0) {
             throw new RuntimeException("Amount must be greater than 0");
-        } else {
-            IcesiAccount account = accountOptional.get();
-            account.setBalance(account.getBalance() + amount);
-            accountRepository.save(account);
         }
+
+        account.setBalance(account.getBalance() - amount);
+        accountRepository.save(account);
+        return accountMapper.fromTransactionOperation(transaction, "Success");
+    }
+
+    public TransactionResultDTO deposit(TransactionOperationDTO transaction){
+        IcesiAccount account = getAccount(transaction.getAccountFrom());
+        long amount = transaction.getAmount();
+        validateStatus(account);
+
+        if (amount < 0) {
+            throw new RuntimeException("Amount must be greater than 0");
+        }
+
+        account.setBalance(account.getBalance() + amount);
+        accountRepository.save(account);
+        return accountMapper.fromTransactionOperation(transaction, "Success");
     }
 
     public String generateAccountNumber() {

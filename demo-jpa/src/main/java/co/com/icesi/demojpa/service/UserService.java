@@ -25,33 +25,40 @@ public class UserService {
 
     public IcesiUser save(UserCreateDTO user){
 
-        Optional<IcesiUser> emailOptional = userRepository.findByEmail(user.getEmail());
-        Optional<IcesiUser> phoneOptional = userRepository.findByPhone(user.getPhoneNumber());
-        Optional<RoleCreateDTO> roleDTOOptional = Optional.ofNullable(user.getRole());
-
-        if(emailOptional.isPresent() && phoneOptional.isPresent()){
-            throw new RuntimeException("User with both e-mail and phone already exists");
-        }else if(emailOptional.isPresent()){
-            throw new RuntimeException("User with this e-mail already exists");
-        }else if(phoneOptional.isPresent()){
-            throw new RuntimeException("User with this phone number already exists");
-        }else if(!roleDTOOptional.isPresent()) {
-            throw new RuntimeException("User must have a role");
-        }
-
-        Optional<IcesiRole> roleOptional = roleRepository.findByName(user.getRole().getName());
-
-        if(roleOptional.isEmpty()){
-            throw new RuntimeException("Role does not exist");
-        }
+        validateEmailAndPhone(user);
+        validateRole(user.getRole());
 
         IcesiUser icesiUser = userMapper.fromIcesiUserDTO(user);
         icesiUser.setUserId(UUID.randomUUID());
-        IcesiRole role = roleOptional.get();
-        icesiUser.setRole(role);
-        //icesiUser.setAccounts(new ArrayList<>());
-        //role.getUsers().add(icesiUser);
-        //roleRepository.save(role);
+
         return userRepository.save(icesiUser);
     }
+
+    public void validateEmailAndPhone(UserCreateDTO user){
+        if(validatePhone(user.getPhoneNumber()) && validateEmail(user.getEmail())){
+            throw new RuntimeException("User with both e-mail and phone already exists");
+        }
+    }
+
+    public boolean validateEmail(String email){
+        userRepository.findByEmail(email).ifPresent(user -> {
+            throw new RuntimeException("User with this e-mail already exists");
+        });
+        return true;
+    }
+
+    public boolean validatePhone(String phone){
+        userRepository.findByPhone(phone).ifPresent(user -> {
+            throw new RuntimeException("User with this phone number already exists");
+        });
+        return true;
+    }
+
+    public void validateRole(RoleCreateDTO roleName){
+        Optional.ofNullable(roleName).orElseThrow(() -> new RuntimeException("User must have a role"));
+
+        roleRepository.findByName(roleName.getName()).orElseThrow(() -> new RuntimeException("Role does not exist"));
+    }
+
+
 }

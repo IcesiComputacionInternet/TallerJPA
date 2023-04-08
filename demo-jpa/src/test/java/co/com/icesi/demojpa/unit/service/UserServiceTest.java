@@ -75,7 +75,6 @@ public class UserServiceTest {
     @Test
     public void testSaveUserEmailAndPhoneNumberAlreadyExist(){
         when(roleRepository.findByName(any())).thenReturn(Optional.of(defaultCreateRole()));
-
         when(userRepository.findByEmail(any())).thenReturn(Optional.of(defaultCreateUser()));
         when(userRepository.findByPhone(any())).thenReturn(Optional.of(defaultCreateUser()));
         try{

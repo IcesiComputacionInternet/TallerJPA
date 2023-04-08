@@ -69,7 +69,6 @@ public class AccountServiceTest {
         }
 
     }
-
     @Test
     public void testDisableAccount(){
         when(accountRepository.findByNumber(any())).thenReturn(Optional.ofNullable(createDefault0BalanceAccount()));
