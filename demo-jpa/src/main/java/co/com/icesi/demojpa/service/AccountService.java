@@ -81,7 +81,7 @@ public class AccountService {
 
     public IcesiAccount getAccount(String accountNumber) {
         return accountRepository.findByNumber(accountNumber)
-                .orElseThrow(() -> new RuntimeException("Account does not exist"));
+                .orElseThrow(() -> new RuntimeException("Account " + accountNumber + " does not exist"));
     }
 
     public void validateAccountType(IcesiAccount account){
@@ -102,8 +102,6 @@ public class AccountService {
         }
     }
 
-
-    //Crear un DTO para la transacción
     public TransactionResultDTO withdraw(TransactionOperationDTO transaction){
         IcesiAccount account = getAccount(transaction.getAccountFrom());
         long amount = transaction.getAmount();

@@ -5,6 +5,7 @@ import co.com.icesi.demojpa.dto.RoleCreateDTO;
 import co.com.icesi.demojpa.dto.TransactionOperationDTO;
 import co.com.icesi.demojpa.dto.UserCreateDTO;
 import co.com.icesi.demojpa.mapper.AccountMapper;
+import co.com.icesi.demojpa.mapper.AccountMapperImpl;
 import co.com.icesi.demojpa.model.IcesiAccount;
 import co.com.icesi.demojpa.model.IcesiRole;
 import co.com.icesi.demojpa.model.IcesiUser;
@@ -33,7 +34,7 @@ public class AccountServiceTest {
     public void init(){
         accountRepository = mock(AccountRepository.class);
         userRepository = mock(UserRepository.class);
-        accountMapper = spy(AccountMapper.class);
+        accountMapper = spy(AccountMapperImpl.class);
         accountService = new AccountService(userRepository, accountRepository, accountMapper);
     }
 
@@ -99,7 +100,7 @@ public class AccountServiceTest {
             fail();
         }catch (RuntimeException exception){
             String message= exception.getMessage();
-            assertEquals("Account does not exist",message);
+            assertEquals("Account " + createTransactionOperationDTO().getAccountFrom() + " does not exist",message);
         }
     }
 
@@ -119,7 +120,7 @@ public class AccountServiceTest {
             fail();
         }catch (RuntimeException exception){
             String message= exception.getMessage();
-            assertEquals("Account does not exist",message);
+            assertEquals("Account " + createTransactionOperationDTO().getAccountFrom() + " does not exist",message);
         }
     }
 
@@ -146,7 +147,7 @@ public class AccountServiceTest {
             fail();
         }catch (RuntimeException exception){
             String message= exception.getMessage();
-            assertEquals("Account must have balance greater than the amount to withdraw",message);
+            assertEquals("Account must have balance greater than the amount to transfer",message);
         }
     }
 
@@ -166,7 +167,7 @@ public class AccountServiceTest {
             fail();
         }catch (RuntimeException exception){
             String message= exception.getMessage();
-            assertEquals("Account does not exist",message);
+            assertEquals("Account " + createTransactionOperationDTO().getAccountFrom() + " does not exist",message);
         }
     }
 
@@ -200,19 +201,19 @@ public class AccountServiceTest {
     @Test
     public void transfer() {
 
-        when(accountRepository.findByNumber(createDefaultPositiveBalanceAccount().getAccountNumber())).thenReturn(Optional.ofNullable(createDefaultPositiveBalanceAccount()));
-        when(accountRepository.findByNumber(createDefault0BalanceAccount().getAccountNumber())).thenReturn(Optional.ofNullable(createDefault0BalanceAccount()));
-        when(accountRepository.save(any())).thenReturn(createDepositAccount());
+        when(accountRepository.findByNumber("123-456789-10")).thenReturn(Optional.ofNullable(createDefaultPositiveBalanceAccount()));
+        when(accountRepository.findByNumber("123-456789-12")).thenReturn(Optional.ofNullable(createDefault0BalanceAccount()));
 
+        accountService.transferMoney(createTransactionOperationDTO());
         IcesiAccount sourceAccount = accountRepository.findByNumber(createDefaultPositiveBalanceAccount().getAccountNumber()).get();
         IcesiAccount targetAccount = accountRepository.findByNumber(createDefault0BalanceAccount().getAccountNumber()).get();
-        accountService.transferMoney(createTransactionOperationDTO());
+
 
         verify(accountRepository, times(2)).save(any());
 
-        assertEquals(999000,sourceAccount.getBalance());
+        assertEquals(999000L,sourceAccount.getBalance());
 
-        assertEquals(1000,targetAccount.getBalance());
+        assertEquals(1000L,targetAccount.getBalance());
 
     }
 
@@ -224,7 +225,7 @@ public class AccountServiceTest {
             fail();
         }catch (RuntimeException exception){
             String message= exception.getMessage();
-            assertEquals("One or both accounts do not exist",message);
+            assertEquals("Account " + createTransactionOperationDTO().getAccountFrom() + " does not exist",message);
         }
     }
 
@@ -235,8 +236,7 @@ public class AccountServiceTest {
             fail();
         }catch (RuntimeException exception){
             String message= exception.getMessage();
-            assertEquals("One or both accounts are deposit accounts, " +
-                    "you can't transfer money to this type of accounts",message);
+            assertEquals("You can't transfer money to this type of accounts",message);
         }
     }
 
@@ -251,7 +251,7 @@ public class AccountServiceTest {
             fail();
         }catch (RuntimeException exception){
             String message= exception.getMessage();
-            assertEquals("Source account must have balance greater than the amount to transfer",message);
+            assertEquals("Account must have balance greater than the amount to transfer",message);
         }
     }
 
@@ -262,7 +262,7 @@ public class AccountServiceTest {
                 .accountNumber("123-456789-10")
                 .type("Default")
                 .user(defaultCreateUser())
-                .balance(1000000)
+                .balance(1000000L)
                 .active(true)
                 .build();
     }
@@ -270,6 +270,7 @@ public class AccountServiceTest {
     private TransactionOperationDTO createTransactionOperationDTO(){
         return TransactionOperationDTO.builder()
                 .accountFrom("123-456789-10")
+                .accountTo("123-456789-12")
                 .amount(1000L)
                 .build();
     }
@@ -313,7 +314,7 @@ public class AccountServiceTest {
                 .accountNumber("123-456789-12")
                 .type("Default")
                 .user(defaultCreateUser())
-                .balance(0)
+                .balance(0L)
                 .active(true)
                 .build();
     }
@@ -337,28 +338,6 @@ public class AccountServiceTest {
                 .user(defaultCreateUser())
                 .balance(1000000)
                 .active(false)
-                .build();
-    }
-
-    private AccountCreateDTO createDefaultDTODisabledAccount(){
-        return AccountCreateDTO.builder()
-                .accountId(UUID.randomUUID())
-                .accountNumber("123-456789-13")
-                .type("Default")
-                .user(defaultCreateUserDTO())
-                .balance(1000000)
-                .active(false)
-                .build();
-    }
-
-    private IcesiAccount createDefaultNegativeBalanceAccount(){
-        return IcesiAccount.builder()
-                .accountId(UUID.randomUUID())
-                .accountNumber("123-456789-14")
-                .type("Default")
-                .user(defaultCreateUser())
-                .balance(-1000000)
-                .active(true)
                 .build();
     }
 

@@ -2,6 +2,7 @@ package co.com.icesi.demojpa.unit.service;
 
 import co.com.icesi.demojpa.dto.RoleCreateDTO;
 import co.com.icesi.demojpa.mapper.RoleMapper;
+import co.com.icesi.demojpa.mapper.RoleMapperImpl;
 import co.com.icesi.demojpa.model.IcesiRole;
 import co.com.icesi.demojpa.repository.RoleRepository;
 import co.com.icesi.demojpa.service.RoleService;
@@ -24,7 +25,7 @@ public class RoleServiceTest {
     @BeforeEach
     public void setup(){
         roleRepository = mock(RoleRepository.class) ;
-        roleMapper = spy(RoleMapper.class);
+        roleMapper = spy(RoleMapperImpl.class);
         roleService = new RoleService(roleRepository, roleMapper);
     }
 
