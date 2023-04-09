@@ -5,6 +5,7 @@ import com.edu.icesi.TallerJPA.mapper.UserMapper;
 import com.edu.icesi.TallerJPA.mapper.UserMapperImpl;
 import com.edu.icesi.TallerJPA.model.IcesiRole;
 import com.edu.icesi.TallerJPA.model.IcesiUser;
+import com.edu.icesi.TallerJPA.repository.RoleRepository;
 import com.edu.icesi.TallerJPA.repository.UserRepository;
 import com.edu.icesi.TallerJPA.service.UserService;
 import com.edu.icesi.TallerJPA.unit.matcher.IcesiUserMatcher;
@@ -25,16 +26,19 @@ public class UserServiceTest {
 
     private UserMapper userMapper;
 
+    private RoleRepository roleRepository;
+
     @BeforeEach
     private void init() {
         userRepository = mock(UserRepository.class);
         userMapper = spy(UserMapperImpl.class);
-        userService = new UserService(userRepository, userMapper);
+        roleRepository = mock(RoleRepository.class);
+        userService = new UserService(userRepository, userMapper, roleRepository);
     }
-    /*
+
     @Test
     public void testCreateUser() {
-        IcesiUser icesiUser = userService.save(createDefaultDTO());
+        UserCreateDTO icesiUser = userService.save(createDefaultDTO());
         IcesiUser icesiUser1 = IcesiUser.builder()
                 .firstName("John")
                 .lastName("Doe")
@@ -147,5 +151,4 @@ public class UserServiceTest {
                 .build();
     }
 
-     */
 }
