@@ -3,6 +3,7 @@ package co.com.icesi.TallerJPA.service;
 import co.com.icesi.TallerJPA.dto.IcesiAccountCreateDTO;
 import co.com.icesi.TallerJPA.dto.IcesiTransactionDTO;
 import co.com.icesi.TallerJPA.dto.responseDTO.IcesiAccountCreateResponseDTO;
+import co.com.icesi.TallerJPA.enums.AccountType;
 import co.com.icesi.TallerJPA.mapper.IcesiAccountMapper;
 import co.com.icesi.TallerJPA.model.IcesiAccount;
 import co.com.icesi.TallerJPA.model.IcesiUser;
@@ -24,20 +25,22 @@ public class IcesiAccountService {
     private final IcesiAccountMapper accountMapper;
 
     public IcesiAccountCreateResponseDTO save(IcesiAccountCreateDTO accountDTO){
-        IcesiUser user = userRepository.findByEmail(accountDTO.getIcesiUser()).orElseThrow(() -> new RuntimeException("The user "+accountDTO.getIcesiUser()+" doesn't exist in the database"));
+        IcesiUser user = userRepository.findByEmail(accountDTO.getIcesiUser().getEmail())
+                .orElseThrow(() -> new RuntimeException("The user "+accountDTO.getIcesiUser()+" doesn't exist in the database"));
 
         IcesiAccount account= accountMapper.fromIcesiAccountDTO(accountDTO);
 
         account.setAccountId(UUID.randomUUID());
         account.setAccountNumber(validateUniqueAccountNumber(generateAccountNumber()));
-        account.setUser(user);
+        account.setIcesiUser(user);
         account.setActive(true);
         return accountMapper.accountToAccountDTO(accountRepository.save(account));
     }
 
+
     //Accounts marked as deposit only can't transfer or be transferred money, only withdrawal and deposit.
     public IcesiAccount getIcesiAccountNumber(String accountNumber){
-        return accountRepository.findAccountByAccountNumber(accountNumber,true)
+        return accountRepository.findAccountByAccountNumber(accountNumber)
                 .orElseThrow( ()-> new RuntimeException("This account "+accountNumber+" doesn't exist in the database"));
     }
     private void validateAccountBalance(long amountAccountBalance, long money) {
@@ -46,13 +49,17 @@ public class IcesiAccountService {
         }
     }
     private void accountType(IcesiAccount account){
-        if (account.getType().equalsIgnoreCase("DEPOSIT_ONLY")){
+        if (account.getAccountType().equals(AccountType.DEPOSIT_ONLY)){
             throw new RuntimeException("This account "+account.getAccountNumber()+" can't transfer because is marked as 'deposit only'");
         }
     }
     @Transactional
     public IcesiTransactionDTO depositOnly(IcesiTransactionDTO transactionDTO) {
-        IcesiAccount account = getIcesiAccountNumber(transactionDTO.getAccountNumberOrigin());
+        IcesiAccount account = accountRepository.findAccountByAccountNumber(transactionDTO.getAccountNumberOrigin())
+                .orElseThrow(() -> new RuntimeException("The account "+transactionDTO.getAccountNumberOrigin()+" does not exist, deposit cannot be made"));
+        if(!account.isActive()){
+            throw new RuntimeException("This account is not active, deposit cannot be made");
+        }
         account.setBalance(account.getBalance() + transactionDTO.getAmount());
         accountRepository.save(account);
         transactionDTO.setMessageResult("The deposit was made successfully");
@@ -60,7 +67,12 @@ public class IcesiAccountService {
     }
     @Transactional
     public IcesiTransactionDTO withdrawal(IcesiTransactionDTO transactionDTO) {
-        IcesiAccount account = getIcesiAccountNumber(transactionDTO.getAccountNumberOrigin());
+        IcesiAccount account = accountRepository.findAccountByAccountNumber(transactionDTO.getAccountNumberDestination())
+                .orElseThrow(() -> new RuntimeException("The account "+transactionDTO.getAccountNumberDestination()+" does not exist, withdrawal cannot be made"));
+        if(!account.isActive()){
+            throw new RuntimeException("This account is not active, withdrawal cannot be made");
+        }
+
         validateAccountBalance(account.getBalance(),transactionDTO.getAmount());
         account.setBalance(account.getBalance() - transactionDTO.getAmount());
         accountRepository.save(account);
@@ -90,7 +102,7 @@ public class IcesiAccountService {
 
     //Accounts number should be unique.
     private String validateUniqueAccountNumber(String accountNumber){
-        if(accountRepository.findAccountByAccountNumber(accountNumber,true).isPresent()){
+        if(accountRepository.findAccountByAccountNumber(accountNumber).isPresent()){
             return validateUniqueAccountNumber(generateAccountNumber());
         }
         return accountNumber;
@@ -118,8 +130,11 @@ public class IcesiAccountService {
     //Enabled and disabled account
     @Transactional
     public String enableAccount(String accountNumber){
-        IcesiAccount account=accountRepository.findAccountByAccountNumber(accountNumber,false).
+        IcesiAccount account=accountRepository.findAccountByAccountNumber(accountNumber).
                 orElseThrow( ()-> new RuntimeException("Account could not be found for activation"));
+        if(account.isActive()){
+            throw new RuntimeException("This account cannot be enabled because is already active");
+        }
         account.setActive(true);
         accountRepository.save(account);
         return "The account was enabled successfully";
@@ -127,10 +142,10 @@ public class IcesiAccountService {
 
     @Transactional
     public String disableAccount(String accountNumber){
-        IcesiAccount account=accountRepository.findAccountByAccountNumber(accountNumber,true).
+        IcesiAccount account=accountRepository.findAccountByAccountNumber(accountNumber).
                 orElseThrow( ()-> new RuntimeException("Account could not be found for deactivation"));
         if(account.getBalance()>0){
-            throw new RuntimeException("The account must have 0 balance for deactivation");
+            throw new RuntimeException("This account cannot be disabled because it is already disabled");
         }
         account.setActive(false);
         accountRepository.save(account);

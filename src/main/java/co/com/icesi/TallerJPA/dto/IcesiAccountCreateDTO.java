@@ -9,5 +9,5 @@ import lombok.Data;
 public class IcesiAccountCreateDTO {
     private Long balance;
     private AccountType accountType;
-    private String icesiUser;
+    private IcesiUserCreateDTO icesiUser;
 }

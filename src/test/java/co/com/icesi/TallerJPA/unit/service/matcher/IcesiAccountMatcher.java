@@ -13,10 +13,9 @@ public class IcesiAccountMatcher implements ArgumentMatcher<IcesiAccount> {
     }
     @Override
     public boolean matches(IcesiAccount icesiAccountRight) {
-        return icesiAccountRight.getAccountId()!=null &&
-                icesiAccountRight.getAccountNumber()!=null &&
-                icesiAccountRight.getUser()!=null &&
-                Objects.equals(icesiAccountRight.getType(),icesiAccountLeft.getType()) &&
+        return icesiAccountRight.getAccountNumber()!=null &&
+                icesiAccountRight.getIcesiUser()!=null &&
+                Objects.equals(icesiAccountRight.getAccountType(),icesiAccountLeft.getAccountType()) &&
                 Objects.equals(icesiAccountRight.isActive(), icesiAccountLeft.isActive()) &&
                 Objects.equals(icesiAccountRight.getBalance(),icesiAccountLeft.getBalance());
     }

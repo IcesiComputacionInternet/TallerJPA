@@ -1,5 +1,6 @@
 package co.com.icesi.TallerJPA.model;
 
+import co.com.icesi.TallerJPA.enums.AccountType;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
@@ -18,9 +19,9 @@ public class IcesiAccount {
     private UUID accountId;
     private String accountNumber;
     private Long balance;
-    private String type;
+    private AccountType accountType;
     private boolean active;
     @ManyToOne
     @JoinColumn(name = "icesi_user_user_id")
-    private IcesiUser user;
+    private IcesiUser icesiUser;
 }
