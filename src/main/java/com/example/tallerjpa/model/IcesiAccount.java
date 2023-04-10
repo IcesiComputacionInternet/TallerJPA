@@ -22,7 +22,7 @@ public class IcesiAccount {
     private UUID accountId;
     private String accountNumber;
     private long balance;
-    private String type;
+    private AccountType type;
     private boolean active;
 
     @ManyToOne

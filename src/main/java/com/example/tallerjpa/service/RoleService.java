@@ -7,7 +7,6 @@ import com.example.tallerjpa.repository.RoleRepository;
 import lombok.AllArgsConstructor;
 import org.springframework.stereotype.Service;
 
-import javax.management.relation.Role;
 import java.util.UUID;
 
 @Service

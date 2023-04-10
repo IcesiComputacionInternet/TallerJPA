@@ -8,12 +8,14 @@ import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RestController;
 
+import static com.example.tallerjpa.api.RoleAPI.BASE_ROLE_URL;
+
 @RestController
 @AllArgsConstructor
 public class IcesiRoleController {
 
     private final RoleService roleService;
 
-    @PostMapping("/role")
+    @PostMapping("/roles")
     public IcesiRole createRole(@RequestBody RoleDTO roleDTO) {return roleService.saveRole(roleDTO);}
 }

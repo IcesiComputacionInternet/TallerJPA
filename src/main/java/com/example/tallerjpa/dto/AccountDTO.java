@@ -1,22 +1,24 @@
 package com.example.tallerjpa.dto;
 
 
-import com.example.tallerjpa.model.IcesiUser;
-import com.fasterxml.jackson.annotation.JsonProperty;
-import lombok.AllArgsConstructor;
+import com.example.tallerjpa.model.AccountType;
 import lombok.Builder;
 import lombok.Data;
-import lombok.NoArgsConstructor;
+
+import javax.validation.constraints.Max;
+import javax.validation.constraints.Min;
+import javax.validation.constraints.NotBlank;
 
 @Data
 @Builder
-@AllArgsConstructor
-@NoArgsConstructor
 public class AccountDTO {
 
+
     private long balance;
-    private String type;
+    private AccountType type;
     private boolean active;
+
+
     private String emailUser;
 
 

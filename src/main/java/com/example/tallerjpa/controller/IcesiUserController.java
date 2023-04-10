@@ -8,13 +8,15 @@ import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RestController;
 
+import static com.example.tallerjpa.api.UserAPI.BASE_USER_URL;
+
 @RestController
 @AllArgsConstructor
 public class IcesiUserController {
 
     private final UserService userService;
 
-    @PostMapping("/user")
+    @PostMapping("/users")
     public IcesiUser createIcesiUser(@RequestBody UserDTO userDTO){
         return userService.saveIcesiUser(userDTO);
     }

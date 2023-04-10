@@ -8,6 +8,7 @@ import org.mapstruct.Mapper;
 public interface AccountMapper {
 
     IcesiAccount fromAccountDTO (AccountDTO accountDTO);
+
     AccountDTO fromIcesiAccount (IcesiAccount icesiAccount);
 
 }
