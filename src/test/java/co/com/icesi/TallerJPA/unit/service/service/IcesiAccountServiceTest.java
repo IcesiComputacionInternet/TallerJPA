@@ -105,9 +105,9 @@ public class IcesiAccountServiceTest {
         IcesiAccount account = defaultIcesiAccount();
         account.setActive(false);
         when(accountRepository.findAccountByAccountNumber(any())).thenReturn(Optional.of(account));
-        accountService.enableAccount(account.getAccountNumber());
+        String accountWithAprovedMessage=accountService.enableAccount(account.getAccountNumber());
         verify(accountRepository,times(1)).save(argThat(new IcesiAccountMatcher(account)));
-        assertEquals("The account was enabled successfully", accountService.enableAccount(account.getAccountNumber()));
+        assertEquals("The account was enabled successfully", accountWithAprovedMessage);
     }
 
     @Test
