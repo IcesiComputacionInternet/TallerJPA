@@ -37,8 +37,6 @@ public class IcesiAccountService {
         return accountMapper.accountToAccountDTO(accountRepository.save(account));
     }
 
-
-    //Accounts marked as deposit only can't transfer or be transferred money, only withdrawal and deposit.
     public IcesiAccount getIcesiAccountNumber(String accountNumber){
         return accountRepository.findAccountByAccountNumber(accountNumber)
                 .orElseThrow( ()-> new RuntimeException("This account "+accountNumber+" doesn't exist in the database"));
@@ -100,7 +98,6 @@ public class IcesiAccountService {
         return  transactionDTO;
     }
 
-    //Accounts number should be unique.
     private String validateUniqueAccountNumber(String accountNumber){
         if(accountRepository.findAccountByAccountNumber(accountNumber).isPresent()){
             return validateUniqueAccountNumber(generateAccountNumber());
@@ -108,7 +105,6 @@ public class IcesiAccountService {
         return accountNumber;
     }
 
-    ////Accounts number should have the format xxx-xxxxxx-xx where x are numbers [0-9].
     private String generateAccountNumber(){
         Random random = new Random();
         StringBuilder sb = new StringBuilder();
@@ -127,7 +123,6 @@ public class IcesiAccountService {
         return sb.toString();
     }
 
-    //Enabled and disabled account
     @Transactional
     public String enableAccount(String accountNumber){
         IcesiAccount account=accountRepository.findAccountByAccountNumber(accountNumber).
