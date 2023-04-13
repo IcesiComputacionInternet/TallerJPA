@@ -5,13 +5,11 @@ import co.com.icesi.demojpa.dto.TransactionOperationDTO;
 import co.com.icesi.demojpa.dto.TransactionResultDTO;
 import co.com.icesi.demojpa.mapper.AccountMapper;
 import co.com.icesi.demojpa.model.IcesiAccount;
-import co.com.icesi.demojpa.model.IcesiUser;
 import co.com.icesi.demojpa.repository.AccountRepository;
 import co.com.icesi.demojpa.repository.UserRepository;
 import lombok.AllArgsConstructor;
 import org.springframework.stereotype.Service;
 
-import java.util.Optional;
 import java.util.Random;
 import java.util.UUID;
 import java.util.stream.Collectors;
@@ -138,10 +136,10 @@ public class AccountService {
                 .limit(11)
                 .mapToObj(Integer::toString)
                 .collect(Collectors.joining(""));
-        accountNumber.replaceFirst("(\\d{3})(\\d{6})(\\d{2})", "$1-$2-$3");
-        /*if(accountRepository.findByNumber(accountNumber).isPresent()){
+        accountNumber = accountNumber.replaceFirst("(\\d{3})(\\d{6})(\\d{2})", "$1-$2-$3");
+        if(accountRepository.findByNumber(accountNumber).isPresent()){
             generateAccountNumber();
-        }*/
+        }
         return accountNumber;
     }
 

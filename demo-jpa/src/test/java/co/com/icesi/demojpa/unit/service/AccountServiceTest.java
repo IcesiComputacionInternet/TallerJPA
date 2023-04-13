@@ -255,6 +255,21 @@ public class AccountServiceTest {
         }
     }
 
+    @Test
+    public void generateAccountNumber(){
+        when(accountRepository.findByNumber(any())).thenReturn(Optional.empty());
+        String accountNumber= accountService.generateAccountNumber();
+        String regex = "\\d{3}-\\d{6}-\\d{2}";
+        assertTrue(accountNumber.matches(regex));
+        assertEquals(13, accountNumber.length());
+    }
+
+    @Test
+    public void generateAccountNumberExistentNumber(){
+        when(accountRepository.findByNumber("123-456789-10")).thenReturn(Optional.ofNullable(createDefaultPositiveBalanceAccount()));
+        String accountNumber= accountService.generateAccountNumber();
+        assertFalse(createDefault0BalanceAccount().getAccountNumber().equals(accountNumber));
+    }
 
     private IcesiAccount createDefaultPositiveBalanceAccount(){
         return IcesiAccount.builder()
