@@ -38,6 +38,8 @@ public class UserServiceTest {
 
     @Test
     public void testCreateUser() {
+        when(roleRepository.findByName(any())).thenReturn(Optional.of(createRole()));
+
         UserCreateDTO icesiUser = userService.save(createDefaultDTO());
         IcesiUser icesiUser1 = IcesiUser.builder()
                 .firstName("John")
@@ -53,40 +55,51 @@ public class UserServiceTest {
 
     @Test
     public void testIcesiUserWithEmailAlreadyExists() {
+        when(roleRepository.findByName(any())).thenReturn(Optional.of(createRole()));
         when(userRepository.findByEmail(any())).thenReturn(Optional.of(createIcesiUser()));
+        UserCreateDTO user = createDefaultDTO();
 
         try {
-            userService.save(createDefaultDTO());
+            userService.save(user);
             fail();
         } catch (RuntimeException exception) {
             String messageOfException = exception.getMessage();
-            assertEquals("User with this email already exists", messageOfException);
+            assertEquals("User with email "+user.getEmail()+" already exists", messageOfException);
         }
+        verify(userRepository, times(0)).save(any());
     }
 
     @Test
     public void testIcesiUserWithPhoneNumberAlreadyExists() {
-        when(userRepository.findByPhoneNumber(any())).thenReturn(Optional.of(createIcesiUser()));
+        when(roleRepository.findByName(any())).thenReturn(Optional.of(createRole()));
+        when(userRepository.findByPhoneNumber("1234567")).thenReturn(Optional.of(createIcesiUser()));
+        UserCreateDTO user = createDefaultDTO();
 
         try {
-            userService.save(createDefaultDTO1());
+            userService.save(user);
             fail();
         } catch (RuntimeException exception) {
             String messageOfException = exception.getMessage();
-            assertEquals("User with this phone number already exists", messageOfException);
+            assertEquals("User with phone number "+user.getPhoneNumber()+" already exists", messageOfException);
         }
+        verify(userRepository, times(0)).save(any());
     }
 
     @Test
     public void testIcesiUserWithPhoneNumberAndEmailAlreadyExists() {
-        userService.save(createDefaultDTO1());
+        when(roleRepository.findByName(any())).thenReturn(Optional.of(createRole()));
+        when(userRepository.findByEmail(any())).thenReturn(Optional.of(createIcesiUser()));
+        when(userRepository.findByPhoneNumber(any())).thenReturn(Optional.of(createIcesiUser()));
+
         try {
             userService.save(createDefaultDTO());
-
+            fail();
         } catch (RuntimeException exception) {
             String messageOfException = exception.getMessage();
             assertEquals("User with this email and phone number already exists", messageOfException);
         }
+
+        verify(userRepository, times(0)).save(any());
     }
 
     @Test
@@ -99,20 +112,10 @@ public class UserServiceTest {
             String messageOfException = exception.getMessage();
             assertEquals("Role can't be null", messageOfException);
         }
+        verify(userRepository, times(0)).save(any());
     }
 
     private UserCreateDTO createDefaultDTO() {
-        return UserCreateDTO.builder()
-                .firstName("John")
-                .lastName("Doe")
-                .email("example@exampleEmail.com")
-                .phoneNumber("1234567")
-                .password("1234")
-                .icesiRole(createRole())
-                .build();
-    }
-
-    private UserCreateDTO createDefaultDTO1() {
         return UserCreateDTO.builder()
                 .firstName("John")
                 .lastName("Doe")

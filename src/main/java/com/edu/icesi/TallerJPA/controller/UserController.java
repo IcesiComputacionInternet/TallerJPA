@@ -18,7 +18,7 @@ public class UserController implements UserAPI {
 
     @Override
     public UserCreateDTO getUser(String email) {
-        return userService.findByEmail(email);
+        return userService.getByEmail(email);
     }
 
     public List<UserCreateDTO> getAllUsers(){
@@ -32,7 +32,7 @@ public class UserController implements UserAPI {
 
     @Override
     public UserCreateDTO getUserByPhoneNumber(String phoneNumber) {
-        return userService.findByPhoneNumber(phoneNumber);
+        return userService.getByPhoneNumber(phoneNumber);
     }
 
 }

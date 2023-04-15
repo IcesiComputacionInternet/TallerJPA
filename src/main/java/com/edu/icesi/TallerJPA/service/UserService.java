@@ -41,13 +41,34 @@ public class UserService {
         return userMapper.fromIcesiUser(userRepository.save(icesiUser));
     }
 
-    public UserCreateDTO findByEmail(String email){
-        return userMapper.fromIcesiUser(userRepository.findByEmail(email).orElseThrow(() -> new RuntimeException("User with this email already exists")));
+    public void findByEmail(String email){
+
+        if(userRepository.findByEmail(email).isPresent()){
+            throw new RuntimeException("User with email "+email+" already exists");
+        }
     }
 
-    public UserCreateDTO findByPhoneNumber(String phoneNumber){
-        return userMapper.fromIcesiUser(userRepository.findByPhoneNumber(phoneNumber)
-                .orElseThrow(() -> new RuntimeException("User with this phone number already exists")));
+    public UserCreateDTO getByEmail(String email){
+
+        if(userRepository.findByEmail(email).isPresent()){
+            throw new RuntimeException("User with this email already exists");
+        }
+        return userMapper.fromIcesiUser(userRepository.findByEmail(email).get());
+    }
+
+    public void findByPhoneNumber(String phoneNumber){
+
+        if(userRepository.findByPhoneNumber(phoneNumber).isPresent()){
+            throw new RuntimeException("User with phone number "+phoneNumber+" already exists");
+        }
+    }
+
+    public UserCreateDTO getByPhoneNumber(String phoneNumber){
+
+        if(userRepository.findByEmail(phoneNumber).isPresent()){
+            throw new RuntimeException("User with this phone number already exists");
+        }
+        return userMapper.fromIcesiUser(userRepository.findByEmail(phoneNumber).get());
     }
 
     public void validationRole(IcesiRole role){
