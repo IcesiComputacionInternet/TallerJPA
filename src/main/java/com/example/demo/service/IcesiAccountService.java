@@ -51,21 +51,18 @@ public class IcesiAccountService {
 
     /*The following method is used to generate a random account number whose format is XXX-XXXXXX-XX
     where X is a random digit between 0 and 9*/
-    
     public static String generateAccountNumber() {
-        
+     
         //The following line creates a IntStream of 11 digits with values between 0(inclusive) and 10(exclusive)
         IntStream intStream = new Random().ints(11,0,10); 
 
         String digits = intStream.mapToObj(Integer::toString).collect(Collectors.joining());
 
         //Each %a, %b, %c corresponds to each one of the following substrings
-        String accountNumber = String.format("%a-%b-%c", 
+        return  String.format("%s-%s-%s", 
             digits.substring(0, 3),
             digits.substring(3, 9),
             digits.substring(9, 11));
-
-        return accountNumber;
     }
 
     //This method checks if the generated account number is actually unique
