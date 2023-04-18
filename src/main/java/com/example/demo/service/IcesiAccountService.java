@@ -58,7 +58,6 @@ public class IcesiAccountService {
 
         String digits = intStream.mapToObj(Integer::toString).collect(Collectors.joining());
 
-        //Each %a, %b, %c corresponds to each one of the following substrings
         return  String.format("%s-%s-%s", 
             digits.substring(0, 3),
             digits.substring(3, 9),
