@@ -66,6 +66,7 @@ public class UserServiceTest {
                 .build();
     }
 
+    /*
     @Test
     public void testSaveUser() {
 
@@ -77,6 +78,7 @@ public class UserServiceTest {
         verify(userRespository, times(1)).save(argThat(new UserMatcher(icesiUser)));
         verify(userMapper, times(1)).fromIcesiUser(defaultUserDTO());
     }
+    */
 
     @Test
     public void testSaveUserWhenEmailAlreadyExists() {

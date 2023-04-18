@@ -6,9 +6,11 @@ import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 
+import javax.validation.Valid;
+
 @RequestMapping(RoleAPI.ROLE_BASE_URL)
 public interface RoleAPI {
     String ROLE_BASE_URL = "/role";
     @PostMapping
-    IcesiRoleResponseDTO createIcesiRole(@RequestBody IcesiRoleDTO role);
+    IcesiRoleResponseDTO createIcesiRole(@Valid @RequestBody IcesiRoleDTO role);
 }

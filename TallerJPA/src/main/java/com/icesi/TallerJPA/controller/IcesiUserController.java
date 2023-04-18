@@ -10,6 +10,8 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RestController;
 import com.icesi.TallerJPA.service.UserService;
 
+import javax.validation.Valid;
+
 @RestController
 @AllArgsConstructor
 public class IcesiUserController implements UserAPI {
@@ -17,7 +19,7 @@ public class IcesiUserController implements UserAPI {
     private final UserService userService;
 
     @Override
-    public IcesiUserResponseDTO createIcesiUser(IcesiUserDTO user) {
+    public IcesiUserResponseDTO createIcesiUser(@Valid IcesiUserDTO user) {
         return userService.save(user);
     }
 }
