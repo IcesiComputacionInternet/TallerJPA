@@ -23,33 +23,19 @@ public class UserController implements UserAPI {
     private final UserService userService;
     private final RoleService roleService;
 
-    @PostMapping("/user")
-    public IcesiUser createIcesiUser(@RequestBody UserCreateDTO user){
-        return userService.save(user);
-    }
 
+    @Override
+    public IcesiUser createIcesiUser(UserCreateDTO user) {
+        return null;
+    }
 
     @Override
     public void getUser(String userEmail) {
 
     }
 
-    @GetMapping
-    public List<IcesiUser> getAllUsers(){
-
-        return null;
-    }
-
     @Override
-    public void addUser(UserCreateDTO user) {
-
-    }
-
-    //En vez de IcesiUser poner el DTO
-    @GetMapping("/{userId}")
-    public IcesiUser getUser(){
+    public List<IcesiUser> getAllUsers() {
         return null;
     }
-
-
 }

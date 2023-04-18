@@ -13,7 +13,6 @@ import org.springframework.transaction.annotation.Transactional;
 import java.util.Optional;
 import java.util.Random;
 import java.util.UUID;
-import java.util.concurrent.atomic.AtomicBoolean;
 
 @Service
 @AllArgsConstructor
@@ -23,24 +22,23 @@ public class AccountService {
     private final UserRepository userRepository;
 
     public AccountResponseDTO save(AccountCreateDTO accountCreateDTO) {
-        Optional<IcesiUser> userFound = userRepository.findByEmail(accountCreateDTO.getUserEmail());
-        if (userFound.isEmpty()) {
-            throw new RuntimeException("User not found");
-        }
+        IcesiUser userFound = userRepository.findByEmail(accountCreateDTO.getUserEmail()).orElseThrow(() -> new RuntimeException("User not found"));
         String uuid = generateAccountNumber();
         IcesiAccount icesiAccount = accountMapper.fromAccountCreateDTO(accountCreateDTO);
         icesiAccount.setAccountNumber(uuid);
         icesiAccount.setAccountId(UUID.randomUUID());
-        icesiAccount.setUser(userFound.get());
+        icesiAccount.setUser(userFound);
         icesiAccount.setBalance(0);
         icesiAccount.setActive(true);
-        accountRepository.save(icesiAccount);
-        return accountMapper.fromAccountToResponse(icesiAccount);
+        return accountMapper.fromAccountToResponse(accountRepository.save(icesiAccount));
     }
 
     @Transactional
     public AccountResponseDTO disableAccount(String accountNumber) {
         IcesiAccount account = getAccountByNumber(accountNumber);
+        if(!account.getActive()){
+            throw new RuntimeException("Account already disabled");
+        }
         account.setActive(false);
         accountRepository.save(account);
         return accountMapper.fromAccountToResponse(account);
@@ -49,6 +47,9 @@ public class AccountService {
     @Transactional
     public AccountResponseDTO enableAccount(String accountNumber) {
         IcesiAccount account = getAccountByNumber(accountNumber);
+        if(account.getActive()){
+            throw new RuntimeException("Account already enabled");
+        }
         account.setActive(true);
         accountRepository.save(account);
         return accountMapper.fromAccountToResponse(account);
@@ -83,6 +84,7 @@ public class AccountService {
         accountRepository.save(destinationAccount);
         return accountMapper.fromRequestToResponse(originAccount, destinationAccount, requestDTO.getAmount(), originAccount.getBalance());
     }
+
     private String generateAccountNumber() {
         StringBuilder sb = new StringBuilder();
         Random random = new Random();
@@ -128,7 +130,7 @@ public class AccountService {
         if(!accountFound.get().getActive()){
             throw new RuntimeException("Account is not active");
         }
-        if(accountFound.get().getType().equals("Deposito")){
+        if(accountFound.get().getType().equals("DEPOSIT_ONLY")){
             throw new RuntimeException("Account of type deposit can't transfer money");
         }
         return accountFound.get();

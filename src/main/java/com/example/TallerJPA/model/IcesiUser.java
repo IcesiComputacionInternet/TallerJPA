@@ -1,5 +1,6 @@
 package com.example.TallerJPA.model;
 
+import com.example.TallerJPA.validations.ColombianPhone;
 import lombok.*;
 
 import javax.persistence.*;

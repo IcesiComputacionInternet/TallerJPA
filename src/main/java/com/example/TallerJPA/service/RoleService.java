@@ -20,14 +20,9 @@ public class RoleService {
         Optional<IcesiRole> roleFound = roleRepository.findByName(role.getName());
         if(roleFound.isPresent()) {
             throw new RuntimeException("Role already exists");
-        } else {
-            IcesiRole icesiRole = roleMapper.fromIcesiRoleDTO(role);
-            icesiRole.setRoleId(UUID.randomUUID());
-            return roleRepository.save(icesiRole);
         }
-    }
-
-    public Optional<IcesiRole> findRoleByName(String name) {
-        return roleRepository.findByName(name);
+        IcesiRole icesiRole = roleMapper.fromIcesiRoleDTO(role);
+        icesiRole.setRoleId(UUID.randomUUID());
+        return roleRepository.save(icesiRole);
     }
 }
