@@ -2,7 +2,7 @@ package co.com.icesi.TallerJPA.unit.service;
 
 import co.com.icesi.TallerJPA.dto.RoleCreateDTO;
 import co.com.icesi.TallerJPA.dto.response.UserResponseDTO;
-import co.com.icesi.TallerJPA.exception.ArgumentsException;
+import co.com.icesi.TallerJPA.error.exception.ArgumentsException;
 import co.com.icesi.TallerJPA.dto.UserCreateDTO;
 import co.com.icesi.TallerJPA.mapper.UserMapper;
 import co.com.icesi.TallerJPA.mapper.UserMapperImpl;
@@ -13,7 +13,6 @@ import co.com.icesi.TallerJPA.model.IcesiUser;
 import co.com.icesi.TallerJPA.repository.RoleRepository;
 import co.com.icesi.TallerJPA.repository.UserRepository;
 import co.com.icesi.TallerJPA.service.UserService;
-import co.com.icesi.TallerJPA.unit.service.matcher.IcesiUserMatcher;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 

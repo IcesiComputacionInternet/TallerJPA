@@ -1,7 +1,7 @@
 package co.com.icesi.TallerJPA.unit.service;
 
 import co.com.icesi.TallerJPA.dto.RoleCreateDTO;
-import co.com.icesi.TallerJPA.exception.ArgumentsException;
+import co.com.icesi.TallerJPA.error.exception.ArgumentsException;
 import co.com.icesi.TallerJPA.mapper.RoleMapper;
 import co.com.icesi.TallerJPA.mapper.RoleMapperImpl;
 import co.com.icesi.TallerJPA.model.IcesiRole;
