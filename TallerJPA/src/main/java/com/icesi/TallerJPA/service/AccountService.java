@@ -2,7 +2,6 @@ package com.icesi.TallerJPA.service;
 
 import com.icesi.TallerJPA.dto.request.IcesiAccountDTO;
 import com.icesi.TallerJPA.dto.response.IcesiAccountResponseDTO;
-import com.icesi.TallerJPA.dto.response.IcesiTransactionDTO;
 import com.icesi.TallerJPA.enums.IcesiAccountType;
 import com.icesi.TallerJPA.mapper.AccountMapper;
 import com.icesi.TallerJPA.model.IcesiAccount;
@@ -64,79 +63,53 @@ public class AccountService {
     }
 
     @Transactional
-    public IcesiTransactionDTO activeAccount(String accountNumber){
+    public String activeAccount(String accountNumber){
         accountRepository.activeAccount(accountNumber);
-
-        IcesiTransactionDTO acc = createTransactionDTO();
-        acc.setOrigin(accountNumber);
-        acc.setMessage("The account " + accountNumber + " was active");
-        return acc;
+        return "The account " + accountNumber + " was active";
     }
 
     @Transactional
-    public IcesiTransactionDTO disableAccount(String accountNumber){
+    public String disableAccount(String accountNumber){
         accountRepository.inactiveAccount(accountNumber);
-        IcesiTransactionDTO acc = createTransactionDTO();
-        acc.setOrigin(accountNumber);
-        acc.setMessage("The account " + accountNumber + " was inactive");
-
         if(!accountRepository.IcesiAccountByActive(accountNumber)){
-            return acc;
+            return "The account " + accountNumber + " was inactive";
         } else {
             throw new RuntimeException("This account can not be disable");
         }
     }
 
     @Transactional
-    public IcesiTransactionDTO withdrawal(String accountNumber, Long value){
+    public String withdrawal(String accountNumber, Long value){
         try{
             accountRepository.withdrawalAccount(accountNumber, value);
-            IcesiTransactionDTO acc = createTransactionDTO();
-            acc.setOrigin(accountNumber);
-            acc.setAmount(value);
-            acc.setMessage("The withdrawal was successful");
-            return acc;
+            return "The withdrawal was successful";
         } catch (DataIntegrityViolationException e){
             throw new DataIntegrityViolationException("You don't have the amount necessary");
         }
     }
 
     @Transactional
-    public IcesiTransactionDTO deposit(String accountNumber, Long value){
+    public String deposit(String accountNumber, Long value){
         if(value>0){
             accountRepository.depositAccount(accountNumber, value);
-            IcesiTransactionDTO acc = createTransactionDTO();
-            acc.setOrigin(accountNumber);
-            acc.setAmount(value);
-            acc.setMessage("The deposit was successful");
-            return acc;
+            return "Deposit was successful";
         } else {
             throw new RuntimeException("Don't deposit a negative amount");
         }
     }
 
     @Transactional
-    public IcesiTransactionDTO transfer(String accountNumberOrigin, String accountNumberDestination, Long value){
+    public String transfer(String accountNumberOrigin, String accountNumberDestination, Long value){
 
         accountRepository.getTypeofAccount(
                 accountNumberOrigin).orElseThrow(()-> new RuntimeException("Deposit Origin Account or inactive"));
         accountRepository.getTypeofAccount(
                 accountNumberDestination).orElseThrow(()->new RuntimeException("Deposit Destination Account or inactive"));
 
-        IcesiTransactionDTO acc = createTransactionDTO();
-
         withdrawal(accountNumberOrigin, value);
         deposit(accountNumberDestination, value);
-        acc.setOrigin(accountNumberOrigin);
-        acc.setDestination(accountNumberDestination);
-        acc.setAmount(value);
-        acc.setMessage("The transfer was successful");
 
-        return acc;
-    }
-
-    public IcesiTransactionDTO createTransactionDTO(){
-        return IcesiTransactionDTO.builder().build();
+        return "The transaction was successful";
     }
 
 }
