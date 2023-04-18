@@ -36,8 +36,8 @@ public class UserService {
     public IcesiUserResponseDTO createUser(IcesiUserDTO user){
         IcesiUser icesiUser = userMapper.fromIcesiUser(user);
         icesiUser.setUserId(UUID.randomUUID());
-        //icesiUser.setIcesiRole(roleRepository.findIcesiRoleByName(
-        //       user.getRolName()).orElseThrow(()-> new RuntimeException("Role not found")));
+        icesiUser.setIcesiRole(roleRepository.findIcesiRoleByName(
+               user.getRolName()).orElseThrow(()-> new RuntimeException("Role not found")));
         return userMapper.toResponse(userRespository.save(icesiUser));
     }
 }
