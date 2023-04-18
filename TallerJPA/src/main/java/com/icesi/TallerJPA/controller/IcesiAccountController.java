@@ -19,7 +19,7 @@ public class IcesiAccountController implements AccountAPI {
     }
 
     @Override
-    public String activeAccount(@PathVariable String accountNumber){
+    public  String activeAccount(@PathVariable String accountNumber){
         return accountService.activeAccount(accountNumber);
     }
 
