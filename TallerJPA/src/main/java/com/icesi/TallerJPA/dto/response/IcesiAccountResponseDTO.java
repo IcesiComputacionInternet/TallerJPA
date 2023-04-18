@@ -1,4 +1,4 @@
-package com.icesi.TallerJPA.dto;
+package com.icesi.TallerJPA.dto.response;
 
 import lombok.AllArgsConstructor;
 import lombok.Builder;

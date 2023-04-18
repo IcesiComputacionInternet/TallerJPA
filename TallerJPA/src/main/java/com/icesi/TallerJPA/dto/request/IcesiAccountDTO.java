@@ -1,4 +1,4 @@
-package com.icesi.TallerJPA.dto;
+package com.icesi.TallerJPA.dto.request;
 
 import com.icesi.TallerJPA.enums.IcesiAccountType;
 import lombok.AllArgsConstructor;
@@ -6,12 +6,18 @@ import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
+import javax.validation.constraints.Max;
+import javax.validation.constraints.Min;
+
 @Data
 @Builder
 @NoArgsConstructor
 @AllArgsConstructor
 public class IcesiAccountDTO {
 
+
+    @Min(value = 0)
+    @Max(value = 100)
     private long balance;
     private IcesiAccountType type;
     private Boolean active;

@@ -1,6 +1,6 @@
 package com.icesi.TallerJPA.unit.service;
 
-import com.icesi.TallerJPA.dto.IcesiUserDTO;
+import com.icesi.TallerJPA.dto.request.IcesiUserDTO;
 import com.icesi.TallerJPA.mapper.UserMapper;
 import com.icesi.TallerJPA.mapper.UserMapperImpl;
 import com.icesi.TallerJPA.model.IcesiRole;
@@ -98,7 +98,7 @@ public class UserServiceTest {
             fail();
         } catch (RuntimeException exception) {
             String message = exception.getMessage();
-            assertEquals("Phone number is repeated", message);
+            assertEquals("Phone is repeated", message);
         }
     }
 
@@ -111,7 +111,7 @@ public class UserServiceTest {
             fail();
         } catch (RuntimeException exception) {
             String message = exception.getMessage();
-            assertEquals("Email and Phone number is repeated", message);
+            assertEquals("Email and Phone is repeated", message);
         }
     }
 

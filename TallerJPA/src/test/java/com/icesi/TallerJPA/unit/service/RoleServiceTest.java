@@ -1,6 +1,6 @@
 package com.icesi.TallerJPA.unit.service;
 
-import com.icesi.TallerJPA.dto.IcesiRoleDTO;
+import com.icesi.TallerJPA.dto.request.IcesiRoleDTO;
 import com.icesi.TallerJPA.mapper.RoleMapper;
 import com.icesi.TallerJPA.mapper.RoleMapperImpl;
 import com.icesi.TallerJPA.model.IcesiRole;

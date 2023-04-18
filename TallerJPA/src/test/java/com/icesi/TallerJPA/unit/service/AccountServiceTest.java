@@ -1,24 +1,19 @@
 package com.icesi.TallerJPA.unit.service;
 
-import com.icesi.TallerJPA.dto.IcesiAccountDTO;
+import com.icesi.TallerJPA.dto.request.IcesiAccountDTO;
 import com.icesi.TallerJPA.enums.IcesiAccountType;
 import com.icesi.TallerJPA.mapper.AccountMapper;
 import com.icesi.TallerJPA.mapper.AccountMapperImpl;
-import com.icesi.TallerJPA.mapper.UserMapper;
-import com.icesi.TallerJPA.mapper.UserMapperImpl;
 import com.icesi.TallerJPA.model.IcesiAccount;
 import com.icesi.TallerJPA.model.IcesiRole;
 import com.icesi.TallerJPA.model.IcesiUser;
 import com.icesi.TallerJPA.repository.AccountRepository;
 import com.icesi.TallerJPA.repository.UserRespository;
 import com.icesi.TallerJPA.service.AccountService;
-import com.icesi.TallerJPA.unit.matcher.AccountMatcher;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
-import org.mockito.stubbing.OngoingStubbing;
 import org.springframework.dao.DataIntegrityViolationException;
 
-import javax.xml.crypto.Data;
 import java.util.Optional;
 import java.util.UUID;
 
@@ -83,12 +78,17 @@ public class AccountServiceTest {
 
     @Test
     public void testSaveAccount() {
-        when(userRespository.findIcesiUserByEmail(any())).thenReturn(Optional.of(defaultUser()));
-        accountService.save(defaultAccountDTO());
-        IcesiAccount icesiAccount = defaultAccount();
 
-        verify(accountRepository, times(1)).save(argThat(new AccountMatcher(icesiAccount)));
-        verify(accountMapper, times(1)).fromIcesiAccountDTO(defaultAccountDTO());
+        when(userRespository.findIcesiUserByEmail(any())).thenReturn(Optional.of(defaultUser()));
+
+        IcesiAccount icesiAccount = defaultAccount();
+        IcesiAccountDTO accountDTO = defaultAccountDTO();
+
+        when(accountMapper.fromIcesiAccountDTO(accountDTO)).thenReturn(icesiAccount);
+        accountService.save(accountDTO);
+        verify(accountMapper, times(1)).fromIcesiAccountDTO(accountDTO);
+        verify(accountRepository, times(1)).save(icesiAccount);
+
     }
 
     @Test

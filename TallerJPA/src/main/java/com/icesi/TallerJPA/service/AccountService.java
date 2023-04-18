@@ -1,8 +1,7 @@
 package com.icesi.TallerJPA.service;
 
-import com.icesi.TallerJPA.dto.IcesiAccountDTO;
-import com.icesi.TallerJPA.dto.IcesiAccountResponseDTO;
-import com.icesi.TallerJPA.dto.IcesiRoleDTO;
+import com.icesi.TallerJPA.dto.request.IcesiAccountDTO;
+import com.icesi.TallerJPA.dto.response.IcesiAccountResponseDTO;
 import com.icesi.TallerJPA.enums.IcesiAccountType;
 import com.icesi.TallerJPA.mapper.AccountMapper;
 import com.icesi.TallerJPA.model.IcesiAccount;
@@ -15,7 +14,6 @@ import org.springframework.transaction.annotation.Transactional;
 
 import java.util.Random;
 import java.util.UUID;
-import java.util.stream.IntStream;
 
 @Service
 @AllArgsConstructor

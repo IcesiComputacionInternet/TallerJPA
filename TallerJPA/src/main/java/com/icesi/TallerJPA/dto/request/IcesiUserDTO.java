@@ -1,26 +1,23 @@
-package com.icesi.TallerJPA.dto;
+package com.icesi.TallerJPA.dto.request;
 
 
-import com.icesi.TallerJPA.model.IcesiRole;
+import com.icesi.TallerJPA.validation.notation.ValidatePhoneNumber;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
-import java.util.UUID;
-
 @Data
 @Builder
 @NoArgsConstructor
 @AllArgsConstructor
-public class IcesiUserResponseDTO {
+public class IcesiUserDTO {
 
-    private UUID userId;
     private String firstName;
     private String lastName;
     private String email;
+    @ValidatePhoneNumber
     private String phoneNumber;
     private String password;
-    private IcesiRoleDTO icesiRole;
+    private String rolName;
 }
-

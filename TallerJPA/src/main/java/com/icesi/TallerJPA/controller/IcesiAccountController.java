@@ -1,7 +1,7 @@
 package com.icesi.TallerJPA.controller;
 
-import com.icesi.TallerJPA.dto.IcesiAccountDTO;
-import com.icesi.TallerJPA.dto.IcesiAccountResponseDTO;
+import com.icesi.TallerJPA.dto.request.IcesiAccountDTO;
+import com.icesi.TallerJPA.dto.response.IcesiAccountResponseDTO;
 import com.icesi.TallerJPA.service.AccountService;
 import lombok.AllArgsConstructor;
 import org.springframework.web.bind.annotation.*;

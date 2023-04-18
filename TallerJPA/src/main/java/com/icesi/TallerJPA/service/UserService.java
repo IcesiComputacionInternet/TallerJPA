@@ -1,8 +1,7 @@
 package com.icesi.TallerJPA.service;
 
-import com.icesi.TallerJPA.dto.IcesiAccountResponseDTO;
-import com.icesi.TallerJPA.dto.IcesiUserDTO;
-import com.icesi.TallerJPA.dto.IcesiUserResponseDTO;
+import com.icesi.TallerJPA.dto.request.IcesiUserDTO;
+import com.icesi.TallerJPA.dto.response.IcesiUserResponseDTO;
 import com.icesi.TallerJPA.mapper.UserMapper;
 import com.icesi.TallerJPA.model.IcesiUser;
 import com.icesi.TallerJPA.repository.RoleRepository;
@@ -37,8 +36,8 @@ public class UserService {
     public IcesiUserResponseDTO createUser(IcesiUserDTO user){
         IcesiUser icesiUser = userMapper.fromIcesiUser(user);
         icesiUser.setUserId(UUID.randomUUID());
-        icesiUser.setIcesiRole(roleRepository.findIcesiRoleByName(
-                user.getRolName()).orElseThrow(()-> new RuntimeException("Role not found")));
+        //icesiUser.setIcesiRole(roleRepository.findIcesiRoleByName(
+        //       user.getRolName()).orElseThrow(()-> new RuntimeException("Role not found")));
         return userMapper.toResponse(userRespository.save(icesiUser));
     }
 }
