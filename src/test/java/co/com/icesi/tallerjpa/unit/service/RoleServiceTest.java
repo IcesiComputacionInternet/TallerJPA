@@ -1,7 +1,7 @@
 package co.com.icesi.tallerjpa.unit.service;
 
 import co.com.icesi.tallerjpa.dto.RoleDTO;
-import co.com.icesi.tallerjpa.error.custom.ExistsException;
+import co.com.icesi.tallerjpa.error.exception.CustomException;
 import co.com.icesi.tallerjpa.mapper.RoleMapper;
 import co.com.icesi.tallerjpa.mapper.RoleMapperImpl;
 import co.com.icesi.tallerjpa.model.Role;
@@ -40,7 +40,7 @@ public class RoleServiceTest {
         when(roleRepository.existsByName(any())).thenReturn(true);
         try{
             roleService.save(defaultRoleDTO());
-        }catch (ExistsException e){
+        }catch (CustomException e){
             assertEquals("Name already exists", e.getMessage());
         }
     }

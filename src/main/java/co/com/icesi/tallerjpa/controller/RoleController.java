@@ -6,7 +6,6 @@ import co.com.icesi.tallerjpa.service.RoleService;
 import lombok.AllArgsConstructor;
 import org.springframework.web.bind.annotation.RestController;
 
-
 @RestController
 @AllArgsConstructor
 public class RoleController implements RoleApi {
@@ -15,8 +14,6 @@ public class RoleController implements RoleApi {
 
     @Override
     public RoleDTO add(RoleDTO role) {
-
-
         return roleService.save(role);
     }
 }

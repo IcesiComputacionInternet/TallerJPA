@@ -8,7 +8,6 @@ import co.com.icesi.tallerjpa.service.AccountService;
 import lombok.AllArgsConstructor;
 import org.springframework.web.bind.annotation.*;
 
-
 @RestController
 @AllArgsConstructor
 public class AccountController implements AccountApi {

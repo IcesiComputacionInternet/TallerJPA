@@ -20,12 +20,11 @@ public class RequestUserDTO {
     @Email
     @NotNull
     private String email;
-    @NotNull
     @NotBlank
     private String password;
     @NotNull
     @ColombianNumber
     private String phoneNumber;
-    @NotNull
+    @NotBlank
     private String role;
 }

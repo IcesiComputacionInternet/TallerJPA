@@ -1,4 +1,4 @@
-package co.com.icesi.tallerjpa.error.exception;
+package co.com.icesi.tallerjpa.error.util;
 
 import lombok.Builder;
 import lombok.Getter;
@@ -10,7 +10,6 @@ import java.util.List;
 @Builder
 public class CustomError {
 
-    private HttpStatus status;
-    private List<CustomErrorDetail> details;
-
+    HttpStatus status;
+    List<CustomDetail> details;
 }

@@ -7,7 +7,6 @@ import co.com.icesi.tallerjpa.service.UserService;
 import lombok.AllArgsConstructor;
 import org.springframework.web.bind.annotation.*;
 
-
 @RestController
 @AllArgsConstructor
 public class UserController implements UserApi {

@@ -13,7 +13,8 @@ import java.lang.annotation.Target;
 @Target( {ElementType.TYPE, ElementType.ANNOTATION_TYPE} )
 @Retention(RetentionPolicy.RUNTIME)
 public @interface EmailOrPhoneNumber {
-    String message() default "The email or the phoneNumber must have a value";
+    String message() default "the email or the phoneNumber must have a value";
+    String field() default "email or phoneNumber";
     Class<?>[] groups() default {};
     Class<? extends Payload>[] payload() default {};
 }

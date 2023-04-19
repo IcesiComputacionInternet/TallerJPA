@@ -1,7 +1,7 @@
 package co.com.icesi.tallerjpa.unit.service;
 
 import co.com.icesi.tallerjpa.dto.RequestUserDTO;
-import co.com.icesi.tallerjpa.error.custom.ExistsException;
+import co.com.icesi.tallerjpa.error.exception.CustomException;
 import co.com.icesi.tallerjpa.mapper.UserMapper;
 import co.com.icesi.tallerjpa.mapper.UserMapperImpl;
 import co.com.icesi.tallerjpa.model.IcesiUser;
@@ -75,7 +75,7 @@ public class UserServiceTest {
 
         try{
             userService.save(defaultUserDTO());
-        }catch (ExistsException e){
+        }catch (CustomException e){
             assertEquals("Email already exists", e.getMessage());
         }
 
@@ -87,7 +87,7 @@ public class UserServiceTest {
 
         try{
             userService.save(defaultUserDTO());
-        }catch (ExistsException e){
+        }catch (CustomException e){
             assertEquals("Phone number already exists", e.getMessage());
         }
 
@@ -100,7 +100,7 @@ public class UserServiceTest {
 
         try{
             userService.save(defaultUserDTO());
-        }catch (ExistsException e){
+        }catch (CustomException e){
             assertEquals("Email and Phone is already used", e.getMessage());
         }
 
