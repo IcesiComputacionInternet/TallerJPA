@@ -13,6 +13,6 @@ public class EmailOrPhoneValueValidator implements ConstraintValidator<EmailOrPh
 
     @Override
     public boolean isValid(IcesiUserDTO icesiUserDTO, ConstraintValidatorContext constraintValidatorContext) {
-        return !icesiUserDTO.getEmail().isBlank() || !icesiUserDTO.getPhoneNumber().isBlank();
+        return !icesiUserDTO.getEmail().isEmpty() || !icesiUserDTO.getPhoneNumber().isEmpty();
     }
 }

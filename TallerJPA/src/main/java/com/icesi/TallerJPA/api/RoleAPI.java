@@ -12,5 +12,5 @@ import javax.validation.Valid;
 public interface RoleAPI {
     String ROLE_BASE_URL = "/role";
     @PostMapping
-    IcesiRoleResponseDTO createIcesiRole(@Valid @RequestBody IcesiRoleDTO role);
+    IcesiRoleResponseDTO createIcesiRole(@RequestBody @Valid IcesiRoleDTO role);
 }

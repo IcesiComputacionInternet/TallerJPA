@@ -19,7 +19,7 @@ public class IcesiUserController implements UserAPI {
     private final UserService userService;
 
     @Override
-    public IcesiUserResponseDTO createIcesiUser(@Valid IcesiUserDTO user) {
+    public IcesiUserResponseDTO createIcesiUser(IcesiUserDTO user) {
         return userService.save(user);
     }
 }

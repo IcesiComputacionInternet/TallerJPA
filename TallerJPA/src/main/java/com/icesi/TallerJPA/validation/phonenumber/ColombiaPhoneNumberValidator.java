@@ -13,6 +13,6 @@ public class ColombiaPhoneNumberValidator implements ConstraintValidator<Colombi
 
     @Override
     public boolean isValid(String phoneNumber, ConstraintValidatorContext constraintValidatorContext) {
-        return phoneNumber.matches("^3[0-9]{9}$");
+        return phoneNumber.matches("\\+573[0-9]{9}");
     }
 }
