@@ -17,7 +17,6 @@ import com.example.tallerjpa.service.UserService;
 import com.example.tallerjpa.unit.service.matcher.AccountMatcher;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
-import org.mockito.Mock;
 
 import java.util.ArrayList;
 import java.util.Optional;
@@ -389,6 +388,8 @@ public class AccountServiceTest {
             assertEquals("The account doesn't have enough money for do this transfer", e.getMessage());
         }
     }
+
+
 
     private AccountDTO defaultAccountDTO(){
         return AccountDTO.builder()

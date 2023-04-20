@@ -1,5 +1,6 @@
 package com.example.tallerjpa.controller;
 
+import com.example.tallerjpa.api.AccountAPI;
 import com.example.tallerjpa.dto.AccountDTO;
 import com.example.tallerjpa.dto.TransactionRequestDTO;
 import com.example.tallerjpa.dto.TransactionResponseDTO;
@@ -8,37 +9,36 @@ import com.example.tallerjpa.service.AccountService;
 import lombok.AllArgsConstructor;
 import org.springframework.web.bind.annotation.*;
 
-import static com.example.tallerjpa.api.AccountAPI.BASE_ACCOUNT_URL;
 
 @RestController
 @AllArgsConstructor
-public class IcesiAccountController {
+public class IcesiAccountController implements AccountAPI {
 
     private final AccountService accountService;
-    @PostMapping("/accounts")
+    @Override
     public IcesiAccount createAccount(@RequestBody AccountDTO accountDTO){return accountService.createAccount(accountDTO);}
 
-    @PatchMapping("/accounts/activate/{accountNumber}")
+    @Override
     public String activateAccount(@PathVariable String accountNumber){
         return accountService.activateAccount(accountNumber);
     }
 
-    @PatchMapping("/accounts/deactivate/{accountNumber}")
+    @Override
     public String deactivateAccount(@PathVariable String accountNumber){
         return accountService.deactivateAccount(accountNumber);
     }
 
-    @PatchMapping("/accounts/withdraw")
+    @Override
     public TransactionResponseDTO withdrawMoney(@RequestBody TransactionRequestDTO transactionRequestDTO){
         return accountService.withdrawMoney(transactionRequestDTO);
     }
 
-    @PatchMapping("/accounts/deposit")
+    @Override
     public TransactionResponseDTO depositMoney(@RequestBody TransactionRequestDTO transactionRequestDTO){
         return accountService.depositMoney(transactionRequestDTO);
     }
 
-    @PatchMapping("/accounts/transfer")
+    @Override
     public TransactionResponseDTO transferMoney(@RequestBody TransactionRequestDTO transactionRequestDTO){
         return accountService.transferMoney(transactionRequestDTO);
     }

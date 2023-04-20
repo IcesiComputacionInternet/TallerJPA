@@ -1,18 +1,20 @@
 package com.example.tallerjpa.api;
 
 import com.example.tallerjpa.dto.UserDTO;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.PathVariable;
+import com.example.tallerjpa.model.IcesiUser;
+import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.RequestBody;
+import org.springframework.web.bind.annotation.RequestMapping;
 
-import java.util.List;
-
+@RequestMapping(UserAPI.BASE_USER_URL)
 public interface UserAPI {
 
     String BASE_USER_URL = "/users";
 
-    @GetMapping("/{userEmail}")
-    UserDTO getUser(@PathVariable UserDTO userEmail);
-    List<UserDTO> getAllUsers();
-    UserDTO addUser(UserDTO userDTO);
+    @PostMapping
+    IcesiUser createUser(@RequestBody UserDTO userDTO);
+
+
+
 
 }

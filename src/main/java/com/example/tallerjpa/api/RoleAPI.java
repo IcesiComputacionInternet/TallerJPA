@@ -1,21 +1,21 @@
 package com.example.tallerjpa.api;
 
 import com.example.tallerjpa.dto.RoleDTO;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.PathVariable;
+import com.example.tallerjpa.model.IcesiRole;
+import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.RequestMapping;
 
-import java.util.List;
 
+@RequestMapping(RoleAPI.BASE_ROLE_URL)
 public interface RoleAPI {
 
     String BASE_ROLE_URL = "/roles";
 
-    @GetMapping("{roleId}")
-    RoleDTO getRole(@PathVariable RoleDTO roleId);
+    @PostMapping
+    IcesiRole createRole(RoleDTO roleDTO);
 
-    List<RoleDTO> getAllRoles();
 
-    RoleDTO addRole (RoleDTO roleDTO);
+
 
 
 
