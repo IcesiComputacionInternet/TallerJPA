@@ -42,7 +42,7 @@ public class SecutiryConfiguration {
             .cors(AbstractHttpConfigurer::disable)
             .csrf(AbstractHttpConfigurer::disable)
             .authorizeHttpRequests(auth -> auth 
-                .anyRequest().authenticated())
+                .anyRequest().authenticated()) //.permitAll() to allow all request
                 .oauth2ResourceServer(OAuth2ResourceServerConfigurer::jwt)
                 .sessionManagement(session -> session.sessionCreationPolicy(SessionCreationPolicy.STATELESS))
                 .build();
