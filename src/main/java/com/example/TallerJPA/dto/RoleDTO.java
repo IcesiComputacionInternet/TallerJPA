@@ -7,7 +7,7 @@ import javax.validation.constraints.NotBlank;
 
 @Data
 @Builder
-public class RoleCreateDTO {
+public class RoleDTO {
     @NotBlank
     private String name;
 

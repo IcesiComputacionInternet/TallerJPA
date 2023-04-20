@@ -1,6 +1,6 @@
 package com.example.TallerJPA.service;
 
-import com.example.TallerJPA.dto.UserCreateDTO;
+import com.example.TallerJPA.dto.UserDTO;
 import com.example.TallerJPA.mapper.UserMapper;
 import com.example.TallerJPA.model.IcesiRole;
 import com.example.TallerJPA.model.IcesiUser;
@@ -19,7 +19,7 @@ public class UserService {
     private final UserRepository userRepository;
     private final UserMapper userMapper;
     private final RoleRepository roleRepository;
-    public IcesiUser save(UserCreateDTO user) {
+    public UserDTO save(UserDTO user) {
         Optional<IcesiUser> userFoundByEmail = userRepository.findByEmail(user.getEmail());
         Optional<IcesiUser> userFoundByPhoneNumber = userRepository.findByPhoneNumber(user.getPhoneNumber());
         if(userFoundByEmail.isPresent() && userFoundByPhoneNumber.isPresent()){
@@ -38,6 +38,6 @@ public class UserService {
         IcesiUser icesiUser = userMapper.fromIcesiUserDTO(user);
         icesiUser.setUserId(UUID.randomUUID());
         icesiUser.setRole(roleFound.get());
-        return userRepository.save(icesiUser);
+        return userMapper.fromIcesiUser(userRepository.save(icesiUser));
     }
 }

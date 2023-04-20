@@ -14,7 +14,7 @@ import lombok.Data;
             message = "Passwords do not match!"
     )
 })
-public class UserCreateDTO {
+public class UserDTO {
     private String firstName;
     private String lastName;
     private String email;

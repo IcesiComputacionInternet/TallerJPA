@@ -1,7 +1,6 @@
 package com.example.TallerJPA.unit.service;
 
-import com.example.TallerJPA.dto.RoleCreateDTO;
-import com.example.TallerJPA.dto.UserCreateDTO;
+import com.example.TallerJPA.dto.UserDTO;
 import com.example.TallerJPA.mapper.RoleMapper;
 import com.example.TallerJPA.mapper.RoleMapperImpl;
 import com.example.TallerJPA.mapper.UserMapper;
@@ -67,9 +66,9 @@ public class UserServiceTest {
     }
     @Test
     public void testCreateUserWhenRoleIsNotFound(){
-        UserCreateDTO userCreateDTO = defaultUserCreateDTO();
-        userCreateDTO.setRoleName("Seguridad");
-        assertThrows(RuntimeException.class,() -> userService.save(userCreateDTO));
+        UserDTO userDTO = defaultUserCreateDTO();
+        userDTO.setRoleName("Seguridad");
+        assertThrows(RuntimeException.class,() -> userService.save(userDTO));
     }
 
 
@@ -84,8 +83,8 @@ public class UserServiceTest {
     }
 
 
-    private UserCreateDTO defaultUserCreateDTO() {
-        return UserCreateDTO.builder()
+    private UserDTO defaultUserCreateDTO() {
+        return UserDTO.builder()
                 .firstName("John")
                 .lastName("Doe")
                 .email("test@example.com")

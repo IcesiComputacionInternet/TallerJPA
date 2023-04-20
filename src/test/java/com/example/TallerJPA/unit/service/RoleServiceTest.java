@@ -1,6 +1,6 @@
 package com.example.TallerJPA.unit.service;
 
-import com.example.TallerJPA.dto.RoleCreateDTO;
+import com.example.TallerJPA.dto.RoleDTO;
 import com.example.TallerJPA.mapper.RoleMapper;
 import com.example.TallerJPA.mapper.RoleMapperImpl;
 import com.example.TallerJPA.model.IcesiRole;
@@ -52,8 +52,8 @@ public class RoleServiceTest {
         assertEquals(Optional.empty(),roleService.findRoleByName("testRole"));
     }
 
-    private RoleCreateDTO defaultRoleCreateDTO() {
-        return RoleCreateDTO.builder()
+    private RoleDTO defaultRoleCreateDTO() {
+        return RoleDTO.builder()
                 .name("testRole")
                 .description("testDescription")
                 .build();
