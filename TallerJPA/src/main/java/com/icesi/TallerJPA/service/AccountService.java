@@ -3,17 +3,23 @@ package com.icesi.TallerJPA.service;
 import com.icesi.TallerJPA.dto.request.IcesiAccountDTO;
 import com.icesi.TallerJPA.dto.response.IcesiAccountResponseDTO;
 import com.icesi.TallerJPA.enums.IcesiAccountType;
+import com.icesi.TallerJPA.error.exception.DetailBuilder;
+import com.icesi.TallerJPA.error.exception.ErrorCode;
+import com.icesi.TallerJPA.error.exception.IcesiException;
 import com.icesi.TallerJPA.mapper.AccountMapper;
 import com.icesi.TallerJPA.model.IcesiAccount;
 import com.icesi.TallerJPA.repository.AccountRepository;
 import com.icesi.TallerJPA.repository.UserRespository;
 import lombok.AllArgsConstructor;
 import org.springframework.dao.DataIntegrityViolationException;
+import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.util.Random;
 import java.util.UUID;
+
+import static com.icesi.TallerJPA.error.util.IcesiExceptionBuilder.createIcesiError;
 
 @Service
 @AllArgsConstructor
@@ -32,7 +38,11 @@ public class AccountService {
 
         IcesiAccount icesiAccount = accountMapper.fromIcesiAccountDTO(icesiAccountDTO);
         icesiAccount.setIcesiUser(userRespository.findIcesiUserByEmail(icesiAccountDTO.getEmailUser())
-                .orElseThrow(()-> new RuntimeException("User not found")));
+                .orElseThrow(
+                        ()-> new IcesiException(
+                                "User not found", createIcesiError("User not found", HttpStatus.NOT_FOUND, new DetailBuilder(ErrorCode.ERR_404, "User", "Email", icesiAccountDTO.getEmailUser()))
+                        )
+                ));
         icesiAccount.setAccountId(UUID.randomUUID());
         icesiAccount.setAccountNumber(setAccountNumberGenerate(generateAccountNumber()));
         setTypeAccount(icesiAccountDTO.getType().getValue(), icesiAccount);
