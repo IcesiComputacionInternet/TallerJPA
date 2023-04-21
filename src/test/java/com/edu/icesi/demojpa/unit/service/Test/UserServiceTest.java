@@ -36,7 +36,7 @@ public class UserServiceTest {
     public void testCreateUser(){
         when(roleRepository.findRoleByName(any())).thenReturn(Optional.ofNullable(defaultIcesiRole()));
 
-        IcesiUser icesiUser = userService.save(defaultUserCreateDTO());
+        userService.save(defaultUserCreateDTO());
         IcesiUser icesiUserToCompare = defaultIcesiUser();
 
         verify(userRepository, times(1)).isEmailInUse(any());

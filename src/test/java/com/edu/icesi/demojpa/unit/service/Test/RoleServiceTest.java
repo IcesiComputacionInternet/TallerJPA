@@ -29,7 +29,7 @@ public class RoleServiceTest {
 
     @Test
     public void testCreateRole(){
-        IcesiRole icesiRole = roleService.save(defaultRoleDTO());
+        roleService.save(defaultRoleDTO());
         IcesiRole icesiRoleToCompare = defaultIcesiRole();
         verify(roleMapper, times(1)).fromIcesiRoleDTO(any());
         verify(roleRepository, times(1)).save(argThat(new IcesiRoleMatcher(icesiRoleToCompare)));

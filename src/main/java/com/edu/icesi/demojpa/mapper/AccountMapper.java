@@ -17,4 +17,6 @@ public interface AccountMapper {
 
     @Mapping(target = "result", source = "result")
     ResponseAccountDTO fromAccountDTO(IcesiAccount icesiAccount, String result);
+
+    ResponseAccountDTO fromAccountToDTO(IcesiAccount icesiAccount);
 }

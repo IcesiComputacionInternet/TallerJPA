@@ -15,6 +15,7 @@ import org.springframework.stereotype.Service;
 
 import javax.transaction.Transactional;
 import java.util.*;
+import java.util.stream.Collectors;
 
 @Service
 @AllArgsConstructor
@@ -85,7 +86,7 @@ public class AccountService {
         return accountMapper.fromAccountDTO(account, "The account has been disabled");
     }
 
-    public ResponseTransactionDTO withdrawal(RequestTransactionDTO transaction){
+    public ResponseTransactionDTO withdraw(RequestTransactionDTO transaction){
         IcesiAccount account = accountRepository.findAccountByAccountNumber(transaction.getAccountFrom(), true)
                 .orElseThrow(() -> new RuntimeException("The withdrawal wasn't successful"));
 
@@ -98,7 +99,7 @@ public class AccountService {
         return  accountMapper.fromTransactionDTO(transaction, "The withdrawal was successfully carried out");
     }
 
-    public ResponseTransactionDTO depositMoney(RequestTransactionDTO transaction){
+    public ResponseTransactionDTO deposit(RequestTransactionDTO transaction){
         IcesiAccount account = accountRepository.findAccountByAccountNumber(transaction.getAccountFrom(), true)
                 .orElseThrow(() -> new RuntimeException("The deposit wasn't successful"));
 
@@ -135,5 +136,19 @@ public class AccountService {
 
     public boolean hasNoFunds(long accountBalance, long amountToWithdrawal){
         return accountBalance < amountToWithdrawal;
+    }
+
+    public ResponseAccountDTO getAccount(String accountNumber){
+        return accountMapper.fromAccountToDTO(
+                accountRepository.findAccountByAccountNumber(accountNumber, true)
+                        .orElseThrow(() -> new RuntimeException("The account with number " + accountNumber + " doesn't exists")));
+    }
+
+    public List<ResponseAccountDTO> getAllAccounts(){
+        return accountRepository
+                .findAll()
+                .stream()
+                .map(accountMapper::fromAccountToDTO)
+                .collect(Collectors.toList());
     }
 }

@@ -138,22 +138,22 @@ public class AccountServiceTest {
     }
 
     @Test
-    public void testWithdrawal() {
+    public void testWithdraw() {
         IcesiAccount icesiAccount = defaultIcesiAccount();
 
         when(accountRepository.findAccountByAccountNumber("000-000000-00", true)).thenReturn(Optional.ofNullable(icesiAccount));
 
-        ResponseTransactionDTO withdrawal = accountService.withdrawal(defaultTransactionDTO());
+        ResponseTransactionDTO withdraw = accountService.withdraw(defaultTransactionDTO());
 
         assertEquals(50L, getBalance(icesiAccount));
-        assertEquals("The withdrawal was successfully carried out", withdrawal.getResult());
+        assertEquals("The withdrawal was successfully carried out", withdraw.getResult());
     }
 
     @Test
-    public void testWithdrawalAccountNotFound() {
+    public void testWithdrawAccountNotFound() {
         when(accountRepository.findAccountByAccountNumber("000-000000-00", true)).thenReturn(Optional.empty());
         try {
-            accountService.withdrawal(defaultTransactionDTO());
+            accountService.withdraw(defaultTransactionDTO());
         } catch (RuntimeException exception) {
             String message = exception.getMessage();
             assertEquals("The withdrawal wasn't successful", message);
@@ -167,7 +167,7 @@ public class AccountServiceTest {
 
         when(accountRepository.findAccountByAccountNumber("000-000000-00", true)).thenReturn(Optional.of(account));
         try {
-            accountService.withdrawal(defaultTransactionDTO());
+            accountService.withdraw(defaultTransactionDTO());
         } catch (RuntimeException exception) {
             String message = exception.getMessage();
             assertEquals("The withdrawal wasn't successful", message);
@@ -181,7 +181,7 @@ public class AccountServiceTest {
 
         when(accountRepository.findAccountByAccountNumber("000-000000-00", true)).thenReturn(Optional.of(account));
         try {
-            accountService.withdrawal(defaultTransactionDTO());
+            accountService.withdraw(defaultTransactionDTO());
         } catch (RuntimeException exception) {
             String message = exception.getMessage();
             assertEquals("The account with number 000-000000-00 doesn't have sufficient funds", message);
@@ -189,23 +189,23 @@ public class AccountServiceTest {
     }
 
     @Test
-    public void testDepositMoney() {
+    public void testDeposit() {
         IcesiAccount icesiAccount = defaultIcesiAccount();
 
         when(accountRepository.findAccountByAccountNumber("000-000000-00", true)).thenReturn(Optional.ofNullable(icesiAccount));
 
-        ResponseTransactionDTO deposit = accountService.depositMoney(defaultTransactionDTO());
+        ResponseTransactionDTO deposit = accountService.deposit(defaultTransactionDTO());
 
         assertEquals("The deposit was successfully carried out", deposit.getResult());
         assertEquals(150L, getBalance(icesiAccount));
     }
 
     @Test
-    public void testDepositMoneyAccountNotFound() {
+    public void testDepositAccountNotFound() {
         when(accountRepository.findAccountByAccountNumber("000-000000-00", true)).thenReturn(Optional.empty());
 
         try{
-            accountService.depositMoney(defaultTransactionDTO());
+            accountService.deposit(defaultTransactionDTO());
 
         }catch (RuntimeException exception){
             String message = exception.getMessage();
@@ -214,13 +214,13 @@ public class AccountServiceTest {
     }
 
     @Test
-    public void testDepositMoneyAccountDisabled() {
+    public void testDepositAccountDisabled() {
         IcesiAccount account = defaultIcesiAccount();
         account.setActive(false);
 
         when(accountRepository.findAccountByAccountNumber("000-000000-00", true)).thenReturn(Optional.of(account));
         try{
-            accountService.depositMoney(defaultTransactionDTO());
+            accountService.deposit(defaultTransactionDTO());
 
         }catch (RuntimeException exception){
             String message = exception.getMessage();

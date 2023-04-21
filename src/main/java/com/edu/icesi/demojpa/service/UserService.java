@@ -1,6 +1,7 @@
 package com.edu.icesi.demojpa.service;
 
 import com.edu.icesi.demojpa.dto.RequestUserDTO;
+import com.edu.icesi.demojpa.dto.ResponseUserDTO;
 import com.edu.icesi.demojpa.mapper.UserMapper;
 import com.edu.icesi.demojpa.model.IcesiRole;
 import com.edu.icesi.demojpa.model.IcesiUser;
@@ -12,6 +13,7 @@ import org.springframework.stereotype.Service;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.UUID;
+import java.util.stream.Collectors;
 
 @Service
 @AllArgsConstructor
@@ -20,7 +22,7 @@ public class UserService {
     private final RoleRepository roleRepository;
     private final UserMapper userMapper;
 
-    public IcesiUser save(RequestUserDTO user){
+    public ResponseUserDTO save(RequestUserDTO user){
         boolean emailInUse = userRepository.isEmailInUse(user.getEmail()).isPresent();
         boolean phoneNumberInUse = userRepository.isPhoneNumberInUse(user.getPhoneNumber()).isPresent();
         IcesiRole role = roleRepository.findRoleByName(user.getRoleType()).orElseThrow(() -> new RuntimeException("The role "+ user.getRoleType() +" doesn't exist"));
@@ -42,6 +44,21 @@ public class UserService {
         IcesiUser icesiUser = userMapper.fromIcesiUserDTO(user);
         icesiUser.setUserId(UUID.randomUUID());
         icesiUser.setRole(role);
-        return userRepository.save(icesiUser);
+        userRepository.save(icesiUser);
+        return userMapper.fromIcesiUser(icesiUser);
+    }
+
+    public ResponseUserDTO getUser(String userEmail){
+        return userMapper.fromIcesiUser(
+                userRepository.isEmailInUse(userEmail)
+                        .orElseThrow(() -> new RuntimeException("The user with email " + userEmail + "doesn't exists")));
+    }
+
+    public List<ResponseUserDTO> getAllUsers(){
+        return userRepository
+                .findAll()
+                .stream()
+                .map(userMapper::fromIcesiUser)
+                .collect(Collectors.toList());
     }
 }
