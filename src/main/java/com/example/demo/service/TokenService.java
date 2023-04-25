@@ -15,6 +15,8 @@ import org.springframework.security.oauth2.jwt.JwtEncoder;
 import org.springframework.security.oauth2.jwt.JwtEncoderParameters;
 import org.springframework.stereotype.Service;
 
+import com.example.demo.security.CustomAuthentication;
+
 import lombok.AllArgsConstructor;
 
 @Service
@@ -25,7 +27,7 @@ public class TokenService {
     private final JwtEncoder encoder;
 
     public String generateToken(Authentication authentication) {
-        Map<String, String> details = (Map<String, String>) authentication.getDetails();
+        CustomAuthentication customAuthentication = (CustomAuthentication) authentication;
         Instant now = Instant.now();
         String scope = authentication.getAuthorities().stream()
             .map(GrantedAuthority::getAuthority)
@@ -36,7 +38,7 @@ public class TokenService {
             .expiresAt(now.plus(1, ChronoUnit.HOURS))
             .subject(authentication.getName())
             .claim("scope", scope)
-            .claim("icesiUserId", details.get("icesiUserId"))
+            .claim("icesiUserId", customAuthentication.getUserId())
             .build();
 
         var encoderParamenters = JwtEncoderParameters.from(JwsHeader.with(MacAlgorithm.HS512).build(), claims);
