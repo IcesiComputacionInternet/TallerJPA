@@ -1,5 +1,6 @@
 package com.example.jpa.controller;
 
+import com.example.jpa.api.UserAPI;
 import com.example.jpa.dto.UserDTO;
 import com.example.jpa.service.UserService;
 import lombok.AllArgsConstructor;
@@ -12,22 +13,22 @@ import static com.example.jpa.api.UserAPI.BASE_USER_URL;
 @RestController
 @AllArgsConstructor
 @RequestMapping(BASE_USER_URL)
-public class IcesiUserController {
+public class IcesiUserController implements UserAPI {
 
     UserService userService;
 
-    @PostMapping
+    @Override
     public UserDTO create(@RequestBody UserDTO userDTO){
         return userService.save(userDTO);
     }
 
-    @GetMapping
+    @Override
     public List<UserDTO> getAllUsers(){
         return userService.getUsers();
     }
 
-    @GetMapping("/{userEmail}")
-    public UserDTO getUser(@PathVariable String userEmail){
+    @Override
+    public UserDTO getUser(String userEmail){
         return userService.getUser(userEmail);
     }
 }

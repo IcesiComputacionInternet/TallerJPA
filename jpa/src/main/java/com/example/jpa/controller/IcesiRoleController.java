@@ -1,5 +1,6 @@
 package com.example.jpa.controller;
 
+import com.example.jpa.api.RoleAPI;
 import com.example.jpa.dto.RoleDTO;
 import com.example.jpa.model.IcesiRole;
 import com.example.jpa.service.RoleService;
@@ -10,23 +11,23 @@ import java.util.List;
 
 @RestController
 @AllArgsConstructor
-@RequestMapping("/roles")
-public class IcesiRoleController {
+@RequestMapping(RoleAPI.BASE_ROLE_URL)
+public class IcesiRoleController implements RoleAPI {
 
     private RoleService roleService;
 
-    @PostMapping
+    @Override
     public IcesiRole createRole(@RequestBody RoleDTO dto){
         return roleService.save(dto);
     }
 
-    @GetMapping
+    @Override
     public List<RoleDTO> getRoles(){
         return roleService.getRoles();
     }
 
-    @GetMapping("/{roleId}")
-    public RoleDTO getRole(@PathVariable String roleId){
+    @Override
+    public RoleDTO getRole(String roleId){
         return roleService.getRole(roleId);
     }
 }
