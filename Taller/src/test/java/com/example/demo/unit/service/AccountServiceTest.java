@@ -1,7 +1,7 @@
 package com.example.demo.unit.service;
 
 import com.example.demo.DTO.IcesiAccountDTO;
-import com.example.demo.Repository.IcesiAccountRepository;
+import com.example.demo.repository.IcesiAccountRepository;
 import com.example.demo.model.IcesiAccount;
 import com.example.demo.service.IcesiAccountService;
 import org.junit.jupiter.api.BeforeEach;

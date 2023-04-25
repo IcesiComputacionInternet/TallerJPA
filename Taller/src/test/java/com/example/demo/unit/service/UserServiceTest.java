@@ -2,7 +2,7 @@ package com.example.demo.unit.service;
 
 import com.example.demo.DTO.IcesiUserDTO;
 import com.example.demo.Mapper.IcesiUserMapper;
-import com.example.demo.Repository.IcesiUserRepository;
+import com.example.demo.repository.IcesiUserRepository;
 import com.example.demo.model.IcesiUser;
 import com.example.demo.service.IcesiUserService;
 import org.junit.jupiter.api.BeforeEach;

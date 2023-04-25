@@ -2,7 +2,7 @@ package com.example.demo.service;
 
 import com.example.demo.DTO.IcesiUserDTO;
 import com.example.demo.Mapper.IcesiUserMapper;
-import com.example.demo.Repository.IcesiUserRepository;
+import com.example.demo.repository.IcesiUserRepository;
 import com.example.demo.model.IcesiUser;
 import lombok.AllArgsConstructor;
 import org.springframework.beans.factory.annotation.Autowired;
