@@ -2,7 +2,6 @@ package com.example.jpa.service;
 
 import com.example.jpa.dto.RoleDTO;
 import com.example.jpa.error.exceptions.RoleException;
-import com.example.jpa.exceptions.NotFoundRoleException;
 import com.example.jpa.mapper.RoleMapper;
 import com.example.jpa.model.IcesiRole;
 import com.example.jpa.repository.RoleRepository;
