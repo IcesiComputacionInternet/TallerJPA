@@ -22,7 +22,7 @@ public class IcesiUser {
     @OneToMany(mappedBy = "user")
     private List<Account> accounts;
 
-    @ManyToOne(optional = false)
+    @ManyToOne(cascade = CascadeType.ALL, optional = false)
     @JoinColumn(name = "role_role_id")
     private Role role;
 
