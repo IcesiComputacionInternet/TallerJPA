@@ -4,11 +4,8 @@ import com.example.jpa.dto.AccountRequestDTO;
 import com.example.jpa.dto.AccountResponseDTO;
 import com.example.jpa.dto.TransactionRequestDTO;
 import com.example.jpa.dto.TransactionResponseDTO;
-import com.example.jpa.exceptions.InactiveAccountException;
-import com.example.jpa.exceptions.AccountNotFoundException;
-import com.example.jpa.exceptions.AccountTypeException;
-import com.example.jpa.exceptions.BalanceNegativeException;
-import com.example.jpa.exceptions.UserNotFoundException;
+import com.example.jpa.error.exceptions.AccountException;
+import com.example.jpa.error.exceptions.UserException;
 import com.example.jpa.mapper.AccountMapper;
 import com.example.jpa.model.IcesiAccount;
 import com.example.jpa.model.IcesiUser;
@@ -71,26 +68,26 @@ public class AccountService {
     //Validate the balance of an account
     private void validateAccountBalance(IcesiAccount account, long amount){
         if (account.getBalance() < amount) {
-            throw new BalanceNegativeException("Low balance: " + account.getBalance()
+            throw new AccountException("Low balance: " + account.getBalance()
                     + "/n" + "Balance can't be negative");
         }
         if(amount < 0){
-            throw new RuntimeException("Amount can't be negative");
+            throw new AccountException("Amount can't be negative");
         }
     }
 
     //Validate if an account exists
     private IcesiAccount validateAccountExists(String accountNumber){
         return accountRepository.getByAccountNumber(accountNumber).orElseThrow(
-                () -> new AccountNotFoundException("Account " + accountNumber + " not found"));
+                () -> new AccountException("Account " + accountNumber + " not found"));
     }
 
     //Validate if the user of a new account exists
     private IcesiUser validateUserExists(AccountRequestDTO accountDTO) {
         if (accountDTO.getUser() == null) {
-            throw new UserNotFoundException("User is null");
+            throw new UserException("User is null");
         }
-        return userRepository.findByEmail(accountDTO.getUser().getEmail()).orElseThrow(() -> new UserNotFoundException("User not found"));
+        return userRepository.findByEmail(accountDTO.getUser().getEmail()).orElseThrow(() -> new UserException("User not found"));
     }
 
     //Enable account if balance is positive
@@ -111,7 +108,7 @@ public class AccountService {
             accountRepository.save(account);
             return true;
         }else {
-            throw new BalanceNegativeException("The account has a positive balance, it's not recommended to disable it");
+            throw new AccountException("The account has a positive balance, it's not recommended to disable it");
         }
     }
 
@@ -153,11 +150,11 @@ public class AccountService {
 
     private void validateTransferConditions(IcesiAccount accountFrom, IcesiAccount accountTo){
         if(!(accountFrom.isActive()) || !(accountTo.isActive())) {
-            throw new InactiveAccountException("One or both accounts are not active");
+            throw new AccountException("One or both accounts are not active");
         }
         if((accountFrom.getType().equalsIgnoreCase("deposit") ||
                 accountTo.getType().equalsIgnoreCase("deposit"))) {
-            throw new AccountTypeException("One or both accounts are of type deposit");
+            throw new AccountException("One or both accounts are of type deposit");
         }
     }
 
