@@ -165,4 +165,10 @@ public class AccountService {
     public List<AccountResponseDTO> getAccounts(){
         return accountRepository.getAllAccounts().stream().map(accountMapper::fromAccountToSendAccountDTO).collect(Collectors.toList());
     }
+
+    //Get account by account number
+    public AccountResponseDTO getAccountByAccountNumber(String accountNumber){
+        return accountMapper.fromAccountToSendAccountDTO(validateAccountExists(accountNumber));
+    }
+
 }
