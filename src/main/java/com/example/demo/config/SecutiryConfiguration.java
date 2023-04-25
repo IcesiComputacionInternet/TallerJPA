@@ -1,6 +1,7 @@
 package com.example.demo.config;
 
 import javax.crypto.spec.SecretKeySpec;
+import javax.transaction.Transactional;
 
 import org.postgresql.shaded.com.ongres.scram.common.exception.ScramException;
 import org.springframework.context.annotation.Bean;
@@ -16,9 +17,13 @@ import org.springframework.security.config.annotation.web.configurers.oauth2.ser
 import org.springframework.security.config.http.SessionCreationPolicy;
 import org.springframework.security.oauth2.jose.jws.MacAlgorithm;
 import org.springframework.security.oauth2.jwt.JwtDecoder;
+import org.springframework.security.oauth2.jwt.JwtEncoder;
 import org.springframework.security.oauth2.jwt.NimbusJwtDecoder;
+import org.springframework.security.oauth2.jwt.NimbusJwtEncoder;
 import org.springframework.security.web.SecurityFilterChain;
 import org.springframework.security.web.access.intercept.RequestAuthorizationContext;
+
+import com.nimbusds.jose.jwk.source.ImmutableSecret;
 
 import lombok.AllArgsConstructor;
 
@@ -33,7 +38,7 @@ public class SecutiryConfiguration {
 
     @Bean
     public AuthenticationManager authenticationManager() {
-        return new ProviderManager(new DaoAuthenticationProvider());
+        return new ProviderManager(icesiAuthenticatorManager);
     }
 
     @Bean
@@ -54,4 +59,9 @@ public class SecutiryConfiguration {
         SecretKeySpec key = new SecretKeySpec(bytes, 0, bytes.length, "RSA");
         return NimbusJwtDecoder.withSecretKey(key).macAlgorithm(MacAlgorithm.HS512).build();
     }
+
+    @Bean
+    public JwtEncoder jwtEncoder() {return new NimbusJwtEncoder(new ImmutableSecret<>(secret.getBytes()));}
+
+    //@Bean@Transactional(propagation= Propagation.REQUIRED, readOnly=true,)
 }
