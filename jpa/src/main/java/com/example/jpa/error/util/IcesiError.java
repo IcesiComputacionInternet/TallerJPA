@@ -1,4 +1,4 @@
-package com.example.jpa.error.exceptions;
+package com.example.jpa.error.util;
 
 import lombok.Builder;
 import lombok.Getter;

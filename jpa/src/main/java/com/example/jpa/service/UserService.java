@@ -1,6 +1,8 @@
 package com.example.jpa.service;
 
 import com.example.jpa.dto.UserDTO;
+import com.example.jpa.error.exceptions.RoleException;
+import com.example.jpa.error.exceptions.UserException;
 import com.example.jpa.exceptions.NotFoundRoleException;
 import com.example.jpa.exceptions.UserNotFoundException;
 import com.example.jpa.mapper.UserMapper;
@@ -40,7 +42,7 @@ public class UserService {
         if(userRepository.findByEmail(email).isPresent()) {
             return userMapper.fromUserToUserResponseDTO(userRepository.findByEmail(email).get());
         }else {
-            throw new UserNotFoundException("User not found");
+            throw new UserException("User not found");
         }
     }
 
@@ -52,11 +54,11 @@ public class UserService {
     private void validateEmailAndPhoneNumberExists(UserDTO user) {
         if(userRepository.findByEmail(user.getEmail()).isPresent()
                 && userRepository.findByPhoneNumber(user.getPhoneNumber()).isPresent()) {
-            throw new RuntimeException("Already exists an user with the same email and phone number");
+            throw new UserException("Already exists an user with the same email and phone number");
         }else if(userRepository.findByEmail(user.getEmail()).isPresent()) {
-            throw new RuntimeException("Already exists an user with the same email");
+            throw new UserException("Already exists an user with the same email");
         }else if(userRepository.findByPhoneNumber(user.getPhoneNumber()).isPresent()) {
-            throw new RuntimeException("Already exists an user with the same phone number");
+            throw new UserException("Already exists an user with the same phone number");
         }
     }
 
@@ -64,9 +66,9 @@ public class UserService {
     private IcesiRole validateRoleExists(UserDTO user) {
         if(user.getRole() != null) {
             return roleRepository.getByName(user.getRole().getName()).
-                    orElseThrow(() -> new NotFoundRoleException("Role " + user.getRole().getName() + " not found or is null"));
+                    orElseThrow(() -> new RoleException("Role " + user.getRole().getName() + " not found or is null"));
         }else {
-            throw new RuntimeException("Role is null");
+            throw new RoleException("Role is null");
         }
     }
 
