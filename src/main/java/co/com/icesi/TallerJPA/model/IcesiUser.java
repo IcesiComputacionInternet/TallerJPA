@@ -22,7 +22,7 @@ public class IcesiUser {
     private String email;
     private String phoneNumber;
     private String password;
-    @OneToMany(mappedBy = "user")
+    @OneToMany(mappedBy = "icesiUser")
     private List<IcesiAccount> accounts;
     @ManyToOne
     @JoinColumn(name = "icesi_role_role_id")

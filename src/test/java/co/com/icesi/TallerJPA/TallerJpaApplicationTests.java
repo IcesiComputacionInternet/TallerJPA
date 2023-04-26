@@ -9,5 +9,4 @@ class TallerJpaApplicationTests {
 	@Test
 	void contextLoads() {
 	}
-
 }

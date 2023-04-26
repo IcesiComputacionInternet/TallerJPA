@@ -6,13 +6,15 @@ import co.com.icesi.TallerJPA.dto.IcesiTransactionDTO;
 import co.com.icesi.TallerJPA.dto.responseDTO.IcesiAccountCreateResponseDTO;
 import co.com.icesi.TallerJPA.service.IcesiAccountService;
 import lombok.AllArgsConstructor;
+import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
 import java.util.List;
 
 import static co.com.icesi.TallerJPA.api.IcesiAccountAPI.BASE_ACCOUNT_URL;
 
-@RestController(BASE_ACCOUNT_URL)
+@RestController
+@RequestMapping(BASE_ACCOUNT_URL)
 @AllArgsConstructor
 public class IcesiAccountController implements IcesiAccountAPI {
     private IcesiAccountService accountService;
