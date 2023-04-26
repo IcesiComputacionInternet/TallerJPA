@@ -21,4 +21,5 @@ public interface UserRepository extends JpaRepository <IcesiUser, UUID> {
     @Query("SELECT u FROM IcesiUser u WHERE u.email = :email")
     Optional<IcesiUser> searchByEmail(@Param("email") String email);
 
+
 }
