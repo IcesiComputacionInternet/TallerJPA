@@ -14,7 +14,7 @@ public interface AccountAPI {
     String BASE_ACCOUNT_URL = "/accounts";
 
     //Add the signature of the methods that are going to be implemented in the controller
-    @PostMapping
+    @PostMapping("/create")
     AccountResponseDTO createAccount(@RequestBody AccountRequestDTO accountRequestDTO);
 
     @GetMapping("/{accountID}")
