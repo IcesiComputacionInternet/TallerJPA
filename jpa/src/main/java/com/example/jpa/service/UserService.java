@@ -3,8 +3,6 @@ package com.example.jpa.service;
 import com.example.jpa.dto.UserDTO;
 import com.example.jpa.error.exceptions.RoleException;
 import com.example.jpa.error.exceptions.UserException;
-import com.example.jpa.exceptions.NotFoundRoleException;
-import com.example.jpa.exceptions.UserNotFoundException;
 import com.example.jpa.mapper.UserMapper;
 import com.example.jpa.model.IcesiRole;
 import com.example.jpa.model.IcesiUser;
