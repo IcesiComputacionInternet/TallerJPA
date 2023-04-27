@@ -12,6 +12,7 @@ import org.mockito.Mock;
 import org.mockito.MockitoAnnotations;
 import org.springframework.dao.DuplicateKeyException;
 
+import java.util.Optional;
 import java.util.UUID;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
@@ -68,7 +69,7 @@ public class UserServiceTest {
                 .phoneNumber("123456789")
                 .userId(userId)
                 .build();
-        when(userRepository.findByEmail("test@example.com")).thenReturn(user);
+        when(userRepository.findByEmail("test@example.com")).thenReturn(Optional.ofNullable(user));
 
         assertThrows(DuplicateKeyException.class, () -> userService.createUser(userDTO));
     }
@@ -87,7 +88,7 @@ public class UserServiceTest {
                 .phoneNumber("123456789")
                 .userId(userId)
                 .build();
-        when(userRepository.findByPhoneNumber("123456789")).thenReturn(user);
+        when(userRepository.findByPhoneNumber("123456789")).thenReturn(Optional.ofNullable(user));
 
         assertThrows(DuplicateKeyException.class, () -> userService.createUser(userDTO));
     }
