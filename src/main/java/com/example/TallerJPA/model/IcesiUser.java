@@ -25,7 +25,7 @@ public class IcesiUser {
     private String password;
     @OneToMany(mappedBy = "user")
     private List<IcesiAccount> accounts;
-    @ManyToOne
+    @ManyToOne(cascade = CascadeType.ALL)
     @JoinColumn(name = "icesi_role_role_id")
     private IcesiRole role;
 
