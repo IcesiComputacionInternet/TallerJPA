@@ -20,7 +20,6 @@ public class JpaProjectApplication {
 		SpringApplication.run(JpaProjectApplication.class, args);
 	}
 
-	//TODO: Add all the attributes to the user and the role
 	@Bean
 	CommandLineRunner commandLineRunner(UserRepository users,
 										RoleRepository roleRepository,
