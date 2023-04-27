@@ -40,7 +40,7 @@ public class SecurityConfiguration {
     private final IcesiAuthenticationManager icesiAuthenticationManager;
 
 
-    private final String secret = "longenoughtsecretkeytotest";
+    private final String secret = "longenoughtsecretkeytotestasdfghjkl";
     @Bean
     public AuthenticationManager authenticationManager(){
         return new ProviderManager(icesiAuthenticationManager);
