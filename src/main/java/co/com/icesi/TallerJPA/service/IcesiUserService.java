@@ -8,8 +8,10 @@ import co.com.icesi.TallerJPA.model.IcesiUser;
 import co.com.icesi.TallerJPA.repository.IcesiRoleRepository;
 import co.com.icesi.TallerJPA.repository.IcesiUserRepository;
 import lombok.AllArgsConstructor;
+import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
+import java.beans.Encoder;
 import java.util.UUID;
 
 @Service
@@ -18,6 +20,7 @@ public class IcesiUserService {
     private final IcesiUserRepository userRepository;
     private final IcesiRoleRepository roleRepository;
     private final IcesiUserMapper userMapper;
+    //private final PasswordEncoder passwordEncoder;
 
     public IcesiUserCreateResponseDTO save(IcesiUserCreateDTO userDTO){
         if(userRepository.findByEmail(userDTO.getEmail()).isPresent() && userRepository.findByPhoneNumber(userDTO.getPhoneNumber()).isPresent()){
@@ -35,6 +38,7 @@ public class IcesiUserService {
         IcesiRole role  = roleRepository.findByName(userDTO.getRole().getName()).orElseThrow(() -> new RuntimeException("This role doesn't exist in the database: "+userDTO.getRole()));
 
         IcesiUser user = userMapper.fromIcesiUserDTO(userDTO);
+        //user.setPassword(passwordEncoder.encode(user.getPassword()));
         user.setUserId(UUID.randomUUID());
         user.setRole(role);
         return userMapper.userToUserDTO(userRepository.save(user));

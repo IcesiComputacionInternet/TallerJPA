@@ -35,18 +35,19 @@ import javax.servlet.http.HttpServletRequest;
 @AllArgsConstructor
 public class SecurityConfiguration {
     private final IcesiAuthenticatorManager icesiAuthenticatorManager;
-    private final String secret ="longenoughsecrettotestjwtencrypt";
+    private final String secret ="longenoughsecrettotestjwtencryptadafretege";
 
     @Bean
     public AuthenticationManager authenticationManager(){
         return new ProviderManager(icesiAuthenticatorManager);
     }
 
+    @Bean
     public SecurityFilterChain securityFilterChain(HttpSecurity http, AuthorizationManager<RequestAuthorizationContext> access) throws Exception{
         return http
                 .csrf(AbstractHttpConfigurer::disable)
                 .authorizeHttpRequests(auth -> auth
-                        .anyRequest().permitAll())
+                        .anyRequest().access(access))
                 .oauth2ResourceServer(OAuth2ResourceServerConfigurer::jwt)
                 .sessionManagement(session -> session.sessionCreationPolicy(SessionCreationPolicy.STATELESS))
                 .build();
@@ -77,5 +78,4 @@ public class SecurityConfiguration {
         AuthorizationManager<HttpServletRequest> manager=managerBuilder.build();
         return ((authentication, object) -> manager.check(authentication, object.getRequest()));
     }
-
 }

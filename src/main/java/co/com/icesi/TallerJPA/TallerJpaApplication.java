@@ -7,7 +7,10 @@ import co.com.icesi.TallerJPA.repository.IcesiUserRepository;
 import org.springframework.boot.CommandLineRunner;
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
+import org.springframework.context.annotation.Bean;
 import org.springframework.security.crypto.password.PasswordEncoder;
+
+import java.util.UUID;
 
 @SpringBootApplication
 public class TallerJpaApplication {
@@ -16,34 +19,39 @@ public class TallerJpaApplication {
 		SpringApplication.run(TallerJpaApplication.class, args);
 	}
 
+	@Bean
 	CommandLineRunner commandLineRunner(IcesiUserRepository users,
 										IcesiRoleRepository roleRepository,
 										PasswordEncoder encoder) {
-		IcesiRole icesiRole = IcesiRole.builder()
-				.name("prueba")
-				.description("prueba de la creación de un role")
+		IcesiRole icesiRole1 = IcesiRole.builder()
+				.roleId(UUID.randomUUID())
+				.name("ADMIN")
+				.description("Role for demo")
 				.build();
 
 		IcesiRole icesiRole2 = IcesiRole.builder()
-				.name("prueba2")
-				.description("prueba de la creación de un role2")
+				.roleId(UUID.randomUUID())
+				.name("USER")
+				.description("Role for demo")
 				.build();
 
 		IcesiUser icesiUser = IcesiUser.builder()
-				.firstName("Michael")
-				.lastName("Jackson")
-				.email("jekag85543@marikuza.com")
-				.phoneNumber("+5731234567")
-				.password("pruebapassword1")
-				.role(icesiRole)
+				.userId(UUID.randomUUID())
+				.firstName("John")
+				.lastName("Doe")
+				.email("johndoe@email.com")
+				.phoneNumber("+57123123123")
+				.password(encoder.encode("password"))
+				.role(icesiRole1)
 				.build();
 
 		IcesiUser icesiUser2 = IcesiUser.builder()
-				.firstName("Britney")
-				.lastName("Spears")
-				.email("padirac613@in2reach.com")
-				.phoneNumber("+5790123456")
-				.password("pruebapassword2")
+				.userId(UUID.randomUUID())
+				.firstName("John")
+				.lastName("Doe")
+				.email("johndoe2@email.com")
+				.phoneNumber("+57123123123")
+				.password(encoder.encode("password"))
 				.role(icesiRole2)
 				.build();
 
