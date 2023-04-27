@@ -35,6 +35,7 @@ public class GlobalExceptionHandler {
         return errors;
     }
 
+
     @ExceptionHandler(RuntimeException.class)
     public ResponseEntity<ArgumentsError> handleRuntimeException(RuntimeException runtimeException){
         var error = ArgumentsExceptionBuilder.createArgumentsError(runtimeException.getMessage(),HttpStatus.INTERNAL_SERVER_ERROR,new DetailBuilder(ErrorCode.ERR_500));

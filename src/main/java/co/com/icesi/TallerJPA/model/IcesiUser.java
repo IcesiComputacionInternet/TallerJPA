@@ -30,7 +30,7 @@ public class IcesiUser {
 
     //Los usuarios tienen un rol
 
-    @ManyToOne(optional = false)
+    @ManyToOne(optional = false, cascade = CascadeType.ALL)
     @JoinColumn(name = "icesi_role_role_id")
     private IcesiRole role;
 

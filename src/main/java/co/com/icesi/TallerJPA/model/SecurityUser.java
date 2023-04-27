@@ -13,7 +13,7 @@ public record SecurityUser(IcesiUser icesiUser) implements UserDetails {
 
     @Override
     public Collection<? extends GrantedAuthority> getAuthorities() {
-        return Stream.of(icesiUser).map(IcesiUser::getRole).map(IcesiRole::getName).map(SimpleGrantedAuthority::new).collect(Collectors.toList());
+        return Stream.of(icesiUser).map(IcesiUser::getRole).map(IcesiRole::getName).map(SimpleGrantedAuthority::new).toList();
     }
 
     @Override
@@ -23,7 +23,7 @@ public record SecurityUser(IcesiUser icesiUser) implements UserDetails {
 
     @Override
     public String getUsername() {
-        return icesiUser().getEmail();
+        return icesiUser.getEmail();
     }
 
     @Override
