@@ -6,8 +6,6 @@ import com.example.jpa.error.exceptions.UserException;
 import com.example.jpa.error.exceptions.ValidationException;
 import com.example.jpa.error.util.IcesiError;
 import com.example.jpa.error.util.IcesiErrorDetail;
-import com.example.jpa.exceptions.AccountNotFoundException;
-import com.example.jpa.exceptions.AccountTypeException;
 import org.springframework.context.support.DefaultMessageSourceResolvable;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
