@@ -42,19 +42,9 @@ public class TallerJpaApplication {
 				.phoneNumber("+57123123123")
 				.password(encoder.encode("password"))
 				.build();
-		IcesiUser icesiUser2 = IcesiUser.builder()
-				.userId(UUID.randomUUID())
-				.email("johndoe2@email.com")
-				.role(icesiRole2)
-				.firstName("John")
-				.lastName("Doe")
-				.phoneNumber("+57123123123")
-				.password(encoder.encode("password"))
-				.build();
 
 		return args -> {
 			users.save(icesiUser);
-			users.save(icesiUser2);
 		};
 	}
 

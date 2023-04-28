@@ -44,9 +44,9 @@ public class SecurityConfiguration {
     }
 
     @Bean
-    public SecurityFilterChain securityFilterChain(HttpSecurity http, AuthorizationManager<RequestAuthorizationContext> access) throws Exception {
+    public SecurityFilterChain securityFilterChain(HttpSecurity http, HandlerMappingIntrospector introspector) throws Exception {
         return http.csrf(AbstractHttpConfigurer::disable)
-                .authorizeHttpRequests(auth -> auth.anyRequest().access(access))
+                .authorizeHttpRequests(auth -> auth.anyRequest().access(requestMatcherAuthenticationManager(introspector)))
                 .oauth2ResourceServer(OAuth2ResourceServerConfigurer::jwt)
                 .sessionManagement(session -> session.sessionCreationPolicy(SessionCreationPolicy.STATELESS))
                 .build();
@@ -75,6 +75,9 @@ public class SecurityConfiguration {
         managerBuilder.add(new MvcRequestMatcher(introspector, "/admin/**"),
                 AuthorityAuthorizationManager.hasAnyAuthority("SCOPE_ADMIN"));
 
+
+        managerBuilder.add(new MvcRequestMatcher(introspector, "/test"),
+                AuthorityAuthorizationManager.hasAnyAuthority("SCOPE_ADMIN"));
         AuthorizationManager<HttpServletRequest> manager = managerBuilder.build();
         return (authentication, object) -> manager.check(authentication, object.getRequest());
     }
