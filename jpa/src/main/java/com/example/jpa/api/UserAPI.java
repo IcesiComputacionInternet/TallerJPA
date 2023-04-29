@@ -10,7 +10,7 @@ public interface UserAPI {
 
     String BASE_USER_URL = "/users";
 
-    @PostMapping
+    @PostMapping("/create")
     UserDTO create(@RequestBody UserDTO userDTO);
 
     @GetMapping("/{userEmail}")
