@@ -2,7 +2,7 @@ package com.example.jpa.service;
 
 import com.example.jpa.dto.TransactionRequestDTO;
 import com.example.jpa.dto.UserDTO;
-import com.example.jpa.exceptions.AccountNotFoundException;
+import com.example.jpa.error.exceptions.AccountException;
 import com.example.jpa.repository.AccountRepository;
 import com.example.jpa.repository.UserRepository;
 import com.example.jpa.dto.AccountRequestDTO;
@@ -291,7 +291,7 @@ public class AccountServiceTest {
             assertEquals("Account 897-887868-67 not found",e.getMessage());
         }
         verify(accountRepository,times(0)).save(any());
-        assertThrows(AccountNotFoundException.class, () -> accountService.transfer(defaultTransferTransaction("897-887868-67","233-121219-21",5L)));
+        assertThrows(AccountException.class, () -> accountService.transfer(defaultTransferTransaction("897-887868-67","233-121219-21",5L)));
     }
 
 
