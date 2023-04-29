@@ -75,9 +75,14 @@ public class SecurityConfiguration {
 
         RequestMatcherDelegatingAuthorizationManager.Builder managerBuilder = RequestMatcherDelegatingAuthorizationManager.builder()
                 .add(permitAll, (context, other) -> new AuthorizationDecision(true));
-
+        //These lines give access to the /admin/** path only to users with the SCOPE_ADMIN authority
         managerBuilder.add(new MvcRequestMatcher(introspector, "/admin/**"),
                 AuthorityAuthorizationManager.hasAnyAuthority("SCOPE_ADMIN"));
+        //These lines give acces to the /user/** path only to users with the SCOPE_USER authority
+        managerBuilder.add(new MvcRequestMatcher(introspector, "/user/**"),
+                AuthorityAuthorizationManager.hasAnyAuthority("SCOPE_USER"));
+        //TODO: Add more paths and authorities here
+
         AuthorizationManager<HttpServletRequest> manager = managerBuilder.build();
         return (authentication, object) -> manager.check(authentication, object.getRequest());
     }
