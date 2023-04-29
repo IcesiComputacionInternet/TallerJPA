@@ -14,7 +14,7 @@ import javax.validation.constraints.NotNull;
 
 @Data
 @Builder
-//@EmailOrPhoneConstraint
+@EmailOrPhoneConstraint
 public class UserCreateDTO {
 
     @NotBlank
@@ -27,13 +27,13 @@ public class UserCreateDTO {
     @NotNull
     private String email;
 
-    //@ColombianNumberConstraint
     @NotNull
+    @ColombianNumberConstraint
     private String phoneNumber;
 
-    @NotNull
+    @NotBlank
     private String password;
 
-    @NotNull
+    @NotBlank
     private String role;
 }
