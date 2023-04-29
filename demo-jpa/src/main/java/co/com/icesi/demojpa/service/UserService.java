@@ -23,7 +23,7 @@ public class UserService {
     private final UserMapper userMapper;
     private final RoleRepository roleRepository;
 
-    public IcesiUser save(UserCreateDTO user){
+    public UserCreateDTO save(UserCreateDTO user){
 
         boolean email = validateEmail(user.getEmail());
         boolean phone = validatePhone(user.getPhoneNumber());
@@ -43,7 +43,7 @@ public class UserService {
         IcesiUser icesiUser = userMapper.fromIcesiUserDTO(user);
         icesiUser.setUserId(UUID.randomUUID());
 
-        return userRepository.save(icesiUser);
+        return userMapper.fromIcesiUser(userRepository.save(icesiUser));
     }
 
     public boolean validateEmail(String email){

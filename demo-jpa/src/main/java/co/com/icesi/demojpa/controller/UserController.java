@@ -5,6 +5,8 @@ import co.com.icesi.demojpa.dto.ResponseUserDTO;
 import co.com.icesi.demojpa.dto.UserCreateDTO;
 import co.com.icesi.demojpa.service.UserService;
 import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RestController;
 
 import java.util.List;
@@ -13,6 +15,11 @@ import java.util.List;
 public class UserController implements UserAPI {
 
     private UserService userService ;
+
+    @PostMapping("add/user")
+    public UserCreateDTO createUser(@RequestBody UserCreateDTO requestUserDTO) {
+        return userService.save(requestUserDTO);
+    }
 
     @Override
     public ResponseUserDTO getUser(String userEmail) {
