@@ -3,6 +3,7 @@ package co.edu.icesi.demo.model;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
+import lombok.NoArgsConstructor;
 
 import javax.persistence.*;
 import java.util.List;
@@ -12,12 +13,13 @@ import java.util.UUID;
 @Data
 @Builder
 @AllArgsConstructor
+@NoArgsConstructor
 public class IcesiUser {
 
     @Id
     private UUID userId;
 
-    private String firstname;
+    private String firstName;
 
     private String lastName;
 
@@ -26,9 +28,10 @@ public class IcesiUser {
     private String phoneNumber;
 
     private String password;
+
     @OneToMany(mappedBy = "user")
     private List<IcesiAccount> icesiAccounts;
-    @ManyToOne
+    @ManyToOne(cascade = CascadeType.ALL)
     @JoinColumn(name = "role_id", nullable = false)
     private IcesiRole role;
 }

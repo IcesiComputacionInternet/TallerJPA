@@ -6,7 +6,7 @@ import co.edu.icesi.demo.model.IcesiAccount;
 import co.edu.icesi.demo.model.IcesiRole;
 import org.mapstruct.Mapper;
 
-@Mapper
+@Mapper(componentModel = "spring")
 public interface IcesiRoleMapper {
 
     IcesiRole fromIcesiRoleDto(IcesiRoleDto icesiRoleDto);
