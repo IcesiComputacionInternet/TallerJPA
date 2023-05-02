@@ -12,6 +12,7 @@ import javax.validation.constraints.NotNull;
 @Data
 @Builder
 @EmailOrPhoneNumber
+@AllArgsConstructor
 public class RequestUserDTO {
     @NotBlank
     private String firstName;
