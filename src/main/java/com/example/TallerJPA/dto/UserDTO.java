@@ -2,11 +2,13 @@ package com.example.TallerJPA.dto;
 
 import com.example.TallerJPA.validations.ColombianPhone;
 import com.example.TallerJPA.validations.NotNullContact;
+import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
 
 @Data
 @Builder
+@AllArgsConstructor
 @NotNullContact.List({
     @NotNullContact(
             phone = "phoneNumber",
