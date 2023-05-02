@@ -4,7 +4,7 @@ import javax.crypto.spec.SecretKeySpec;
 import javax.servlet.http.HttpServletRequest;
 import javax.transaction.Transactional;
 
-import org.postgresql.shaded.com.ongres.scram.common.exception.ScramException;
+//import org.postgresql.shaded.com.ongres.scram.common.exception.ScramException;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.security.authentication.AuthenticationManager;
