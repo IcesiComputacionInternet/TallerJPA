@@ -11,7 +11,7 @@ public interface RoleAPI {
 
     String BASE_ROLE_URL = "/roles";
 
-    @PostMapping
+    @PostMapping("/createRole")
     IcesiRole createRole(@RequestBody RoleDTO dto);
 
     @GetMapping("/{roleId}")
