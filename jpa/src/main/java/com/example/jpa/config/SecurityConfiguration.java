@@ -78,10 +78,15 @@ public class SecurityConfiguration {
         //These lines give access to the /admin/** path only to users with the SCOPE_ADMIN authority
         managerBuilder.add(new MvcRequestMatcher(introspector, "/admin/**"),
                 AuthorityAuthorizationManager.hasAnyAuthority("SCOPE_ADMIN"));
+        //These lines give acces to the /roles/** path only to users with the SCOPE_ADMIN authority
+        managerBuilder.add(new MvcRequestMatcher(introspector, "/roles/**"),
+                AuthorityAuthorizationManager.hasAnyAuthority("SCOPE_ADMIN"));
         //These lines give acces to the /user/** path only to users with the SCOPE_USER authority
-        managerBuilder.add(new MvcRequestMatcher(introspector, "/user/**"),
+        managerBuilder.add(new MvcRequestMatcher(introspector, "/users/**"),
                 AuthorityAuthorizationManager.hasAnyAuthority("SCOPE_USER"));
-        //TODO: Add more paths and authorities here
+        //These lines give acces to the /accounts/** path only to users with the SCOPE_USER authority
+        managerBuilder.add(new MvcRequestMatcher(introspector, "/accounts/**"),
+                AuthorityAuthorizationManager.hasAnyAuthority("SCOPE_USER"));
 
         AuthorizationManager<HttpServletRequest> manager = managerBuilder.build();
         return (authentication, object) -> manager.check(authentication, object.getRequest());
