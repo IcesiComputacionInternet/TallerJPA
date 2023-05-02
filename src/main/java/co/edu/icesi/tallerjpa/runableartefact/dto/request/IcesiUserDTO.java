@@ -14,12 +14,15 @@ public class IcesiUserDTO {
     @NotBlank
     private String firstName;
 
+    @NotBlank
     private String lastName;
 
     @Email(message = "Email should be valid", regexp = "^[A-Za-z0-9+_.-]+@(.+)$")
+    @NotBlank
     private String email;
 
     @ColombianNumber
+    @NotBlank
     private String phoneNumber;
 
     @NotBlank

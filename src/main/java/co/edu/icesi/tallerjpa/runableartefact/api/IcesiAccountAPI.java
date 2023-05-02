@@ -1,6 +1,7 @@
 package co.edu.icesi.tallerjpa.runableartefact.api;
 
 import co.edu.icesi.tallerjpa.runableartefact.dto.request.IcesiAccountDTO;
+import co.edu.icesi.tallerjpa.runableartefact.dto.response.TransactionInformationResponseDTO;
 import org.springframework.web.bind.annotation.PatchMapping;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
@@ -29,5 +30,5 @@ public interface IcesiAccountAPI {
         String deposit(@RequestBody Map<String, String> depositInformation);
 
         @PatchMapping("/transfer")
-        String transfer(@RequestBody Map<String,String> transferInformation);
+        TransactionInformationResponseDTO transfer(@RequestBody Map<String,String> transferInformation);
 }

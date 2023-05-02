@@ -1,7 +1,9 @@
 package co.edu.icesi.tallerjpa.runableartefact.dto.request;
 
+import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
+import lombok.NoArgsConstructor;
 import org.springframework.boot.jackson.JsonComponent;
 
 import javax.validation.constraints.Max;
@@ -11,6 +13,8 @@ import javax.validation.constraints.NotBlank;
 @Data
 @Builder
 @JsonComponent
+@AllArgsConstructor
+@NoArgsConstructor
 public class TransactionInformationDTO {
 
     @NotBlank
