@@ -30,23 +30,18 @@ public class IcesiAccountController implements IcesiAccountAPI {
     }
 
     @Override
-    public String withdrawal(Map<String, String> withdrawalInformation) {
-        return null;
+    public TransactionInformationResponseDTO withdrawal(TransactionInformationDTO withdrawalInformation) {
+        return icesiAccountService.withdrawal(withdrawalInformation);
     }
 
-    public String withdrawal(TransactionInformationDTO withdrawalInformation) {
-        return null;
-    }
 
-    public String deposit(@RequestBody Map<String, String> depositInformation) {
-        return icesiAccountService.deposit(depositInformation.get("accountNumber"), Long.valueOf(depositInformation.get("amount")));
+    public String deposit(@RequestBody TransactionInformationDTO depositInformation) {
+        return icesiAccountService.deposit(depositInformation.getAccountNumberOrigin(), depositInformation.getAmount());
     }
 
     //TODO: Cambiar el tipo de dato que recibe por un DTO
-    public TransactionInformationResponseDTO transfer(@RequestBody Map<String,String> transferInformation) {
-        return icesiAccountService.transfer(transferInformation.get("accountNumberOrigin")
-                , transferInformation.get("accountNumberDestination")
-                , Long.valueOf(transferInformation.get("amount")));
+    public TransactionInformationResponseDTO transfer(@RequestBody TransactionInformationDTO transferInformation) {
+        return icesiAccountService.transfer(transferInformation);
     }
 
 }

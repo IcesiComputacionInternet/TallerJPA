@@ -94,9 +94,10 @@ public class IcesiAccountService {
     }
 
     @Transactional
-    public TransactionInformationResponseDTO transfer(String accountNumberOrigin, String accountNumberDestination, Long amount) {
-        IcesiAccount icesiAccountOrigin = getIcesiAccountByAccountNumber(accountNumberOrigin);
-        IcesiAccount icesiAccountDestination = getIcesiAccountByAccountNumber(accountNumberDestination);
+    public TransactionInformationResponseDTO transfer(TransactionInformationDTO transactionInformationDTO) {
+        IcesiAccount icesiAccountOrigin = getIcesiAccountByAccountNumber(transactionInformationDTO.getAccountNumberOrigin());
+        IcesiAccount icesiAccountDestination = getIcesiAccountByAccountNumber(transactionInformationDTO.getAccountNumberDestination());
+        Long amount = transactionInformationDTO.getAmount();
 
         canTransfer(icesiAccountOrigin);
         canTransfer(icesiAccountDestination);
@@ -110,8 +111,8 @@ public class IcesiAccountService {
         icesiAccountRepository.save(icesiAccountDestination);
 
         return TransactionInformationResponseDTO.builder()
-                .accountNumberOrigin(accountNumberOrigin)
-                .accountNumberDestination(accountNumberDestination)
+                .accountNumberOrigin(transactionInformationDTO.getAccountNumberOrigin())
+                .accountNumberDestination(transactionInformationDTO.getAccountNumberDestination())
                 .amount(amount)
                 .message("Transfer successful")
                 .build();

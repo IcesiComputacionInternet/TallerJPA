@@ -1,0 +1,57 @@
+package co.edu.icesi.tallerjpa.runableartefact.integration.controller;
+
+import co.edu.icesi.tallerjpa.runableartefact.model.IcesiRole;
+import co.edu.icesi.tallerjpa.runableartefact.model.IcesiUser;
+import co.edu.icesi.tallerjpa.runableartefact.repository.IcesiRoleRepository;
+import co.edu.icesi.tallerjpa.runableartefact.repository.IcesiUserRepository;
+import org.springframework.boot.CommandLineRunner;
+import org.springframework.boot.test.context.TestConfiguration;
+import org.springframework.context.annotation.Bean;
+import org.springframework.security.crypto.password.PasswordEncoder;
+
+import java.util.UUID;
+
+@TestConfiguration
+public class TestConfigurationData {
+
+    @Bean
+    CommandLineRunner commandLineRunner(IcesiUserRepository users,
+                                        IcesiRoleRepository roleRepository,
+                                        PasswordEncoder encoder) {
+
+        IcesiRole icesiRole = IcesiRole.builder()
+                .roleId(UUID.randomUUID())
+                .name("ADMIN")
+                .build();
+        IcesiRole icesiRole2 = IcesiRole.builder()
+                .roleId(UUID.randomUUID())
+                .name("USER")
+                .build();
+        IcesiUser icesiUser = IcesiUser.builder()
+                .userId(UUID.randomUUID())
+                .role(icesiRole)
+                .firstName("John")
+                .lastName("Doe")
+                .email("test@email.com")
+                .phoneNumber("3123342122")
+                .password(encoder.encode("password"))
+                .build();
+        IcesiUser icesiUser2 = IcesiUser.builder()
+                .userId(UUID.randomUUID())
+                .email("johndoe2@email.com")
+                .role(icesiRole2)
+                .firstName("John")
+                .lastName("Doe")
+                .phoneNumber("3123342122")
+                .password(encoder.encode("password"))
+                .build();
+
+        return args -> {
+            roleRepository.save(icesiRole);
+            roleRepository.save(icesiRole2);
+            users.save(icesiUser);
+            users.save(icesiUser2);
+        };
+
+    }
+}
