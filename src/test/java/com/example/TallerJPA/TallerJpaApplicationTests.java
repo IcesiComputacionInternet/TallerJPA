@@ -41,7 +41,7 @@ class TallerJpaApplicationTests {
 	}
 	@Test
 	public void testCreateUser() throws Exception{
-		var result = mockMvc.perform(MockMvcRequestBuilders.post("/user").content(
+		var result = mockMvc.perform(MockMvcRequestBuilders.post("/users").content(
 				objectMapper.writeValueAsString(new UserDTO("Pedro",
 						"Perez",
 						"pedro@email.com",

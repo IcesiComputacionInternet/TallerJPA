@@ -1,4 +1,4 @@
-/**package com.example.TallerJPA.unit.service;
+package com.example.TallerJPA.unit.service;
 
 import com.example.TallerJPA.dto.RoleDTO;
 import com.example.TallerJPA.mapper.RoleMapper;
@@ -49,7 +49,7 @@ public class RoleServiceTest {
     @Test
     public void testRoleDoesNotExist(){
         when(roleRepository.findById(any())).thenReturn(Optional.empty());
-        assertEquals(Optional.empty(),roleService.findRoleByName("testRole"));
+        assertEquals(Optional.empty(),roleRepository.findByName("testRole"));
     }
 
     private RoleDTO defaultRoleCreateDTO() {
@@ -66,4 +66,3 @@ public class RoleServiceTest {
                 .build();
     }
 }
- **/

@@ -39,6 +39,9 @@ public class AccountService {
         if(!account.getActive()){
             throw new RuntimeException("Account already disabled");
         }
+        if(account.getBalance() > 0){
+            throw new RuntimeException("Account has balance");
+        }
         account.setActive(false);
         accountRepository.save(account);
         return accountMapper.fromAccountToResponse(account);
@@ -67,6 +70,9 @@ public class AccountService {
     @Transactional
     public AccountResponseDTO deposit(TransactionAccountDTO transactionInformation){
         IcesiAccount account = getAccountByNumber(transactionInformation.getAccountNumber());
+        if(!account.getActive()){
+            throw new RuntimeException("Account is disabled");
+        }
         account.setBalance(account.getBalance() + transactionInformation.getAmount());
         accountRepository.save(account);
         return accountMapper.fromAccountToResponse(account);

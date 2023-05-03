@@ -1,4 +1,4 @@
-/**package com.example.TallerJPA.unit.service;
+package com.example.TallerJPA.unit.service;
 
 import com.example.TallerJPA.dto.UserDTO;
 import com.example.TallerJPA.mapper.RoleMapper;
@@ -33,12 +33,12 @@ public class UserServiceTest {
         userMapper = spy(UserMapperImpl.class);
         roleMapper = spy(RoleMapperImpl.class);
         roleService = new RoleService(roleMapper,roleRepository);
-        userService = new UserService(userRepository,userMapper,roleService);
+        userService = new UserService(userRepository,userMapper,roleRepository);
     }
 
     @Test
     public void testCreateUser(){
-        when(roleService.findRoleByName(any())).thenReturn(Optional.of(IcesiRole.builder().name("Estudiante").build()));
+        when(roleRepository.findByName(any())).thenReturn(Optional.of(IcesiRole.builder().name("Estudiante").build()));
         userService.save(defaultUserCreateDTO());
         IcesiRole role = IcesiRole.builder()
                 .name("Estudiante")
@@ -94,4 +94,3 @@ public class UserServiceTest {
                 .build();
     }
 }
-**/
