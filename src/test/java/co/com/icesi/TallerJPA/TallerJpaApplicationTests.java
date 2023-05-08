@@ -3,7 +3,6 @@ package co.com.icesi.TallerJPA;
 import co.com.icesi.TallerJPA.dto.IcesiRoleCreateDTO;
 import co.com.icesi.TallerJPA.dto.IcesiUserCreateDTO;
 import co.com.icesi.TallerJPA.dto.LoginDTO;
-import co.com.icesi.TallerJPA.model.IcesiRole;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -14,8 +13,6 @@ import org.springframework.http.MediaType;
 import org.springframework.test.context.ActiveProfiles;
 import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.request.MockMvcRequestBuilders;
-
-import java.util.UUID;
 
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
@@ -47,10 +44,12 @@ class TallerJpaApplicationTests {
 	}
 
 	//CREAR PRUEBA PARA CREAR UN USUARIO
-	IcesiRoleCreateDTO icesiRole1 = IcesiRoleCreateDTO.builder()
-			.name("ADMIN")
-			.description("Role for demo")
-			.build();
+	private IcesiRoleCreateDTO getDefaultRoleDTO(){
+		return   IcesiRoleCreateDTO.builder()
+				.name("Administrador")
+				.description("El administrador se encarga de administrar la página")
+				.build();
+	}
 	@Test
 	public void testCreateUserEndPoint() throws Exception{
 		var result = mockMvc.perform(MockMvcRequestBuilders.get("/users").content(
@@ -61,7 +60,7 @@ class TallerJpaApplicationTests {
 												.email("johndoe@email.com")
 												.phoneNumber("+57123123123")
 												.password("password")
-												.role(icesiRole1)
+												.role(getDefaultRoleDTO())
 												.build()))
 						.contentType(MediaType.APPLICATION_JSON)
 						.accept(MediaType.APPLICATION_JSON))
