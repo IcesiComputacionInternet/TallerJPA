@@ -61,14 +61,28 @@ Note that we don't need the controllers right now.
 ### PART 2
 
 ## Requirements
+- Add the necesary controllers.
 - Add security to te application.
 - A normal user can only update the state of it's own accounts
 - An admin user should be able to create roles, users and assing roles.
 - A bank user should be able to create users.
 
+The aplication should handle it's custom exceptions and show a JSON response when an error appears: 
+- Add a custom exception.
+- Add a controller advice.
+- Handle the custom exception.
+- Return the expected exception.
+- Login exceptions should be handled too.
+
+The application should handle the input validations by using the @Valid @Validated anotations:
+- Use custom anotation if needed.
+- The exception for the validations should be handled by the controller advice.
+
 ## Testing
-- Add a integration test for transfering money
-- Add a integration test for user creation
+- Add a integration test for transfering money.
+- Add a integration test for user creation.
+
+The integration test should include the happy path and possible errors throw by the application
 
 
 
