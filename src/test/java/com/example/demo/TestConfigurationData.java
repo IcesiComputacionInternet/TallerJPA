@@ -13,7 +13,6 @@ import com.example.demo.repository.IcesiRoleRepository;
 import com.example.demo.repository.IcesiUserRepository;
 
 @TestConfiguration
-
 public class TestConfigurationData {
     @Bean
 	CommandLineRunner commandLineRunner(IcesiUserRepository users,

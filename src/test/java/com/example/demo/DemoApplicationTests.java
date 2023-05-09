@@ -9,9 +9,12 @@ import org.springframework.http.MediaType;
 import org.springframework.test.context.ActiveProfiles;
 import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.request.MockMvcRequestBuilders;
+
+import static org.junit.jupiter.api.Assertions.assertNotNull;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
 import com.example.demo.DTO.LoginDTO;
+import com.example.demo.exception.IcesiError;
 import com.fasterxml.jackson.databind.ObjectMapper;
 
 @AutoConfigureMockMvc
@@ -44,4 +47,16 @@ class DemoApplicationTests {
 		System.out.println(result.getResponse().getContentAsString());
 	}
 
+	@Test
+	public void testTokenEndpointWithINvalidEmail() throws Exception {
+		var result = mockMvc.perform(MockMvcRequestBuilders.get("/token").content(
+			objectMapper.writeValueAsString(new LoginDTO("incorrect@email.com", "password"))
+		)
+		.contentType(MediaType.APPLICATION_JSON)
+		.accept(MediaType.APPLICATION_JSON)
+		.andExpect(status().isOk())
+		.andReturn();
+		IcesiError token = objectMapper.readValue(result.getResponse().getContentAsString(),TokenDTO.class);
+		assertNotNull(token); 
+	}
 }
