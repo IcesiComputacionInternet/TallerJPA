@@ -58,5 +58,17 @@ Note that we don't need the controllers right now.
 
 ![alt text](./rubrica.jpeg)
 
+### PART 2
+
+## Requirements
+- Add security to te application.
+- A normal user can only update the state of it's own accounts
+- An admin user should be able to create roles, users and assing roles.
+- A bank user should be able to create users.
+
+## Testing
+- Add a integration test for transfering money
+- Add a integration test for user creation
+
 
 
