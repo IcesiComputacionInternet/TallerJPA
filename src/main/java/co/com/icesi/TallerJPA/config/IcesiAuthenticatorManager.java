@@ -2,7 +2,7 @@ package co.com.icesi.TallerJPA.config;
 
 import co.com.icesi.TallerJPA.model.SecurityUser;
 import co.com.icesi.TallerJPA.security.CustomAuthentication;
-import co.com.icesi.TallerJPA.service.UserManagementService;
+import co.com.icesi.TallerJPA.service.security.UserManagementService;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.authentication.dao.DaoAuthenticationProvider;
 import org.springframework.security.core.Authentication;

@@ -7,7 +7,7 @@ import co.com.icesi.TallerJPA.mapper.RoleMapperImpl;
 import co.com.icesi.TallerJPA.model.IcesiRole;
 import co.com.icesi.TallerJPA.repository.RoleRepository;
 import co.com.icesi.TallerJPA.service.RoleService;
-import co.com.icesi.TallerJPA.unit.service.matcher.IcesiRoleMatcher;
+import co.com.icesi.TallerJPA.unit.matcher.IcesiRoleMatcher;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 
@@ -43,7 +43,7 @@ public class RoleServiceTest {
             roleService.save(defaultRoleCreateDTO());
         }catch (ArgumentsException e){
             String message = e.getMessage();
-            assertEquals("Role name already exist",message);
+            assertEquals("Existing data",message);
         }
     }
 

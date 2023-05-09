@@ -1,4 +1,4 @@
-package co.com.icesi.TallerJPA.service;
+package co.com.icesi.TallerJPA.service.security;
 
 import co.com.icesi.TallerJPA.security.CustomAuthentication;
 import lombok.AllArgsConstructor;
@@ -37,7 +37,7 @@ public class TokenService {
                 .claim("scope",scope)
                 .claim("icesiUserId",customAuthentication.getUserId())
                 .build();
-        var encoderParameters = JwtEncoderParameters.from(JwsHeader.with(MacAlgorithm.HS512).build(),claims);
+        var encoderParameters = JwtEncoderParameters.from(JwsHeader.with(MacAlgorithm.HS256).build(),claims);
         return this.encoder.encode(encoderParameters).getTokenValue();
     }
 

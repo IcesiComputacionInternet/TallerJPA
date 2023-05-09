@@ -59,7 +59,7 @@ public class UserServiceTest {
             userService.save(defaultUserCreateDTO());
         }catch (ArgumentsException e) {
             String message = e.getMessage();
-            assertEquals("Email already exist",message);
+            assertEquals("Existing data",message);
         }
         //assertThrows(ArgumentsException.class,() -> userService.save(defaultUserCreateDTO()));
     }
@@ -86,7 +86,7 @@ public class UserServiceTest {
             userService.save(userCreateDTO);
         }catch (ArgumentsException e) {
             String message = e.getMessage();
-            assertEquals("Role does not exist", message);
+            assertEquals("Not existing data", message);
         }
         //assertThrows(ArgumentsException.class,() -> userService.save(userCreateDTO));
     }

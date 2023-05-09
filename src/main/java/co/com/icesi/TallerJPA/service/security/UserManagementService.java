@@ -1,4 +1,4 @@
-package co.com.icesi.TallerJPA.service;
+package co.com.icesi.TallerJPA.service.security;
 
 import co.com.icesi.TallerJPA.model.SecurityUser;
 import co.com.icesi.TallerJPA.repository.UserRepository;

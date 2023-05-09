@@ -4,7 +4,6 @@ import co.com.icesi.TallerJPA.Enum.AccountType;
 import co.com.icesi.TallerJPA.dto.AccountCreateDTO;
 import co.com.icesi.TallerJPA.dto.RoleCreateDTO;
 import co.com.icesi.TallerJPA.dto.TransactionOperationDTO;
-import co.com.icesi.TallerJPA.dto.response.AccountResponseDTO;
 import co.com.icesi.TallerJPA.dto.response.UserResponseDTO;
 import co.com.icesi.TallerJPA.mapper.AccountMapper;
 import co.com.icesi.TallerJPA.mapper.AccountMapperImpl;
@@ -16,7 +15,7 @@ import co.com.icesi.TallerJPA.model.IcesiUser;
 import co.com.icesi.TallerJPA.repository.AccountRepository;
 import co.com.icesi.TallerJPA.repository.UserRepository;
 import co.com.icesi.TallerJPA.service.AccountService;
-import co.com.icesi.TallerJPA.unit.service.matcher.IcesiAccountMatcher;
+import co.com.icesi.TallerJPA.unit.matcher.IcesiAccountMatcher;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 

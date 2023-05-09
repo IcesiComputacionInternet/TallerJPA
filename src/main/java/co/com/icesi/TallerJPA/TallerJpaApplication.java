@@ -19,6 +19,7 @@ public class TallerJpaApplication {
 		SpringApplication.run(TallerJpaApplication.class, args);
 	}
 
+	/*
 	@Bean
 	CommandLineRunner commandLineRunner(UserRepository users,
 										RoleRepository roleRepository,
@@ -58,4 +59,5 @@ public class TallerJpaApplication {
 			users.save(icesiUser2);
 		};
 	}
+	 */
 }
