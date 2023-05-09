@@ -11,7 +11,8 @@ import java.util.List;
 import java.util.Optional;
 import java.util.UUID;
 
-@RestController("/accounts")
+@RestController
+@RequestMapping("/accounts")
 public class AccountController {
 
     private final AccountService accountService;

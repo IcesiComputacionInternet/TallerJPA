@@ -8,7 +8,8 @@ import org.springframework.web.bind.annotation.*;
 
 import java.util.UUID;
 
-@RestController("/roles")
+@RestController
+@RequestMapping("/roles")
 @AllArgsConstructor
 public class RoleController {
 
