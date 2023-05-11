@@ -70,18 +70,20 @@ public class IcesiAccountService {
                 .collect(Collectors.joining(""));
     }
 
-    public void enableAccount(String accountId){
+    public IcesiAccountShowDTO enableAccount(String accountId){
         if(getAccountById(accountId).isActive()){
             throw new RuntimeException("The account was already enabled");
         }
         icesiAccountRepository.enableAccount(accountId);
+        return icesiAccountMapper.fromIcesiAccountToShowDTO(getAccountById(accountId));
     }
 
-    public void disableAccount(String accountId){
+    public IcesiAccountShowDTO disableAccount(String accountId){
         if(getAccountById(accountId).getBalance() != 0){
             throw new RuntimeException("Account can only be disabled if the balance is 0.");
         }
         icesiAccountRepository.disableAccount(accountId);
+        return icesiAccountMapper.fromIcesiAccountToShowDTO(getAccountById(accountId));
     }
 
     public TransactionResultDTO withdrawalMoney(TransactionCreateDTO transactionCreateDTO){
