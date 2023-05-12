@@ -28,6 +28,8 @@ public interface AccountRepository extends JpaRepository<Account, UUID> {
     void disableAccount(@Param("accountNumber") String accountNumber);
     @Query("SELECT a.active FROM Account a WHERE a.accountNumber = :accountNumber")
     boolean isActive(@Param("accountNumber") String accountNumber);
+    @Query("SELECT CASE WHEN (COUNT(a) > 0) THEN true ELSE false END FROM Account a WHERE a.accountNumber = :accountNumber AND a.user.userId = :userId")
+    boolean isAccountOwner(@Param("userId") UUID userId, @Param("accountNumber") String accountNumber);
 
 
 

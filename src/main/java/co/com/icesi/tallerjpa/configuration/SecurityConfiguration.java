@@ -1,5 +1,6 @@
 package co.com.icesi.tallerjpa.configuration;
 
+import co.com.icesi.tallerjpa.repository.PermissionRepository;
 import com.nimbusds.jose.jwk.source.ImmutableSecret;
 import lombok.AllArgsConstructor;
 import org.springframework.context.annotation.Bean;
@@ -25,18 +26,26 @@ import org.springframework.security.web.access.intercept.RequestMatcherDelegatin
 import org.springframework.security.web.servlet.util.matcher.MvcRequestMatcher;
 import org.springframework.security.web.util.matcher.AndRequestMatcher;
 import org.springframework.security.web.util.matcher.RequestMatcher;
+import org.springframework.transaction.annotation.Propagation;
+import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.servlet.handler.HandlerMappingIntrospector;
 
 import javax.crypto.spec.SecretKeySpec;
 import javax.servlet.http.HttpServletRequest;
+import java.util.Collection;
+import java.util.List;
+import java.util.Map;
+import java.util.stream.Collectors;
+import java.util.stream.Stream;
+import java.util.stream.StreamSupport;
 
 @Configuration
 @EnableWebSecurity
 @AllArgsConstructor
 public class SecurityConfiguration {
     private final String secret = "hdenmroaheldhbcry7uldtbcbbchjsgcjsabjhcbajsbcjhsbjhdbsbh";
-
     private final AuthenticatorManagerImpl AuthenticationManager;
+    private final PermissionRepository permissionRepository;
 
     @Bean
     public AuthenticationManager authenticatorManager() {
@@ -44,9 +53,9 @@ public class SecurityConfiguration {
     }
 
     @Bean
-    public SecurityFilterChain securityFilterChain(HttpSecurity http, HandlerMappingIntrospector introspector) throws Exception {
+    public SecurityFilterChain securityFilterChain(HttpSecurity http, AuthorizationManager<RequestAuthorizationContext> access) throws Exception {
         return http.csrf(AbstractHttpConfigurer::disable)
-                .authorizeHttpRequests(auth -> auth.anyRequest().access(requestMatcherAuthenticationManager(introspector)))
+                .authorizeHttpRequests(auth -> auth.anyRequest().access(access))
                 .oauth2ResourceServer(OAuth2ResourceServerConfigurer::jwt)
                 .sessionManagement(session -> session.sessionCreationPolicy(SessionCreationPolicy.STATELESS))
                 .build();
@@ -65,20 +74,25 @@ public class SecurityConfiguration {
     }
 
     @Bean
+    @Transactional(propagation= Propagation.REQUIRED, readOnly=true, noRollbackFor=Exception.class)
     public AuthorizationManager<RequestAuthorizationContext> requestMatcherAuthenticationManager(HandlerMappingIntrospector introspector) {
+        Map<RequestMatcher, List<String>> roleMap = StreamSupport.stream(permissionRepository.findAll().spliterator(),false)
+                .collect(
+                        Collectors.toMap(permission -> new MvcRequestMatcher(introspector, permission.getPath()),
+                            permission -> permission.getRoles().stream().map(role -> "SCOPE_" + role.getName()).toList(),
+                            (actualList, newList) -> Stream.of(actualList, newList).flatMap(Collection::stream).distinct().toList()
+                        )
+                );
+
         RequestMatcher permitAll = new AndRequestMatcher(new MvcRequestMatcher(introspector, "/login"));
 
-        RequestMatcherDelegatingAuthorizationManager.Builder managerBuilder
-                = RequestMatcherDelegatingAuthorizationManager.builder()
+        RequestMatcherDelegatingAuthorizationManager.Builder managerBuilder = RequestMatcherDelegatingAuthorizationManager.builder()
                 .add(permitAll, (context, other) -> new AuthorizationDecision(true));
 
-        managerBuilder.add(new MvcRequestMatcher(introspector, "/admin/**"),
-                AuthorityAuthorizationManager.hasAnyAuthority("SCOPE_ADMIN"));
+        roleMap.forEach((matcher, authorities) -> managerBuilder.add(matcher, AuthorityAuthorizationManager.hasAnyAuthority(authorities.toArray(new String[0]))));
 
-
-        managerBuilder.add(new MvcRequestMatcher(introspector, "/test"),
-                AuthorityAuthorizationManager.hasAnyAuthority("SCOPE_ADMIN"));
         AuthorizationManager<HttpServletRequest> manager = managerBuilder.build();
         return (authentication, object) -> manager.check(authentication, object.getRequest());
+
     }
 }

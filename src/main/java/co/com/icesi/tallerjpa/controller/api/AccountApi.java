@@ -6,6 +6,7 @@ import co.com.icesi.tallerjpa.dto.TransactionDTO;
 import org.springframework.web.bind.annotation.*;
 
 import javax.validation.Valid;
+import java.security.Principal;
 
 @RequestMapping(AccountApi.ACCOUNT_BASE_URL)
 public interface AccountApi {

@@ -21,7 +21,7 @@ public class RoleService {
     @SneakyThrows
     public RoleDTO save(RoleDTO roleDTO){
 
-        boolean nameExists = roleRepository.existsByName(roleDTO.getName());
+        boolean nameExists = roleRepository.existsByName(roleDTO.name());
 
         if (nameExists){ throw new CustomException("Name already exists");}
 

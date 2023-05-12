@@ -1,10 +1,9 @@
 package co.com.icesi.tallerjpa.model;
 
+import co.com.icesi.tallerjpa.model.security.UserPermission;
 import lombok.*;
 
-import javax.persistence.Entity;
-import javax.persistence.Id;
-import javax.persistence.OneToMany;
+import javax.persistence.*;
 import java.util.List;
 import java.util.UUID;
 
@@ -21,5 +20,13 @@ public class Role {
     private String description;
     @OneToMany(mappedBy = "role")
     private List<IcesiUser> users;
+
+    @ManyToMany(cascade = CascadeType.MERGE, fetch = FetchType.LAZY)
+    @JoinTable(
+            name = "user_permission_roles",
+            joinColumns = @JoinColumn(name = "role_role_id"),
+            inverseJoinColumns = @JoinColumn(name = "user_permission_permission_id")
+    )
+    private List<UserPermission> permissionList;
 
 }

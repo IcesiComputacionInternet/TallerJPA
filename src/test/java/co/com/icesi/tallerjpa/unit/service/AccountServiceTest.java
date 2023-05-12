@@ -3,6 +3,7 @@ package co.com.icesi.tallerjpa.unit.service;
 import co.com.icesi.tallerjpa.dto.RequestAccountDTO;
 import co.com.icesi.tallerjpa.dto.TransactionDTO;
 import co.com.icesi.tallerjpa.enums.TypeAccount;
+import co.com.icesi.tallerjpa.error.exception.CustomException;
 import co.com.icesi.tallerjpa.mapper.AccountMapper;
 import co.com.icesi.tallerjpa.mapper.AccountMapperImpl;
 import co.com.icesi.tallerjpa.model.Account;
@@ -321,43 +322,114 @@ public class AccountServiceTest {
     }
 
     @Test
-    public void testDisableAccountCantBeDisabled() {
+    public void testDisableAccountCantBeDisabledButUserIsOwner() {
+        when(accountRepository.isAccountOwner(any(), any())).thenReturn(true);
         when(accountRepository.isActive(any())).thenReturn(true);
-        TransactionDTO msg = accountService.disableAccount(any());
+        TransactionDTO msg = accountService.disableAccount(any(), any());
 
         assertEquals("The account can't be disabled", msg.getMessage());
         verify(accountRepository, times(1)).disableAccount(any());
         verify(accountRepository, times(1)).isActive(any());
+        verify(accountRepository, times(1)).isAccountOwner(any(), any());
     }
 
     @Test
-    public void testDisableAccount() {
+    public void testDisableAccountCantBeDisabledButUserIsNotOwner() {
+        when(accountRepository.isAccountOwner(any(), any())).thenReturn(false);
+        when(accountRepository.isActive(any())).thenReturn(true);
+
+        try {
+            accountService.enableAccount(any(), any());
+        } catch (CustomException e) {
+            assertEquals("You are not the owner of this account", e.getMessage());
+        }
+
+        verify(accountRepository, times(0)).disableAccount(any());
+        verify(accountRepository, times(0)).isActive(any());
+        verify(accountRepository, times(1)).isAccountOwner(any(), any());
+    }
+
+    @Test
+    public void testDisableAccountWhenUserIsOwner() {
+        when(accountRepository.isAccountOwner(any(), any())).thenReturn(true);
         when(accountRepository.isActive(any())).thenReturn(false);
-        TransactionDTO msg = accountService.disableAccount(any());
+        TransactionDTO msg = accountService.disableAccount(any(), any());
 
         assertEquals("The account was disabled", msg.getMessage());
         verify(accountRepository, times(1)).disableAccount(any());
         verify(accountRepository, times(1)).isActive(any());
+        verify(accountRepository, times(1)).isAccountOwner(any(), any());
     }
 
     @Test
-    public void testEnableAccountCantBeEnabled() {
+    public void testDisableAccountWhenUserIsNotOwner() {
+        when(accountRepository.isAccountOwner(any(), any())).thenReturn(false);
         when(accountRepository.isActive(any())).thenReturn(false);
-        TransactionDTO msg = accountService.enableAccount(any());
+
+        try {
+            accountService.enableAccount(any(), any());
+        } catch (CustomException e) {
+            assertEquals("You are not the owner of this account", e.getMessage());
+        }
+
+        verify(accountRepository, times(0)).disableAccount(any());
+        verify(accountRepository, times(0)).isActive(any());
+        verify(accountRepository, times(1)).isAccountOwner(any(), any());
+    }
+
+    @Test
+    public void testEnableAccountCantBeEnabledButUserIsTheOwner() {
+        when(accountRepository.isAccountOwner(any(), any())).thenReturn(true);
+        when(accountRepository.isActive(any())).thenReturn(false);
+        TransactionDTO msg = accountService.enableAccount(any(), any());
 
         assertEquals("The account can't be enabled", msg.getMessage());
         verify(accountRepository, times(1)).enableAccount(any());
         verify(accountRepository, times(1)).isActive(any());
+        verify(accountRepository, times(1)).isAccountOwner(any(), any());
     }
 
     @Test
-    public void testEnableAccount() {
+    public void testEnableAccountCantBeEnabledButUserIsNotTheOwner() {
+        when(accountRepository.isAccountOwner(any(), any())).thenReturn(false);
+        when(accountRepository.isActive(any())).thenReturn(false);
+
+        try {
+            accountService.enableAccount(any(), any());
+        } catch (CustomException e) {
+            assertEquals("You are not the owner of this account", e.getMessage());
+        }
+
+        verify(accountRepository, times(0)).enableAccount(any());
+        verify(accountRepository, times(0)).isActive(any());
+        verify(accountRepository, times(1)).isAccountOwner(any(), any());
+    }
+
+    @Test
+    public void testEnableAccountWhenUserIsOwner() {
+        when(accountRepository.isAccountOwner(any(), any())).thenReturn(true);
         when(accountRepository.isActive(any())).thenReturn(true);
-        TransactionDTO msg = accountService.enableAccount(any());
+        TransactionDTO msg = accountService.enableAccount(any(), any());
 
         assertEquals("The account was enabled", msg.getMessage());
         verify(accountRepository, times(1)).enableAccount(any());
         verify(accountRepository, times(1)).isActive(any());
+    }
+
+    @Test
+    public void testEnableAccountWhenUserIsNotOwner() {
+        when(accountRepository.isAccountOwner(any(), any())).thenReturn(false);
+        when(accountRepository.isActive(any())).thenReturn(true);
+
+        try {
+            accountService.enableAccount(any(), any());
+        } catch (CustomException e) {
+            assertEquals("You are not the owner of this account", e.getMessage());
+        }
+
+        verify(accountRepository, times(0)).enableAccount(any());
+        verify(accountRepository, times(0)).isActive(any());
+        verify(accountRepository, times(1)).isAccountOwner(any(), any());
     }
 
     @Test

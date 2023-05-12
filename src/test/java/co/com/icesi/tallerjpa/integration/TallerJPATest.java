@@ -36,7 +36,7 @@ public class TallerJPATest {
     public void testLoginEndPoint() throws Exception {
         var result = mvc.perform(MockMvcRequestBuilders.post("/login").content(
                 mapper.writeValueAsString(
-                        new LoginDTO("johndoe@email.com", "password")
+                        new LoginDTO("admin@email.com", "password")
                 )).contentType(MediaType.APPLICATION_JSON).accept(MediaType.APPLICATION_JSON))
                 .andExpect(status().isOk())
                 .andReturn();

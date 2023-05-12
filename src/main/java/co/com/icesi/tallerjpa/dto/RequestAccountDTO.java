@@ -13,8 +13,6 @@ import javax.validation.constraints.NotNull;
 public class RequestAccountDTO {
     @Min(value = 0, message = "The balance must be greater than 0")
     private Long balance;
-    @NotNull
     private TypeAccount type;
-    @NotBlank
     private String user;
 }

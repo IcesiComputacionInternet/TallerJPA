@@ -3,6 +3,7 @@ package co.com.icesi.tallerjpa.service;
 import co.com.icesi.tallerjpa.dto.RequestAccountDTO;
 import co.com.icesi.tallerjpa.dto.ResponseAccountDTO;
 import co.com.icesi.tallerjpa.dto.TransactionDTO;
+import co.com.icesi.tallerjpa.error.exception.CustomException;
 import co.com.icesi.tallerjpa.mapper.AccountMapper;
 import co.com.icesi.tallerjpa.model.Account;
 import co.com.icesi.tallerjpa.repository.AccountRepository;
@@ -11,6 +12,7 @@ import lombok.AllArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.security.Principal;
 import java.util.Random;
 import java.util.UUID;
 import java.util.stream.Collectors;
@@ -73,7 +75,8 @@ public class AccountService {
     }
 
     @Transactional
-    public TransactionDTO enableAccount(String accountNumber){
+    public TransactionDTO enableAccount(String accountNumber, UUID user){
+        isAccountOwner(accountNumber, user);
         accountRepository.enableAccount(accountNumber);
         return TransactionDTO.builder()
                 .accountNumberOrigin(accountNumber)
@@ -82,7 +85,8 @@ public class AccountService {
     }
 
     @Transactional
-    public TransactionDTO disableAccount(String accountNumber){
+    public TransactionDTO disableAccount(String accountNumber, UUID user){
+        isAccountOwner(accountNumber, user);
         accountRepository.disableAccount(accountNumber);
         return TransactionDTO.builder()
                 .accountNumberOrigin(accountNumber)
@@ -108,5 +112,11 @@ public class AccountService {
                 randomNumbers.substring(0, 3),
                 randomNumbers.substring(3, 9),
                 randomNumbers.substring(9, 11));
+    }
+
+    private void isAccountOwner(String accountNumber, UUID userId){
+        if (!accountRepository.isAccountOwner(userId, accountNumber)) {
+            throw new CustomException("You are not the owner of this account");
+        }
     }
 }
