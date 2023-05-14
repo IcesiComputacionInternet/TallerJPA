@@ -2,6 +2,7 @@ package com.example.TallerJPA.controller;
 
 import com.example.TallerJPA.api.AccountAPI;
 import com.example.TallerJPA.dto.*;
+import com.example.TallerJPA.security.IcesiSecurityContext;
 import com.example.TallerJPA.service.AccountService;
 import lombok.AllArgsConstructor;
 import org.springframework.web.bind.annotation.*;
@@ -41,9 +42,14 @@ public class AccountController implements AccountAPI {
     public AccountResponseDTO disableAccount(@PathVariable String accountNumber){
         return accountService.disableAccount(accountNumber);
     }
-    @GetMapping("/admin/pathTest")
+    @GetMapping("/admin/pathTest/")
     public void pathTest(@RequestBody AccountCreateDTO account){
         System.out.println("It got into the pathTest method");
+    }
+
+    @GetMapping("/user/pathTest/")
+    public void pathTest2(@RequestBody AccountCreateDTO account){
+        System.out.println("It got into the pathTest2 method");
     }
 
 }

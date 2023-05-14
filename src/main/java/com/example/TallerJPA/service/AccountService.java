@@ -6,6 +6,7 @@ import com.example.TallerJPA.model.IcesiAccount;
 import com.example.TallerJPA.model.IcesiUser;
 import com.example.TallerJPA.repository.AccountRepository;
 import com.example.TallerJPA.repository.UserRepository;
+import com.example.TallerJPA.security.IcesiSecurityContext;
 import lombok.AllArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -20,6 +21,7 @@ public class AccountService {
     private final AccountRepository accountRepository;
     private final AccountMapper accountMapper;
     private final UserRepository userRepository;
+
 
     public AccountResponseDTO save(AccountCreateDTO accountCreateDTO) {
         IcesiUser userFound = userRepository.findByEmail(accountCreateDTO.getUserEmail()).orElseThrow(() -> new RuntimeException("User not found"));
