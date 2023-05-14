@@ -76,82 +76,82 @@ public class AccountServiceTest {
     }
 
 
-     @Test
-     public void testChangeAccountStatusWhenBalanceIsZero() {
-     IcesiAccount account = defaultIcesiAccount();
-     when(accountRepository.findByAccountNumber(any())).thenReturn(Optional.of(account));
-     accountService.disableAccount(account.getAccountNumber());
-     assertEquals(false, account.getActive());
-     }
+    @Test
+    public void testChangeAccountStatusWhenBalanceIsZero() {
+        IcesiAccount account = defaultIcesiAccount();
+        when(accountRepository.findByAccountNumber(any())).thenReturn(Optional.of(account));
+        accountService.disableAccount(account.getAccountNumber());
+        assertEquals(false, account.getActive());
+    }
 
-     @Test
-     public void testChangeAccountStatusWhenBalanceIsNotZero() {
-     IcesiAccount account = defaultIcesiAccount();
-     account.setBalance(1000);
-     when(accountRepository.findByAccountNumber(any())).thenReturn(Optional.of(account));
-     assertThrows(RuntimeException.class, () -> accountService.disableAccount(account.getAccountNumber()));
-     }
-     @Test
-     public void testWithdrawWhenBalanceIsZero() {
-     IcesiAccount account = defaultIcesiAccount();
-     when(accountRepository.findByAccountNumber(any())).thenReturn(Optional.of(account));
-     assertThrows(RuntimeException.class, () -> accountService.withdraw(new TransactionAccountDTO(account.getAccountNumber(), 1000)));
-     }
-     @Test
-     public void testWithdrawWhenBalanceIsNotZero() {
-     IcesiAccount account = defaultIcesiAccount();
-     account.setBalance(1000);
-     when(accountRepository.findByAccountNumber(any())).thenReturn(Optional.of(account));
-     accountService.withdraw(new TransactionAccountDTO(account.getAccountNumber(), 500));
-     assertEquals(500, account.getBalance());
-     }
-     @Test
-     public void testDepositWhenAccountIsActive() {
-     IcesiAccount account = defaultIcesiAccount();
-     when(accountRepository.findByAccountNumber(any())).thenReturn(Optional.of(account));
-     accountService.deposit(new TransactionAccountDTO(account.getAccountNumber(), 1000));
-     assertEquals(1000, account.getBalance());
-     }
-     @Test
-     public void testDepositWhenAccountIsNotActive() {
+    @Test
+    public void testChangeAccountStatusWhenBalanceIsNotZero() {
+        IcesiAccount account = defaultIcesiAccount();
+        account.setBalance(1000);
+        when(accountRepository.findByAccountNumber(any())).thenReturn(Optional.of(account));
+        assertThrows(RuntimeException.class, () -> accountService.disableAccount(account.getAccountNumber()));
+    }
+    @Test
+    public void testWithdrawWhenBalanceIsZero() {
+        IcesiAccount account = defaultIcesiAccount();
+        when(accountRepository.findByAccountNumber(any())).thenReturn(Optional.of(account));
+        assertThrows(RuntimeException.class, () -> accountService.withdraw(new TransactionAccountDTO(account.getAccountNumber(), 1000)));
+    }
+    @Test
+    public void testWithdrawWhenBalanceIsNotZero() {
+        IcesiAccount account = defaultIcesiAccount();
+        account.setBalance(1000);
+        when(accountRepository.findByAccountNumber(any())).thenReturn(Optional.of(account));
+        accountService.withdraw(new TransactionAccountDTO(account.getAccountNumber(), 500));
+        assertEquals(500, account.getBalance());
+    }
+    @Test
+    public void testDepositWhenAccountIsActive() {
+        IcesiAccount account = defaultIcesiAccount();
+        when(accountRepository.findByAccountNumber(any())).thenReturn(Optional.of(account));
+        accountService.deposit(new TransactionAccountDTO(account.getAccountNumber(), 1000));
+        assertEquals(1000, account.getBalance());
+    }
+    @Test
+    public void testDepositWhenAccountIsNotActive() {
         IcesiAccount account = defaultIcesiAccount();
         account.setActive(false);
         when(accountRepository.findByAccountNumber(any())).thenReturn(Optional.of(account));
         assertThrows(RuntimeException.class, () -> accountService.deposit(new TransactionAccountDTO(account.getAccountNumber(), 1000)));
-     }
-     @Test
-     public void testTransferWhenBalanceIsZero() {
-     IcesiAccount account = defaultIcesiAccount();
-     IcesiAccount account2 = defaultIcesiAccount();
-     when(accountRepository.findByAccountNumber(account.getAccountNumber())).thenReturn(Optional.of(account));
-     when(accountRepository.findByAccountNumber(account2.getAccountNumber())).thenReturn(Optional.of(account2));
-     assertThrows(RuntimeException.class, () -> accountService.transfer(new TransferRequestDTO(account.getAccountNumber(), account2.getAccountNumber(), 1000)));
-     }
+    }
+    @Test
+    public void testTransferWhenBalanceIsZero() {
+        IcesiAccount account = defaultIcesiAccount();
+        IcesiAccount account2 = defaultIcesiAccount();
+        when(accountRepository.findByAccountNumber(account.getAccountNumber())).thenReturn(Optional.of(account));
+        when(accountRepository.findByAccountNumber(account2.getAccountNumber())).thenReturn(Optional.of(account2));
+        assertThrows(RuntimeException.class, () -> accountService.transfer(new TransferRequestDTO(account.getAccountNumber(), account2.getAccountNumber(), 1000)));
+    }
 
-     @Test
-     public void testTransferWhenBalanceIsNotZero() {
-     IcesiAccount account = defaultIcesiAccount();
-     account.setBalance(1000);
-     IcesiAccount account2 = defaultIcesiAccount();
-     account2.setAccountNumber("123-456789-11");
-     when(accountRepository.findByAccountNumber(account.getAccountNumber())).thenReturn(Optional.of(account));
-     when(accountRepository.findByAccountNumber(account2.getAccountNumber())).thenReturn(Optional.of(account2));
-     accountService.transfer(new TransferRequestDTO(account.getAccountNumber(), account2.getAccountNumber(), 500));
-     assertEquals(500, account.getBalance());
-     assertEquals(500, account2.getBalance());
-     }
+    @Test
+    public void testTransferWhenBalanceIsNotZero() {
+        IcesiAccount account = defaultIcesiAccount();
+        account.setBalance(1000);
+        IcesiAccount account2 = defaultIcesiAccount();
+        account2.setAccountNumber("123-456789-11");
+        when(accountRepository.findByAccountNumber(account.getAccountNumber())).thenReturn(Optional.of(account));
+        when(accountRepository.findByAccountNumber(account2.getAccountNumber())).thenReturn(Optional.of(account2));
+        accountService.transfer(new TransferRequestDTO(account.getAccountNumber(), account2.getAccountNumber(), 500));
+        assertEquals(500, account.getBalance());
+        assertEquals(500, account2.getBalance());
+    }
 
-     @Test
-     public void testTransferToDepositAccount(){
-     IcesiAccount account = defaultIcesiAccount();
-     account.setBalance(1000);
-     IcesiAccount account2 = defaultIcesiAccount();
-     account2.setAccountNumber("123-456789-11");
-     account2.setType("DEPOSIT_ONLY");
-     when(accountRepository.findByAccountNumber(account.getAccountNumber())).thenReturn(Optional.of(account));
-     when(accountRepository.findByAccountNumber(account2.getAccountNumber())).thenReturn(Optional.of(account2));
-     assertThrows(RuntimeException.class, () -> accountService.transfer(new TransferRequestDTO(account.getAccountNumber(), account2.getAccountNumber(), 500)));
-     }
+    @Test
+    public void testTransferToDepositAccount(){
+        IcesiAccount account = defaultIcesiAccount();
+        account.setBalance(1000);
+        IcesiAccount account2 = defaultIcesiAccount();
+        account2.setAccountNumber("123-456789-11");
+        account2.setType("DEPOSIT_ONLY");
+        when(accountRepository.findByAccountNumber(account.getAccountNumber())).thenReturn(Optional.of(account));
+        when(accountRepository.findByAccountNumber(account2.getAccountNumber())).thenReturn(Optional.of(account2));
+        assertThrows(RuntimeException.class, () -> accountService.transfer(new TransferRequestDTO(account.getAccountNumber(), account2.getAccountNumber(), 500)));
+    }
 
 
     private AccountCreateDTO defaultAccountCreateDTO() {

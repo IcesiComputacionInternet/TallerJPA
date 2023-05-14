@@ -1,6 +1,7 @@
 package com.example.TallerJPA;
 
 import com.example.TallerJPA.dto.LoginDTO;
+import com.example.TallerJPA.dto.TokenDTO;
 import com.example.TallerJPA.dto.UserDTO;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import org.junit.jupiter.api.Test;
@@ -13,6 +14,7 @@ import org.springframework.test.context.ActiveProfiles;
 import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.request.MockMvcRequestBuilders;
 
+import static org.junit.jupiter.api.Assertions.assertNotNull;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
 @SpringBootTest
@@ -37,7 +39,8 @@ class TallerJpaApplicationTests {
 					.accept(MediaType.APPLICATION_JSON))
 					.andExpect(status().isOk())
 					.andReturn();
-
+		TokenDTO tokenDTO = objectMapper.readValue(result.getResponse().getContentAsString(),TokenDTO.class);
+		assertNotNull(tokenDTO.getToken());
 	}
 	@Test
 	public void testCreateUser() throws Exception{

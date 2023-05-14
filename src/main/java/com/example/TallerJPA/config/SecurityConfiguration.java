@@ -50,7 +50,7 @@ public class SecurityConfiguration {
                 .cors(AbstractHttpConfigurer::disable)
                 .csrf(AbstractHttpConfigurer::disable)
                 .authorizeHttpRequests(auth -> auth
-                        .anyRequest().access(access)) //permitAll para que funcione
+                        .anyRequest().access(access)) //permitAll para que funcione | access(access)
                 .oauth2ResourceServer(OAuth2ResourceServerConfigurer::jwt)
                 .sessionManagement(session -> session.sessionCreationPolicy(SessionCreationPolicy.STATELESS))
                 .build();
@@ -74,6 +74,7 @@ public class SecurityConfiguration {
                 .add(permitAll,(context,other)->new AuthorizationDecision(true));
         managerBuilder.add(new MvcRequestMatcher(introspector,"/admin/**"),
                 AuthorityAuthorizationManager.hasAnyAuthority("SCOPE_ADMIN"));
+
         AuthorizationManager<HttpServletRequest> manager = managerBuilder.build();
         return (authentication, object) -> manager.check(authentication,object.getRequest());
     }

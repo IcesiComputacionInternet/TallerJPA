@@ -41,5 +41,9 @@ public class AccountController implements AccountAPI {
     public AccountResponseDTO disableAccount(@PathVariable String accountNumber){
         return accountService.disableAccount(accountNumber);
     }
+    @GetMapping("/admin/pathTest")
+    public void pathTest(@RequestBody AccountCreateDTO account){
+        System.out.println("It got into the pathTest method");
+    }
 
 }
