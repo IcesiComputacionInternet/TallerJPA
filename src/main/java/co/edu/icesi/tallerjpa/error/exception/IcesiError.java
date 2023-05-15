@@ -10,7 +10,7 @@ import java.util.List;
 @Builder
 public class IcesiError {
 
-    private HttpStatus httpStatus;
+    private HttpStatus status;
     private List<IcesiErrorDetail> details;
 
 }

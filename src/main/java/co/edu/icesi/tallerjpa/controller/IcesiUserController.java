@@ -7,15 +7,16 @@ import co.edu.icesi.tallerjpa.service.IcesiUserService;
 import lombok.AllArgsConstructor;
 import org.springframework.web.bind.annotation.RestController;
 
+import javax.validation.Valid;
+
 @RestController
 @AllArgsConstructor
 public class IcesiUserController implements IcesiUserApi {
     private final IcesiUserService icesiUserService;
 
     @Override
-    public IcesiUserShowDTO createIcesiUser(IcesiUserCreateDTO userDTO){
+    public IcesiUserShowDTO createIcesiUser(@Valid IcesiUserCreateDTO userDTO){
         return icesiUserService.save(userDTO);
     }
-
 
 }

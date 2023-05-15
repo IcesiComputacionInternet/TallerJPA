@@ -7,12 +7,14 @@ import co.edu.icesi.tallerjpa.service.IcesiRoleService;
 import lombok.AllArgsConstructor;
 import org.springframework.web.bind.annotation.RestController;
 
+import javax.validation.Valid;
+
 @AllArgsConstructor
 @RestController
 public class IcesiRoleController implements IcesiRoleApi {
     IcesiRoleService icesiRoleService;
     @Override
-    public IcesiRoleShowDTO createRole(IcesiRoleCreateDTO icesiRoleCreateDTO) {
+    public IcesiRoleShowDTO createRole(@Valid IcesiRoleCreateDTO icesiRoleCreateDTO) {
         return icesiRoleService.save(icesiRoleCreateDTO);
     }
 }
