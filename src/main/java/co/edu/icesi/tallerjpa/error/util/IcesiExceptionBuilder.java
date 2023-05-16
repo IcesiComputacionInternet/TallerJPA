@@ -19,8 +19,8 @@ public class IcesiExceptionBuilder {
 
     public static IcesiErrorDetail mapToIcesiErrorDetail(DetailBuilder detailBuilder) {
         return IcesiErrorDetail.builder()
-                .errorCode(detailBuilder.getErrorCode().getCode())
-                .errorMessage(detailBuilder.getErrorCode().getMessage().formatted(detailBuilder.getFields()))
+                .errorCode(detailBuilder.errorCode().getCode())
+                .errorMessage(detailBuilder.errorCode().getMessage().formatted(detailBuilder.fields()))
                 .build();
     }
 

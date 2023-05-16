@@ -6,6 +6,8 @@ import co.edu.icesi.tallerjpa.service.IcesiAccountService;
 import lombok.AllArgsConstructor;
 import org.springframework.web.bind.annotation.RestController;
 
+import javax.validation.Valid;
+
 @AllArgsConstructor
 @RestController
 public class IcesiAccountController implements IcesiAccountApi {
@@ -14,7 +16,7 @@ public class IcesiAccountController implements IcesiAccountApi {
 
 
     @Override
-    public IcesiAccountShowDTO createIcesiAccount(IcesiAccountCreateDTO icesiAccountCreateDTO) {
+    public IcesiAccountShowDTO createIcesiAccount(@Valid IcesiAccountCreateDTO icesiAccountCreateDTO) {
         return icesiAccountService.save(icesiAccountCreateDTO);
     }
 

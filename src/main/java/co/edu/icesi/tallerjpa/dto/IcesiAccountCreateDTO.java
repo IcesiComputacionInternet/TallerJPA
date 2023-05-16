@@ -4,6 +4,7 @@ import co.edu.icesi.tallerjpa.enums.TypeIcesiAccount;
 import lombok.Builder;
 import lombok.Data;
 
+import javax.validation.Valid;
 import javax.validation.constraints.Min;
 import javax.validation.constraints.NotNull;
 import java.util.UUID;
@@ -17,5 +18,6 @@ public class IcesiAccountCreateDTO {
     private TypeIcesiAccount type;
     private boolean active;
     @NotNull(message = "The icesi user can not be null")
+    @Valid
     private IcesiUserCreateDTO icesiUserDTO;
 }

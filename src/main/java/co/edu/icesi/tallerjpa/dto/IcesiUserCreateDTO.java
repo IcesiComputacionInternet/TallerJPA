@@ -4,6 +4,7 @@ import co.edu.icesi.tallerjpa.model.IcesiRole;
 import lombok.Builder;
 import lombok.Data;
 
+import javax.validation.Valid;
 import javax.validation.constraints.NotBlank;
 import javax.validation.constraints.NotEmpty;
 import javax.validation.constraints.NotNull;
@@ -36,5 +37,6 @@ public class IcesiUserCreateDTO {
     @NotEmpty(message = "The password name can not be empty")
     private String password;
     @NotNull(message = "The role of the icesi user can not be null")
+    @Valid
     private IcesiRoleCreateDTO icesiRoleCreateDTO;
 }

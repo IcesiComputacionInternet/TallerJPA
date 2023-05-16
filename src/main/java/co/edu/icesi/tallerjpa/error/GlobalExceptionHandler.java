@@ -12,6 +12,9 @@ import org.springframework.web.bind.annotation.ControllerAdvice;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 import co.edu.icesi.tallerjpa.error.exception.IcesiErrorDetail;
 
+import java.util.ArrayList;
+import java.util.List;
+
 import static co.edu.icesi.tallerjpa.error.util.IcesiExceptionBuilder.createIcesiError;
 
 @ControllerAdvice
@@ -21,7 +24,7 @@ public class GlobalExceptionHandler {
             MethodArgumentNotValidException argumentNotValidException) {
         var errorBuilder = IcesiError.builder().status(HttpStatus.BAD_REQUEST);
         var details = argumentNotValidException.getBindingResult().getAllErrors().stream().map(this::mapBindingResultToError).toList();
-        var error = createIcesiError(argumentNotValidException.getMessage(), HttpStatus.BAD_REQUEST, new DetailBuilder(ErrorCode.ERR_400));
+        var error = errorBuilder.details(details).build();
         return ResponseEntity.status(error.getStatus()).body(error);
     }
 
@@ -31,4 +34,6 @@ public class GlobalExceptionHandler {
                 .errorCode(ErrorCode.ERR_400.getCode())
                 .errorMessage(message).build();
     }
+
+
 }

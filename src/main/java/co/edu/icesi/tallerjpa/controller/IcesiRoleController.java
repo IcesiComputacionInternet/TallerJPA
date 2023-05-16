@@ -14,7 +14,7 @@ import javax.validation.Valid;
 public class IcesiRoleController implements IcesiRoleApi {
     IcesiRoleService icesiRoleService;
     @Override
-    public IcesiRoleShowDTO createRole(@Valid IcesiRoleCreateDTO icesiRoleCreateDTO) {
+    public IcesiRoleShowDTO createRole(IcesiRoleCreateDTO icesiRoleCreateDTO) {
         return icesiRoleService.save(icesiRoleCreateDTO);
     }
 }
