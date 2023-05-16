@@ -25,7 +25,6 @@ public class IcesiAccount {
     private long balance;
     private String type;
     private boolean active;
-    @NotNull(message = "The icesi user can not be null")
     @ManyToOne
     @JoinColumn(name = "icesiUser_userId", nullable = false)
     private IcesiUser icesiUser;

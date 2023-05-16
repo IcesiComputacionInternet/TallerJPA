@@ -4,18 +4,23 @@ import co.edu.icesi.tallerjpa.dto.IcesiAccountCreateDTO;
 import co.edu.icesi.tallerjpa.dto.IcesiAccountShowDTO;
 import co.edu.icesi.tallerjpa.dto.TransactionCreateDTO;
 import co.edu.icesi.tallerjpa.dto.TransactionResultDTO;
+import co.edu.icesi.tallerjpa.error.exception.DetailBuilder;
+import co.edu.icesi.tallerjpa.error.exception.ErrorCode;
 import co.edu.icesi.tallerjpa.mapper.IcesiAccountMapper;
 import co.edu.icesi.tallerjpa.model.IcesiAccount;
 import co.edu.icesi.tallerjpa.model.IcesiUser;
 import co.edu.icesi.tallerjpa.repository.IcesiAccountRepository;
 import co.edu.icesi.tallerjpa.repository.IcesiUserRepository;
 import lombok.AllArgsConstructor;
+import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
 
 import java.util.Optional;
 import java.util.UUID;
 import java.util.stream.Collectors;
 import java.util.stream.IntStream;
+
+import static co.edu.icesi.tallerjpa.error.util.IcesiExceptionBuilder.createIcesiException;
 
 @Service
 @AllArgsConstructor
@@ -27,10 +32,20 @@ public class IcesiAccountService {
         checkConditionsToCreateAccount(icesiAccountCreateDTO);
 
         IcesiUser icesiUser = icesiUserRepository.findByEmail(icesiAccountCreateDTO.getIcesiUserDTO().getEmail())
-                .orElseThrow(() -> new RuntimeException("There is no user with the email "+icesiAccountCreateDTO.getIcesiUserDTO().getEmail()));
+                .orElseThrow(createIcesiException(
+                        "Icesi user not found",
+                        HttpStatus.NOT_FOUND,
+                        new DetailBuilder(ErrorCode.ERR_404, "Icesi user", "email", icesiAccountCreateDTO.getIcesiUserDTO().getEmail())
+                ));
+//                .orElseThrow(() -> new RuntimeException("There is no user with the email "+icesiAccountCreateDTO.getIcesiUserDTO().getEmail()));
 
         String accountNumber = createAccountNumber(100)
-                .orElseThrow(() -> new RuntimeException("There were errors creating the account number, please try again later"));
+                .orElseThrow(createIcesiException(
+                        "Internal server error",
+                        HttpStatus.INTERNAL_SERVER_ERROR,
+                        new DetailBuilder(ErrorCode.ERR_500, "There were errors creating the account number, please try again later")
+                ));
+//                .orElseThrow(() -> new RuntimeException("There were errors creating the account number, please try again later"));
 
         IcesiAccount icesiAccount = icesiAccountMapper.fromCreateIcesiAccountDTO(icesiAccountCreateDTO);
         icesiAccount.setIcesiUser(icesiUser);
@@ -41,10 +56,20 @@ public class IcesiAccountService {
 
     private void checkConditionsToCreateAccount(IcesiAccountCreateDTO icesiAccountCreateDTO){
         if(icesiAccountCreateDTO.getBalance() < 0){
-            throw new RuntimeException("Accounts balance can't be below 0.");
+            throw createIcesiException(
+                    "Accounts balance can't be below 0",
+                    HttpStatus.BAD_REQUEST,
+                    new DetailBuilder(ErrorCode.ERR_400, "balance", "Accounts balance can't be below 0")
+            ).get();
+//            throw new RuntimeException("Accounts balance can't be below 0.");
         }
         if(!icesiAccountCreateDTO.isActive() && icesiAccountCreateDTO.getBalance() != 0){
-            throw new RuntimeException("Account can only be disabled if the balance is 0.");
+            throw createIcesiException(
+                    "Account can only be disabled if the balance is 0",
+                    HttpStatus.BAD_REQUEST,
+                    new DetailBuilder(ErrorCode.ERR_400, "isActive", "Account can only be disabled if the balance is 0")
+            ).get();
+//            throw new RuntimeException("Account can only be disabled if the balance is 0.");
         }
     }
 
@@ -72,7 +97,8 @@ public class IcesiAccountService {
 
     public IcesiAccountShowDTO enableAccount(String accountId){
         if(getAccountById(accountId).isActive()){
-            throw new RuntimeException("The account was already enabled");
+
+//            throw new RuntimeException("The account was already enabled");
         }
         icesiAccountRepository.enableAccount(accountId);
         return icesiAccountMapper.fromIcesiAccountToShowDTO(getAccountById(accountId));

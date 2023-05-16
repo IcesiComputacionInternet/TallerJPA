@@ -1,10 +1,10 @@
 package co.edu.icesi.tallerjpa.error;
 
-import co.edu.icesi.tallerjpa.error.exception.DetailBuilder;
 import co.edu.icesi.tallerjpa.error.exception.ErrorCode;
 import co.edu.icesi.tallerjpa.error.exception.IcesiError;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.authentication.BadCredentialsException;
 import org.springframework.validation.FieldError;
 import org.springframework.validation.ObjectError;
 import org.springframework.web.bind.MethodArgumentNotValidException;
@@ -14,8 +14,6 @@ import co.edu.icesi.tallerjpa.error.exception.IcesiErrorDetail;
 
 import java.util.ArrayList;
 import java.util.List;
-
-import static co.edu.icesi.tallerjpa.error.util.IcesiExceptionBuilder.createIcesiError;
 
 @ControllerAdvice
 public class GlobalExceptionHandler {
@@ -33,6 +31,16 @@ public class GlobalExceptionHandler {
         return IcesiErrorDetail.builder()
                 .errorCode(ErrorCode.ERR_400.getCode())
                 .errorMessage(message).build();
+    }
+
+    @ExceptionHandler(BadCredentialsException.class)
+    public ResponseEntity<IcesiError> handleLoginException(
+            BadCredentialsException badCredentialsException) {
+        var errorBuilder = IcesiError.builder().status(HttpStatus.UNAUTHORIZED);
+        List<IcesiErrorDetail> details = new ArrayList<>();
+        details.add(new IcesiErrorDetail("401", "The user or the password are incorrect"));
+        var error = errorBuilder.details(details).build();
+        return ResponseEntity.status(error.getStatus()).body(error);
     }
 
 

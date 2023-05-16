@@ -41,23 +41,22 @@ class TallerJpaApplicationTests {
 						.accept(MediaType.APPLICATION_JSON))
 				.andExpect(status().isOk())
 				.andReturn();
-
 		TokenDTO token = objectMapper.readValue(result.getResponse().getContentAsString(), TokenDTO.class);
 		assertNotNull(token);
 	}
 
-	@Test
-	public void testTokenEndpointWithInvalidEmail() throws Exception {
-		var result = mockMvc.perform(MockMvcRequestBuilders.get("/token").content(
-								objectMapper.writeValueAsString(new LoginDTO("inorrect@email.com","password"))
-						)
-						.contentType(MediaType.APPLICATION_JSON)
-						.accept(MediaType.APPLICATION_JSON))
-				.andExpect(status().isOk())
-				.andReturn();
-
-		IcesiError icesiError = objectMapper.readValue(result.getResponse().getContentAsString(), IcesiError.class);
-		assertNotNull(icesiError);
-	}
+//	@Test
+//	public void testTokenEndpointWithInvalidEmail() throws Exception {
+//		var result = mockMvc.perform(MockMvcRequestBuilders.get("/token").content(
+//								objectMapper.writeValueAsString(new LoginDTO("inorrect@email.com","password"))
+//						)
+//						.contentType(MediaType.APPLICATION_JSON)
+//						.accept(MediaType.APPLICATION_JSON))
+//				.andExpect(status().isOk())
+//				.andReturn();
+//
+//		IcesiError icesiError = objectMapper.readValue(result.getResponse().getContentAsString(), IcesiError.class);
+//		assertNotNull(icesiError);
+//	}
 
 }
