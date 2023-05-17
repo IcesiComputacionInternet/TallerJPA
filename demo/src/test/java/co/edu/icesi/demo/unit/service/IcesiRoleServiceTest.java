@@ -9,6 +9,7 @@ import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 
 import java.util.Optional;
+import java.util.UUID;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.fail;
@@ -43,12 +44,19 @@ public class IcesiRoleServiceTest {
                 .build();
     }
 
-    @Test
-    public void testSaveRole(){
-        icesiRoleService.saveRole(createDefaultIcesiRoleDto());
-        IcesiRole icesiRole = createDefaultIcesiRole();
 
-        verify(icesiRoleRepository, times(1)).save(argThat(new IcesiRoleMatcher(icesiRole)));
+    @Test
+    public void testCreateRole(){
+        IcesiRoleDto roleCreateDTO = createDefaultIcesiRoleDto();
+        IcesiRole expectedRole = createDefaultIcesiRole();
+        expectedRole.setRoleId(UUID.randomUUID());
+
+        when(icesiRoleRepository.findByName(anyString())).thenReturn(Optional.empty());
+        when(icesiRoleMapper.fromIcesiRoleDto(roleCreateDTO)).thenReturn(expectedRole);
+        when(icesiRoleRepository.save(expectedRole)).thenReturn(expectedRole);
+
+        icesiRoleService.saveRole(roleCreateDTO);
+        verify(icesiRoleRepository,times(1)).save(argThat(new IcesiRoleMatcher(expectedRole)));
     }
 
     @Test
