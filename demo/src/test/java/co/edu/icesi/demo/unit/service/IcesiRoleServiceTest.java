@@ -32,7 +32,7 @@ public class IcesiRoleServiceTest {
     private IcesiRole createDefaultIcesiRole(){
         return IcesiRole.builder()
                 .name("suffering_soul")
-                .description("me")
+                .roleDescription("me")
                 .build();
     }
 

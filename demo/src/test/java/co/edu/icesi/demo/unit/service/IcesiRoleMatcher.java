@@ -16,6 +16,6 @@ public class IcesiRoleMatcher implements ArgumentMatcher<IcesiRole> {
     public boolean matches(IcesiRole icesiRoleRight) {
         return icesiRoleRight.getRoleId()!=null &&
                 Objects.equals(icesiRoleRight.getName(),icesiRoleLeft.getName()) &&
-                Objects.equals(icesiRoleRight.getDescription(),icesiRoleLeft.getDescription());
+                Objects.equals(icesiRoleRight.getRoleDescription(),icesiRoleLeft.getRoleDescription());
     }
 }

@@ -1,5 +1,6 @@
 package co.edu.icesi.demo.model;
 
+import co.edu.icesi.demo.enums.TypeAccount;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
@@ -28,4 +29,6 @@ public class IcesiAccount {
     private boolean active;
     @ManyToOne
     private IcesiUser user;
+
+    private TypeAccount typeAccount;
 }

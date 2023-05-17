@@ -1,5 +1,6 @@
 package co.edu.icesi.demo.controller;
 
+import co.edu.icesi.demo.dto.IcesiAccountDto;
 import co.edu.icesi.demo.dto.RequestAccountDto;
 import co.edu.icesi.demo.dto.ResponseAccountDto;
 import co.edu.icesi.demo.service.IcesiAccountService;
@@ -14,7 +15,7 @@ public class AccountController  {
     private final IcesiAccountService icesiAccountService;
 
     @PostMapping("/add/account")
-    public ResponseAccountDto save(@RequestBody RequestAccountDto account){
+    public IcesiAccountDto save(@RequestBody IcesiAccountDto account){
         return icesiAccountService.save(account);
     }
 }
