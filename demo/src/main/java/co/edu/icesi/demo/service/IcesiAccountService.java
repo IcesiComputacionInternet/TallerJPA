@@ -9,7 +9,6 @@ import co.edu.icesi.demo.repository.IcesiUserRepository;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import org.springframework.stereotype.Service;
-import org.springframework.transaction.annotation.Transactional;
 
 import java.util.Random;
 import java.util.UUID;
@@ -41,13 +40,52 @@ public class IcesiAccountService {
                 .orElseThrow(() -> new RuntimeException("Account not found"));
     }
 
-    @Transactional
-    public TransactionResultDto withdraw(TransactionOperationDto transaction) {
-        IcesiAccount account = getAccountByAccountNumber(transaction.getAccountFrom());
-        validateAccountBalance(account, transaction.getAmount());
-        account.setBalance( account.getBalance() - transaction.getAmount() );
+
+    public void validateBalance(long amount, long balance){
+        if(amount>balance){
+            throw new RuntimeException("Account must have balance greater than the amount to transfer");
+        }
+    }
+
+    public void validateStatus(IcesiAccount account){
+        if(!account.isActive()){
+            throw new RuntimeException("Account is disabled");
+        }
+    }
+
+    public TransactionResultDto transfer(TransactionOperationDto transaction){
+
+        IcesiAccount sourceAccount = getAccount(transaction.getAccountFrom());
+        IcesiAccount targetAccount = getAccount(transaction.getAccountTo());
+        long amount = transaction.getAmount();
+
+        validateAccountType(sourceAccount);
+        validateAccountType(targetAccount);
+        validateBalance(amount, sourceAccount.getBalance());
+
+        sourceAccount.setBalance(sourceAccount.getBalance()-amount);
+        targetAccount.setBalance(targetAccount.getBalance()+amount);
+        accountRepository.save(sourceAccount);
+        accountRepository.save(targetAccount);
+
+        return accountMapper.fromTransactionOperationDto(transaction, "Success");
+    }
+
+
+    public TransactionResultDto withdraw(TransactionOperationDto transaction){
+        IcesiAccount account = getAccount(transaction.getAccountFrom());
+        long amount = transaction.getAmount();
+
+        validateStatus(account);
+        validateBalance(amount, account.getBalance());
+
+        if (amount < 0) {
+            throw new RuntimeException("Amount must be greater than 0");
+        }
+
+        account.setBalance(account.getBalance() - amount);
         accountRepository.save(account);
-        return accountMapper.fromTransactionOperationDto(transaction, "The withdrawal was successful");
+        return accountMapper.fromTransactionOperationDto(transaction, "Success");
     }
 
     private void validateAccountBalance(IcesiAccount account, long amount){
@@ -56,29 +94,21 @@ public class IcesiAccountService {
         }
     }
 
-    @Transactional
-    public TransactionResultDto deposit(TransactionOperationDto transaction) {
-        IcesiAccount account = getAccountByAccountNumber(transaction.getAccountTo());
-        account.setBalance(account.getBalance() + transaction.getAmount());
+    public TransactionResultDto deposit(TransactionOperationDto transaction){
+        IcesiAccount account = getAccount(transaction.getAccountFrom());
+        long amount = transaction.getAmount();
+        validateStatus(account);
+
+        if (amount < 0) {
+            throw new RuntimeException("Amount must be greater than 0");
+        }
+
+        account.setBalance(account.getBalance() + amount);
         accountRepository.save(account);
-        return accountMapper.fromTransactionOperationDto(transaction, "The deposit was successful");
+        return accountMapper.fromTransactionOperationDto(transaction, "Success");
     }
 
-    @Transactional
-    public TransactionResultDto transfer(TransactionOperationDto transaction) {
-        IcesiAccount accountOrigin = getAccountByAccountNumber(transaction.getAccountFrom());
-        IcesiAccount accountDestination = getAccountByAccountNumber(transaction.getAccountTo());
-        validateAccountType(accountOrigin);
-        validateAccountType(accountDestination);
-        validateAccountBalance(accountOrigin, transaction.getAmount());
 
-        accountOrigin.setBalance( accountOrigin.getBalance() - transaction.getAmount());
-        accountDestination.setBalance( accountDestination.getBalance() + transaction.getAmount());
-
-        accountRepository.save(accountOrigin);
-        accountRepository.save(accountDestination);
-        return accountMapper.fromTransactionOperationDto(transaction, "The transfer was successful");
-    }
 
     private void validateAccountType(IcesiAccount account){
         if(account.getTypeAccount() == TypeAccount.DEPOSIT_ONLY){
@@ -86,23 +116,29 @@ public class IcesiAccountService {
         }
     }
 
-    @Transactional
-    public String enableAccount(String accountNumber) {
-        var account = accountRepository.findByAccountNumber(accountNumber, false)
-                .orElseThrow(() -> new RuntimeException("The account: " + accountNumber + " can't be enabled"));
+    public void enableAccount(String accountNumber){
+        IcesiAccount account = getAccount(accountNumber);
         account.setActive(true);
         accountRepository.save(account);
-        return "The account is enabled";
     }
 
-    @Transactional
-    public String disableAccount(String accountNumber) {
-        var account = accountRepository.findByAccountNumber(accountNumber, true)
-                .orElseThrow(() -> new RuntimeException("The account: " + accountNumber + " can't be disabled"));
+    public void disableAccount(String accountNumber){
+        IcesiAccount account = getAccount(accountNumber);
+
+        if(account.getBalance()>0){
+            throw new RuntimeException("Account must have 0 balance to be disabled");
+        }
+
         account.setActive(false);
         accountRepository.save(account);
-        return "The account was disabled";
+
     }
+
+    public IcesiAccount getAccount(String accountNumber) {
+        return accountRepository.findByNumber(accountNumber)
+                .orElseThrow(() -> new RuntimeException("Account " + accountNumber + " does not exist"));
+    }
+
 
     private String validateAccountNumber(String accountNumber) {
         if (accountRepository.existsByAccountNumber(accountNumber)) {

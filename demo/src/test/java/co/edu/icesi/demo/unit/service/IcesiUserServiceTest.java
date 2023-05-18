@@ -2,13 +2,13 @@ package co.edu.icesi.demo.unit.service;
 
 import co.edu.icesi.demo.dto.IcesiRoleDto;
 import co.edu.icesi.demo.dto.IcesiUserDto;
-import co.edu.icesi.demo.mapper.IcesiRoleMapper;
 import co.edu.icesi.demo.mapper.IcesiUserMapper;
 import co.edu.icesi.demo.model.IcesiRole;
 import co.edu.icesi.demo.model.IcesiUser;
 import co.edu.icesi.demo.repository.IcesiRoleRepository;
 import co.edu.icesi.demo.repository.IcesiUserRepository;
 import co.edu.icesi.demo.service.IcesiUserService;
+import co.edu.icesi.demo.unit.matcher.IcesiUserMatcher;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 
@@ -65,6 +65,8 @@ public class IcesiUserServiceTest {
     public void testSaveUser(){
 
         when(icesiRoleRepository.findByName(any())).thenReturn(Optional.of(defaultCreateRole()));
+        when(icesiUserRepository.findByPhoneNumber(any())).thenReturn(Optional.empty());
+        when(icesiUserRepository.findByEmail(any())).thenReturn(Optional.ofNullable(createDefaultIcesiUser()));
 
         icesiUserService.saveUser(createDefaultIcesiUserDto());
 

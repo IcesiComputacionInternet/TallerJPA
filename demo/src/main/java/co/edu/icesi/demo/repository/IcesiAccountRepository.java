@@ -16,6 +16,9 @@ public interface IcesiAccountRepository extends JpaRepository<IcesiAccount, UUID
     @Query("SELECT a FROM IcesiAccount a WHERE a.accountNumber = :accountNumber")
     Optional<IcesiRole> findByAccountNumber(String accountNumber);
 
+    @Query("SELECT a FROM IcesiAccount a WHERE a.accountNumber = :number")
+    Optional<IcesiAccount> findByNumber(String number);
+
     @Query("SELECT CASE WHEN (COUNT(u) > 0) THEN true ELSE false END FROM Account u WHERE u.accountNumber = :accountNumber")
     boolean existsByAccountNumber(String accountNumber);
     @Query("SELECT a FROM Account a WHERE a.accountNumber = :accountNumber AND a.active = :isActive")

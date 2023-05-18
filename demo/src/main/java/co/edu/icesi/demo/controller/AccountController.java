@@ -1,8 +1,6 @@
 package co.edu.icesi.demo.controller;
 
 import co.edu.icesi.demo.dto.IcesiAccountDto;
-import co.edu.icesi.demo.dto.RequestAccountDto;
-import co.edu.icesi.demo.dto.ResponseAccountDto;
 import co.edu.icesi.demo.service.IcesiAccountService;
 import lombok.AllArgsConstructor;
 import org.springframework.web.bind.annotation.PostMapping;
