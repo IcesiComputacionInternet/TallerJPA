@@ -2,6 +2,8 @@ package co.edu.icesi.tallerjpa.unit.service;
 
 import co.edu.icesi.tallerjpa.dto.*;
 import co.edu.icesi.tallerjpa.enums.TypeIcesiAccount;
+import co.edu.icesi.tallerjpa.error.exception.IcesiError;
+import co.edu.icesi.tallerjpa.error.exception.IcesiException;
 import co.edu.icesi.tallerjpa.mapper.IcesiAccountMapper;
 import co.edu.icesi.tallerjpa.mapper.IcesiAccountMapperImpl;
 import co.edu.icesi.tallerjpa.model.IcesiAccount;
@@ -158,8 +160,13 @@ public class IcesiAccountServiceTest {
     public void testCreateIcesiAccountWithBalanceMinorZero(){
         IcesiAccountCreateDTO icesiAccountCreateDTO = regularIcesiAccountCreateDTO();
         icesiAccountCreateDTO.setBalance(-1);
-        Exception exception = assertThrows(RuntimeException.class, () -> icesiAccountService.save(icesiAccountCreateDTO));
-        assertEquals("Accounts balance can't be below 0.", exception.getMessage());
+        IcesiException exception = assertThrows(IcesiException.class, () -> icesiAccountService.save(icesiAccountCreateDTO));
+        IcesiError icesiError = exception.getError();
+        assertEquals(1, icesiError.getDetails().size());
+        assertEquals(400, icesiError.getStatus().value());
+        assertEquals("field balance: Accounts balance can't be below 0", icesiError.getDetails().get(0).getErrorMessage());
+        assertEquals("Accounts balance can't be below 0", exception.getMessage());
+
     }
 
     @Test
@@ -167,8 +174,12 @@ public class IcesiAccountServiceTest {
         IcesiAccountCreateDTO icesiAccountCreateDTO = regularIcesiAccountCreateDTO();
         icesiAccountCreateDTO.setBalance(1);
         icesiAccountCreateDTO.setActive(false);
-        Exception exception = assertThrows(RuntimeException.class, () -> icesiAccountService.save(icesiAccountCreateDTO));
-        assertEquals("Account can only be disabled if the balance is 0.", exception.getMessage());
+        IcesiException exception = assertThrows(IcesiException.class, () -> icesiAccountService.save(icesiAccountCreateDTO));
+        IcesiError icesiError = exception.getError();
+        assertEquals(1, icesiError.getDetails().size());
+        assertEquals(400, icesiError.getStatus().value());
+        assertEquals("field isActive: Account can only be disabled if the balance is 0", icesiError.getDetails().get(0).getErrorMessage());
+        assertEquals("Account can only be disabled if the balance is 0", exception.getMessage());
     }
 
     @Test
@@ -184,8 +195,12 @@ public class IcesiAccountServiceTest {
         IcesiAccountCreateDTO icesiAccountCreateDTO = regularIcesiAccountCreateDTO();
         when(icesiUserRepository.findByEmail(icesiAccountCreateDTO.getIcesiUserDTO().getEmail())).thenReturn(Optional.ofNullable(defaultIcesiUser()));
         when(icesiAccountRepository.findByAccountNumber(any())).thenReturn(Optional.ofNullable(defaultIcesiAccount()));
-        Exception exception = assertThrows(RuntimeException.class, () -> icesiAccountService.save(icesiAccountCreateDTO));
-        assertEquals("There were errors creating the account number, please try again later", exception.getMessage());
+        IcesiException exception = assertThrows(IcesiException.class, () -> icesiAccountService.save(icesiAccountCreateDTO));
+        IcesiError icesiError = exception.getError();
+        assertEquals(1, icesiError.getDetails().size());
+        assertEquals("There were errors creating the account number, please try again later", icesiError.getDetails().get(0).getErrorMessage());
+        assertEquals("Internal server error", exception.getMessage());
+        assertEquals(500, icesiError.getStatus().value());
     }
 
     @Test

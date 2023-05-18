@@ -97,7 +97,11 @@ public class IcesiAccountService {
 
     public IcesiAccountShowDTO enableAccount(String accountId){
         if(getAccountById(accountId).isActive()){
-
+            throw createIcesiException(
+                    "The account was already enabled",
+                    HttpStatus.BAD_REQUEST,
+                    new DetailBuilder(ErrorCode.ERR_400, "isActive", "The account was already enabled")
+            ).get();
 //            throw new RuntimeException("The account was already enabled");
         }
         icesiAccountRepository.enableAccount(accountId);
@@ -106,7 +110,12 @@ public class IcesiAccountService {
 
     public IcesiAccountShowDTO disableAccount(String accountId){
         if(getAccountById(accountId).getBalance() != 0){
-            throw new RuntimeException("Account can only be disabled if the balance is 0.");
+            throw createIcesiException(
+                    "Account can only be disabled if the balance is 0",
+                    HttpStatus.BAD_REQUEST,
+                    new DetailBuilder(ErrorCode.ERR_400, "isActive and balance", "Account can only be disabled if the balance is 0")
+            ).get();
+//            throw new RuntimeException("Account can only be disabled if the balance is 0.");
         }
         icesiAccountRepository.disableAccount(accountId);
         return icesiAccountMapper.fromIcesiAccountToShowDTO(getAccountById(accountId));
@@ -116,7 +125,12 @@ public class IcesiAccountService {
         IcesiAccount icesiAccount = getAccountById(transactionCreateDTO.getSenderAccountId());
         checkIfTheAccountIsDisabled(icesiAccount);
         if(!icesiAccount.isThereEnoughMoney(transactionCreateDTO.getAmount())){
-            throw new RuntimeException("Not enough money to withdraw. At most you can withdraw: " + icesiAccount.getBalance());
+            throw createIcesiException(
+                    "Not enough money to withdraw. At most you can withdraw: " + icesiAccount.getBalance(),
+                    HttpStatus.BAD_REQUEST,
+                    new DetailBuilder(ErrorCode.ERR_400, "balance", "Not enough money to withdraw. At most you can withdraw: " + icesiAccount.getBalance())
+            ).get();
+//            throw new RuntimeException("Not enough money to withdraw. At most you can withdraw: " + icesiAccount.getBalance());
         }
         long newBalance = icesiAccount.getBalance() - transactionCreateDTO.getAmount();
         icesiAccountRepository.updateBalance(newBalance, transactionCreateDTO.getSenderAccountId());
@@ -129,7 +143,12 @@ public class IcesiAccountService {
 
     private IcesiAccount getAccountById(String accountId){
         return icesiAccountRepository.findById(UUID.fromString(accountId))
-                .orElseThrow(() -> new RuntimeException("There is no account with the id: " + accountId));
+                .orElseThrow(createIcesiException(
+                        "There is no account with the id: " + accountId,
+                        HttpStatus.NOT_FOUND,
+                        new DetailBuilder(ErrorCode.ERR_404, "account", "id", accountId)
+                ));
+//                .orElseThrow(() -> new RuntimeException("There is no account with the id: " + accountId));
     }
 
     public TransactionResultDTO depositMoney(TransactionCreateDTO transactionCreateDTO){
@@ -160,26 +179,51 @@ public class IcesiAccountService {
     private void checkConditionsToTransfer(IcesiAccount senderIcesiAccount, IcesiAccount receiverIcesiAccount, long moneyToTransfer){
         checkIfTheAccountIsDisabled(senderIcesiAccount);
         if(senderIcesiAccount.isMarkedAsDepositOnly()){
-            throw new RuntimeException("The account with id " + senderIcesiAccount.getAccountId() + " is marked as deposit only so it can't transfers money");
+            throw createIcesiException(
+                    "The account with id " + senderIcesiAccount.getAccountId() + " is marked as deposit only so it can't transfers money",
+                    HttpStatus.BAD_REQUEST,
+                    new DetailBuilder(ErrorCode.ERR_400, "type", "The account with id " + senderIcesiAccount.getAccountId() + " is marked as deposit only so it can't transfers money")
+            ).get();
+//            throw new RuntimeException("The account with id " + senderIcesiAccount.getAccountId() + " is marked as deposit only so it can't transfers money");
         }
         if(!senderIcesiAccount.isThereEnoughMoney(moneyToTransfer)){
-            throw new RuntimeException("Not enough money to transfer. At most you can transfer: " + senderIcesiAccount.getBalance());
+            throw createIcesiException(
+                    "Not enough money to transfer. At most you can transfer: " + senderIcesiAccount.getBalance(),
+                    HttpStatus.BAD_REQUEST,
+                    new DetailBuilder(ErrorCode.ERR_400, "balance", "Not enough money to transfer. At most you can transfer: " + senderIcesiAccount.getBalance())
+            ).get();
+//            throw new RuntimeException("Not enough money to transfer. At most you can transfer: " + senderIcesiAccount.getBalance());
         }
         checkIfTheAccountIsDisabled(receiverIcesiAccount);
         if(receiverIcesiAccount.isMarkedAsDepositOnly()){
-            throw new RuntimeException("The account with id " + receiverIcesiAccount.getAccountId() + " is marked as deposit only so no money can be transferred");
+            throw createIcesiException(
+                    "The account with id " + receiverIcesiAccount.getAccountId() + " is marked as deposit only so no money can be transferred",
+                    HttpStatus.BAD_REQUEST,
+                    new DetailBuilder(ErrorCode.ERR_400, "type", "The account with id " + receiverIcesiAccount.getAccountId() + " is marked as deposit only so no money can be transferred")
+            ).get();
+//            throw new RuntimeException("The account with id " + receiverIcesiAccount.getAccountId() + " is marked as deposit only so no money can be transferred");
         }
     }
 
     private void checkIfTheAccountIsDisabled(IcesiAccount icesiAccount){
         if (icesiAccount.isDisable()){
-            throw new RuntimeException("The account "+icesiAccount.getAccountId()+" is disabled");
+            throw createIcesiException(
+                    "The account "+icesiAccount.getAccountId()+" is disabled",
+                    HttpStatus.BAD_REQUEST,
+                    new DetailBuilder(ErrorCode.ERR_400, "isActive", "The account "+icesiAccount.getAccountId()+" is disabled")
+            ).get();
+//            throw new RuntimeException("The account "+icesiAccount.getAccountId()+" is disabled");
         }
     }
 
     public IcesiAccountShowDTO getAccountByAccountNumber(String accountNumber){
-        return icesiAccountMapper.fromIcesiAccountToShowDTO(icesiAccountRepository.findByAccountNumber(accountNumber).orElseThrow(
-                () -> new RuntimeException("There is no account with the number: " + accountNumber)
-        ));
+        return icesiAccountMapper.fromIcesiAccountToShowDTO(icesiAccountRepository.findByAccountNumber(accountNumber)
+                        .orElseThrow(createIcesiException(
+                                "There is no account with the number: " + accountNumber,
+                                HttpStatus.NOT_FOUND,
+                                new DetailBuilder(ErrorCode.ERR_404, "account", "the number", accountNumber)
+                        ))
+//                .orElseThrow(() -> new RuntimeException("There is no account with the number: " + accountNumber)
+        );
     }
 }
