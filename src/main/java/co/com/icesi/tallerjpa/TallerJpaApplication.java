@@ -22,7 +22,7 @@ public class TallerJpaApplication {
 		SpringApplication.run(TallerJpaApplication.class, args);
 	}
 
-	@Bean
+	//@Bean
 	public CommandLineRunner commandLineRunner(UserRepository users,
 											   PasswordEncoder encoder) {
 		UserPermission adminPermission = UserPermission.builder()

@@ -54,7 +54,7 @@ public class SecurityConfiguration {
 
     @Bean
     public SecurityFilterChain securityFilterChain(HttpSecurity http, AuthorizationManager<RequestAuthorizationContext> access) throws Exception {
-        return http.cors().and()
+        return http.csrf(AbstractHttpConfigurer::disable)
                 .authorizeHttpRequests(auth -> auth.anyRequest().access(access))
                 .oauth2ResourceServer(OAuth2ResourceServerConfigurer::jwt)
                 .sessionManagement(session -> session.sessionCreationPolicy(SessionCreationPolicy.STATELESS))
@@ -76,7 +76,7 @@ public class SecurityConfiguration {
     @Bean
     @Transactional(propagation= Propagation.REQUIRED, readOnly=true, noRollbackFor=Exception.class)
     public AuthorizationManager<RequestAuthorizationContext> requestMatcherAuthenticationManager(HandlerMappingIntrospector introspector) {
-        Map<RequestMatcher, List<String>> roleMap = StreamSupport.stream(permissionRepository.findAll().spliterator(),false)
+        Map<RequestMatcher, List<String>> roleMap = permissionRepository.findAll().stream()
                 .collect(
                         Collectors.toMap(permission -> new MvcRequestMatcher(introspector, permission.getPath()),
                             permission -> permission.getRoles().stream().map(role -> "SCOPE_" + role.getName()).toList(),
