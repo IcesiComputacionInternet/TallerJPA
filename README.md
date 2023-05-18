@@ -65,7 +65,8 @@ Note that we don't need the controllers right now.
 - Add security to te application.
 - A normal user can only update the state of it's own accounts
 - An admin user should be able to create roles, users and assing roles.
-- A bank user should be able to create users.
+- A bank-user should be able to create users. But no admin-users.
+- A normal user can create and update accounts for himself.
 
 The aplication should handle it's custom exceptions and show a JSON response when an error appears: 
 - Add a custom exception.
