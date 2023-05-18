@@ -9,5 +9,5 @@ public interface IcesiRoleAPI {
     String BASE_URL = "/roles";
 
     @PostMapping("/add")
-    IcesiRoleCreateDTO add(@RequestBody IcesiRoleCreateDTO role);
+    IcesiRoleCreateDTO add(@RequestBody IcesiRoleCreateDTO icesiRoleCreateDTO);
 }
