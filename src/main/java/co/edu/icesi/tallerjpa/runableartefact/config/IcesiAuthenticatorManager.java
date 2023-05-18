@@ -2,8 +2,7 @@ package co.edu.icesi.tallerjpa.runableartefact.config;
 
 import co.edu.icesi.tallerjpa.runableartefact.model.SecurityUser;
 import co.edu.icesi.tallerjpa.runableartefact.security.CustomAuthentication;
-import co.edu.icesi.tallerjpa.runableartefact.service.UserManagementService;
-import org.springframework.context.annotation.Bean;
+import co.edu.icesi.tallerjpa.runableartefact.service.security.UserManagementService;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.authentication.dao.DaoAuthenticationProvider;
 import org.springframework.security.core.Authentication;

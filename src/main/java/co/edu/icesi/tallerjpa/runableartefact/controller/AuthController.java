@@ -1,12 +1,12 @@
 package co.edu.icesi.tallerjpa.runableartefact.controller;
 
 import co.edu.icesi.tallerjpa.runableartefact.dto.LoginDTO;
-import co.edu.icesi.tallerjpa.runableartefact.service.TokenService;
+import co.edu.icesi.tallerjpa.runableartefact.service.security.TokenService;
 import lombok.AllArgsConstructor;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.Authentication;
-import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RestController;
 
@@ -18,7 +18,7 @@ public class AuthController {
 
     private final AuthenticationManager authenticationManager;
 
-    @GetMapping("/token")
+    @PostMapping("/token")
     public String token(@RequestBody LoginDTO loginDTO) {
         Authentication authentication = authenticationManager
                 .authenticate(new UsernamePasswordAuthenticationToken(loginDTO.username(), loginDTO.password()));

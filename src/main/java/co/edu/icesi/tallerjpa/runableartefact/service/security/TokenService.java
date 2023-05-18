@@ -1,4 +1,4 @@
-package co.edu.icesi.tallerjpa.runableartefact.service;
+package co.edu.icesi.tallerjpa.runableartefact.service.security;
 
 import co.edu.icesi.tallerjpa.runableartefact.security.CustomAuthentication;
 import lombok.AllArgsConstructor;

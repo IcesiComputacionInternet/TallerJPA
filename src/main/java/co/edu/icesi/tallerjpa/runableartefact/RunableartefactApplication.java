@@ -19,6 +19,7 @@ public class RunableartefactApplication {
 		SpringApplication.run(RunableartefactApplication.class, args);
 	}
 
+	/*
 	@Bean
 	CommandLineRunner commandLineRunner(IcesiUserRepository users,
 										IcesiRoleRepository roleRepository,
@@ -31,6 +32,10 @@ public class RunableartefactApplication {
 		IcesiRole icesiRole2 = IcesiRole.builder()
 				.roleId(UUID.randomUUID())
 				.name("USER")
+				.build();
+		IcesiRole icesiRole3 = IcesiRole.builder()
+				.roleId(UUID.randomUUID())
+				.name("BANK")
 				.build();
 		IcesiUser icesiUser = IcesiUser.builder()
 				.userId(UUID.randomUUID())
@@ -50,13 +55,23 @@ public class RunableartefactApplication {
 				.phoneNumber("3123342122")
 				.password(encoder.encode("password"))
 				.build();
-
+		IcesiUser icesiUser3 = IcesiUser.builder()
+				.userId(UUID.randomUUID())
+				.email("johndoe3@email.com")
+				.role(icesiRole3)
+				.firstName("John")
+				.lastName("Doe")
+				.phoneNumber("3123342122")
+				.password(encoder.encode("password"))
+				.build();
 		return args -> {
 			roleRepository.save(icesiRole);
 			roleRepository.save(icesiRole2);
+			roleRepository.save(icesiRole3);
 			users.save(icesiUser);
 			users.save(icesiUser2);
+			users.save(icesiUser3);
 		};
 
-	}
+	} */
 }

@@ -1,4 +1,4 @@
-package co.edu.icesi.tallerjpa.runableartefact.service;
+package co.edu.icesi.tallerjpa.runableartefact.service.security;
 
 import co.edu.icesi.tallerjpa.runableartefact.model.SecurityUser;
 import co.edu.icesi.tallerjpa.runableartefact.repository.IcesiUserRepository;

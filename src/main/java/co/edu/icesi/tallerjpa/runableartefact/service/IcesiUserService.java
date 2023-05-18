@@ -10,6 +10,7 @@ import co.edu.icesi.tallerjpa.runableartefact.repository.IcesiUserRepository;
 import lombok.AllArgsConstructor;
 import org.springframework.stereotype.Service;
 
+import java.util.List;
 import java.util.UUID;
 
 @Service
@@ -34,6 +35,9 @@ public class IcesiUserService {
         icesiUser.setUserId(UUID.randomUUID());
         icesiUserRepository.save(icesiUser);
         return "User saved";
+    }
+    public List<IcesiUser> getAllUsers(){
+        return icesiUserRepository.findAll();
     }
 
     private void validateUserEmail(IcesiUser icesiUser) throws DataAlreadyExist {
