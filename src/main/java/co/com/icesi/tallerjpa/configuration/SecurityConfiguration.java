@@ -54,7 +54,7 @@ public class SecurityConfiguration {
 
     @Bean
     public SecurityFilterChain securityFilterChain(HttpSecurity http, AuthorizationManager<RequestAuthorizationContext> access) throws Exception {
-        return http.csrf(AbstractHttpConfigurer::disable)
+        return http.cors().and()
                 .authorizeHttpRequests(auth -> auth.anyRequest().access(access))
                 .oauth2ResourceServer(OAuth2ResourceServerConfigurer::jwt)
                 .sessionManagement(session -> session.sessionCreationPolicy(SessionCreationPolicy.STATELESS))
