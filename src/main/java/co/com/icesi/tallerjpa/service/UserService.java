@@ -33,7 +33,7 @@ public class UserService {
 
         IcesiUser user = userMapper.fromUserDTO(userDTO);
         user.setUserId(UUID.randomUUID());
-        user.setRole(roleRepository.findByName(userDTO.getRole()).orElseThrow(() -> new Exception("Role not found")));
+        user.setRole(roleRepository.findByName(userDTO.getRole()).orElseThrow(() -> new CustomException("Role not found")));
 
         return userMapper.fromUserToSendUserDTO(userRepository.save(user));
 

@@ -19,8 +19,8 @@ import org.springframework.test.web.servlet.request.MockMvcRequestBuilders;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
 @SpringBootTest
-//@Import(TestConfigurationData.class)
-//@ActiveProfiles(profiles = "test")
+@Import(TestConfigurationData.class)
+@ActiveProfiles(profiles = "test")
 @AutoConfigureMockMvc
 @TestClassOrder(ClassOrderer.OrderAnnotation.class)
 public class TallerJPATest {
