@@ -22,6 +22,7 @@ public class AccountService {
     private final AccountMapper accountMapper;
     private final UserRepository userRepository;
 
+
     public AccountResponseDTO save(AccountCreateDTO accountCreateDTO) {
         IcesiUser userFound = userRepository.findByEmail(accountCreateDTO.getUserEmail()).orElseThrow(() -> new RuntimeException("User not found"));
         String uuid = generateAccountNumber();
