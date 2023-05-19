@@ -27,7 +27,6 @@ public class IcesiRoleService {
                     HttpStatus.BAD_REQUEST,
                     new DetailBuilder(ErrorCode.ERR_400, "name", "There is already a role with the name " + icesiRoleDTO.getName())
                     ).get();
-//            throw new RuntimeException("There is already a role with the name: " + icesiRoleDTO.getName());
         }
 
         IcesiRole icesiRole = icesiRoleMapper.fromCreateIcesiRoleDTO(icesiRoleDTO);

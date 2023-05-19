@@ -1,6 +1,8 @@
 package co.edu.icesi.tallerjpa.unit.service;
 
 import co.edu.icesi.tallerjpa.dto.IcesiRoleCreateDTO;
+import co.edu.icesi.tallerjpa.error.exception.IcesiError;
+import co.edu.icesi.tallerjpa.error.exception.IcesiException;
 import co.edu.icesi.tallerjpa.mapper.IcesiRoleMapper;
 import co.edu.icesi.tallerjpa.mapper.IcesiRoleMapperImpl;
 import co.edu.icesi.tallerjpa.model.IcesiRole;
@@ -61,7 +63,11 @@ public class IcesiRoleServiceTest {
                 .description("Manage the system")
                 .name("Admin")
                 .build();
-        Exception exception = assertThrows(RuntimeException.class, () -> icesiRoleService.save(defaultIcesiRoleCreateDTO()));
+        IcesiException exception = assertThrows(IcesiException.class, () -> icesiRoleService.save(defaultIcesiRoleCreateDTO()));
+        IcesiError icesiError = exception.getError();
+        assertEquals(1, icesiError.getDetails().size());
+        assertEquals(400, icesiError.getStatus().value());
+        assertEquals("field name: There is already a role with the name "+icesiRole.getName(), icesiError.getDetails().get(0).getErrorMessage());
         assertEquals("There is already a role with the name: " + icesiRole.getName(), exception.getMessage());
         verify(icesiRoleRepository, times(0)).save(any());
     }

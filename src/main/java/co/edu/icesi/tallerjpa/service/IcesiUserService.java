@@ -43,7 +43,6 @@ public class IcesiUserService {
                     HttpStatus.BAD_REQUEST,
                     new DetailBuilder(ErrorCode.ERR_400, "email or phone number", allErrorMessages)
             ).get();
-//            throw new RuntimeException(errors.stream().reduce("", (errorMessage, error) -> errorMessage + error));
         }
 
         IcesiRole icesiRole = icesiRoleRepository.findByName(icesiUserCreateDTO.getIcesiRoleCreateDTO().getName())
@@ -52,7 +51,6 @@ public class IcesiUserService {
                         HttpStatus.NOT_FOUND,
                         new DetailBuilder(ErrorCode.ERR_404, "role", "name", icesiUserCreateDTO.getIcesiRoleCreateDTO().getName())
                 ));
-//                .orElseThrow(() -> new RuntimeException(("There is no role with that name")));
 
         IcesiUser icesiUser = icesiUserMapper.fromCreateIcesiUserDTO(icesiUserCreateDTO);
         icesiUser.setIcesiRole(icesiRole);
@@ -81,7 +79,6 @@ public class IcesiUserService {
                         HttpStatus.NOT_FOUND,
                         new DetailBuilder(ErrorCode.ERR_404, "role", "name", name)
                 ));
-//                .orElseThrow(() -> new RuntimeException("There is no role with that name"));
         return icesiRole.getRoleId();
     }
 }

@@ -2,6 +2,8 @@ package co.edu.icesi.tallerjpa.unit.service;
 
 import co.edu.icesi.tallerjpa.dto.IcesiRoleCreateDTO;
 import co.edu.icesi.tallerjpa.dto.IcesiUserCreateDTO;
+import co.edu.icesi.tallerjpa.error.exception.IcesiError;
+import co.edu.icesi.tallerjpa.error.exception.IcesiException;
 import co.edu.icesi.tallerjpa.mapper.IcesiUserMapper;
 import co.edu.icesi.tallerjpa.mapper.IcesiUserMapperImpl;
 import co.edu.icesi.tallerjpa.model.IcesiRole;
@@ -90,16 +92,24 @@ public class IcesiUserServiceTest {
     public void testCreateUserWhenEmailAlreadyExists() {
         when(icesiUserRepository.findByEmail(any())).thenReturn(Optional.of(defaultIcesiUser()));
         IcesiUserCreateDTO icesiUserCreateDTO = defaultIcesiUserCreateDTO();
-        Exception exception = assertThrows(RuntimeException.class, () -> icesiUserService.save(icesiUserCreateDTO));
-        assertEquals("There is already a user with the email " + defaultIcesiUserCreateDTO().getEmail() + "\n", exception.getMessage());
+        IcesiException exception = assertThrows(IcesiException.class, () -> icesiUserService.save(icesiUserCreateDTO));
+        IcesiError icesiError = exception.getError();
+        assertEquals(1, icesiError.getDetails().size());
+        assertEquals(400, icesiError.getStatus().value());
+        assertEquals("field email or phone number: There is already a user with the email "+icesiUserCreateDTO.getEmail()+"\n", icesiError.getDetails().get(0).getErrorMessage());
+        assertEquals("There is already a user with the email " + icesiUserCreateDTO.getEmail() + "\n", exception.getMessage());
     }
 
     @Test
     public void testCreateUserWhenPhoneNumberAlreadyExists() {
         when(icesiUserRepository.findByPhoneNumber(any())).thenReturn(Optional.of(defaultIcesiUser()));
         IcesiUserCreateDTO icesiUserCreateDTO = defaultIcesiUserCreateDTO();
-        Exception exception = assertThrows(RuntimeException.class, () -> icesiUserService.save(icesiUserCreateDTO));
-        assertEquals("There is already a user with the phone number " + defaultIcesiUserCreateDTO().getPhoneNumber() + "\n", exception.getMessage());
+        IcesiException exception = assertThrows(IcesiException.class, () -> icesiUserService.save(icesiUserCreateDTO));
+        IcesiError icesiError = exception.getError();
+        assertEquals(1, icesiError.getDetails().size());
+        assertEquals(400, icesiError.getStatus().value());
+        assertEquals("field email or phone number: There is already a user with the phone number "+icesiUserCreateDTO.getPhoneNumber()+"\n", icesiError.getDetails().get(0).getErrorMessage());
+        assertEquals("There is already a user with the phone number " + icesiUserCreateDTO.getPhoneNumber() + "\n", exception.getMessage());
     }
 
     @Test
@@ -107,8 +117,15 @@ public class IcesiUserServiceTest {
         when(icesiUserRepository.findByEmail(any())).thenReturn(Optional.of(defaultIcesiUser()));
         when(icesiUserRepository.findByPhoneNumber(any())).thenReturn(Optional.of(defaultIcesiUser()));
         IcesiUserCreateDTO icesiUserCreateDTO = defaultIcesiUserCreateDTO();
-        Exception exception = assertThrows(RuntimeException.class, () -> icesiUserService.save(icesiUserCreateDTO));
-        String exceptionMessage = "There is already a user with the email " + defaultIcesiUserCreateDTO().getEmail() + "\n";
+        IcesiException exception = assertThrows(IcesiException.class, () -> icesiUserService.save(icesiUserCreateDTO));
+        IcesiError icesiError = exception.getError();
+        assertEquals(1, icesiError.getDetails().size());
+        assertEquals(400, icesiError.getStatus().value());
+        String exceptionMessage = "field email or phone number: There is already a user with the email "+icesiUserCreateDTO.getEmail()+"\n";
+        exceptionMessage += "There is already a user with the phone number "+icesiUserCreateDTO.getPhoneNumber()+"\n";
+        assertEquals(exceptionMessage, icesiError.getDetails().get(0).getErrorMessage());
+
+        exceptionMessage = "There is already a user with the email " + defaultIcesiUserCreateDTO().getEmail() + "\n";
         exceptionMessage += "There is already a user with the phone number " + defaultIcesiUserCreateDTO().getPhoneNumber() + "\n";
         assertEquals(exceptionMessage, exception.getMessage());
     }
@@ -116,7 +133,11 @@ public class IcesiUserServiceTest {
     @Test
     public void testCreateIcesiUserWithNotExistingIcesiRole(){
         when(icesiRoleRepository.findByName(any())).thenReturn(Optional.ofNullable((null)));
-        Exception exception = assertThrows(RuntimeException.class, () -> icesiUserService.save(defaultIcesiUserCreateDTO()));
+        IcesiException exception = assertThrows(IcesiException.class, () -> icesiUserService.save(defaultIcesiUserCreateDTO()));
+        IcesiError icesiError = exception.getError();
+        assertEquals(1, icesiError.getDetails().size());
+        assertEquals(404, icesiError.getStatus().value());
+        assertEquals("role with name: "+defaultIcesiUserCreateDTO().getIcesiRoleCreateDTO().getName() + " not found", icesiError.getDetails().get(0).getErrorMessage());
         assertEquals("There is no role with that name", exception.getMessage());
     }
 

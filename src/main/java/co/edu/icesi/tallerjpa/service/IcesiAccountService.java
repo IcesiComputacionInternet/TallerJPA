@@ -33,11 +33,10 @@ public class IcesiAccountService {
 
         IcesiUser icesiUser = icesiUserRepository.findByEmail(icesiAccountCreateDTO.getIcesiUserDTO().getEmail())
                 .orElseThrow(createIcesiException(
-                        "Icesi user not found",
+                        "There is no user with the email "+icesiAccountCreateDTO.getIcesiUserDTO().getEmail(),
                         HttpStatus.NOT_FOUND,
                         new DetailBuilder(ErrorCode.ERR_404, "Icesi user", "email", icesiAccountCreateDTO.getIcesiUserDTO().getEmail())
                 ));
-//                .orElseThrow(() -> new RuntimeException("There is no user with the email "+icesiAccountCreateDTO.getIcesiUserDTO().getEmail()));
 
         String accountNumber = createAccountNumber(100)
                 .orElseThrow(createIcesiException(
@@ -45,7 +44,6 @@ public class IcesiAccountService {
                         HttpStatus.INTERNAL_SERVER_ERROR,
                         new DetailBuilder(ErrorCode.ERR_500, "There were errors creating the account number, please try again later")
                 ));
-//                .orElseThrow(() -> new RuntimeException("There were errors creating the account number, please try again later"));
 
         IcesiAccount icesiAccount = icesiAccountMapper.fromCreateIcesiAccountDTO(icesiAccountCreateDTO);
         icesiAccount.setIcesiUser(icesiUser);
@@ -61,7 +59,6 @@ public class IcesiAccountService {
                     HttpStatus.BAD_REQUEST,
                     new DetailBuilder(ErrorCode.ERR_400, "balance", "Accounts balance can't be below 0")
             ).get();
-//            throw new RuntimeException("Accounts balance can't be below 0.");
         }
         if(!icesiAccountCreateDTO.isActive() && icesiAccountCreateDTO.getBalance() != 0){
             throw createIcesiException(
@@ -69,7 +66,6 @@ public class IcesiAccountService {
                     HttpStatus.BAD_REQUEST,
                     new DetailBuilder(ErrorCode.ERR_400, "isActive", "Account can only be disabled if the balance is 0")
             ).get();
-//            throw new RuntimeException("Account can only be disabled if the balance is 0.");
         }
     }
 
@@ -102,7 +98,6 @@ public class IcesiAccountService {
                     HttpStatus.BAD_REQUEST,
                     new DetailBuilder(ErrorCode.ERR_400, "isActive", "The account was already enabled")
             ).get();
-//            throw new RuntimeException("The account was already enabled");
         }
         icesiAccountRepository.enableAccount(accountId);
         return icesiAccountMapper.fromIcesiAccountToShowDTO(getAccountById(accountId));
@@ -115,7 +110,6 @@ public class IcesiAccountService {
                     HttpStatus.BAD_REQUEST,
                     new DetailBuilder(ErrorCode.ERR_400, "isActive and balance", "Account can only be disabled if the balance is 0")
             ).get();
-//            throw new RuntimeException("Account can only be disabled if the balance is 0.");
         }
         icesiAccountRepository.disableAccount(accountId);
         return icesiAccountMapper.fromIcesiAccountToShowDTO(getAccountById(accountId));
@@ -130,7 +124,6 @@ public class IcesiAccountService {
                     HttpStatus.BAD_REQUEST,
                     new DetailBuilder(ErrorCode.ERR_400, "balance", "Not enough money to withdraw. At most you can withdraw: " + icesiAccount.getBalance())
             ).get();
-//            throw new RuntimeException("Not enough money to withdraw. At most you can withdraw: " + icesiAccount.getBalance());
         }
         long newBalance = icesiAccount.getBalance() - transactionCreateDTO.getAmount();
         icesiAccountRepository.updateBalance(newBalance, transactionCreateDTO.getSenderAccountId());
@@ -148,7 +141,6 @@ public class IcesiAccountService {
                         HttpStatus.NOT_FOUND,
                         new DetailBuilder(ErrorCode.ERR_404, "account", "id", accountId)
                 ));
-//                .orElseThrow(() -> new RuntimeException("There is no account with the id: " + accountId));
     }
 
     public TransactionResultDTO depositMoney(TransactionCreateDTO transactionCreateDTO){
@@ -184,7 +176,6 @@ public class IcesiAccountService {
                     HttpStatus.BAD_REQUEST,
                     new DetailBuilder(ErrorCode.ERR_400, "type", "The account with id " + senderIcesiAccount.getAccountId() + " is marked as deposit only so it can't transfers money")
             ).get();
-//            throw new RuntimeException("The account with id " + senderIcesiAccount.getAccountId() + " is marked as deposit only so it can't transfers money");
         }
         if(!senderIcesiAccount.isThereEnoughMoney(moneyToTransfer)){
             throw createIcesiException(
@@ -192,7 +183,6 @@ public class IcesiAccountService {
                     HttpStatus.BAD_REQUEST,
                     new DetailBuilder(ErrorCode.ERR_400, "balance", "Not enough money to transfer. At most you can transfer: " + senderIcesiAccount.getBalance())
             ).get();
-//            throw new RuntimeException("Not enough money to transfer. At most you can transfer: " + senderIcesiAccount.getBalance());
         }
         checkIfTheAccountIsDisabled(receiverIcesiAccount);
         if(receiverIcesiAccount.isMarkedAsDepositOnly()){
@@ -201,7 +191,6 @@ public class IcesiAccountService {
                     HttpStatus.BAD_REQUEST,
                     new DetailBuilder(ErrorCode.ERR_400, "type", "The account with id " + receiverIcesiAccount.getAccountId() + " is marked as deposit only so no money can be transferred")
             ).get();
-//            throw new RuntimeException("The account with id " + receiverIcesiAccount.getAccountId() + " is marked as deposit only so no money can be transferred");
         }
     }
 
@@ -212,7 +201,6 @@ public class IcesiAccountService {
                     HttpStatus.BAD_REQUEST,
                     new DetailBuilder(ErrorCode.ERR_400, "isActive", "The account "+icesiAccount.getAccountId()+" is disabled")
             ).get();
-//            throw new RuntimeException("The account "+icesiAccount.getAccountId()+" is disabled");
         }
     }
 
@@ -223,7 +211,6 @@ public class IcesiAccountService {
                                 HttpStatus.NOT_FOUND,
                                 new DetailBuilder(ErrorCode.ERR_404, "account", "the number", accountNumber)
                         ))
-//                .orElseThrow(() -> new RuntimeException("There is no account with the number: " + accountNumber)
         );
     }
 }
