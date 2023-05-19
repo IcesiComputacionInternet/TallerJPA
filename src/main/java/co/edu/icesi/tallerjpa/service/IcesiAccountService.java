@@ -4,6 +4,7 @@ import co.edu.icesi.tallerjpa.dto.IcesiAccountCreateDTO;
 import co.edu.icesi.tallerjpa.dto.IcesiAccountShowDTO;
 import co.edu.icesi.tallerjpa.dto.TransactionCreateDTO;
 import co.edu.icesi.tallerjpa.dto.TransactionResultDTO;
+import co.edu.icesi.tallerjpa.enums.NameIcesiRole;
 import co.edu.icesi.tallerjpa.error.exception.DetailBuilder;
 import co.edu.icesi.tallerjpa.error.exception.ErrorCode;
 import co.edu.icesi.tallerjpa.mapper.IcesiAccountMapper;
@@ -91,7 +92,8 @@ public class IcesiAccountService {
                 .collect(Collectors.joining(""));
     }
 
-    public IcesiAccountShowDTO enableAccount(String accountId){
+    public IcesiAccountShowDTO enableAccount(String accountId, String icesiUserId){
+        checkIfTheAccountBelongsToTheIcesiUser(accountId, icesiUserId);
         if(getAccountById(accountId).isActive()){
             throw createIcesiException(
                     "The account was already enabled",
@@ -103,7 +105,8 @@ public class IcesiAccountService {
         return icesiAccountMapper.fromIcesiAccountToShowDTO(getAccountById(accountId));
     }
 
-    public IcesiAccountShowDTO disableAccount(String accountId){
+    public IcesiAccountShowDTO disableAccount(String accountId, String icesiUserId){
+        checkIfTheAccountBelongsToTheIcesiUser(accountId, icesiUserId);
         if(getAccountById(accountId).getBalance() != 0){
             throw createIcesiException(
                     "Account can only be disabled if the balance is 0",
@@ -115,8 +118,9 @@ public class IcesiAccountService {
         return icesiAccountMapper.fromIcesiAccountToShowDTO(getAccountById(accountId));
     }
 
-    public TransactionResultDTO withdrawalMoney(TransactionCreateDTO transactionCreateDTO){
+    public TransactionResultDTO withdrawalMoney(TransactionCreateDTO transactionCreateDTO, String icesiUserId){
         IcesiAccount icesiAccount = getAccountById(transactionCreateDTO.getSenderAccountId());
+        checkIfTheAccountBelongsToTheIcesiUser(icesiAccount, icesiUserId);
         checkIfTheAccountIsDisabled(icesiAccount);
         if(!icesiAccount.isThereEnoughMoney(transactionCreateDTO.getAmount())){
             throw createIcesiException(
@@ -143,8 +147,9 @@ public class IcesiAccountService {
                 ));
     }
 
-    public TransactionResultDTO depositMoney(TransactionCreateDTO transactionCreateDTO){
+    public TransactionResultDTO depositMoney(TransactionCreateDTO transactionCreateDTO, String icesiUserId){
         IcesiAccount icesiAccount = getAccountById(transactionCreateDTO.getReceiverAccountId());
+        checkIfTheAccountBelongsToTheIcesiUser(icesiAccount, icesiUserId);
         checkIfTheAccountIsDisabled(icesiAccount);
         long newBalance = icesiAccount.getBalance() + transactionCreateDTO.getAmount();
         icesiAccountRepository.updateBalance(newBalance, transactionCreateDTO.getReceiverAccountId());
@@ -154,9 +159,10 @@ public class IcesiAccountService {
         return transactionResultDTO;
     }
 
-    public TransactionResultDTO transferMoney(TransactionCreateDTO transactionCreateDTO){
+    public TransactionResultDTO transferMoney(TransactionCreateDTO transactionCreateDTO, String icesiUserId){
         IcesiAccount senderIcesiAccount = getAccountById(transactionCreateDTO.getSenderAccountId());
         IcesiAccount receiverIcesiAccount = getAccountById(transactionCreateDTO.getReceiverAccountId());
+        checkIfTheAccountBelongsToTheIcesiUser(senderIcesiAccount, icesiUserId);
         checkConditionsToTransfer(senderIcesiAccount, receiverIcesiAccount, transactionCreateDTO.getAmount());
         long senderAccountNewBalance = senderIcesiAccount.getBalance() - transactionCreateDTO.getAmount();
         long receiverAccountNewBalance = receiverIcesiAccount.getBalance() + transactionCreateDTO.getAmount();
@@ -204,13 +210,36 @@ public class IcesiAccountService {
         }
     }
 
-    public IcesiAccountShowDTO getAccountByAccountNumber(String accountNumber){
-        return icesiAccountMapper.fromIcesiAccountToShowDTO(icesiAccountRepository.findByAccountNumber(accountNumber)
-                        .orElseThrow(createIcesiException(
-                                "There is no account with the number: " + accountNumber,
-                                HttpStatus.NOT_FOUND,
-                                new DetailBuilder(ErrorCode.ERR_404, "account", "the number", accountNumber)
-                        ))
-        );
+    public IcesiAccountShowDTO getAccountByAccountNumber(String accountNumber, String icesiUserId){
+        IcesiAccount icesiAccount = icesiAccountRepository.findByAccountNumber(accountNumber)
+                .orElseThrow(createIcesiException(
+                        "There is no account with the number: " + accountNumber,
+                        HttpStatus.NOT_FOUND,
+                        new DetailBuilder(ErrorCode.ERR_404, "account", "the number", accountNumber)
+                ));
+        checkIfTheAccountBelongsToTheIcesiUser(icesiAccount, icesiUserId);
+        return icesiAccountMapper.fromIcesiAccountToShowDTO(icesiAccount);
+    }
+
+    private void checkIfTheAccountBelongsToTheIcesiUser(String accountId, String icesiUserId){
+        IcesiAccount icesiAccount = getAccountById(accountId);
+        checkIfTheAccountBelongsToTheIcesiUser(icesiAccount, icesiUserId);
+    }
+
+    private void checkIfTheAccountBelongsToTheIcesiUser(IcesiAccount icesiAccount, String icesiUserId){
+        IcesiUser icesiUser = icesiUserRepository.findById(UUID.fromString(icesiUserId)).orElseThrow(createIcesiException(
+                "There is no icesi user with the id: " + icesiUserId,
+                HttpStatus.NOT_FOUND,
+                new DetailBuilder(ErrorCode.ERR_404, "icesi user", "id", icesiUserId)
+        ));
+        if(icesiUser.getIcesiRole().getName().equals(NameIcesiRole.USER)){
+            if (!icesiAccount.getIcesiUser().getUserId().equals(icesiUserId)){
+                throw createIcesiException(
+                        "The account does not belong to" + icesiUser.getEmail(),
+                        HttpStatus.FORBIDDEN,
+                        new DetailBuilder(ErrorCode.ERR_400, "The account does not belong to" + icesiUser.getEmail())
+                ).get();
+            }
+        }
     }
 }

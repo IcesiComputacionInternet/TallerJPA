@@ -30,43 +30,36 @@ public class IcesiAccountController implements IcesiAccountApi {
     @Override
     public IcesiAccountShowDTO enableAccount(String accountId) {
         String icesiUserId = IcesiSecurityContext.getCurrentUserId();
-        var temp = SecurityContextHolder.getContext();
-        return icesiAccountService.enableAccount(accountId);
+        return icesiAccountService.enableAccount(accountId, icesiUserId);
     }
 
     @Override
     public IcesiAccountShowDTO disableAccount(String accountId) {
-        return icesiAccountService.disableAccount(accountId);
+        String icesiUserId = IcesiSecurityContext.getCurrentUserId();
+        return icesiAccountService.disableAccount(accountId, icesiUserId);
     }
 
     @Override
     public TransactionResultDTO withdrawalMoney(TransactionCreateDTO transactionCreateDTO) {
-        return icesiAccountService.withdrawalMoney(transactionCreateDTO);
+        String icesiUserId = IcesiSecurityContext.getCurrentUserId();
+        return icesiAccountService.withdrawalMoney(transactionCreateDTO, icesiUserId);
     }
 
     @Override
     public TransactionResultDTO depositMoney(TransactionCreateDTO transactionCreateDTO) {
-        return icesiAccountService.depositMoney(transactionCreateDTO);
+        String icesiUserId = IcesiSecurityContext.getCurrentUserId();
+        return icesiAccountService.depositMoney(transactionCreateDTO, icesiUserId);
     }
 
     @Override
     public TransactionResultDTO transferMoney(TransactionCreateDTO transactionCreateDTO) {
-        return icesiAccountService.transferMoney(transactionCreateDTO);
+        String icesiUserId = IcesiSecurityContext.getCurrentUserId();
+        return icesiAccountService.transferMoney(transactionCreateDTO, icesiUserId);
     }
 
     @Override
     public IcesiAccountShowDTO getAccountByAccountNumber(String accountId) {
-        return icesiAccountService.getAccountByAccountNumber(accountId);
-    }
-
-    @GetMapping("/admin/pathTest/")
-    public void pathTest(){
-        var temp = SecurityContextHolder.getContext();
-        System.out.println("I'm admin");
-    }
-
-    @GetMapping("/user/pathTest/")
-    public void pathTest2(){
-        System.out.println("I'm user");
+        String icesiUserId = IcesiSecurityContext.getCurrentUserId();
+        return icesiAccountService.getAccountByAccountNumber(accountId, icesiUserId);
     }
 }
