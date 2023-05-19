@@ -9,7 +9,7 @@ import org.springframework.web.bind.annotation.*;
 import static com.example.TallerJPA.api.AccountAPI.BASE_ACCOUNT_URL;
 
 @AllArgsConstructor
-@RestController(BASE_ACCOUNT_URL)
+@RestController
 public class AccountController implements AccountAPI {
     private final AccountService accountService;
     @Override
@@ -40,10 +40,6 @@ public class AccountController implements AccountAPI {
     @Override
     public AccountResponseDTO disableAccount(@PathVariable String accountNumber){
         return accountService.disableAccount(accountNumber);
-    }
-    @GetMapping("/admin/pathTest")
-    public void pathTest(@RequestBody AccountCreateDTO account){
-        System.out.println("It got into the pathTest method");
     }
 
 }

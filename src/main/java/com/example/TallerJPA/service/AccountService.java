@@ -6,6 +6,7 @@ import com.example.TallerJPA.model.IcesiAccount;
 import com.example.TallerJPA.model.IcesiUser;
 import com.example.TallerJPA.repository.AccountRepository;
 import com.example.TallerJPA.repository.UserRepository;
+import com.example.TallerJPA.security.IcesiSecurityContext;
 import lombok.AllArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -36,6 +37,9 @@ public class AccountService {
     @Transactional
     public AccountResponseDTO disableAccount(String accountNumber) {
         IcesiAccount account = getAccountByNumber(accountNumber);
+        if(!verifyAccountOwner(accountNumber)){
+            throw new RuntimeException("Account doesn't belong to user");
+        }
         if(!account.getActive()){
             throw new RuntimeException("Account already disabled");
         }
@@ -49,6 +53,9 @@ public class AccountService {
 
     @Transactional
     public AccountResponseDTO enableAccount(String accountNumber) {
+        if(!verifyAccountOwner(accountNumber)){
+            throw new RuntimeException("Account doesn't belong to user");
+        }
         IcesiAccount account = getAccountByNumber(accountNumber);
         if(account.getActive()){
             throw new RuntimeException("Account already enabled");
@@ -59,6 +66,9 @@ public class AccountService {
     }
     @Transactional
     public AccountResponseDTO withdraw(TransactionAccountDTO transactionInformation){
+        if(!verifyAccountOwner(transactionInformation.getAccountNumber())){
+            throw new RuntimeException("Account doesn't belong to user");
+        }
         IcesiAccount account = getAccountByNumber(transactionInformation.getAccountNumber());
         if(account.getBalance() < transactionInformation.getAmount()) {
             throw new RuntimeException("Account doesn't have enough balance");
@@ -69,6 +79,9 @@ public class AccountService {
     }
     @Transactional
     public AccountResponseDTO deposit(TransactionAccountDTO transactionInformation){
+        if(!verifyAccountOwner(transactionInformation.getAccountNumber())){
+            throw new RuntimeException("Account doesn't belong to user");
+        }
         IcesiAccount account = getAccountByNumber(transactionInformation.getAccountNumber());
         if(!account.getActive()){
             throw new RuntimeException("Account is disabled");
@@ -79,6 +92,9 @@ public class AccountService {
     }
     @Transactional
     public TransferResponseDTO transfer(TransferRequestDTO requestDTO){
+        if(!verifyAccountOwner(requestDTO.getOriginAccountNumber())){
+            throw new RuntimeException("Account doesn't belong to user");
+        }
         IcesiAccount originAccount = getTransferableAccountByNumber(requestDTO.getOriginAccountNumber());
         IcesiAccount destinationAccount = getTransferableAccountByNumber(requestDTO.getDestinationAccountNumber());
         if(originAccount.getBalance() < requestDTO.getAmount()){
@@ -144,5 +160,13 @@ public class AccountService {
     private IcesiAccount getAccountByNumber(String accountNumber){
         Optional<IcesiAccount> accountFound = accountRepository.findByAccountNumber(accountNumber);
         return accountFound.orElseThrow(() -> new RuntimeException("Account not found"));
+    }
+
+    private boolean verifyAccountOwner(String accountNumber){
+        String userId = IcesiSecurityContext.getCurrentUserId();
+        System.out.println(userId);
+        IcesiAccount accountFound = accountRepository.findByAccountNumber(accountNumber).get();
+        System.out.println(accountFound.getUser().getUserId().toString());
+        return accountFound.getUser().getUserId().toString().equals(userId);
     }
 }

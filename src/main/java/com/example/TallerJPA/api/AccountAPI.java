@@ -1,11 +1,9 @@
 package com.example.TallerJPA.api;
 
 import com.example.TallerJPA.dto.*;
-import org.springframework.web.bind.annotation.PatchMapping;
-import org.springframework.web.bind.annotation.PathVariable;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestBody;
+import org.springframework.web.bind.annotation.*;
 
+@RequestMapping(AccountAPI.BASE_ACCOUNT_URL)
 public interface AccountAPI {
     String BASE_ACCOUNT_URL = "/accounts";
     @PostMapping("/add/account")
@@ -21,4 +19,5 @@ public interface AccountAPI {
     public AccountResponseDTO enableAccount(@PathVariable String accountNumber);
     @PatchMapping("/disableAccount/{accountNumber}")
     public AccountResponseDTO disableAccount(@PathVariable String accountNumber);
+
 }

@@ -11,7 +11,7 @@ import org.springframework.web.bind.annotation.RestController;
 import static com.example.TallerJPA.api.RoleAPI.BASE_ROLE_URL;
 
 @AllArgsConstructor
-@RestController(BASE_ROLE_URL)
+@RestController
 public class RoleController implements RoleAPI {
     private RoleService roleService;
 

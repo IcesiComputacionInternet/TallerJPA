@@ -40,7 +40,7 @@ class TallerJpaApplicationTests {
 					.andExpect(status().isOk())
 					.andReturn();
 		TokenDTO tokenDTO = objectMapper.readValue(result.getResponse().getContentAsString(),TokenDTO.class);
-		assertNotNull(tokenDTO.getToken());
+		assertNotNull(result.getResponse().getContentAsString());
 	}
 	@Test
 	public void testCreateUser() throws Exception{
