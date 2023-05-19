@@ -7,16 +7,12 @@ import javax.security.auth.Subject;
 import java.util.Collection;
 
 public class CustomAuthentication implements Authentication {
-
-    private Authentication authentication;
-
+    private final Authentication authentication;
     private final String userId;
-
     public CustomAuthentication(Authentication authentication, String userId){
         this.authentication = authentication;
         this.userId = userId;
     }
-
     @Override
     public Collection<? extends GrantedAuthority> getAuthorities() {
         return authentication.getAuthorities();
@@ -54,10 +50,10 @@ public class CustomAuthentication implements Authentication {
 
     @Override
     public boolean implies(Subject subject) {
-        return authentication.implies(subject);
+        return Authentication.super.implies(subject);
     }
 
-    public String getUserId() {
-        return userId;
+    public String getUserId(){
+        return this.userId;
     }
 }

@@ -1,6 +1,5 @@
 package co.edu.icesi.tallerjpa.service;
 
-import co.edu.icesi.tallerjpa.dto.TokenDTO;
 import co.edu.icesi.tallerjpa.security.CustomAuthentication;
 import lombok.AllArgsConstructor;
 import org.springframework.security.core.Authentication;
@@ -22,7 +21,7 @@ import java.util.stream.Collectors;
 public class TokenService {
     private final JwtEncoder encoder;
 
-    public TokenDTO generateToken(Authentication authentication){
+    public String generateToken(Authentication authentication){
         CustomAuthentication customAuthentication = (CustomAuthentication) authentication;
         Instant now = Instant.now();
         String scope = authentication.getAuthorities().stream()
@@ -33,12 +32,11 @@ public class TokenService {
                 .issuedAt(now)
                 .expiresAt(now.plus(1, ChronoUnit.HOURS))
                 .subject(authentication.getName())
-                .claim("scope", scope)
-                .claim("icesiUserId", customAuthentication.getUserId())
+                .claim("scope",scope)
+                .claim("icesiUserId",customAuthentication.getUserId())
                 .build();
-        var encoderParameters = JwtEncoderParameters.from(JwsHeader.with(MacAlgorithm.HS256).build(), claims);
-        TokenDTO tokenDTO = new TokenDTO(this.encoder.encode(encoderParameters).getTokenValue());
-        return tokenDTO;
+        var encoderParameters = JwtEncoderParameters.from(JwsHeader.with(MacAlgorithm.HS256).build(),claims);
+        System.out.println(this.encoder.encode(encoderParameters).getTokenValue());
+        return this.encoder.encode(encoderParameters).getTokenValue();
     }
-
 }
