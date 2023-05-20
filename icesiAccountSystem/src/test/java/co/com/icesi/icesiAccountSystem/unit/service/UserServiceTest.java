@@ -1,6 +1,7 @@
 package co.com.icesi.icesiAccountSystem.unit.service;
 
-import co.com.icesi.icesiAccountSystem.dto.UserDTO;
+
+import co.com.icesi.icesiAccountSystem.dto.RequestUserDTO;
 import co.com.icesi.icesiAccountSystem.mapper.UserMapper;
 import co.com.icesi.icesiAccountSystem.mapper.UserMapperImpl;
 import co.com.icesi.icesiAccountSystem.model.IcesiRole;
@@ -8,10 +9,13 @@ import co.com.icesi.icesiAccountSystem.model.IcesiUser;
 import co.com.icesi.icesiAccountSystem.repository.RoleRepository;
 import co.com.icesi.icesiAccountSystem.repository.UserRepository;
 import co.com.icesi.icesiAccountSystem.service.UserService;
+import co.com.icesi.icesiAccountSystem.unit.service.matcher.IcesiUserMatcher;
+
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 
 import java.util.Optional;
+import java.util.UUID;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.fail;
@@ -29,7 +33,6 @@ public class UserServiceTest {
 
     private UserMapper userMapper;
 
-
     @BeforeEach
     private void init(){
         userRepository = mock(UserRepository.class);
@@ -40,8 +43,13 @@ public class UserServiceTest {
 
     @Test
     public void testCreateUser(){
-        when(roleRepository.findByName(any())).thenReturn(Optional.of(defaultIcesiRole()));
-        userService.saveUser(defaultUserDTO());
+        // Arrange
+        var userDTO = defaultUserDTO();
+        var icesiRole= defaultIcesiRole();
+        when(roleRepository.findByName(any())).thenReturn(Optional.of(icesiRole));
+        // Act
+        userService.saveUser(userDTO);
+        // Assert
         IcesiUser newIcesiUser = IcesiUser.builder()
                 .role(defaultIcesiRole())
                 .firstName("Damiano")
@@ -50,71 +58,104 @@ public class UserServiceTest {
                 .phoneNumber("3152485689")
                 .password("taEkbs08")
                 .build();
+        verify(userRepository, times(1)).findByEmail(any());
+        verify(userRepository, times(1)).findByPhoneNumber(any());
+        verify(roleRepository, times(1)).findByName(any());
         verify(userRepository,times( 1)).save(argThat(new IcesiUserMatcher(newIcesiUser)));
+        verify(userMapper, times(1)).fromUserDTO(any());
+        verify(userMapper, times(1)).fromUserToResponseUserDTO(any());
     }
 
     @Test
     public void testCreateUserWithoutRole(){
-        when(roleRepository.findByName(any())).thenReturn(Optional.of(defaultIcesiRole()));
+        // Arrange
+        var userDTO = defaultUserDTO1();
         try {
-            userService.saveUser(defaultUserDTO1());
+            // Act
+            userService.saveUser(userDTO);
             fail();
         } catch (RuntimeException exception){
             String message = exception.getMessage();
-            assertEquals("It is not possible to create a user without role.", message);
+            // Assert
+            assertEquals("Role was not specified or does not exist yet.", message);
         }
     }
 
     @Test
     public void testCreateUserWithRoleThatDoesNotExists(){
+        // Arrange
+        var userDTO = defaultUserDTO();
         try {
-            userService.saveUser(defaultUserDTO());
+            // Act
+            userService.saveUser(userDTO);
             fail();
         } catch (RuntimeException exception){
             String message = exception.getMessage();
-            assertEquals("Role does not exists.", message);
+            // Assert
+            assertEquals("Role was not specified or does not exist yet.", message);
         }
     }
 
     @Test
     public void testCreateUserWhenEmailAndPhoneAlreadyExists(){
-        when(userRepository.findByEmail(any())).thenReturn(Optional.of(defaultIcesiUser()));
-        when(userRepository.findByPhoneNumber(any())).thenReturn(Optional.of(defaultIcesiUser()));
+        // Arrange
+        var userDTO = defaultUserDTO();
+        var icesiRole= defaultIcesiRole();
+        var icesiUser= defaultIcesiUser();
+        when(roleRepository.findByName(any())).thenReturn(Optional.of(icesiRole));
+        when(userRepository.findByEmail(any())).thenReturn(Optional.of(icesiUser));
+        when(userRepository.findByPhoneNumber(any())).thenReturn(Optional.of(icesiUser));
         try {
-            userService.saveUser(defaultUserDTO());
+            // Act
+            userService.saveUser(userDTO);
             fail();
         } catch (RuntimeException exception){
             String message = exception.getMessage();
-            assertEquals("Another user already has this email and phone number.", message);
+            // Assert
+            assertEquals("A User with the same email and phone already exists.", message);
         }
     }
 
     @Test
     public void testCreateUserWhenEmailAlreadyExists(){
-        when(userRepository.findByEmail(any())).thenReturn(Optional.of(defaultIcesiUser()));
+        // Arrange
+        var userDTO = defaultUserDTO();
+        var icesiRole= defaultIcesiRole();
+        var icesiUser= defaultIcesiUser();
+        when(roleRepository.findByName(any())).thenReturn(Optional.of(icesiRole));
+        when(userRepository.findByEmail(any())).thenReturn(Optional.of(icesiUser));
         try {
-            userService.saveUser(defaultUserDTO());
+            // Act
+            userService.saveUser(userDTO);
             fail();
         } catch (RuntimeException exception){
             String message = exception.getMessage();
-            assertEquals("Another user already has this email.", message);
+            // Assert
+            assertEquals("A User with the same email already exists.", message);
         }
     }
 
     @Test
     public void testCreateUserWhenPhoneAlreadyExists(){
-        when(userRepository.findByPhoneNumber(any())).thenReturn(Optional.of(defaultIcesiUser()));
+        // Arrange
+        var userDTO = defaultUserDTO();
+        var icesiRole= defaultIcesiRole();
+        var icesiUser= defaultIcesiUser();
+        when(roleRepository.findByName(any())).thenReturn(Optional.of(icesiRole));
+        when(userRepository.findByPhoneNumber(any())).thenReturn(Optional.of(icesiUser));
         try {
-            userService.saveUser(defaultUserDTO());
+            // Act
+            userService.saveUser(userDTO);
             fail();
         } catch (RuntimeException exception){
             String message = exception.getMessage();
-            assertEquals("Another user already has this phone number.", message);
+            // Assert
+            assertEquals("A User with the same phone already exists.", message);
         }
     }
 
-    private UserDTO defaultUserDTO(){
-        return UserDTO.builder()
+    private RequestUserDTO defaultUserDTO(){
+        return RequestUserDTO.builder()
                 .roleName("Director SIS")
                 .firstName("Damiano")
                 .lastName("David")
@@ -124,8 +165,8 @@ public class UserServiceTest {
                 .build();
     }
 
-    private UserDTO defaultUserDTO1(){
-        return UserDTO.builder()
+    private RequestUserDTO defaultUserDTO1(){
+        return RequestUserDTO.builder()
                 .roleName("")
                 .firstName("Damiano")
                 .lastName("David")
@@ -137,6 +178,7 @@ public class UserServiceTest {
 
     private IcesiUser defaultIcesiUser(){
         return IcesiUser.builder()
+                .userId(UUID.randomUUID())
                 .role(defaultIcesiRole())
                 .firstName("Damiano")
                 .lastName("David")
@@ -148,8 +190,10 @@ public class UserServiceTest {
 
     private IcesiRole defaultIcesiRole() {
         return IcesiRole.builder()
+                .roleId(UUID.randomUUID())
                 .description("Director del programa de Ingenieria de sistemas")
                 .name("Director SIS")
                 .build();
     }
+
 }

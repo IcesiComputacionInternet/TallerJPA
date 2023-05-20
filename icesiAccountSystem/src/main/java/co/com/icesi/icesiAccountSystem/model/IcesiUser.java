@@ -19,7 +19,8 @@ public class IcesiUser {
     @OneToMany(mappedBy = "user")
     private List<IcesiAccount> listOfAccounts;
 
-    @ManyToOne(optional = false)
+
+    @ManyToOne(optional = false, cascade = CascadeType.ALL)
     @JoinColumn(name="icesi_role_role_id", nullable=false)
     private IcesiRole role;
 

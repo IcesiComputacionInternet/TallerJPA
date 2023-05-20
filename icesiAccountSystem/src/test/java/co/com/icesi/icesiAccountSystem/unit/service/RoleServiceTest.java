@@ -6,10 +6,12 @@ import co.com.icesi.icesiAccountSystem.mapper.RoleMapperImpl;
 import co.com.icesi.icesiAccountSystem.model.IcesiRole;
 import co.com.icesi.icesiAccountSystem.repository.RoleRepository;
 import co.com.icesi.icesiAccountSystem.service.RoleService;
+import co.com.icesi.icesiAccountSystem.unit.service.matcher.IcesiRoleMatcher;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 
 import java.util.Optional;
+import java.util.UUID;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.fail;
@@ -29,23 +31,37 @@ public class RoleServiceTest {
     }
 
     @Test
-    public void testCreateRole(){
-        roleService.saveRole(defaultRoleDTO());
+
+    public void testCreateRole_HappyPath(){
+        // Arrange
+        var roleDTO= defaultRoleDTO();
+        // Act
+        roleService.saveRole(roleDTO);
+        // Assert
         IcesiRole newIcesiRole = IcesiRole.builder()
             .description("Director del programa de Diseño de Medios Interactivos")
             .name("Director DMI")
             .build();
         verify(roleRepository,times(1)).save(argThat(new IcesiRoleMatcher(newIcesiRole)));
+        verify(roleMapper, times(1)).fromRoleDTO(any());
+        verify(roleMapper, times(1)).fromRoleToRoleDTO(any());
+        verify(roleRepository, times(1)).findByName(any());
     }
 
     @Test
     public void testCreateRoleWhenNameAlreadyExists(){
-        when(roleRepository.findByName(any())).thenReturn(Optional.of(defaultIcesiRole()));
+        // Arrange
+        var roleDTO= defaultRoleDTO();
+        var icesiRole= defaultIcesiRole();
+        when(roleRepository.findByName(any())).thenReturn(Optional.of(icesiRole));
+
         try {
-            roleService.saveRole(defaultRoleDTO());
+            // Act
+            roleService.saveRole(roleDTO);
             fail();
         } catch (RuntimeException exception){
             String message = exception.getMessage();
+            // Assert
             assertEquals("Another role already has this name.", message);
         }
     }
@@ -59,8 +75,9 @@ public class RoleServiceTest {
 
     private IcesiRole defaultIcesiRole() {
         return IcesiRole.builder()
-                .description("Director del programa de Ingenieria de sistemas")
-                .name("Director SIS")
+                .roleId(UUID.randomUUID())
+                .description("Director del programa de Diseño de Medios Interactivos")
+                .name("Director DMI")
                 .build();
     }
 }

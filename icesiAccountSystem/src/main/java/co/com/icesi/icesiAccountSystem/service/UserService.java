@@ -1,16 +1,19 @@
 package co.com.icesi.icesiAccountSystem.service;
 
-import co.com.icesi.icesiAccountSystem.dto.RoleDTO;
-import co.com.icesi.icesiAccountSystem.dto.UserDTO;
+
+import co.com.icesi.icesiAccountSystem.dto.RequestUserDTO;
+import co.com.icesi.icesiAccountSystem.dto.ResponseUserDTO;
 import co.com.icesi.icesiAccountSystem.mapper.UserMapper;
-import co.com.icesi.icesiAccountSystem.model.IcesiRole;
 import co.com.icesi.icesiAccountSystem.model.IcesiUser;
 import co.com.icesi.icesiAccountSystem.repository.RoleRepository;
 import co.com.icesi.icesiAccountSystem.repository.UserRepository;
 import lombok.AllArgsConstructor;
 import org.springframework.stereotype.Service;
 
+import java.util.List;
+import java.util.Optional;
 import java.util.UUID;
+import java.util.stream.Collectors;
 
 @Service
 @AllArgsConstructor
@@ -19,31 +22,40 @@ public class UserService {
     private final RoleRepository roleRepository;
     private final UserMapper userMapper;
 
-    public IcesiUser saveUser(UserDTO userDTO) {
-        boolean foundSameEmail = userRepository.findByEmail(userDTO.getEmail()).isPresent();
-        boolean foundSamePhone = userRepository.findByPhoneNumber(userDTO.getPhoneNumber()).isPresent();
-        if(foundSameEmail && foundSamePhone){
-            throw new RuntimeException("Another user already has this email and phone number.");
-        }else if (foundSameEmail) {
-            throw new RuntimeException("Another user already has this email.");
-        }else if (foundSamePhone){
-            throw new RuntimeException("Another user already has this phone number.");
-        }
-        IcesiUser icesiUser = userMapper.fromUserDTO(userDTO);
-        icesiUser.setUserId(UUID.randomUUID());
-        assignUser(userDTO, icesiUser);
+    public ResponseUserDTO saveUser(RequestUserDTO requestUserDTO) {
 
-        return userRepository.save(icesiUser);
+        Optional<IcesiUser> userByEmail= userRepository.findByEmail(requestUserDTO.getEmail());
+        Optional<IcesiUser> userByPhone=userRepository.findByPhoneNumber(requestUserDTO.getPhoneNumber());
+        var role = roleRepository.findByName(requestUserDTO.getRoleName())
+                .orElseThrow(() -> new RuntimeException("Role was not specified or does not exist yet."));
+
+        if (userByEmail.isPresent() && userByPhone.isPresent()){
+            throw new RuntimeException("A User with the same email and phone already exists.");
+        }
+        if (userByEmail.isPresent()){
+            throw new RuntimeException("A User with the same email already exists.");
+        }
+        if(userByPhone.isPresent()){
+            throw new RuntimeException("A User with the same phone already exists.");
+        }
+
+        IcesiUser icesiUser = userMapper.fromUserDTO(requestUserDTO);
+        icesiUser.setUserId(UUID.randomUUID());
+        icesiUser.setRole(role);
+        userRepository.save(icesiUser);
+        return userMapper.fromUserToResponseUserDTO(icesiUser);
     }
 
-    private void assignUser(UserDTO userDTO, IcesiUser user) {
-        if (userDTO.getRoleName().equals("")){
-            throw new RuntimeException("It is not possible to create a user without role.");
+    public ResponseUserDTO getUser(String userEmail) {
+        Optional<IcesiUser> userByEmail=userRepository.findByEmail(userEmail);
+        if (!userByEmail.isPresent()){
+
+            throw new RuntimeException("The user with the specified email does not exists.");
         }
-        if(roleRepository.findByName(userDTO.getRoleName()).isPresent()){
-            user.setRole(roleRepository.findByName(userDTO.getRoleName()).get());
-        } else{
-            throw new RuntimeException("Role does not exists.");
-        }
+        return userMapper.fromUserToResponseUserDTO(userByEmail.get());
+    }
+
+    public List<ResponseUserDTO> getAllUsers() {
+        return userRepository.findAll().stream().map(userMapper::fromUserToResponseUserDTO).collect(Collectors.toList());
     }
 }

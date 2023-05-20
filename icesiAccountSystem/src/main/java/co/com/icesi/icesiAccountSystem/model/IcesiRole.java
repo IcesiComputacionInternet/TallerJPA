@@ -19,11 +19,9 @@ import java.util.UUID;
 public class IcesiRole {
 
     @OneToMany(mappedBy = "role")
-    private List<IcesiUser> listOfRoles;
+    private List<IcesiUser> listOfUsers;
     @Id
     private UUID roleId;
     private String description;
-
-    @Column(unique=true)
     private String name;
 }

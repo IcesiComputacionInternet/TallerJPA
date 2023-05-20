@@ -1,5 +1,5 @@
 package co.com.icesi.icesiAccountSystem.model;
-
+import co.com.icesi.icesiAccountSystem.enums.AccountType;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
@@ -14,8 +14,6 @@ import java.util.UUID;
 @AllArgsConstructor
 @NoArgsConstructor
 public class IcesiAccount {
-
-
     @ManyToOne
     @JoinColumn(name="icesi_user_user_id", nullable=false)
     private IcesiUser user;
@@ -24,6 +22,6 @@ public class IcesiAccount {
     @Column(unique=true)
     private String accountNumber;
     private long balance;
-    private String type;
+    private AccountType type;
     private boolean active;
 }
