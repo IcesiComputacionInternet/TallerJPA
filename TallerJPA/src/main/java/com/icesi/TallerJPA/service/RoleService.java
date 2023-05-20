@@ -20,16 +20,13 @@ public class RoleService {
     private final RoleMapper roleMapper;
     private final RoleRepository roleRepository;
 
-    private final IcesiExceptionBuilder exceptionBuilder = new IcesiExceptionBuilder();
+    private final IcesiExceptionBuilder eb = new IcesiExceptionBuilder();
 
     public IcesiRoleResponseDTO save(IcesiRoleDTO role) throws IcesiException {
 
-
-
         if(roleRepository.existsByName(role.getName())) {
-            exceptionBuilder.throwExceptionDuplicated("Role already exists", "role", "name", role.getName());
+            throw  eb.exceptionDuplicate("Role already exists", "role", "name", role.getName());
         }
-
 
         IcesiRole icesiRole = roleMapper.fromIcesiRoleDTO(role);
         icesiRole.setRoleId(UUID.randomUUID());

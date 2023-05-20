@@ -1,22 +1,20 @@
 package com.icesi.TallerJPA.service;
 
+import com.icesi.TallerJPA.config.PasswordEncoderConfiguration;
 import com.icesi.TallerJPA.dto.request.IcesiUserDTO;
 import com.icesi.TallerJPA.dto.response.IcesiUserResponseDTO;
-import com.icesi.TallerJPA.error.exception.DetailBuilder;
-import com.icesi.TallerJPA.error.exception.ErrorCode;
-import com.icesi.TallerJPA.error.exception.IcesiException;
 import com.icesi.TallerJPA.error.util.IcesiExceptionBuilder;
 import com.icesi.TallerJPA.mapper.UserMapper;
 import com.icesi.TallerJPA.model.IcesiUser;
 import com.icesi.TallerJPA.repository.RoleRepository;
 import com.icesi.TallerJPA.repository.UserRespository;
 import lombok.AllArgsConstructor;
-import org.springframework.http.HttpStatus;
+import org.springframework.security.core.context.SecurityContextHolder;
+import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
 import java.util.UUID;
 
-import static com.icesi.TallerJPA.error.util.IcesiExceptionBuilder.createIcesiError;
 
 @Service
 @AllArgsConstructor
@@ -30,28 +28,43 @@ public class UserService {
 
     private final IcesiExceptionBuilder eb = new IcesiExceptionBuilder();
 
+    private final PasswordEncoderConfiguration encoder = new PasswordEncoderConfiguration();
+
+
     public IcesiUserResponseDTO save(IcesiUserDTO user) {
 
         Boolean existEmail = userRespository.existsByEmail(user.getEmail());
         Boolean existPhone = userRespository.existsByPhoneNumber(user.getPhoneNumber());
 
         if(existEmail && existPhone){
-            eb.throwExceptionDuplicated("Email and phone are repeated", "user", "email and phone", user.getEmail() + " y " + user.getPhoneNumber());}
+            throw eb.exceptionDuplicate("Email and phone are repeated", "user", "email and phone", user.getEmail() + " y " + user.getPhoneNumber());}
         if(existEmail){
-            eb.throwExceptionDuplicated("Email is repeated", "user", "email", user.getEmail());}
+            throw eb.exceptionDuplicate("Email is repeated", "user", "email", user.getEmail());}
         if(existPhone){
-            eb.throwExceptionDuplicated("Phone is repeated", "user", "phone", user.getPhoneNumber());}
+            throw eb.exceptionDuplicate("Phone is repeated", "user", "phone", user.getPhoneNumber());}
 
         return createUser(user);
     }
 
     public IcesiUserResponseDTO createUser(IcesiUserDTO user) {
         IcesiUser icesiUser = userMapper.fromIcesiUser(user);
+        icesiUser.setPassword(encoder.passwordEncoder().encode(user.getPassword()));
         icesiUser.setUserId(UUID.randomUUID());
-        icesiUser.setIcesiRole(roleRepository.findIcesiRoleByName(
-                user.getRolName()).orElseThrow(()-> new IcesiException(
-                        "Role not found", createIcesiError("Role not found", HttpStatus.NOT_FOUND, new DetailBuilder(ErrorCode.ERR_404, "User", "Id", icesiUser.getUserId()))
-                        )));
+        if(user.getRolName().equals("ADMIN") && roleBank()){
+            throw eb.exceptionUnauthorized("You don't have permission to create an admin user", "user" );
+        }
+
+        icesiUser.setIcesiRole(roleRepository.findIcesiRoleByName(user.getRolName()).orElseThrow(() -> {
+            throw eb.exceptionNotFound("Role not found", user.getRolName());
+        }));
         return userMapper.toResponse(userRespository.save(icesiUser));
+    }
+
+    public Boolean roleBank(){
+        var username = SecurityContextHolder.getContext().getAuthentication().getName();
+        var user = userRespository.findIcesiUserByEmail(username).orElseThrow(()->{
+            throw eb.exceptionNotFound("User not found", username);
+        });
+        return user.getIcesiRole().getName().equals("BANK");
     }
 }

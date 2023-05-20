@@ -19,7 +19,7 @@ public interface AccountRepository extends JpaRepository<IcesiAccount, UUID> {
     void activeAccount(@Param("accountNumber") String accountNumber);
 
     @Modifying
-    @Query("UPDATE IcesiAccount a SET a.active = false WHERE a.accountNumber = :accountNumber AND a.balance = 0")
+    @Query("UPDATE IcesiAccount a SET a.active = false WHERE a.accountNumber = :accountNumber")
     void inactiveAccount(@Param("accountNumber") String accountNumber);
 
     @Query("SELECT a.active FROM IcesiAccount a WHERE a.accountNumber = :accountNumber")
@@ -35,5 +35,8 @@ public interface AccountRepository extends JpaRepository<IcesiAccount, UUID> {
 
     @Query("SELECT a FROM IcesiAccount a WHERE a.accountNumber = :accountNumber AND a.type <> 0 AND a.active = true")
     Optional<IcesiAccount> getTypeofAccount(@Param("accountNumber") String accountNumber);
+
+    @Query("SELECT CASE WHEN COUNT(a)>0 THEN true ELSE false END FROM IcesiAccount a WHERE a.accountNumber = :accountNumber AND a.icesiUser.userId = :userId")
+    Boolean accountOwner(@Param("accountNumber") String accountNumber, @Param("userId") UUID userId);
 
 }

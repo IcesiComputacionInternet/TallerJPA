@@ -1,11 +1,16 @@
 package com.icesi.TallerJPA.config;
 
+import com.icesi.TallerJPA.model.IcesiPermits;
+import com.icesi.TallerJPA.repository.PermissionRepository;
+import com.nimbusds.jose.jwk.source.ImmutableSecret;
 import lombok.AllArgsConstructor;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.ProviderManager;
-import org.springframework.security.authentication.dao.DaoAuthenticationProvider;
+import org.springframework.security.authorization.AuthorityAuthorizationManager;
+import org.springframework.security.authorization.AuthorizationDecision;
+import org.springframework.security.authorization.AuthorizationManager;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
 import org.springframework.security.config.annotation.web.configurers.AbstractHttpConfigurer;
@@ -13,28 +18,48 @@ import org.springframework.security.config.annotation.web.configurers.oauth2.ser
 import org.springframework.security.config.http.SessionCreationPolicy;
 import org.springframework.security.oauth2.jose.jws.MacAlgorithm;
 import org.springframework.security.oauth2.jwt.JwtDecoder;
+import org.springframework.security.oauth2.jwt.JwtEncoder;
 import org.springframework.security.oauth2.jwt.NimbusJwtDecoder;
+import org.springframework.security.oauth2.jwt.NimbusJwtEncoder;
 import org.springframework.security.web.SecurityFilterChain;
+import org.springframework.security.web.access.intercept.RequestAuthorizationContext;
+import org.springframework.security.web.access.intercept.RequestMatcherDelegatingAuthorizationManager;
+import org.springframework.security.web.servlet.util.matcher.MvcRequestMatcher;
+import org.springframework.security.web.util.matcher.AndRequestMatcher;
+import org.springframework.security.web.util.matcher.RequestMatcher;
+import org.springframework.transaction.annotation.Propagation;
+import org.springframework.transaction.annotation.Transactional;
+import org.springframework.web.servlet.handler.HandlerMappingIntrospector;
 
 import javax.crypto.spec.SecretKeySpec;
+import javax.servlet.http.HttpServletRequest;
+import java.util.Collection;
+import java.util.List;
+import java.util.Map;
+import java.util.stream.Collectors;
+import java.util.stream.Stream;
 
 @Configuration
 @EnableWebSecurity
 @AllArgsConstructor
 public class SecurityConfiguration {
 
+    private final IcesiAuthenticationManager icesiAuthenticationManager;
+
     private final String secret = "longenoughsecrettotestjwtencrypt";
+
+    private final PermissionRepository permissionRepository;
 
     @Bean
     public AuthenticationManager authenticationManager()  {
-        return new ProviderManager(new DaoAuthenticationProvider());
+        return new ProviderManager(icesiAuthenticationManager);
     }
 
     @Bean
-    public SecurityFilterChain securityFilterChain(HttpSecurity http) throws Exception {
+    public SecurityFilterChain securityFilterChain(HttpSecurity http, AuthorizationManager<RequestAuthorizationContext> access) throws Exception {
         return http.csrf(AbstractHttpConfigurer::disable)
                 .authorizeHttpRequests(auth -> auth
-                        .anyRequest().permitAll())
+                        .anyRequest().access(access))
                 .oauth2ResourceServer(OAuth2ResourceServerConfigurer::jwt)
                 .sessionManagement(session -> session.sessionCreationPolicy(SessionCreationPolicy.STATELESS)).build();
     }
@@ -43,8 +68,43 @@ public class SecurityConfiguration {
     public JwtDecoder jwtDecoder() {
         byte[] bytes = secret.getBytes();
         SecretKeySpec key = new SecretKeySpec(bytes, 0, bytes.length, "RSA");
-        return NimbusJwtDecoder.withSecretKey(key).macAlgorithm(MacAlgorithm.HS512).build();
+        return NimbusJwtDecoder.withSecretKey(key).macAlgorithm(MacAlgorithm.HS256).build();
     }
 
+    @Bean
+    public JwtEncoder jwtEncoder(){
+        return new NimbusJwtEncoder(new ImmutableSecret<>(secret.getBytes()));
+    }
 
+    @Bean
+    @Transactional(propagation= Propagation.REQUIRED, readOnly=true, noRollbackFor=Exception.class)
+    public AuthorizationManager<RequestAuthorizationContext> requestMatcherAuthorizationManager(HandlerMappingIntrospector introspector){
+
+
+        Map<MvcRequestMatcher, List<String >> rolePaths = permissionRepository.findAll().stream()
+                .collect(
+                        Collectors.toMap(permission -> new MvcRequestMatcher(introspector, permission.getPath()),
+                                permission -> permission.getRoles().stream().map(role -> "SCOPE_"+role.getName()).toList()
+                ));
+
+        RequestMatcher permitAll = new AndRequestMatcher(new MvcRequestMatcher(introspector, "/login"));
+
+        RequestMatcherDelegatingAuthorizationManager.Builder managerBuilder =
+                RequestMatcherDelegatingAuthorizationManager.builder()
+                        .add(permitAll, (context, other)-> new AuthorizationDecision(true));
+
+
+        //rolePaths.forEach((paths, roles) -> managerBuilder.add(paths, AuthorityAuthorizationManager.hasAnyAuthority(roles.toArray(new String[0]))));
+
+
+        managerBuilder.add(new MvcRequestMatcher(introspector, "/user"), AuthorityAuthorizationManager.hasAnyAuthority("SCOPE_ADMIN", "SCOPE_BANK"));
+        managerBuilder.add(new MvcRequestMatcher(introspector, "/role"), AuthorityAuthorizationManager.hasAnyAuthority("SCOPE_ADMIN"));
+        managerBuilder.add(new MvcRequestMatcher(introspector, "/account"), AuthorityAuthorizationManager.hasAnyAuthority("SCOPE_USER"));
+        managerBuilder.add(new MvcRequestMatcher(introspector, "/account/inactiveAccount/**"), AuthorityAuthorizationManager.hasAnyAuthority("SCOPE_USER"));
+        managerBuilder.add(new MvcRequestMatcher(introspector, "/account/activeAccount/**"), AuthorityAuthorizationManager.hasAnyAuthority("SCOPE_USER"));
+
+
+        AuthorizationManager<HttpServletRequest> manager = managerBuilder.build();
+        return (authentication, object) -> manager.check(authentication, object.getRequest());
+    }
 }
