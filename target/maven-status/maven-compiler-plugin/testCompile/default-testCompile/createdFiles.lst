@@ -1,0 +1,8 @@
+co\com\icesi\tallerjpa\TestConfigurationData.class
+co\com\icesi\tallerjpa\unit\service\RoleServiceTest.class
+co\com\icesi\tallerjpa\unit\service\IcesiUserMatcher.class
+co\com\icesi\tallerjpa\TallerjpaApplicationTests.class
+co\com\icesi\tallerjpa\unit\service\IcesiRoleMatcher.class
+co\com\icesi\tallerjpa\unit\service\AccountServiceTest.class
+co\com\icesi\tallerjpa\unit\service\UserServiceTest.class
+co\com\icesi\tallerjpa\unit\service\IcesiAccountMatcher.class

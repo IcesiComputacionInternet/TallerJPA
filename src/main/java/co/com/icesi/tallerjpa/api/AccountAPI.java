@@ -5,12 +5,13 @@ import co.com.icesi.tallerjpa.dto.ResponseAccountDTO;
 import co.com.icesi.tallerjpa.dto.TransactionDTO;
 import org.springframework.web.bind.annotation.*;
 
+import javax.validation.Valid;
 import java.util.List;
 
 public interface AccountAPI {
     String ACCOUNT_URL = "/accounts";
     @PostMapping
-    ResponseAccountDTO addAccount(@RequestBody RequestAccountDTO accountDTO);
+    ResponseAccountDTO addAccount(@Valid @RequestBody RequestAccountDTO accountDTO);
 
     @PatchMapping("/enable")
     ResponseAccountDTO enableAcc(@PathVariable String accNum);
@@ -19,11 +20,11 @@ public interface AccountAPI {
     ResponseAccountDTO disableAcc(@PathVariable String accNum);
 
     @PatchMapping("/withdrawal")
-    TransactionDTO withdrawal(@RequestBody TransactionDTO transacDTO);
+    TransactionDTO withdrawal(@Valid @RequestBody TransactionDTO transacDTO);
 
     @PatchMapping("/deposit")
-    TransactionDTO deposit(@RequestBody TransactionDTO transacDTO);
+    TransactionDTO deposit(@Valid @RequestBody TransactionDTO transacDTO);
 
     @PatchMapping("/transfer")
-    TransactionDTO tranfer(@RequestBody TransactionDTO transacDTO);
+    TransactionDTO tranfer(@Valid @RequestBody TransactionDTO transacDTO);
 }

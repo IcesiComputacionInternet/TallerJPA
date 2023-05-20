@@ -8,6 +8,8 @@ import co.com.icesi.tallerjpa.service.AccountService;
 import lombok.AllArgsConstructor;
 import org.springframework.web.bind.annotation.*;
 
+import javax.validation.Valid;
+
 import static co.com.icesi.tallerjpa.api.AccountAPI.ACCOUNT_URL;
 
 @RestController
@@ -17,7 +19,7 @@ public class AccountController implements AccountAPI {
     private final AccountService accountService;
 
     @Override
-    public ResponseAccountDTO addAccount(RequestAccountDTO accountDTO) { return accountService.save(accountDTO);}
+    public ResponseAccountDTO addAccount(@Valid RequestAccountDTO accountDTO) { return accountService.save(accountDTO);}
 
     @Override
     public ResponseAccountDTO enableAcc(String accNum){

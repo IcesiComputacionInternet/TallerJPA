@@ -19,7 +19,7 @@ public class TallerjpaApplication {
 		SpringApplication.run(TallerjpaApplication.class, args);
 	}
 
-	@Bean
+	//@Bean
 	CommandLineRunner commandLineRunner(UserRepository users,
 										RoleRepository roleRepository,
 										PasswordEncoder encoder) {

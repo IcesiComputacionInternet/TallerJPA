@@ -8,4 +8,5 @@ public class IcesiSecurityContext {
         return ((JwtAuthenticationToken) SecurityContextHolder.getContext().getAuthentication())
                 .getToken().getClaimAsString("icesiUser");
     }
+    // hacer lo mismo para agarrar el scope y en servicios chequeo el usuario y le indico los permisos que tiene
 }

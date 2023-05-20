@@ -155,8 +155,6 @@ public class AccountServiceTest {
         assertEquals("Successful withdrawal", transactionDTO.getResult());
     }
 
-    //cuenta no existe
-
     @Test
     public void testWithdrawalBalanceLessThanAmount(){
 

@@ -13,5 +13,5 @@ public class EmailorPhoneValidator implements ConstraintValidator<EmailorPhoneCo
 @Override
     public boolean isValid(String contactField, ConstraintValidatorContext cxt) {
         return !contactField.isEmpty();
-    }
+}
 }

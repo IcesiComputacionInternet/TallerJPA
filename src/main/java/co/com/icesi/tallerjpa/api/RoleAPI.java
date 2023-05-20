@@ -5,6 +5,7 @@ import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 
+import javax.validation.Valid;
 import java.util.List;
 
 public interface RoleAPI {
@@ -16,5 +17,5 @@ public interface RoleAPI {
     List<RoleCreateDTO> getAllRoles();
 
     @PostMapping("/createRole")
-    RoleCreateDTO addRole(@RequestBody RoleCreateDTO roleCreateDTO);
+    RoleCreateDTO addRole(@Valid @RequestBody RoleCreateDTO roleCreateDTO);
 }
