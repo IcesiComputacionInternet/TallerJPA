@@ -113,4 +113,33 @@ class UserControllerTest {
                 .andReturn();
         System.out.println(result.getResponse().getContentAsString());
     }
+
+    @Test
+    @Order(3)
+    public void testCreateUserEndPointWhenUserAuthUser() throws Exception {
+        var resultToken = mockMvc.perform(MockMvcRequestBuilders.post("/login").content(
+                                objectMapper.writeValueAsString(new IcesiLoginDTO("user@email.com", "password"))
+                        )
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .accept(MediaType.APPLICATION_JSON))
+                .andExpect(status().isOk())
+                .andReturn();
+        token = resultToken.getResponse().getContentAsString();
+        var result = mockMvc.perform(post("/user").content(
+                                objectMapper.writeValueAsString(
+                                        IcesiUserDTO.builder()
+                                                .email("123454489@gmail.com")
+                                                .phoneNumber("+573197229033")
+                                                .firstName("John")
+                                                .lastName("Doe")
+                                                .password("password")
+                                                .rolName("USER")
+                                                .build()
+                                ))
+                        .header("Authorization", "Bearer " + token)
+                        .contentType(MediaType.APPLICATION_JSON).accept(MediaType.APPLICATION_JSON))
+                .andExpect(status().isForbidden())
+                .andReturn();
+        System.out.println(result.getResponse().getContentAsString());
+    }
 }
