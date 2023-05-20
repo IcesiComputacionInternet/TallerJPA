@@ -361,7 +361,7 @@ public class AccountServiceTest {
                 .balance(100L)
                 .type(depositOnly.getType())
                 .active(true)
-                .icesiUserId("e9cd0f1a-29a2-4eb0-9271-3e6a36fa40dc")
+                .icesiUserId(UUID.fromString("e9cd0f1a-29a2-4eb0-9271-3e6a36fa40dc"))
                 .build();
     }
 

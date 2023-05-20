@@ -12,13 +12,13 @@ public interface AccountAPI {
     String BASE_ACCOUNT_URL = "/accounts";
     @GetMapping("/{accountNumber}")
     ResponseAccountDTO getAccount(@PathVariable String accountNumber);
-    @GetMapping
+    @GetMapping("/getAccounts")
     List<ResponseAccountDTO> getAllAccounts();
     @PostMapping("/createAccount")
     ResponseAccountDTO createAccount(@RequestBody RequestAccountDTO requestAccountDTO);
     @PatchMapping("/enable")
     ResponseAccountDTO enableAccount(@RequestBody RequestAccountDTO account);
-    @PatchMapping("/enable")
+    @PatchMapping("/disable")
     ResponseAccountDTO disableAccount(@RequestBody RequestAccountDTO account);
     @PatchMapping("/withdraw")
     ResponseTransactionDTO withdraw(@RequestBody RequestTransactionDTO transaction);

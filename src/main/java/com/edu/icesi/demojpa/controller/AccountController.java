@@ -7,13 +7,15 @@ import com.edu.icesi.demojpa.dto.ResponseAccountDTO;
 import com.edu.icesi.demojpa.dto.ResponseTransactionDTO;
 import com.edu.icesi.demojpa.service.AccountService;
 import lombok.AllArgsConstructor;
+import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
 import java.util.List;
 
 import static com.edu.icesi.demojpa.api.AccountAPI.BASE_ACCOUNT_URL;
 
-@RestController(BASE_ACCOUNT_URL)
+@RestController
+@RequestMapping(BASE_ACCOUNT_URL)
 @AllArgsConstructor
 public class AccountController implements AccountAPI {
     private final AccountService accountService;

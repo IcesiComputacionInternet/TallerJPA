@@ -13,4 +13,7 @@ import java.util.UUID;
 public interface AccountRepository extends JpaRepository<IcesiAccount, UUID>{
     @Query("SELECT account FROM IcesiAccount account WHERE account.accountNumber = :accountNumber AND account.active = :isActive")
     Optional<IcesiAccount> findAccountByAccountNumber(String accountNumber, boolean isActive);
+
+    @Query("SELECT COUNT(account) > 0 FROM IcesiAccount account WHERE account.accountId = :accountId AND account.accountNumber = :accountNumber")
+    Boolean isOwnerAccount(UUID accountId, String accountNumber);
 }

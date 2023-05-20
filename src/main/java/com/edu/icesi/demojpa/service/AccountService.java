@@ -151,4 +151,11 @@ public class AccountService {
                 .map(accountMapper::fromAccountToDTO)
                 .collect(Collectors.toList());
     }
+
+    //Falta implementar las nuevas excepciones y además ponerle restricción de que solo un usuario normal puede alterar su propia cuenta.
+    public void isOwnerAccount(UUID userIs, String accountNumber){
+        if(!accountRepository.isOwnerAccount(userIs, accountNumber)){
+            System.out.println("Nosepuedepa");
+        }
+    }
 }
