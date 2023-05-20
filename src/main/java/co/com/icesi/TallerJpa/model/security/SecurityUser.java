@@ -1,5 +1,7 @@
-package co.com.icesi.TallerJpa.model;
+package co.com.icesi.TallerJpa.model.security;
 
+import co.com.icesi.TallerJpa.model.IcesiRole;
+import co.com.icesi.TallerJpa.model.IcesiUser;
 import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.security.core.userdetails.UserDetails;
