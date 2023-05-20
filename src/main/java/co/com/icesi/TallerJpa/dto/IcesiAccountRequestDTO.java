@@ -12,9 +12,9 @@ import javax.validation.constraints.NotNull;
 @Builder
 public class IcesiAccountRequestDTO {
     @Min(value = 0, message = "El balance de la cuenta debe ser mayor a 0.")
-    private long balance;
-    @NotNull
+    private Long balance;
+    @NotNull(message = "El tipo de cuenta no puede ser nulo.")
     private AccountType type;
-    @NotBlank
+    @NotBlank(message = "El usuario no puede ser nulo.")
     private String user;
 }

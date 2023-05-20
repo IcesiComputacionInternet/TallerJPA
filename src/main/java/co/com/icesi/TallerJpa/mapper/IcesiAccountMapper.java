@@ -9,5 +9,5 @@ import org.mapstruct.Mapper;
 public interface IcesiAccountMapper {
     IcesiAccount fromAccountDto(IcesiAccountRequestDTO icesiAccountRequestDTO);
     IcesiAccountRequestDTO fromIcesiAccount(IcesiAccount icesiAccount);
-    IcesiAccountResponseDTO fromIcesiAccountResponse(IcesiAccount icesiAccount);
+    IcesiAccountResponseDTO fromIcesiAccountToResponse(IcesiAccount icesiAccount);
 }

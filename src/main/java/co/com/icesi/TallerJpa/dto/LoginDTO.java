@@ -1,4 +1,13 @@
 package co.com.icesi.TallerJpa.dto;
 
-public record LoginDTO (String username, String password) {
+import javax.validation.constraints.NotBlank;
+import javax.validation.constraints.NotNull;
+
+public record LoginDTO (
+        @NotNull
+        @NotBlank
+        String username,
+        @NotNull
+        @NotBlank
+        String password) {
 }
