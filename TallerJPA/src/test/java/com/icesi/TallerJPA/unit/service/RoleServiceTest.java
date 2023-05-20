@@ -62,7 +62,7 @@ public class RoleServiceTest {
             fail();
         } catch (RuntimeException exception) {
             String message = exception.getMessage();
-            assertEquals("Name must be unique", message);
+            assertEquals("Role already exists", message);
         }
     }
 

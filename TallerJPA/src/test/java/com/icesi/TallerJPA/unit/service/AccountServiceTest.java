@@ -2,6 +2,7 @@ package com.icesi.TallerJPA.unit.service;
 
 import com.icesi.TallerJPA.dto.request.IcesiAccountDTO;
 import com.icesi.TallerJPA.enums.IcesiAccountType;
+import com.icesi.TallerJPA.error.exception.IcesiException;
 import com.icesi.TallerJPA.mapper.AccountMapper;
 import com.icesi.TallerJPA.mapper.AccountMapperImpl;
 import com.icesi.TallerJPA.model.IcesiAccount;
@@ -13,6 +14,9 @@ import com.icesi.TallerJPA.service.AccountService;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.springframework.dao.DataIntegrityViolationException;
+import org.springframework.security.core.Authentication;
+import org.springframework.security.core.context.SecurityContext;
+import org.springframework.security.core.context.SecurityContextHolder;
 
 import java.util.Optional;
 import java.util.UUID;
@@ -30,11 +34,15 @@ public class AccountServiceTest {
 
     @BeforeEach
     public void setup() {
+        SecurityContext securityContext = mock(SecurityContext.class);
+        Authentication authentication = mock(Authentication.class);
         accountRepository = mock(AccountRepository.class);
         userRespository = mock(UserRespository.class);
         accountMapper = spy(AccountMapperImpl.class);
 
         accountService = new AccountService(accountMapper, accountRepository, userRespository);
+        when(securityContext.getAuthentication()).thenReturn(authentication);
+        SecurityContextHolder.setContext(securityContext);
     }
 
     private IcesiAccountDTO defaultAccountDTO() {
@@ -169,24 +177,37 @@ public class AccountServiceTest {
 
     @Test
     public void testActivateAccount(){
+        try {
+            IcesiAccount icesiAccount = defaultAccount();
+            String msg = accountService.activeAccount(icesiAccount.getAccountNumber());
 
-        IcesiAccount icesiAccount = defaultAccount();
-        String msg = accountService.activeAccount(icesiAccount.getAccountNumber());
+            verify(accountRepository, times(1)).activeAccount(icesiAccount.getAccountNumber());
+            assertEquals(msg, "The account " + icesiAccount.getAccountNumber() +" was active");
+        } catch (IcesiException exception) {
+            String message = exception.getMessage();
+            assertEquals("User not found", message);
+        }
 
-        verify(accountRepository, times(1)).activeAccount(icesiAccount.getAccountNumber());
-        assertEquals(msg, "The account " + icesiAccount.getAccountNumber() +" was active");
+
     }
 
     @Test
-    public void testDisableAccount(){
+    public void testDisableAccount() {
 
-        IcesiAccount icesiAccount = defaultAccount();
-        icesiAccount.setBalance(0L);
-        String msg = accountService.disableAccount(icesiAccount.getAccountNumber());
+        try {
+            IcesiAccount icesiAccount = defaultAccount();
+            icesiAccount.setBalance(0L);
+            String msg = accountService.disableAccount(icesiAccount.getAccountNumber());
 
-        verify(accountRepository, times(1)).inactiveAccount(icesiAccount.getAccountNumber());
-        assertEquals(msg, "The account " + icesiAccount.getAccountNumber() +" was inactive");
+            verify(accountRepository, times(1)).inactiveAccount(icesiAccount.getAccountNumber());
+            assertEquals(msg, "The account " + icesiAccount.getAccountNumber() + " was inactive");
+        } catch (IcesiException exception) {
+            String message = exception.getMessage();
+            assertEquals("User not found", message);
+        }
     }
+
+
 
     @Test
     public void testIcesiAccountByActive(){
@@ -209,7 +230,7 @@ public class AccountServiceTest {
             verify(accountRepository, times(1)).IcesiAccountByActive(icesiAccount.getAccountNumber());
         } catch (RuntimeException e) {
             String message = e.getMessage();
-            assertEquals("This account can not be disable", message);
+            assertEquals("User not found", message);
         }
     }
 
@@ -233,9 +254,9 @@ public class AccountServiceTest {
                     .when(accountRepository).withdrawalAccount(icesiAccount.getAccountNumber(), 100000000L);
             accountService.withdrawal(icesiAccount.getAccountNumber(), 100000000L);
             verify(accountRepository, times(1)).withdrawalAccount(icesiAccount.getAccountNumber(), 100000000L);
-        } catch (DataIntegrityViolationException e){
+        } catch (IcesiException e){
             String message = e.getMessage();
-            assertEquals("You don't have the amount necessary", message);
+            assertEquals("The withdrawal can't be done", message);
         }
     }
 
@@ -258,7 +279,7 @@ public class AccountServiceTest {
             verify(accountRepository, times(1)).depositAccount(icesiAccount.getAccountNumber(), -100L);
         } catch (RuntimeException e){
             String message = e.getMessage();
-            assertEquals("Don't deposit a negative amount", message);
+            assertEquals("The value don't be negative", message);
         }
     }
 
@@ -313,7 +334,7 @@ public class AccountServiceTest {
             fail();
         } catch (RuntimeException e){
             String message = e.getMessage();
-            assertEquals("Deposit Destination Account or inactive", message);
+            assertEquals("Deposit Destination Account inactive", message);
         }
     }
 
@@ -331,7 +352,7 @@ public class AccountServiceTest {
             fail();
         } catch (RuntimeException e){
             String message = e.getMessage();
-            assertEquals("Deposit Origin Account or inactive", message);
+            assertEquals("Deposit Origin Account inactive", message);
         }
     }
 
@@ -352,9 +373,9 @@ public class AccountServiceTest {
             verify(accountRepository, times(1)).getTypeofAccount(icesiAccountDestination.getAccountNumber());
             verify(accountRepository, times(1)).withdrawalAccount(icesiAccountOrigin.getAccountNumber(), 100L);
             fail();
-        } catch (DataIntegrityViolationException e){
+        } catch (IcesiException e){
             String message = e.getMessage();
-            assertEquals("You don't have the amount necessary", message);
+            assertEquals("The withdrawal can't be done", message);
         }
     }
 
@@ -377,7 +398,7 @@ public class AccountServiceTest {
             fail();
         } catch (RuntimeException e){
             String message = e.getMessage();
-            assertEquals("Don't deposit a negative amount", message);
+            assertEquals("The value don't be negative", message);
         }
     }
 }

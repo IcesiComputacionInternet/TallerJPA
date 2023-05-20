@@ -19,7 +19,7 @@ public interface AccountRepository extends JpaRepository<IcesiAccount, UUID> {
     void activeAccount(@Param("accountNumber") String accountNumber);
 
     @Modifying
-    @Query("UPDATE IcesiAccount a SET a.active = false WHERE a.accountNumber = :accountNumber")
+    @Query("UPDATE IcesiAccount a SET a.active = false WHERE a.accountNumber = :accountNumber AND a.balance = 0")
     void inactiveAccount(@Param("accountNumber") String accountNumber);
 
     @Query("SELECT a.active FROM IcesiAccount a WHERE a.accountNumber = :accountNumber")

@@ -8,7 +8,6 @@ import com.icesi.TallerJPA.model.IcesiUser;
 import com.icesi.TallerJPA.repository.RoleRepository;
 import com.icesi.TallerJPA.repository.UserRespository;
 import com.icesi.TallerJPA.service.UserService;
-import com.icesi.TallerJPA.unit.matcher.UserMatcher;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 
@@ -66,19 +65,25 @@ public class UserServiceTest {
                 .build();
     }
 
-    /*
+
     @Test
     public void testSaveUser() {
 
         when(roleRepository.findIcesiRoleByName(any())).thenReturn(Optional.of(defaultRole()));
+        when(userRespository.existsByEmail(anyString())).thenReturn(false);
+        when(userRespository.existsByPhoneNumber(anyString())).thenReturn(false);
+        when(userMapper.fromIcesiUser(any(IcesiUserDTO.class))).thenReturn(defaultUser());
 
         userService.save(defaultUserDTO());
-        IcesiUser icesiUser = defaultUser();
 
-        verify(userRespository, times(1)).save(argThat(new UserMatcher(icesiUser)));
-        verify(userMapper, times(1)).fromIcesiUser(defaultUserDTO());
+        verify(roleRepository, times(1)).findIcesiRoleByName(anyString());
+        verify(userRespository, times(1)).existsByEmail(anyString());
+        verify(userRespository, times(1)).existsByPhoneNumber(anyString());
+        verify(userMapper, times(1)).fromIcesiUser(any(IcesiUserDTO.class));
+        verify(userRespository, times(1)).save(any(IcesiUser.class));
+
+
     }
-    */
 
     @Test
     public void testSaveUserWhenEmailAlreadyExists() {
@@ -113,7 +118,7 @@ public class UserServiceTest {
             fail();
         } catch (RuntimeException exception) {
             String message = exception.getMessage();
-            assertEquals("Email and Phone is repeated", message);
+            assertEquals("Email and phone are repeated", message);
         }
     }
 
