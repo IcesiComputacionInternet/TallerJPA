@@ -32,13 +32,12 @@ class TallerJpaApplicationTests {
 
 	@Test
 	public void testTokenEndpoint() throws Exception {
-		var result = mockMvc.perform(MockMvcRequestBuilders.post("/token").content(
-				objectMapper.writeValueAsString(new IcesiLoginDTO("johndoe2@email.com", "password"))
+		var result = mockMvc.perform(MockMvcRequestBuilders.post("/login").content(
+				objectMapper.writeValueAsString(new IcesiLoginDTO("user@email.com", "password"))
 				)
 						.contentType(MediaType.APPLICATION_JSON)
 						.accept(MediaType.APPLICATION_JSON))
 					.andExpect(status().isOk())
 					.andReturn();
-		System.out.println(result.getResponse().getContentAsString());
 	}
 }
