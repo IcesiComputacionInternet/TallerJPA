@@ -12,10 +12,8 @@ import javax.validation.constraints.NotBlank;
 @Data
 @Builder
 public class AccountCreateDTO {
-    //private String accountNumber;
 
     @Min(value = 0, message = "The balance must be greater than 0")
-    @Max(value = 100)
     private long balance;
 
     @NotBlank

@@ -77,8 +77,23 @@ public class SecurityConfiguration {
                 = RequestMatcherDelegatingAuthorizationManager.builder()
                 .add(permitAll,(context,other)-> new AuthorizationDecision(true));
 
-        managerBuilder.add(new MvcRequestMatcher(introspector,"/**"),
+        //Paths that require user role
+        managerBuilder.add(new MvcRequestMatcher(introspector,"/accounts/**"),
+                AuthorityAuthorizationManager.hasAnyAuthority("SCOPE_USER"));
+
+        //Paths that require admin role
+
+        //admin user should be able to create roles
+        managerBuilder.add(new MvcRequestMatcher(introspector,"/roles"),
                 AuthorityAuthorizationManager.hasAnyAuthority("SCOPE_ADMIN"));
+
+        //This is a path that requires bank role
+        //admin user should be able to create users and assign roles
+        managerBuilder.add(new MvcRequestMatcher(introspector,"/users"),
+                AuthorityAuthorizationManager.hasAnyAuthority("SCOPE_ADMIN","SCOPE_BANK"));
+
+
+
 
         AuthorizationManager<HttpServletRequest> manager = managerBuilder.build();
         return (authentication, object) -> manager.check(authentication,object.getRequest());

@@ -14,6 +14,8 @@ public interface IcesiUserAPI {
 
     String BASE_USER_URL = "/users";
 
+    @PostMapping
+    UserResponseDTO createIcesiUser(@Valid @RequestBody UserCreateDTO user);
 
     @GetMapping("/{userEmail}")
     UserResponseDTO getUserByEmail(@PathVariable String userEmail);
@@ -22,6 +24,5 @@ public interface IcesiUserAPI {
     List<UserResponseDTO> getAllUsers();
 
 
-    @PostMapping
-    UserResponseDTO createIcesiUser(@RequestBody @Valid UserCreateDTO user);
+
 }

@@ -10,6 +10,7 @@ public enum ErrorCode {
     ERR_403("ERR_403", "%s and %s already exists"),
     ERR_406("ERR_406", "%s already exists"),
     ERR_500("ERR_500", "Oops, we ran into an error"),
+    ERR_500_ACC("ERR_500", "Oops, we ran into an error because %s"),
     ERR_400("ERR_400", "field %s %s"),
     ERR_REQUIRED_FIELD("ERR_REQUIRED_FIELD", "field %s is required"),
     ERR_NOT_EXITS("ERR_NOT_EXIST","The %s not exists"),

@@ -1,8 +1,5 @@
 package co.com.icesi.TallerJPA.validation.validateEmailorPhone;
 
-
-
-
 import javax.validation.Constraint;
 import javax.validation.Payload;
 import java.lang.annotation.*;

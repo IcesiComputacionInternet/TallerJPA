@@ -20,7 +20,7 @@ public class RoleService {
     private final RoleRepository roleRepository;
     private final RoleMapper roleMapper;
 
-    public IcesiRole save(RoleCreateDTO role) {
+    public RoleCreateDTO save(RoleCreateDTO role) {
         boolean name = roleRepository.findByName(role.getName());
         if (name) {
             throw ArgumentsExceptionBuilder.createArgumentsException(
@@ -32,11 +32,12 @@ public class RoleService {
         }
         IcesiRole icesiRole = roleMapper.fromIcesiRoleDTO(role);
         icesiRole.setRoleId(UUID.randomUUID());
-        return roleRepository.save(icesiRole);
+        return roleMapper.fromICesiRole(roleRepository.save(icesiRole));
+
     }
 
-    public IcesiRole getRoleByName(String roleName) {
-        return roleRepository.returnRole(roleName).orElse(null);
+    public RoleCreateDTO getRoleByName(String roleName) {
+        return roleMapper.fromICesiRole(roleRepository.returnRole(roleName).orElse(null));
     }
 
     public List<IcesiRole> getAllRoles() {

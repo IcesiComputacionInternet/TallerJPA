@@ -12,8 +12,6 @@ import javax.validation.constraints.NotNull;
 @Builder
 public class RoleCreateDTO {
     private String description;
-
     @NotBlank
-    @NotNull
     private String name;
 }

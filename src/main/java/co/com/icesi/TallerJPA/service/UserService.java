@@ -1,5 +1,6 @@
 package co.com.icesi.TallerJPA.service;
 
+import co.com.icesi.TallerJPA.config.PasswordEncoderConfiguration;
 import co.com.icesi.TallerJPA.dto.UserCreateDTO;
 import co.com.icesi.TallerJPA.dto.response.UserResponseDTO;
 import co.com.icesi.TallerJPA.error.util.DetailBuilder;
@@ -24,6 +25,7 @@ public class UserService {
     private final RoleRepository roleRepository;
     private final UserMapper userMapper;
     private final UserResponseMapper userResponseMapper;
+    private final PasswordEncoderConfiguration passwordEncoderConfiguration;
 
 
     public UserResponseDTO save(UserCreateDTO user) {
@@ -76,6 +78,7 @@ public class UserService {
         ));
 
         icesiUser.setUserId(UUID.randomUUID());
+        icesiUser.setPassword(passwordEncoderConfiguration.passwordEncoder().encode(user.getPassword()));
         //userResponseMapper.fromICesiUSer(userRepository.save(userMapper.fromIcesiUserDTO(user)));
         UserResponseDTO userResponseDTO = userResponseMapper.fromICesiUSer(userRepository.save(icesiUser));
         userResponseDTO.setUserId(icesiUser.getUserId());

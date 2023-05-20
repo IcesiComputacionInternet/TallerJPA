@@ -10,7 +10,7 @@ public class DetailBuilder {
     private final ErrorCode errorCode;
     private final Object[] fields;
 
-    public DetailBuilder(ErrorCode errorCode, Object... fields){
+    public DetailBuilder(ErrorCode errorCode, Object... fields){ //... zero or more Objects may be passed
         this.errorCode = errorCode;
         this.fields = fields;
     }

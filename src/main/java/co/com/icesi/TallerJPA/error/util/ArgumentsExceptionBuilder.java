@@ -11,15 +11,15 @@ import java.util.function.Supplier;
 public class ArgumentsExceptionBuilder {
 
     public static Supplier<ArgumentsException> createArgumentsExceptionSup(String message, HttpStatus httpStatus,DetailBuilder... details){
-        return () -> new ArgumentsException(message,createArgumentsError(message, HttpStatus.BAD_REQUEST,details));
+        return () -> new ArgumentsException(message,createArgumentsError(HttpStatus.BAD_REQUEST,details));
 
     }
 
     public static ArgumentsException createArgumentsException(String message, HttpStatus httpStatus,DetailBuilder... details) {
-        return new ArgumentsException(message, createArgumentsError(message, httpStatus, details));
+        return new ArgumentsException(message, createArgumentsError(httpStatus, details));
     }
 
-    public static ArgumentsError createArgumentsError(String message,HttpStatus httpStatus,DetailBuilder... details){
+    public static ArgumentsError createArgumentsError(HttpStatus httpStatus,DetailBuilder... details){
         return ArgumentsError.builder()
                 .status(httpStatus)
                 .details(

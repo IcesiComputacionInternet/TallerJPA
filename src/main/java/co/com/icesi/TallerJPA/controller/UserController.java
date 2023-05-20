@@ -7,15 +7,21 @@ import co.com.icesi.TallerJPA.service.UserService;
 import lombok.AllArgsConstructor;
 import org.springframework.web.bind.annotation.*;
 
-import javax.validation.Valid;
+
 import java.util.List;
 
-import static co.com.icesi.TallerJPA.api.IcesiUserAPI.BASE_USER_URL;
+
 
 @RestController
 @AllArgsConstructor
 public class UserController implements IcesiUserAPI {
     private final UserService userService;
+
+
+    @Override
+    public UserResponseDTO createIcesiUser(UserCreateDTO user) {
+        return userService.save(user);
+    }
 
     @Override
     public UserResponseDTO getUserByEmail(String userEmail) {
@@ -25,11 +31,6 @@ public class UserController implements IcesiUserAPI {
     @Override
     public List<UserResponseDTO> getAllUsers() {
         return userService.getAllUsers();
-    }
-
-    @Override
-    public UserResponseDTO createIcesiUser(@RequestBody @Valid UserCreateDTO user) {
-        return userService.save(user);
     }
 
 

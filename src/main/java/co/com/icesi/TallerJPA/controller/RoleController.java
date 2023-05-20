@@ -17,7 +17,12 @@ public class RoleController implements IcesiRoleAPI {
     private final RoleService roleService;
 
     @Override
-    public IcesiRole getRoleByName(String roleName) {
+    public RoleCreateDTO createIcesiRole(RoleCreateDTO role) {
+        return roleService.save(role);
+    }
+
+    @Override
+    public RoleCreateDTO getRoleByName(String roleName) {
         return roleService.getRoleByName(roleName);
     }
 
@@ -26,8 +31,5 @@ public class RoleController implements IcesiRoleAPI {
         return roleService.getAllRoles();
     }
 
-    @Override
-    public IcesiRole createIcesiRole(@RequestBody RoleCreateDTO role) {
-        return roleService.save(role);
-    }
+
 }

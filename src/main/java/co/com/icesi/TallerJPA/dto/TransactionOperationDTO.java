@@ -4,6 +4,7 @@ import lombok.Builder;
 import lombok.Data;
 
 
+import javax.validation.constraints.Min;
 import javax.validation.constraints.NotBlank;
 import javax.validation.constraints.NotNull;
 
@@ -11,12 +12,11 @@ import javax.validation.constraints.NotNull;
 @Builder
 public class TransactionOperationDTO {
 
-    @NotNull
-    private String accountFrom;
-    @NotNull
-    private String accountTo;
 
+    private String accountFrom;
+    private String accountTo;
     @NotBlank
+    @Min(value = 0, message = "The amount must be greater than 0")
     private Long amount;
     private String result;
 }

@@ -18,6 +18,36 @@ public class AccountController implements IcesiAccountAPI {
     private final AccountService accountService;
 
     @Override
+    public AccountResponseDTO createIcesiAccount(AccountCreateDTO account) {
+        return accountService.save(account);
+    }
+
+    @Override
+    public String enableAccount(String accountNumber) {
+        return accountService.enableAccount(accountNumber);
+    }
+
+    @Override
+    public String disableAccount(String accountNumber) {
+        return accountService.disableAccount(accountNumber);
+    }
+
+    @Override
+    public TransactionOperationDTO withdraw(TransactionOperationDTO transaction){
+        return accountService.withdraw(transaction);
+    }
+
+    @Override
+    public TransactionOperationDTO deposit(TransactionOperationDTO transaction) {
+        return accountService.deposit(transaction);
+    }
+
+    @Override
+    public TransactionOperationDTO transfer(TransactionOperationDTO transaction) {
+        return accountService.transfer(transaction);
+    }
+
+    @Override
     public AccountResponseDTO getAccountByNumber(String accountNumber) {
         return accountService.getAccountByNumber(accountNumber);
     }
@@ -26,46 +56,6 @@ public class AccountController implements IcesiAccountAPI {
     public List<AccountResponseDTO> getAllAccounts() {
         return accountService.getAllAccounts();
     }
-
-    @Override
-    public AccountResponseDTO createIcesiAccount(@RequestBody AccountCreateDTO account) {
-        return accountService.save(account);
-    }
-
-    @Override
-    public String enableAccount(@PathVariable String accountNumber) {
-        return accountService.enableAccount(accountNumber);
-    }
-
-    @Override
-    public String disableAccount(@PathVariable String accountNumber) {
-        return accountService.disableAccount(accountNumber);
-    }
-
-    @Override
-    public TransactionOperationDTO withdraw(@RequestBody TransactionOperationDTO transaction){
-        return accountService.withdraw(transaction);
-    }
-
-    @Override
-    public TransactionOperationDTO deposit(@RequestBody TransactionOperationDTO transaction) {
-        return accountService.deposit(transaction);
-    }
-
-    @Override
-    public TransactionOperationDTO transfer(@RequestBody TransactionOperationDTO transaction) {
-        return accountService.transfer(transaction);
-    }
-
-
-    /*
-    Me falta
-    lo del DTO de las operaciones
-    revisar el metodo de transferencia
-
-
-     */
-
 
 
 
