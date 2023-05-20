@@ -165,9 +165,7 @@ public class AccountService {
 
     private boolean verifyAccountOwner(String accountNumber){
         String userId = IcesiSecurityContext.getCurrentUserId();
-        System.out.println(userId);
         IcesiAccount accountFound = accountRepository.findByAccountNumber(accountNumber).get();
-        System.out.println(accountFound.getUser().getUserId().toString());
         return accountFound.getUser().getUserId().toString().equals(userId);
     }
 }
