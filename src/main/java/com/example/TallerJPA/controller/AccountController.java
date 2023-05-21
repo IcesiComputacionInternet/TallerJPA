@@ -5,6 +5,7 @@ import com.example.TallerJPA.dto.*;
 import com.example.TallerJPA.security.IcesiSecurityContext;
 import com.example.TallerJPA.service.AccountService;
 import lombok.AllArgsConstructor;
+import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
 
 import javax.validation.Valid;
@@ -13,6 +14,7 @@ import static com.example.TallerJPA.api.AccountAPI.BASE_ACCOUNT_URL;
 
 @AllArgsConstructor
 @RestController
+@Validated
 public class AccountController implements AccountAPI {
     private final AccountService accountService;
     @Override
@@ -45,7 +47,7 @@ public class AccountController implements AccountAPI {
         return accountService.disableAccount(accountNumber);
     }
     @Override
-    public void testPath(@RequestBody @Valid TransferRequestDTO transaction){
+    public void testPath(@Valid @RequestBody TransferRequestDTO transaction){
         System.out.println("It got here!");
     }
 
