@@ -37,7 +37,7 @@ import java.nio.charset.StandardCharsets;
 @AllArgsConstructor
 public class SecurityConfiguration {
 
-    private final String secret = "longenoughscrettotestjwtencrypt";
+    private final String secret = "longenoughscrettotestjwtencryptasdasdasasdas";
 
 
     private final IcesiAuthenticationManager authenticationManager;

@@ -1,6 +1,7 @@
 package co.com.icesi.demojpa.controller;
 
 
+import co.com.icesi.demojpa.api.RoleAPI;
 import co.com.icesi.demojpa.dto.RoleCreateDTO;
 import co.com.icesi.demojpa.model.IcesiRole;
 import co.com.icesi.demojpa.service.RoleService;
@@ -10,20 +11,20 @@ import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RestController;
 
-@RestController("/roles")
+@RestController
 @AllArgsConstructor
-public class RoleController {
+public class RoleController implements RoleAPI {
+
 
     private RoleService roleService;
 
-    //Debe devolver un DTO en vez de un normal
-    @PostMapping("/add")
-    public IcesiRole addRole(@RequestBody RoleCreateDTO role){
+    @Override
+    public RoleCreateDTO addRole(RoleCreateDTO role){
         return roleService.save(role);
     }
 
-    @GetMapping("/{roleId}")
-    public IcesiRole getRoleById(String roleId){
+    @Override
+    public RoleCreateDTO getRoleById(String roleId){
         return null;
     }
 }

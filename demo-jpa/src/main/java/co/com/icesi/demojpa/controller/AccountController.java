@@ -1,5 +1,7 @@
 package co.com.icesi.demojpa.controller;
 
+import co.com.icesi.demojpa.api.AccountAPI;
+import co.com.icesi.demojpa.dto.AccountCreateDTO;
 import co.com.icesi.demojpa.dto.TransactionOperationDTO;
 import co.com.icesi.demojpa.dto.TransactionResultDTO;
 import co.com.icesi.demojpa.service.AccountService;
@@ -8,26 +10,38 @@ import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RestController;
 
-@RestController("/accounts")
-public class AccountController {
+@RestController
+public class AccountController implements AccountAPI {
 
     private AccountService accountService;
 
-    @PatchMapping("/withdraw")
+    @Override
+    public AccountCreateDTO add(AccountCreateDTO account) {
+        return null;
+    }
+
+    @Override
     public TransactionResultDTO withdraw(@RequestBody TransactionOperationDTO transaction){
-        //cambiar método para recibir transactionoperationDTO
         return accountService.withdraw(transaction);
     }
 
-    @PatchMapping("/deposit")
+    @Override
     public TransactionResultDTO deposit(@RequestBody TransactionOperationDTO transaction){
-        //cambiar método para recibir transactionoperationDTO
         return accountService.deposit(transaction);
     }
 
-    @PatchMapping("/transfer")
+    @Override
     public TransactionResultDTO transfer(@RequestBody TransactionOperationDTO transaction){
-        //cambiar método para recibir transactionoperationDTO
         return accountService.transferMoney(transaction);
+    }
+
+    @Override
+    public String enableAccount(String accountNumber) {
+        return null;
+    }
+
+    @Override
+    public String disableAccount(String accountNumber) {
+        return null;
     }
 }
