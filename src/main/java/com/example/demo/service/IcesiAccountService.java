@@ -11,6 +11,7 @@ import org.springframework.stereotype.Service;
 
 import com.example.demo.DTO.IcesiAccountCreateDTO;
 import com.example.demo.DTO.ResponseIcesiAccountDTO;
+import com.example.demo.DTO.ResponseTransactionDTO;
 import com.example.demo.DTO.TransactionCreateDTO;
 import com.example.demo.error.exception.DetailBuilder;
 import com.example.demo.error.exception.ErrorCode;
@@ -19,6 +20,7 @@ import com.example.demo.model.IcesiAccount;
 import com.example.demo.model.IcesiUser;
 import com.example.demo.repository.IcesiAccountRepository;
 import com.example.demo.repository.IcesiUserRepository;
+import com.example.demo.error.util.IcesiExceptionBuilder;
 
 import lombok.AllArgsConstructor;
 
@@ -93,31 +95,37 @@ public class IcesiAccountService {
     }
 
     public ResponseTransactionDTO withdrawalMoney(TransactionCreateDTO transactionCreateDTO) {
-
-        IcesiAccount account = icesiAccountRepository.findByAccountNumber(transactionCreateDTO.getReceiverAccountNumber());
+        IcesiAccount account = findIcesiAccountByAccountNumber(transactionCreateDTO.getSenderAccountNumber());
 
         if(!account.isActive()) {
             throw new RuntimeException("Account is disabled, it is not possible to withdraw form it");
         } 
-        
-        if((account.getBalance() - amountToWithdraw) < 0) {
+
+        if((account.getBalance() - transactionCreateDTO.getAmount()) < 0) {
             throw new RuntimeException("This account does not have enough funds");
         }
-  
-        account.setBalance(account.getBalance() - amountToWithdraw);
+        
+        account.setBalance(account.getBalance() - transactionCreateDTO.getAmount());
 
         return icesiAccountMapper.fromTransactionCrateDTO(transactionCreateDTO);
     }
 
-    public ResponseTransactionDTO depositMoney(long amountToDeposit, IcesiAccountCreateDTO account) {
+    public ResponseTransactionDTO depositMoney(TransactionCreateDTO transactionCreateDTO) {
+        IcesiAccount account = findIcesiAccountByAccountNumber(transactionCreateDTO.getReceiverAccountNumber());
+
         if(!account.isActive()) {
             throw new RuntimeException("Account is disabled, it is not possible to deposit money to it");
         }
 
-        account.setBalance(account.getBalance() + amountToDeposit);
+        account.setBalance(account.getBalance() + transactionCreateDTO.getAmount());
+
+        return icesiAccountMapper.fromTransactionCrateDTO(transactionCreateDTO);
     }
 
-    public ResponseTransactionDTO transferMoneyToAnotherAccount(long amountToTransfer, IcesiAccountCreateDTO originAccount, IcesiAccountCreateDTO destinationAccount) {
+    public ResponseTransactionDTO transferMoneyToAnotherAccount(TransactionCreateDTO transactionCreateDTO) {
+        IcesiAccount originAccount = findIcesiAccountByAccountNumber(transactionCreateDTO.getSenderAccountNumber());
+        IcesiAccount destinationAccount = findIcesiAccountByAccountNumber(transactionCreateDTO.getReceiverAccountNumber());
+
         if(!originAccount.isActive()) {
             throw new RuntimeException("The origin account is disabled");
         }
@@ -126,26 +134,28 @@ public class IcesiAccountService {
             throw new RuntimeException("The destination account is disabled");
         }
 
-        if (originAccount.getType().name() == "deposit") {
+        if (originAccount.getType() == "deposit") {
             throw new RuntimeException("The origin account is not allowed to be transfer money");
         }
     
-        if(destinationAccount.getType().name() == "deposit") {
+        if(destinationAccount.getType() == "deposit") {
             throw new RuntimeException("The destination account is not allowed to be transferred money");
         }
         
-        if((originAccount.getBalance() - amountToTransfer) < 0) {
+        if((originAccount.getBalance() - transactionCreateDTO.getAmount()) < 0) {
             throw new RuntimeException("The origin account does not have enough funds");
         }
     
-        originAccount.setBalance(originAccount.getBalance() - amountToTransfer);
-        destinationAccount.setBalance(destinationAccount.getBalance() + amountToTransfer);
+        originAccount.setBalance(originAccount.getBalance() - transactionCreateDTO.getAmount());
+        destinationAccount.setBalance(destinationAccount.getBalance() + transactionCreateDTO.getAmount());
+
+        return icesiAccountMapper.fromTransactionCrateDTO(transactionCreateDTO);
     }
 
     private IcesiAccount findIcesiAccountByAccountNumber(String accountNumber) {
         return icesiAccountRepository.findByAccountNumber(accountNumber)
-        .orElseThrow(createIcesiException(
-                "There is no account with the number: " + accountNumber,
+        .orElseThrow(IcesiExceptionBuilder.createIcesiException(
+                "The account number" + accountNumber  + "is not present in the database",
                 HttpStatus.NOT_FOUND,
                 new DetailBuilder(ErrorCode.ERR_404, "account", "the number", accountNumber)
         ));

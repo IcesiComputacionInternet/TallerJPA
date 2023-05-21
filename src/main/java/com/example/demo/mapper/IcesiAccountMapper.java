@@ -13,6 +13,6 @@ public interface IcesiAccountMapper {
     
     IcesiAccount fromIcesiAccountCreateDTO(IcesiAccountCreateDTO IcesiAccountCreateDTO);
     ResponseIcesiAccountDTO fromIcesiAccountToResponseIcesiAccountDTO(IcesiAccount icesiAccount);
-    ResponseIcesiAccountDTO fromIcesiAccountCreateDTOToResponseIcesiAccountDTO(IcesiAccountCreateDTO icesiAccountCreateDTO)
+    ResponseIcesiAccountDTO fromIcesiAccountCreateDTOToResponseIcesiAccountDTO(IcesiAccountCreateDTO icesiAccountCreateDTO);
     ResponseTransactionDTO fromTransactionCrateDTO(TransactionCreateDTO transactionCreateDTO);
 }
