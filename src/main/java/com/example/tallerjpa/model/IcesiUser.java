@@ -25,10 +25,10 @@ public class IcesiUser {
     private String phoneNumber;
     private String password;
 
-    @JsonIgnore
     @OneToMany(mappedBy = "icesiUser")
     private List<IcesiAccount> accountList;
 
+    @JsonIgnore
     @ManyToOne
     @JoinColumn(name = "icesi_role_id")
     private IcesiRole icesiRole;

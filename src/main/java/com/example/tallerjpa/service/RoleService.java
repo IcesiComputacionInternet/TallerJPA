@@ -1,6 +1,7 @@
 package com.example.tallerjpa.service;
 
 import com.example.tallerjpa.dto.RoleDTO;
+import com.example.tallerjpa.error.exception.CustomException;
 import com.example.tallerjpa.mapper.RoleMapper;
 import com.example.tallerjpa.model.IcesiRole;
 import com.example.tallerjpa.repository.RoleRepository;
@@ -23,7 +24,7 @@ public class RoleService {
 
     public IcesiRole createRole(RoleDTO roleDTO){
         IcesiRole icesiRole = roleMapper.fromRoleDTO(roleDTO);
-        if(roleRepository.existsByName(roleDTO.getName())){throw new RuntimeException("Role's name must be unique");}
+        if(roleRepository.existsByName(roleDTO.getName())){throw new CustomException("Role's name must be unique");}
         icesiRole.setRoleId(UUID.randomUUID());
         return icesiRole;
     }

@@ -1,5 +1,16 @@
 package com.example.tallerjpa.dto;
 
 
-public record LoginDTO (String username, String password){
+import lombok.NonNull;
+
+import javax.validation.constraints.NotBlank;
+
+public record LoginDTO (
+
+        @NonNull
+        @NotBlank
+        String username,
+        @NonNull
+        @NotBlank
+        String password){
 }

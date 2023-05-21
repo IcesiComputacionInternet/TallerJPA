@@ -1,6 +1,7 @@
 package com.example.tallerjpa.service;
 
 import com.example.tallerjpa.dto.UserDTO;
+import com.example.tallerjpa.error.exception.CustomException;
 import com.example.tallerjpa.mapper.UserMapper;
 import com.example.tallerjpa.model.IcesiUser;
 import com.example.tallerjpa.repository.RoleRepository;
@@ -28,19 +29,19 @@ public class UserService {
         boolean existsByEmail = userRepository.existsByEmail(userDTO.getEmail());
         boolean existsByPhoneNumber = userRepository.existsByPhoneNumber(userDTO.getPhoneNumber());
         if (existsByEmail&&existsByPhoneNumber){
-            throw new RuntimeException("The email and the phone number already exists");
+            throw new CustomException("The email and the phone number already exists");
         }
         if (existsByEmail){
-            throw new RuntimeException("This email already exists");
+            throw new CustomException("This email already exists");
         }
         if (existsByPhoneNumber){
-            throw new RuntimeException("This phone number already exists");
+            throw new CustomException("This phone number already exists");
         }
         icesiUser.setUserId(UUID.randomUUID());
         if(userDTO.getRole().isEmpty()){
-            throw new RuntimeException("The role can't be null");
+            throw new CustomException("The role can't be null");
         }
-        icesiUser.setIcesiRole(roleRepository.searchByName(userDTO.getRole()).orElseThrow(()-> new RuntimeException("Role doesn't exists")));
+        icesiUser.setIcesiRole(roleRepository.searchByName(userDTO.getRole()).orElseThrow(()-> new CustomException("Role doesn't exists")));
         return icesiUser;
 
     }

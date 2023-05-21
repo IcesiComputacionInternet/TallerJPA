@@ -1,0 +1,24 @@
+-------------------------------------------------------------------------------
+Test set: com.example.tallerjpa.TallerJpaApplicationTests
+-------------------------------------------------------------------------------
+Tests run: 5, Failures: 1, Errors: 2, Skipped: 0, Time elapsed: 2.673 s <<< FAILURE! - in com.example.tallerjpa.TallerJpaApplicationTests
+testCreateRoleEndpoint  Time elapsed: 0.031 s  <<< FAILURE!
+java.lang.AssertionError: Status expected:<200> but was:<400>
+	at com.example.tallerjpa.TallerJpaApplicationTests.testCreateRoleEndpoint(TallerJpaApplicationTests.java:96)
+
+testCreateUserEndpoint  Time elapsed: 0.016 s  <<< ERROR!
+org.springframework.web.util.NestedServletException: Request processing failed; nested exception is org.springframework.dao.InvalidDataAccessApiUsageException: For queries with named parameters you need to provide names for method parameters; Use @Param for query method parameters, or when on Java 8+ use the javac flag -parameters; nested exception is java.lang.IllegalStateException: For queries with named parameters you need to provide names for method parameters; Use @Param for query method parameters, or when on Java 8+ use the javac flag -parameters
+	at com.example.tallerjpa.TallerJpaApplicationTests.testCreateUserEndpoint(TallerJpaApplicationTests.java:70)
+Caused by: org.springframework.dao.InvalidDataAccessApiUsageException: For queries with named parameters you need to provide names for method parameters; Use @Param for query method parameters, or when on Java 8+ use the javac flag -parameters; nested exception is java.lang.IllegalStateException: For queries with named parameters you need to provide names for method parameters; Use @Param for query method parameters, or when on Java 8+ use the javac flag -parameters
+	at com.example.tallerjpa.TallerJpaApplicationTests.testCreateUserEndpoint(TallerJpaApplicationTests.java:70)
+Caused by: java.lang.IllegalStateException: For queries with named parameters you need to provide names for method parameters; Use @Param for query method parameters, or when on Java 8+ use the javac flag -parameters
+	at com.example.tallerjpa.TallerJpaApplicationTests.testCreateUserEndpoint(TallerJpaApplicationTests.java:70)
+
+testTransferMoneyEndpoint  Time elapsed: 0.009 s  <<< ERROR!
+org.springframework.web.util.NestedServletException: Request processing failed; nested exception is org.springframework.dao.InvalidDataAccessApiUsageException: For queries with named parameters you need to provide names for method parameters; Use @Param for query method parameters, or when on Java 8+ use the javac flag -parameters; nested exception is java.lang.IllegalStateException: For queries with named parameters you need to provide names for method parameters; Use @Param for query method parameters, or when on Java 8+ use the javac flag -parameters
+	at com.example.tallerjpa.TallerJpaApplicationTests.testTransferMoneyEndpoint(TallerJpaApplicationTests.java:58)
+Caused by: org.springframework.dao.InvalidDataAccessApiUsageException: For queries with named parameters you need to provide names for method parameters; Use @Param for query method parameters, or when on Java 8+ use the javac flag -parameters; nested exception is java.lang.IllegalStateException: For queries with named parameters you need to provide names for method parameters; Use @Param for query method parameters, or when on Java 8+ use the javac flag -parameters
+	at com.example.tallerjpa.TallerJpaApplicationTests.testTransferMoneyEndpoint(TallerJpaApplicationTests.java:58)
+Caused by: java.lang.IllegalStateException: For queries with named parameters you need to provide names for method parameters; Use @Param for query method parameters, or when on Java 8+ use the javac flag -parameters
+	at com.example.tallerjpa.TallerJpaApplicationTests.testTransferMoneyEndpoint(TallerJpaApplicationTests.java:58)
+
