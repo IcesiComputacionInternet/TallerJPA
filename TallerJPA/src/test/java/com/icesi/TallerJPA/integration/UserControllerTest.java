@@ -37,7 +37,6 @@ class UserControllerTest {
 
 
     @Test
-    @Order(1)
     public void testCreateUserEndPointWhenUserIsNotAuth() throws Exception {
         var result = mockMvc.perform(post("/user").content(
                         objectMapper.writeValueAsString(
@@ -56,7 +55,6 @@ class UserControllerTest {
     }
 
     @Test
-    @Order(2)
     public void testCreateUserEndPointWhenUserAuthAdmin() throws Exception {
         var resultToken = mockMvc.perform(MockMvcRequestBuilders.post("/login").content(
                                 objectMapper.writeValueAsString(new IcesiLoginDTO("admin@email.com", "password"))
@@ -86,7 +84,6 @@ class UserControllerTest {
 
 
     @Test
-    @Order(3)
     public void testCreateUserEndPointWhenUserAuthBank() throws Exception {
         var resultToken = mockMvc.perform(MockMvcRequestBuilders.post("/login").content(
                                 objectMapper.writeValueAsString(new IcesiLoginDTO("bank@email.com", "password"))
@@ -115,7 +112,6 @@ class UserControllerTest {
     }
 
     @Test
-    @Order(3)
     public void testCreateUserEndPointWhenUserAuthUser() throws Exception {
         var resultToken = mockMvc.perform(MockMvcRequestBuilders.post("/login").content(
                                 objectMapper.writeValueAsString(new IcesiLoginDTO("user@email.com", "password"))
@@ -144,7 +140,6 @@ class UserControllerTest {
     }
 
     @Test
-    @Order(4)
     public void testValidationEmailOrPhoneCreateUserWhenAuthAdmin() throws Exception {
         var resultToken = mockMvc.perform(MockMvcRequestBuilders.post("/login").content(
                                 objectMapper.writeValueAsString(new IcesiLoginDTO("admin@email.com", "password"))
@@ -173,7 +168,6 @@ class UserControllerTest {
     }
 
     @Test
-    @Order(5)
     public void testValidationEmailCreateUserWhenAuthAdmin() throws Exception {
         var resultToken = mockMvc.perform(MockMvcRequestBuilders.post("/login").content(
                                 objectMapper.writeValueAsString(new IcesiLoginDTO("admin@email.com", "password"))
@@ -202,7 +196,6 @@ class UserControllerTest {
     }
 
     @Test
-    @Order(6)
     public void testValidationColombiaPhoneNumberCreateUserWhenAuthAdmin() throws Exception {
         var resultToken = mockMvc.perform(MockMvcRequestBuilders.post("/login").content(
                                 objectMapper.writeValueAsString(new IcesiLoginDTO("admin@email.com", "password"))
@@ -231,7 +224,6 @@ class UserControllerTest {
     }
 
     @Test
-    @Order(4)
     public void testValidationEmailOrPhoneCreateUserWhenAuthBank() throws Exception {
         var resultToken = mockMvc.perform(MockMvcRequestBuilders.post("/login").content(
                                 objectMapper.writeValueAsString(new IcesiLoginDTO("bank@email.com", "password"))
@@ -260,7 +252,6 @@ class UserControllerTest {
     }
 
     @Test
-    @Order(5)
     public void testValidationEmailCreateUserWhenAuthBank() throws Exception {
         var resultToken = mockMvc.perform(MockMvcRequestBuilders.post("/login").content(
                                 objectMapper.writeValueAsString(new IcesiLoginDTO("bank@email.com", "password"))
@@ -289,7 +280,6 @@ class UserControllerTest {
     }
 
     @Test
-    @Order(6)
     public void testValidationColombiaPhoneNumberCreateUserWhenAuthBank() throws Exception {
         var resultToken = mockMvc.perform(MockMvcRequestBuilders.post("/login").content(
                                 objectMapper.writeValueAsString(new IcesiLoginDTO("bank@email.com", "password"))

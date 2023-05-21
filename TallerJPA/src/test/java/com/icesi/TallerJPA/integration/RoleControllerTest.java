@@ -41,7 +41,6 @@ public class RoleControllerTest {
     }
 
     @Test
-    @Order(1)
     public void testCreateRoleWhenIsNotAuth() throws Exception {
         var result = mockMvc.perform(post("/role").content(
                         objectMapper.writeValueAsString(
@@ -56,7 +55,6 @@ public class RoleControllerTest {
     }
 
     @Test
-    @Order(2)
     public void testCreateRoleWhenAuthAdmin() throws Exception {
         var resultToken = mockMvc.perform(MockMvcRequestBuilders.post("/login").content(
                                 objectMapper.writeValueAsString(new IcesiLoginDTO("admin@email.com", "password"))
@@ -81,7 +79,6 @@ public class RoleControllerTest {
     }
 
     @Test
-    @Order(3)
     public void testValidationEmptyDescriptionWhenAuthAdmin() throws Exception {
         var resultToken = mockMvc.perform(MockMvcRequestBuilders.post("/login").content(
                                 objectMapper.writeValueAsString(new IcesiLoginDTO("admin@email.com", "password"))
@@ -106,7 +103,6 @@ public class RoleControllerTest {
     }
 
     @Test
-    @Order(3)
     public void testValidationEmptyNameWhenAuthAdmin() throws Exception {
         var resultToken = mockMvc.perform(MockMvcRequestBuilders.post("/login").content(
                                 objectMapper.writeValueAsString(new IcesiLoginDTO("admin@email.com", "password"))

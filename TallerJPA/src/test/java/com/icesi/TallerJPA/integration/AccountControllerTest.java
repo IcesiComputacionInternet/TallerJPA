@@ -43,7 +43,6 @@ class AccountControllerTest {
 
 
     @Test
-    @Order(1)
     public void testTransferMoneyEndPointWhenUserIsNotAuth() throws Exception {
         var result = mockMvc.perform(
                         patch("/account/transfer/{accountNumberOrigin}/{accountNumberDestination}", "1", "2")
@@ -56,7 +55,6 @@ class AccountControllerTest {
     }
 
     @Test
-    @Order(2)
     public void testTransferMoneyEndPointWhenAuthUser() throws Exception {
         var resultToken = mockMvc.perform(post("/login").content(
                                 objectMapper.writeValueAsString(new IcesiLoginDTO("user@email.com", "password"))
@@ -78,7 +76,6 @@ class AccountControllerTest {
     }
 
     @Test
-    @Order(3)
     public void testTransferMoneyEndPointWhenAuthAdmin() throws Exception {
         var resultToken = mockMvc.perform(post("/login").content(
                                 objectMapper.writeValueAsString(new IcesiLoginDTO("admin@email.com", "password"))
@@ -99,7 +96,6 @@ class AccountControllerTest {
     }
 
     @Test
-    @Order(3)
     public void testTransferMoneyEndPointWhenAuthBank() throws Exception {
         var resultToken = mockMvc.perform(post("/login").content(
                                 objectMapper.writeValueAsString(new IcesiLoginDTO("bank@email.com", "password"))
@@ -120,7 +116,6 @@ class AccountControllerTest {
     }
 
     @Test
-    @Order(4)
     public void testCreateUserWhenIsNotAuth() throws Exception {
         var result = mockMvc.perform(post("/account").content(
                                 objectMapper.writeValueAsString(
@@ -138,7 +133,6 @@ class AccountControllerTest {
     }
 
     @Test
-    @Order(5)
     public void testCreateUserWhenAuthUser() throws Exception {
         var resultToken = mockMvc.perform(post("/login").content(
                                 objectMapper.writeValueAsString(new IcesiLoginDTO("user@email.com", "password"))
@@ -166,7 +160,6 @@ class AccountControllerTest {
     }
 
     @Test
-    @Order(6)
     public void testCreateUserWhenAuthAdmin() throws Exception {
         var resultToken = mockMvc.perform(post("/login").content(
                                 objectMapper.writeValueAsString(new IcesiLoginDTO("admin@email.com", "password"))
@@ -194,7 +187,6 @@ class AccountControllerTest {
     }
 
     @Test
-    @Order(7)
     public void testCreateUserWhenAuthBank() throws Exception {
         var resultToken = mockMvc.perform(post("/login").content(
                                 objectMapper.writeValueAsString(new IcesiLoginDTO("bank@email.com", "password"))
