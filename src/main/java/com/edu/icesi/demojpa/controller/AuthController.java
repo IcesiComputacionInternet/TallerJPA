@@ -1,7 +1,7 @@
 package com.edu.icesi.demojpa.controller;
 
-import com.edu.icesi.demojpa.dto.LoginDTO;
-import com.edu.icesi.demojpa.dto.TokenDTO;
+import com.edu.icesi.demojpa.dto.request.LoginDTO;
+import com.edu.icesi.demojpa.dto.request.TokenDTO;
 import com.edu.icesi.demojpa.service.TokenService;
 import lombok.AllArgsConstructor;
 import org.springframework.security.authentication.AuthenticationManager;

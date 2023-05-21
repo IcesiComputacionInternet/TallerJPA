@@ -1,7 +1,7 @@
-package com.edu.icesi.demojpa;
+package com.edu.icesi.demojpa.integration;
 
-import com.edu.icesi.demojpa.dto.LoginDTO;
-import com.edu.icesi.demojpa.dto.TokenDTO;
+import com.edu.icesi.demojpa.dto.request.LoginDTO;
+import com.edu.icesi.demojpa.dto.request.TokenDTO;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -30,7 +30,7 @@ class DemoJpaApplicationTests {
 	void contextLoads() {
 	}
 
-/*	@Test
+	@Test
 	public void testTokenEndPoint() throws Exception{
 		var result = mockMvc.perform(MockMvcRequestBuilders.post("/token").content(
 				objectMapper.writeValueAsString(new LoginDTO("johndoe@email.com", "password")))
@@ -40,7 +40,7 @@ class DemoJpaApplicationTests {
 				.andReturn();
 		TokenDTO token = objectMapper.readValue(result.getResponse().getContentAsString(),TokenDTO.class);
 		assertNotNull(token);
-	}*/
+	}
 
 /*	@Test
 	public void testTokenEndpointWithInvalidEmail() throws Exception{

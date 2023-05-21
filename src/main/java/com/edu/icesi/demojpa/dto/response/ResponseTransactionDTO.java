@@ -1,11 +1,12 @@
-package com.edu.icesi.demojpa.dto;
+package com.edu.icesi.demojpa.dto.response;
 
 import lombok.Builder;
 import lombok.Data;
 
 @Data
 @Builder
-public class RequestTransactionDTO {
+public class ResponseTransactionDTO {
+    private String result;
     private String accountFrom;
     private String accountTo;
     private long amount;

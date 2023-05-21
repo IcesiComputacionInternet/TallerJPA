@@ -1,6 +1,8 @@
 package com.edu.icesi.demojpa.unit.service.Test;
 
-import com.edu.icesi.demojpa.dto.RoleDTO;
+import com.edu.icesi.demojpa.dto.request.RoleDTO;
+import com.edu.icesi.demojpa.error.exception.IcesiException;
+import com.edu.icesi.demojpa.error.util.IcesiExceptionBuilder;
 import com.edu.icesi.demojpa.mapper.RoleMapper;
 import com.edu.icesi.demojpa.mapper.RoleMapperImpl;
 import com.edu.icesi.demojpa.model.IcesiRole;
@@ -40,7 +42,7 @@ public class RoleServiceTest {
         when(roleRepository.findRoleByName(any())).thenReturn(Optional.ofNullable(defaultIcesiRole()));
         try{
             roleService.save(defaultRoleDTO());
-        }catch (RuntimeException exception){
+        }catch (IcesiException exception){
             String message = exception.getMessage();
             assertEquals("This role is already in use", message);
         }

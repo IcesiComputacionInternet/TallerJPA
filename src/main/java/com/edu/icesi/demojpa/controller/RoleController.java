@@ -1,7 +1,7 @@
 package com.edu.icesi.demojpa.controller;
 
 import com.edu.icesi.demojpa.api.RoleAPI;
-import com.edu.icesi.demojpa.dto.RoleDTO;
+import com.edu.icesi.demojpa.dto.request.RoleDTO;
 import com.edu.icesi.demojpa.service.RoleService;
 import lombok.AllArgsConstructor;
 import org.springframework.web.bind.annotation.RequestMapping;

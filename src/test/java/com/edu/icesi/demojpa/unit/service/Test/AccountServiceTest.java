@@ -1,10 +1,12 @@
 package com.edu.icesi.demojpa.unit.service.Test;
 
 import com.edu.icesi.demojpa.Enum.AccountType;
-import com.edu.icesi.demojpa.dto.RequestAccountDTO;
-import com.edu.icesi.demojpa.dto.RequestTransactionDTO;
-import com.edu.icesi.demojpa.dto.ResponseAccountDTO;
-import com.edu.icesi.demojpa.dto.ResponseTransactionDTO;
+import com.edu.icesi.demojpa.dto.request.RequestAccountDTO;
+import com.edu.icesi.demojpa.dto.request.RequestTransactionDTO;
+import com.edu.icesi.demojpa.dto.response.ResponseAccountDTO;
+import com.edu.icesi.demojpa.dto.response.ResponseTransactionDTO;
+import com.edu.icesi.demojpa.error.exception.IcesiException;
+import com.edu.icesi.demojpa.error.util.IcesiExceptionBuilder;
 import com.edu.icesi.demojpa.mapper.AccountMapper;
 import com.edu.icesi.demojpa.mapper.AccountMapperImpl;
 import com.edu.icesi.demojpa.model.IcesiAccount;
@@ -17,7 +19,6 @@ import com.edu.icesi.demojpa.unit.service.Matcher.IcesiAccountMatcher;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 
-import javax.swing.text.html.Option;
 import java.util.Optional;
 import java.util.UUID;
 
@@ -60,12 +61,14 @@ public class AccountServiceTest {
     @Test
     public void testEnableAccount() {
         IcesiAccount account = defaultIcesiAccount();
+        RequestAccountDTO requestAccountDTO = defaultAccountDTO();
         account.setBalance(0L);
         account.setActive(false);
 
         when(accountRepository.findAccountByAccountNumber(account.getAccountNumber(), true)).thenReturn(Optional.of(account));
+        when(accountRepository.isOwnerAccount(requestAccountDTO.getIcesiUserId(), requestAccountDTO.getAccountNumber())).thenReturn(true);
 
-        ResponseAccountDTO response = accountService.enableAccount(defaultAccountDTO());
+        ResponseAccountDTO response = accountService.enableAccount(requestAccountDTO);
 
         verify(accountRepository, times(1)).findAccountByAccountNumber("000-000000-00", true);
         verify(accountRepository, times(1)).save(any());
@@ -77,13 +80,15 @@ public class AccountServiceTest {
     @Test
     public void testEnableNotFoundAccount() {
         IcesiAccount account = defaultIcesiAccount();
+        RequestAccountDTO requestAccountDTO = defaultAccountDTO();
         account.setActive(false);
 
         when(accountRepository.findAccountByAccountNumber(account.getAccountNumber(), true)).thenReturn(Optional.empty());
+        when(accountRepository.isOwnerAccount(requestAccountDTO.getIcesiUserId(), requestAccountDTO.getAccountNumber())).thenReturn(true);
 
         try {
-            accountService.enableAccount(defaultAccountDTO());
-        } catch (RuntimeException exception) {
+            accountService.enableAccount(requestAccountDTO);
+        } catch (IcesiException exception) {
             String message = exception.getMessage();
             assertEquals("Account with number 000-000000-00 can't be enabled", message);
             assertFalse(account.isActive());
@@ -117,7 +122,7 @@ public class AccountServiceTest {
 
         try {
             accountService.disableAccount(defaultAccountDTO());
-        } catch (RuntimeException exception) {
+        } catch (IcesiException exception) {
             String message = exception.getMessage();
             assertEquals("Account with number 000-000000-00 can't be disabled", message);
             assertTrue(account.isActive());
@@ -131,7 +136,7 @@ public class AccountServiceTest {
 
         try {
             accountService.disableAccount(defaultAccountDTO());
-        } catch (RuntimeException exception) {
+        } catch (IcesiException exception) {
             String message = exception.getMessage();
             assertEquals("The account couldn't be deactivated because it is funded", message);
         }
@@ -154,7 +159,7 @@ public class AccountServiceTest {
         when(accountRepository.findAccountByAccountNumber("000-000000-00", true)).thenReturn(Optional.empty());
         try {
             accountService.withdraw(defaultTransactionDTO());
-        } catch (RuntimeException exception) {
+        } catch (IcesiException exception) {
             String message = exception.getMessage();
             assertEquals("The withdrawal wasn't successful", message);
         }
@@ -182,7 +187,7 @@ public class AccountServiceTest {
         when(accountRepository.findAccountByAccountNumber("000-000000-00", true)).thenReturn(Optional.of(account));
         try {
             accountService.withdraw(defaultTransactionDTO());
-        } catch (RuntimeException exception) {
+        } catch (IcesiException exception) {
             String message = exception.getMessage();
             assertEquals("The account with number 000-000000-00 doesn't have sufficient funds", message);
         }
@@ -206,8 +211,7 @@ public class AccountServiceTest {
 
         try{
             accountService.deposit(defaultTransactionDTO());
-
-        }catch (RuntimeException exception){
+        }catch (IcesiException exception){
             String message = exception.getMessage();
             assertEquals("The deposit wasn't successful", message);
         }
@@ -217,12 +221,11 @@ public class AccountServiceTest {
     public void testDepositAccountDisabled() {
         IcesiAccount account = defaultIcesiAccount();
         account.setActive(false);
-
         when(accountRepository.findAccountByAccountNumber("000-000000-00", true)).thenReturn(Optional.of(account));
+
         try{
             accountService.deposit(defaultTransactionDTO());
-
-        }catch (RuntimeException exception){
+        }catch (IcesiException exception){
             String message = exception.getMessage();
             assertEquals("The deposit wasn't successful", message);
         }
@@ -244,7 +247,6 @@ public class AccountServiceTest {
         when(accountRepository.findAccountByAccountNumber("000-000000-01", true)).thenReturn(Optional.of(accountTo));
 
         ResponseTransactionDTO transaction = accountService.transfer(defaultTransactionDTO());
-
 
         verify(accountRepository, times(1)).findAccountByAccountNumber("000-000000-00", true);
         verify(accountRepository, times(1)).findAccountByAccountNumber("000-000000-01", true);
@@ -271,7 +273,7 @@ public class AccountServiceTest {
 
         try {
             accountService.transfer(defaultTransactionDTO());
-        } catch (RuntimeException exception) {
+        } catch (IcesiException exception) {
             String message = exception.getMessage();
             assertEquals("The account with number 000-000000-00 can't transfer money", message);
         }
@@ -294,7 +296,7 @@ public class AccountServiceTest {
 
         try {
             accountService.transfer(defaultTransactionDTO());
-        } catch (RuntimeException exception) {
+        } catch (IcesiException exception) {
             String message = exception.getMessage();
             assertEquals("The account with number 000-000000-01 can't be transferred money", message);
         }
@@ -318,7 +320,7 @@ public class AccountServiceTest {
 
         try {
             accountService.transfer(defaultTransactionDTO());
-        } catch (RuntimeException exception) {
+        } catch (IcesiException exception) {
             String message = exception.getMessage();
             assertEquals("The account with number 000-000000-00 doesn't have sufficient funds", message);
         }

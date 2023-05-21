@@ -1,10 +1,10 @@
 package com.edu.icesi.demojpa.controller;
 
 import com.edu.icesi.demojpa.api.AccountAPI;
-import com.edu.icesi.demojpa.dto.RequestAccountDTO;
-import com.edu.icesi.demojpa.dto.RequestTransactionDTO;
-import com.edu.icesi.demojpa.dto.ResponseAccountDTO;
-import com.edu.icesi.demojpa.dto.ResponseTransactionDTO;
+import com.edu.icesi.demojpa.dto.request.RequestAccountDTO;
+import com.edu.icesi.demojpa.dto.request.RequestTransactionDTO;
+import com.edu.icesi.demojpa.dto.response.ResponseAccountDTO;
+import com.edu.icesi.demojpa.dto.response.ResponseTransactionDTO;
 import com.edu.icesi.demojpa.service.AccountService;
 import lombok.AllArgsConstructor;
 import org.springframework.web.bind.annotation.RequestMapping;

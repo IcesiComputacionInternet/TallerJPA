@@ -1,7 +1,7 @@
 package com.edu.icesi.demojpa.service;
 
 import com.edu.icesi.demojpa.config.CustomAuthentication;
-import com.edu.icesi.demojpa.dto.TokenDTO;
+import com.edu.icesi.demojpa.dto.request.TokenDTO;
 import lombok.AllArgsConstructor;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.GrantedAuthority;

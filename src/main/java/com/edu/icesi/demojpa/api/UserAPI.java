@@ -1,7 +1,7 @@
 package com.edu.icesi.demojpa.api;
 
-import com.edu.icesi.demojpa.dto.RequestUserDTO;
-import com.edu.icesi.demojpa.dto.ResponseUserDTO;
+import com.edu.icesi.demojpa.dto.request.RequestUserDTO;
+import com.edu.icesi.demojpa.dto.response.ResponseUserDTO;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;

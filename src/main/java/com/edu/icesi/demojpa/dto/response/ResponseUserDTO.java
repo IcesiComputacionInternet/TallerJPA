@@ -1,11 +1,11 @@
-package com.edu.icesi.demojpa.dto;
+package com.edu.icesi.demojpa.dto.response;
 
 import lombok.Builder;
 import lombok.Data;
 
 @Data
 @Builder
-public class RequestUserDTO {
+public class ResponseUserDTO {
     private String firstName;
     private String lastName;
     private String email;

@@ -1,7 +1,9 @@
 package com.edu.icesi.demojpa.service;
 
-import com.edu.icesi.demojpa.dto.RequestUserDTO;
-import com.edu.icesi.demojpa.dto.ResponseUserDTO;
+import com.edu.icesi.demojpa.dto.request.RequestUserDTO;
+import com.edu.icesi.demojpa.dto.response.ResponseUserDTO;
+import com.edu.icesi.demojpa.error.exception.IcesiException;
+import com.edu.icesi.demojpa.error.util.IcesiExceptionBuilder;
 import com.edu.icesi.demojpa.mapper.UserMapper;
 import com.edu.icesi.demojpa.model.IcesiRole;
 import com.edu.icesi.demojpa.model.IcesiUser;
@@ -21,24 +23,25 @@ public class UserService {
     private final UserRepository userRepository;
     private final RoleRepository roleRepository;
     private final UserMapper userMapper;
+    private final IcesiExceptionBuilder icesiExceptionBuilder = new IcesiExceptionBuilder();
 
     public ResponseUserDTO save(RequestUserDTO user){
         boolean emailInUse = userRepository.isEmailInUse(user.getEmail()).isPresent();
         boolean phoneNumberInUse = userRepository.isPhoneNumberInUse(user.getPhoneNumber()).isPresent();
         IcesiRole role = roleRepository.findRoleByName(user.getRoleType()).orElseThrow(() -> new RuntimeException("The role "+ user.getRoleType() +" doesn't exist"));
 
-        List<RuntimeException> errors = new ArrayList<>();
+        List<IcesiException> errors = new ArrayList<>();
 
         if(emailInUse){
-            errors.add(new RuntimeException("The email is already in use"));
+            errors.add(icesiExceptionBuilder.duplicatedValueException("The email is already in use", user.getEmail()));
         }
 
         if(phoneNumberInUse){
-            errors.add(new RuntimeException("The phone-number is already in use"));
+            errors.add(icesiExceptionBuilder.duplicatedValueException("The phone-number is already in use", user.getPhoneNumber()));
         }
 
         if (!errors.isEmpty()){
-            errors.stream().map(RuntimeException::getMessage).forEach(System.out::println);
+            errors.stream().map(IcesiException::getMessage).forEach(System.out::println);
         }
 
         IcesiUser icesiUser = userMapper.fromIcesiUserDTO(user);
@@ -51,7 +54,7 @@ public class UserService {
     public ResponseUserDTO getUser(String userEmail){
         return userMapper.fromIcesiUser(
                 userRepository.isEmailInUse(userEmail)
-                        .orElseThrow(() -> new RuntimeException("The user with email " + userEmail + "doesn't exists")));
+                        .orElseThrow(() -> icesiExceptionBuilder.notFoundException("The user with email " + userEmail + "doesn't exists", "User", "email", userEmail)));
     }
 
     public List<ResponseUserDTO> getAllUsers(){

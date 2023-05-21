@@ -1,4 +1,4 @@
-package com.edu.icesi.demojpa.dto;
+package com.edu.icesi.demojpa.dto.request;
 
 import lombok.AllArgsConstructor;
 import lombok.Data;

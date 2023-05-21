@@ -1,10 +1,11 @@
 package com.edu.icesi.demojpa.service;
 
 import com.edu.icesi.demojpa.Enum.AccountType;
-import com.edu.icesi.demojpa.dto.RequestAccountDTO;
-import com.edu.icesi.demojpa.dto.RequestTransactionDTO;
-import com.edu.icesi.demojpa.dto.ResponseAccountDTO;
-import com.edu.icesi.demojpa.dto.ResponseTransactionDTO;
+import com.edu.icesi.demojpa.dto.request.RequestAccountDTO;
+import com.edu.icesi.demojpa.dto.request.RequestTransactionDTO;
+import com.edu.icesi.demojpa.dto.response.ResponseAccountDTO;
+import com.edu.icesi.demojpa.dto.response.ResponseTransactionDTO;
+import com.edu.icesi.demojpa.error.util.IcesiExceptionBuilder;
 import com.edu.icesi.demojpa.mapper.AccountMapper;
 import com.edu.icesi.demojpa.model.IcesiAccount;
 import com.edu.icesi.demojpa.model.IcesiUser;
@@ -26,14 +27,16 @@ public class AccountService {
 
     private final AccountMapper accountMapper;
 
+    private final IcesiExceptionBuilder icesiExceptionBuilder = new IcesiExceptionBuilder();
     private final AccountType depositOnly = AccountType.DEPOSIT_ONLY;
 
     public ResponseAccountDTO save(RequestAccountDTO account){
         IcesiUser icesiUser = userRepository.findUserById(account.getIcesiUserId())
-                .orElseThrow(() -> new RuntimeException("User with id " + account.getIcesiUserId() + " was not found"));
+                .orElseThrow(() -> icesiExceptionBuilder.notFoundException("User with id " + account.getIcesiUserId() + " was not found",
+                        "User", "id", account.getIcesiUserId().toString()));
 
         if(account.getBalance() < 0){
-            throw new RuntimeException("The balance can't be below 0");
+           throw icesiExceptionBuilder.badRequestException("The balance can't be below 0", "balance");
         }
 
         IcesiAccount icesiAccount = accountMapper.fromIcesiAccountDTO(account);
@@ -65,8 +68,10 @@ public class AccountService {
     }
 
     public ResponseAccountDTO enableAccount(RequestAccountDTO accountDTO){
+        isOwnerAccount(accountDTO.getIcesiUserId(), accountDTO.getAccountNumber());
         IcesiAccount account = accountRepository.findAccountByAccountNumber(accountDTO.getAccountNumber(), true)
-                .orElseThrow(() -> new RuntimeException("Account with number " + accountDTO.getAccountNumber() + " can't be enabled"));
+                .orElseThrow(() -> icesiExceptionBuilder.badRequestException("Account with number " + accountDTO.getAccountNumber() + " can't be enabled",
+                        "account"));
         account.setActive(true);
         accountRepository.save(account);
         return accountMapper.fromAccountDTO(account, "The account has been activated");
@@ -74,11 +79,12 @@ public class AccountService {
 
     public ResponseAccountDTO disableAccount(RequestAccountDTO accountDTO){
         IcesiAccount account = accountRepository.findAccountByAccountNumber(accountDTO.getAccountNumber(), true)
-                .orElseThrow(() -> new RuntimeException("Account with number " + accountDTO.getAccountNumber() + " can't be disabled"));
+                .orElseThrow(() -> icesiExceptionBuilder.badRequestException("Account with number " + accountDTO.getAccountNumber() + " can't be disabled",
+                        "account"));
         boolean hasFund = account.getBalance() > 0;
 
         if(hasFund){
-            throw new RuntimeException("The account couldn't be deactivated because it is funded");
+            throw icesiExceptionBuilder.badRequestException("The account couldn't be deactivated because it is funded", "balance");
         }
 
         account.setActive(false);
@@ -88,10 +94,10 @@ public class AccountService {
 
     public ResponseTransactionDTO withdraw(RequestTransactionDTO transaction){
         IcesiAccount account = accountRepository.findAccountByAccountNumber(transaction.getAccountFrom(), true)
-                .orElseThrow(() -> new RuntimeException("The withdrawal wasn't successful"));
+                .orElseThrow(() -> icesiExceptionBuilder.badRequestException("The withdrawal wasn't successful", "account"));
 
         if(hasNoFunds(account.getBalance(), transaction.getAmount())){
-            throw new RuntimeException("The account with number " + transaction.getAccountFrom() + " doesn't have sufficient funds");
+            throw icesiExceptionBuilder.badRequestException("The account with number " + transaction.getAccountFrom() + " doesn't have sufficient funds", "balance");
         }
 
         account.setBalance(account.getBalance() - transaction.getAmount());
@@ -101,7 +107,7 @@ public class AccountService {
 
     public ResponseTransactionDTO deposit(RequestTransactionDTO transaction){
         IcesiAccount account = accountRepository.findAccountByAccountNumber(transaction.getAccountFrom(), true)
-                .orElseThrow(() -> new RuntimeException("The deposit wasn't successful"));
+                .orElseThrow(() -> icesiExceptionBuilder.badRequestException("The deposit wasn't successful", "account"));
 
         account.setBalance(account.getBalance() + transaction.getAmount());
         accountRepository.save(account);
@@ -111,20 +117,23 @@ public class AccountService {
     @Transactional
     public ResponseTransactionDTO transfer(RequestTransactionDTO transaction){
         IcesiAccount accountToWithdrawal = accountRepository.findAccountByAccountNumber(transaction.getAccountFrom(), true)
-                .orElseThrow(() -> new RuntimeException("Money couldn't be transferred"));
+                .orElseThrow(() -> icesiExceptionBuilder.badRequestException("Money couldn't be transferred. The account is disable", "account to withdrawal"));
         IcesiAccount accountToDeposit = accountRepository.findAccountByAccountNumber(transaction.getAccountTo(), true)
-                .orElseThrow(() -> new RuntimeException("Money couldn't be transferred"));
+                .orElseThrow(() -> icesiExceptionBuilder.badRequestException("Money couldn't be transferred. The account is disable", "account to deposit"));
 
         if(accountToWithdrawal.getType().equals(depositOnly.getType())){
-            throw new RuntimeException("The account with number " + accountToWithdrawal.getAccountNumber() + " can't transfer money");
+            throw icesiExceptionBuilder.badRequestException("The account with number " + accountToWithdrawal.getAccountNumber() + " can't transfer money",
+                    "account to withdrawal. Deposit only.");
         }
 
         if(accountToDeposit.getType().equals(depositOnly.getType())){
-            throw new RuntimeException("The account with number " + accountToDeposit.getAccountNumber() + " can't be transferred money");
+            throw icesiExceptionBuilder.badRequestException("The account with number " + accountToDeposit.getAccountNumber() + " can't be transferred money",
+                    "account to deposit. Deposit only.");
         }
 
         if(hasNoFunds(accountToWithdrawal.getBalance(), transaction.getAmount())){
-            throw new RuntimeException("The account with number " + transaction.getAccountFrom() + " doesn't have sufficient funds");
+            throw icesiExceptionBuilder.badRequestException("The account with number " + transaction.getAccountFrom() + " doesn't have sufficient funds",
+                    "account to withdrawal. Has no funds.");
         }
 
         accountToWithdrawal.setBalance(accountToWithdrawal.getBalance() - transaction.getAmount());
@@ -141,7 +150,8 @@ public class AccountService {
     public ResponseAccountDTO getAccount(String accountNumber){
         return accountMapper.fromAccountToDTO(
                 accountRepository.findAccountByAccountNumber(accountNumber, true)
-                        .orElseThrow(() -> new RuntimeException("The account with number " + accountNumber + " doesn't exists")));
+                        .orElseThrow(() -> icesiExceptionBuilder.notFoundException("The account with number " + accountNumber + " doesn't exists",
+                                "Account", "number", accountNumber)));
     }
 
     public List<ResponseAccountDTO> getAllAccounts(){
@@ -152,10 +162,9 @@ public class AccountService {
                 .collect(Collectors.toList());
     }
 
-    //Falta implementar las nuevas excepciones y además ponerle restricción de que solo un usuario normal puede alterar su propia cuenta.
-    public void isOwnerAccount(UUID userIs, String accountNumber){
-        if(!accountRepository.isOwnerAccount(userIs, accountNumber)){
-            System.out.println("Nosepuedepa");
+    public void isOwnerAccount(UUID userId, String accountNumber){
+        if(!accountRepository.isOwnerAccount(userId, accountNumber)){
+            throw icesiExceptionBuilder.noPermissionException("No permission to do that");
         }
     }
 }

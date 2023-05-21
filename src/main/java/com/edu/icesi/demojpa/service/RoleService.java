@@ -1,6 +1,7 @@
 package com.edu.icesi.demojpa.service;
 
-import com.edu.icesi.demojpa.dto.RoleDTO;
+import com.edu.icesi.demojpa.dto.request.RoleDTO;
+import com.edu.icesi.demojpa.error.util.IcesiExceptionBuilder;
 import com.edu.icesi.demojpa.mapper.RoleMapper;
 import com.edu.icesi.demojpa.model.IcesiRole;
 import com.edu.icesi.demojpa.repository.RoleRepository;
@@ -16,12 +17,13 @@ import java.util.stream.Collectors;
 public class RoleService {
     private final RoleRepository roleRepository;
     private final RoleMapper roleMapper;
+    private final IcesiExceptionBuilder icesiExceptionBuilder = new IcesiExceptionBuilder();
 
     public RoleDTO save(RoleDTO role) {
         boolean isNameInUse = roleRepository.findRoleByName(role.getName()).isPresent();
 
         if (isNameInUse) {
-            throw new RuntimeException("This role is already in use");
+            throw icesiExceptionBuilder.duplicatedValueException("This role is already in use", role.getName());
         }
 
         IcesiRole icesiRole = roleMapper.fromIcesiRoleDTO(role);
@@ -33,7 +35,8 @@ public class RoleService {
     public RoleDTO getRole(String roleName){
         return roleMapper.fromIcesiRole(
                 roleRepository.findRoleByName(roleName)
-                        .orElseThrow(() -> new RuntimeException("The role with the name " + roleName + "doesn't exists")));
+                        .orElseThrow(() -> icesiExceptionBuilder.notFoundException("The role with the name " + roleName + "doesn't exists",
+                                "Role", "name", roleName)));
     }
 
     public List<RoleDTO> getAllRoles(){

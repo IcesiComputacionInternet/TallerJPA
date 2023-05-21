@@ -1,25 +1,38 @@
 package com.edu.icesi.demojpa.error.util;
 
-import com.edu.icesi.demojpa.error.exception.DetailBuilder;
-import com.edu.icesi.demojpa.error.exception.IcesiError;
-import com.edu.icesi.demojpa.error.exception.IcesiErrorDetail;
-import com.edu.icesi.demojpa.error.exception.IcesiException;
+import com.edu.icesi.demojpa.error.exception.*;
 import org.springframework.http.HttpStatus;
 
 import java.util.Arrays;
+import java.util.List;
 import java.util.function.Supplier;
 
 public class IcesiExceptionBuilder {
-
-    public static Supplier<IcesiException> createIcesiException(String message, DetailBuilder... details){
-        return () -> new IcesiException(message, createIcesiError(message, HttpStatus.BAD_REQUEST, details));
+    public IcesiException noPermissionException(String message){
+        IcesiError error = createIcesiError(HttpStatus.UNAUTHORIZED, new DetailBuilder(ErrorCode.ERROR_401,
+                ErrorCode.ERROR_401.getMessage()));
+        return new IcesiException(message, error);
     }
 
-    public static Supplier<IcesiException> createIcesiException(String message, HttpStatus httpStatus, DetailBuilder... details){
-        return () -> new IcesiException(message, createIcesiError(message, httpStatus, details));
+    public IcesiException notFoundException(String message, String field1, String field2, String field3){
+        IcesiError error = createIcesiError(HttpStatus.NOT_FOUND, new DetailBuilder(ErrorCode.ERROR_404,
+                ErrorCode.ERROR_404.getMessage().formatted(field1, field2, field3)));
+        return new IcesiException(message, error);
     }
 
-    public static IcesiError createIcesiError(String message, HttpStatus httpStatus, DetailBuilder... details) {
+    public IcesiException badRequestException(String message, String field1){
+        IcesiError error = createIcesiError(HttpStatus.BAD_REQUEST, new DetailBuilder(ErrorCode.ERROR_400,
+                ErrorCode.ERROR_400.getMessage().formatted(field1)));
+        return new IcesiException(message, error);
+    }
+
+    public IcesiException duplicatedValueException(String message, String field1){
+        IcesiError error = createIcesiError(HttpStatus.CONFLICT, new DetailBuilder(ErrorCode.ERR_DUPLICATED,
+                ErrorCode.ERR_DUPLICATED.getMessage().formatted(field1)));
+        return new IcesiException(message, error);
+    }
+
+    public static IcesiError createIcesiError(HttpStatus httpStatus, DetailBuilder... details) {
         return IcesiError.builder()
                 .status(httpStatus)
                 .details(

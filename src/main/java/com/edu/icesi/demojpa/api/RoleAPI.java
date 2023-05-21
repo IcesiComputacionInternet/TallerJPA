@@ -1,6 +1,6 @@
 package com.edu.icesi.demojpa.api;
 
-import com.edu.icesi.demojpa.dto.RoleDTO;
+import com.edu.icesi.demojpa.dto.request.RoleDTO;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;

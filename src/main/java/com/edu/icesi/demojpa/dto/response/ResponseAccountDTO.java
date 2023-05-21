@@ -1,7 +1,6 @@
-package com.edu.icesi.demojpa.dto;
+package com.edu.icesi.demojpa.dto.response;
 
-import com.edu.icesi.demojpa.model.IcesiAccount;
-import com.edu.icesi.demojpa.model.IcesiUser;
+import com.edu.icesi.demojpa.dto.request.RequestUserDTO;
 import lombok.Builder;
 import lombok.Data;
 

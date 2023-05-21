@@ -1,9 +1,9 @@
 package com.edu.icesi.demojpa.mapper;
 
-import com.edu.icesi.demojpa.dto.RequestAccountDTO;
-import com.edu.icesi.demojpa.dto.RequestTransactionDTO;
-import com.edu.icesi.demojpa.dto.ResponseAccountDTO;
-import com.edu.icesi.demojpa.dto.ResponseTransactionDTO;
+import com.edu.icesi.demojpa.dto.request.RequestAccountDTO;
+import com.edu.icesi.demojpa.dto.request.RequestTransactionDTO;
+import com.edu.icesi.demojpa.dto.response.ResponseAccountDTO;
+import com.edu.icesi.demojpa.dto.response.ResponseTransactionDTO;
 import com.edu.icesi.demojpa.model.IcesiAccount;
 import org.mapstruct.Mapper;
 import org.mapstruct.Mapping;

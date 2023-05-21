@@ -1,4 +1,4 @@
-package com.edu.icesi.demojpa;
+package com.edu.icesi.demojpa.integration;
 import com.edu.icesi.demojpa.model.IcesiRole;
 import com.edu.icesi.demojpa.model.IcesiUser;
 import com.edu.icesi.demojpa.repository.RoleRepository;
