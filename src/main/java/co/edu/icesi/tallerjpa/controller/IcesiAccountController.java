@@ -22,19 +22,20 @@ public class IcesiAccountController implements IcesiAccountApi {
 
     @Override
     public IcesiAccountShowDTO createIcesiAccount(@Valid IcesiAccountCreateDTO icesiAccountCreateDTO) {
-        return icesiAccountService.save(icesiAccountCreateDTO);
+        String icesiUserId = IcesiSecurityContext.getCurrentUserId();
+        return icesiAccountService.save(icesiAccountCreateDTO, icesiUserId);
     }
 
     @Override
-    public IcesiAccountShowDTO enableAccount(String accountId) {
+    public IcesiAccountShowDTO enableAccount(String accountNumber) {
         String icesiUserId = IcesiSecurityContext.getCurrentUserId();
-        return icesiAccountService.enableAccount(accountId, icesiUserId);
+        return icesiAccountService.enableAccount(accountNumber, icesiUserId);
     }
 
     @Override
-    public IcesiAccountShowDTO disableAccount(String accountId) {
+    public IcesiAccountShowDTO disableAccount(String accountNumber) {
         String icesiUserId = IcesiSecurityContext.getCurrentUserId();
-        return icesiAccountService.disableAccount(accountId, "icesiUserId");
+        return icesiAccountService.disableAccount(accountNumber, icesiUserId);
     }
 
     @Override
@@ -60,10 +61,4 @@ public class IcesiAccountController implements IcesiAccountApi {
         String icesiUserId = IcesiSecurityContext.getCurrentUserId();
         return icesiAccountService.getAccountByAccountNumber(accountId, icesiUserId);
     }
-    @GetMapping("/admin/pathTest/")
-    public void pathTest(){
-        var temp = SecurityContextHolder.getContext();
-        System.out.println("It got into the pathTest method");
-    }
-
 }

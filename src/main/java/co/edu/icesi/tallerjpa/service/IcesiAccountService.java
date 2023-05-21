@@ -8,6 +8,7 @@ import co.edu.icesi.tallerjpa.enums.NameIcesiRole;
 import co.edu.icesi.tallerjpa.error.exception.DetailBuilder;
 import co.edu.icesi.tallerjpa.error.exception.ErrorCode;
 import co.edu.icesi.tallerjpa.mapper.IcesiAccountMapper;
+import co.edu.icesi.tallerjpa.mapper.IcesiUserMapper;
 import co.edu.icesi.tallerjpa.model.IcesiAccount;
 import co.edu.icesi.tallerjpa.model.IcesiUser;
 import co.edu.icesi.tallerjpa.repository.IcesiAccountRepository;
@@ -28,16 +29,15 @@ import static co.edu.icesi.tallerjpa.error.util.IcesiExceptionBuilder.createIces
 public class IcesiAccountService {
     private final IcesiAccountRepository icesiAccountRepository;
     private final IcesiAccountMapper icesiAccountMapper;
+    private final IcesiUserMapper icesiUserMapper;
     private final IcesiUserRepository icesiUserRepository;
-    public IcesiAccountShowDTO save(IcesiAccountCreateDTO icesiAccountCreateDTO){
+
+    public IcesiAccountShowDTO save(IcesiAccountCreateDTO icesiAccountCreateDTO, String icesiUserId){
         checkConditionsToCreateAccount(icesiAccountCreateDTO);
 
-        IcesiUser icesiUser = icesiUserRepository.findByEmail(icesiAccountCreateDTO.getIcesiUserDTO().getEmail())
-                .orElseThrow(createIcesiException(
-                        "There is no user with the email "+icesiAccountCreateDTO.getIcesiUserDTO().getEmail(),
-                        HttpStatus.NOT_FOUND,
-                        new DetailBuilder(ErrorCode.ERR_404, "Icesi user", "email", icesiAccountCreateDTO.getIcesiUserDTO().getEmail())
-                ));
+        IcesiUser icesiUser = getIcesiUserByEmail(icesiAccountCreateDTO.getIcesiUserEmail());
+
+        checkIfTheUserISTryingToCreateAnAccountForHimself(icesiUser, icesiUserId);
 
         String accountNumber = createAccountNumber(100)
                 .orElseThrow(createIcesiException(
@@ -50,10 +50,27 @@ public class IcesiAccountService {
         icesiAccount.setIcesiUser(icesiUser);
         icesiAccount.setAccountNumber(accountNumber);
         icesiAccount.setAccountId(UUID.randomUUID());
-        return icesiAccountMapper.fromIcesiAccountToShowDTO(icesiAccountRepository.save(icesiAccount));
+        IcesiAccount icesiAccountSaved = icesiAccountRepository.save(icesiAccount);
+        IcesiAccountShowDTO icesiAccountShowDTO = icesiAccountMapper.fromIcesiAccountToShowDTO(icesiAccountSaved);
+        icesiAccountShowDTO.setIcesiUserDTO(icesiUserMapper.fromIcesiUserToShow(icesiAccountSaved.getIcesiUser()));
+        return icesiAccountShowDTO;
+    }
+
+    private void checkIfTheUserISTryingToCreateAnAccountForHimself(IcesiUser icesiUserAccountOwner, String icesiUserId){
+        boolean isTryingToCreateAnAccountForAnotherUser = !icesiUserAccountOwner.getUserId().toString().equals(icesiUserId);
+        IcesiUser loggedIcesiUser = getIcesiUserById(icesiUserId);
+        boolean isNotAnAdminRole = !loggedIcesiUser.getIcesiRole().getName().equals(NameIcesiRole.ADMIN.toString());
+        if(isNotAnAdminRole && isTryingToCreateAnAccountForAnotherUser){
+            throw createIcesiException(
+                    "Forbidden: Only ADMIN can create accounts for others users",
+                    HttpStatus.FORBIDDEN,
+                    new DetailBuilder(ErrorCode.ERR_403, "Forbidden: Only ADMIN can create accounts for others users")
+            ).get();
+        }
     }
 
     private void checkConditionsToCreateAccount(IcesiAccountCreateDTO icesiAccountCreateDTO){
+
         if(icesiAccountCreateDTO.getBalance() < 0){
             throw createIcesiException(
                     "Accounts balance can't be below 0",
@@ -77,7 +94,7 @@ public class IcesiAccountService {
         int attempts = 0;
         while (!isUnique && attempts < maximumAttempts){
             String possibleAccountNumber = createRandomDigits(3, minDigit, maxDigit)+"-"+createRandomDigits(6, minDigit, maxDigit)+"-"+createRandomDigits(2, minDigit, maxDigit);
-            if(!icesiAccountRepository.findByAccountNumber(possibleAccountNumber).isPresent()){
+            if(icesiAccountRepository.findByAccountNumber(possibleAccountNumber).isEmpty()){
                 isUnique = true;
                 accountNumber = possibleAccountNumber;
             }
@@ -92,30 +109,32 @@ public class IcesiAccountService {
                 .collect(Collectors.joining(""));
     }
 
-    public IcesiAccountShowDTO enableAccount(String accountId, String icesiUserId){
-        checkIfTheAccountBelongsToTheIcesiUser(accountId, icesiUserId);
-        if(getAccountById(accountId).isActive()){
+    public IcesiAccountShowDTO enableAccount(String accountNumber, String icesiUserId){
+        checkIfTheAccountBelongsToTheIcesiUser(accountNumber, icesiUserId);
+        IcesiAccount icesiAccount = getAccountByAccountNumber(accountNumber);
+        if(icesiAccount.isActive()){
             throw createIcesiException(
                     "The account was already enabled",
                     HttpStatus.BAD_REQUEST,
                     new DetailBuilder(ErrorCode.ERR_400, "isActive", "The account was already enabled")
             ).get();
         }
-        icesiAccountRepository.enableAccount(accountId);
-        return icesiAccountMapper.fromIcesiAccountToShowDTO(getAccountById(accountId));
+        icesiAccountRepository.enableAccount(icesiAccount.getAccountId().toString());
+        return icesiAccountMapper.fromIcesiAccountToShowDTO(getAccountById(icesiAccount.getAccountId().toString()));
     }
 
-    public IcesiAccountShowDTO disableAccount(String accountId, String icesiUserId){
-        checkIfTheAccountBelongsToTheIcesiUser(accountId, icesiUserId);
-        if(getAccountById(accountId).getBalance() != 0){
+    public IcesiAccountShowDTO disableAccount(String accountNumber, String icesiUserId){
+        checkIfTheAccountBelongsToTheIcesiUser(accountNumber, icesiUserId);
+        IcesiAccount icesiAccount = getAccountByAccountNumber(accountNumber);
+        if(icesiAccount.getBalance() != 0){
             throw createIcesiException(
                     "Account can only be disabled if the balance is 0",
                     HttpStatus.BAD_REQUEST,
                     new DetailBuilder(ErrorCode.ERR_400, "isActive and balance", "Account can only be disabled if the balance is 0")
             ).get();
         }
-        icesiAccountRepository.disableAccount(accountId);
-        return icesiAccountMapper.fromIcesiAccountToShowDTO(getAccountById(accountId));
+        icesiAccountRepository.disableAccount(icesiAccount.getAccountId().toString());
+        return icesiAccountMapper.fromIcesiAccountToShowDTO(getAccountById(icesiAccount.getAccountId().toString()));
     }
 
     public TransactionResultDTO withdrawalMoney(TransactionCreateDTO transactionCreateDTO, String icesiUserId){
@@ -211,38 +230,48 @@ public class IcesiAccountService {
         }
     }
 
-    public IcesiAccountShowDTO getAccountByAccountNumber(String accountNumber, String icesiUserId){
-        IcesiAccount icesiAccount = icesiAccountRepository.findByAccountNumber(accountNumber)
+    private IcesiAccount getAccountByAccountNumber(String accountNumber){
+        return icesiAccountRepository.findByAccountNumber(accountNumber)
                 .orElseThrow(createIcesiException(
                         "There is no account with the number: " + accountNumber,
                         HttpStatus.NOT_FOUND,
                         new DetailBuilder(ErrorCode.ERR_404, "account", "the number", accountNumber)
                 ));
+    }
+
+    public IcesiAccountShowDTO getAccountByAccountNumber(String accountNumber, String icesiUserId){
+        IcesiAccount icesiAccount = getAccountByAccountNumber(accountNumber);
         checkIfTheAccountBelongsToTheIcesiUser(icesiAccount, icesiUserId);
         return icesiAccountMapper.fromIcesiAccountToShowDTO(icesiAccount);
     }
 
-    private void checkIfTheAccountBelongsToTheIcesiUser(String accountId, String icesiUserId){
-        IcesiAccount icesiAccount = getAccountById(accountId);
+    private void checkIfTheAccountBelongsToTheIcesiUser(String accountNumber, String icesiUserId){
+        IcesiAccount icesiAccount = getAccountByAccountNumber(accountNumber);
         checkIfTheAccountBelongsToTheIcesiUser(icesiAccount, icesiUserId);
     }
 
     private void checkIfTheAccountBelongsToTheIcesiUser(IcesiAccount icesiAccount, String icesiUserId){
-        IcesiUser icesiUser = icesiUserRepository.findById(fromIdToUUID(icesiUserId)).orElseThrow(createIcesiException(
+        IcesiUser icesiUser = getIcesiUserById(icesiUserId);
+        boolean isNotAnAdminRole = !icesiUser.getIcesiRole().getName().equals(NameIcesiRole.ADMIN.toString());
+        boolean theAccountDoesNotBelongToTheUser = !icesiAccount.getIcesiUser().getUserId().toString().equals(icesiUserId);
+        if (isNotAnAdminRole && theAccountDoesNotBelongToTheUser){
+            throw createIcesiException(
+                    "The account does not belong to" + icesiUser.getEmail(),
+                    HttpStatus.FORBIDDEN,
+                    new DetailBuilder(ErrorCode.ERR_400, "The account does not belong to" + icesiUser.getEmail())
+            ).get();
+        }
+    }
+
+    private IcesiUser getIcesiUserById(String icesiUserId){
+        return icesiUserRepository.findById(fromIdToUUID(icesiUserId)).orElseThrow(createIcesiException(
                 "There is no icesi user with the id: " + icesiUserId,
                 HttpStatus.NOT_FOUND,
                 new DetailBuilder(ErrorCode.ERR_404, "icesi user", "id", icesiUserId)
         ));
-        if(icesiUser.getIcesiRole().getName().equals(NameIcesiRole.USER)){
-            if (!icesiAccount.getIcesiUser().getUserId().equals(icesiUserId)){
-                throw createIcesiException(
-                        "The account does not belong to" + icesiUser.getEmail(),
-                        HttpStatus.FORBIDDEN,
-                        new DetailBuilder(ErrorCode.ERR_400, "The account does not belong to" + icesiUser.getEmail())
-                ).get();
-            }
-        }
     }
+
+
 
     private UUID fromIdToUUID(String icesiUserId){
         try{
@@ -254,5 +283,14 @@ public class IcesiAccountService {
                     new DetailBuilder(ErrorCode.ERR_400, "id", "Invalid account id")
             ).get();
         }
+    }
+
+    private IcesiUser getIcesiUserByEmail(String email){
+        return icesiUserRepository.findByEmail(email)
+                .orElseThrow(createIcesiException(
+                        "There is no user with the email "+email,
+                        HttpStatus.NOT_FOUND,
+                        new DetailBuilder(ErrorCode.ERR_404, "Icesi user", "email", email)
+                ));
     }
 }

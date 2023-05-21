@@ -5,8 +5,7 @@ import lombok.Builder;
 import lombok.Data;
 
 import javax.validation.Valid;
-import javax.validation.constraints.Min;
-import javax.validation.constraints.NotNull;
+import javax.validation.constraints.*;
 import java.util.UUID;
 
 @Data
@@ -17,7 +16,9 @@ public class IcesiAccountCreateDTO {
     @NotNull(message = "The icesi account type can not be null")
     private TypeIcesiAccount type;
     private boolean active;
-    @NotNull(message = "The icesi user can not be null")
-    @Valid
-    private IcesiUserCreateDTO icesiUserDTO;
+    @NotNull(message = "The email can not be null")
+    @NotBlank(message = "The email can not be blank")
+    @NotEmpty(message = "The email can not be empty")
+    @Email
+    private String icesiUserEmail;
 }

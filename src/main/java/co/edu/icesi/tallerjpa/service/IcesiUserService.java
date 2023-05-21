@@ -3,7 +3,6 @@ package co.edu.icesi.tallerjpa.service;
 import co.edu.icesi.tallerjpa.dto.IcesiUserCreateDTO;
 import co.edu.icesi.tallerjpa.dto.IcesiUserShowDTO;
 import co.edu.icesi.tallerjpa.enums.NameIcesiRole;
-import co.edu.icesi.tallerjpa.enums.TypeIcesiAccount;
 import co.edu.icesi.tallerjpa.error.exception.DetailBuilder;
 import co.edu.icesi.tallerjpa.error.exception.ErrorCode;
 import co.edu.icesi.tallerjpa.mapper.IcesiUserMapper;
@@ -13,6 +12,7 @@ import co.edu.icesi.tallerjpa.repository.IcesiRoleRepository;
 import co.edu.icesi.tallerjpa.repository.IcesiUserRepository;
 import lombok.AllArgsConstructor;
 import org.springframework.http.HttpStatus;
+import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
 import java.util.ArrayList;
@@ -26,6 +26,8 @@ public class IcesiUserService {
     private final IcesiUserRepository icesiUserRepository;
     private final IcesiRoleRepository icesiRoleRepository;
     private final IcesiUserMapper icesiUserMapper;
+
+    private final PasswordEncoder passwordEncoder;
 
     public IcesiUserShowDTO save(IcesiUserCreateDTO icesiUserCreateDTO, String icesiUserId){
         ArrayList<String> errors = new ArrayList<>();
@@ -53,7 +55,7 @@ public class IcesiUserService {
         IcesiUser icesiUser = icesiUserMapper.fromCreateIcesiUserDTO(icesiUserCreateDTO);
         icesiUser.setIcesiRole(icesiRole);
         icesiUser.setUserId(UUID.randomUUID());
-
+        icesiUser.setPassword(passwordEncoder.encode(icesiUserCreateDTO.getPassword()));
         return icesiUserMapper.fromIcesiUserToShow(icesiUserRepository.save(icesiUser));
     }
     private boolean isEmailUnique(String email){

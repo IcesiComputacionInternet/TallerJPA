@@ -13,5 +13,5 @@ public class IcesiAccountShowDTO {
     private long balance;
     private String type;
     private boolean active;
-    private IcesiUserCreateDTO icesiUserDTO;
+    private IcesiUserShowDTO icesiUserDTO;
 }

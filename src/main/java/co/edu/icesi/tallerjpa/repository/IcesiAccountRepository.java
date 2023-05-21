@@ -11,7 +11,7 @@ import java.util.UUID;
 
 @Repository
 public interface IcesiAccountRepository extends JpaRepository<IcesiAccount, UUID> {
-    @Query("SELECT ia FROM IcesiAccount ia WHERE ia.accountId = :accountNumber")
+    @Query("SELECT ia FROM IcesiAccount ia WHERE ia.accountNumber = :accountNumber")
     Optional<IcesiAccount> findByAccountNumber(String accountNumber);
 
     @Modifying

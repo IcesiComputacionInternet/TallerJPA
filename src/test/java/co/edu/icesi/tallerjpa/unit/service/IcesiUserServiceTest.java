@@ -13,6 +13,7 @@ import co.edu.icesi.tallerjpa.repository.IcesiUserRepository;
 import co.edu.icesi.tallerjpa.service.IcesiUserService;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
+import org.springframework.security.crypto.password.PasswordEncoder;
 
 import java.util.Optional;
 
@@ -24,13 +25,15 @@ public class IcesiUserServiceTest {
     private IcesiUserRepository icesiUserRepository;
     private IcesiUserMapper icesiUserMapper;
     private IcesiRoleRepository icesiRoleRepository;
+    private PasswordEncoder passwordEncoder;
 
     @BeforeEach
     private void init(){
       icesiUserRepository = mock(IcesiUserRepository.class);
       icesiRoleRepository = mock(IcesiRoleRepository.class);
       icesiUserMapper = spy(IcesiUserMapperImpl.class);
-      icesiUserService = new IcesiUserService(icesiUserRepository, icesiRoleRepository, icesiUserMapper);
+
+      icesiUserService = new IcesiUserService(icesiUserRepository, icesiRoleRepository, icesiUserMapper, passwordEncoder);
     }
 
     private IcesiRoleCreateDTO defaultIcesiRoleCreateDTO(){

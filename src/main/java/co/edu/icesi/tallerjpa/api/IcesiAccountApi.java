@@ -14,11 +14,11 @@ public interface IcesiAccountApi {
     @PostMapping
     public IcesiAccountShowDTO createIcesiAccount(@Valid @RequestBody IcesiAccountCreateDTO icesiAccountCreateDTO);
 
-    @PatchMapping("enable/{accountId}")
-    public IcesiAccountShowDTO enableAccount(@PathVariable("accountId") String accountId);
+    @PatchMapping("enable/{accountNumber}")
+    public IcesiAccountShowDTO enableAccount(@PathVariable("accountNumber") String accountNumber);
 
-    @PatchMapping("disable/{accountId}")
-    public IcesiAccountShowDTO disableAccount(@PathVariable("accountId") String accountId);
+    @PatchMapping("disable/{accountNumber}")
+    public IcesiAccountShowDTO disableAccount(@PathVariable("accountNumber") String accountNumber);
 
     @PatchMapping("withdrawal_money")
     public TransactionResultDTO withdrawalMoney(@Valid @RequestBody TransactionCreateDTO transactionCreateDTO);
@@ -29,7 +29,7 @@ public interface IcesiAccountApi {
     @PatchMapping("transfer_money")
     public TransactionResultDTO transferMoney(@Valid @RequestBody TransactionCreateDTO transactionCreateDTO);
 
-    @GetMapping("id/{accountId}")
-    public IcesiAccountShowDTO getAccountByAccountNumber(@PathVariable("accountId") String accountId);
+    @GetMapping("id/{accountNumber}")
+    public IcesiAccountShowDTO getAccountByAccountNumber(@PathVariable("accountNumber") String accountNumber);
 
 }
