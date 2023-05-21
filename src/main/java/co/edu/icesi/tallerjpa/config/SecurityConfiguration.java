@@ -1,11 +1,14 @@
 package co.edu.icesi.tallerjpa.config;
 
+import co.edu.icesi.tallerjpa.api.IcesiAccountApi;
+import co.edu.icesi.tallerjpa.api.IcesiRoleApi;
 import com.nimbusds.jose.jwk.source.ImmutableSecret;
 import lombok.AllArgsConstructor;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.ProviderManager;
+import org.springframework.security.authentication.dao.DaoAuthenticationProvider;
 import org.springframework.security.authorization.AuthorityAuthorizationManager;
 import org.springframework.security.authorization.AuthorizationDecision;
 import org.springframework.security.authorization.AuthorizationManager;
@@ -71,10 +74,15 @@ public class SecurityConfiguration {
         RequestMatcherDelegatingAuthorizationManager.Builder managerBuilder =
                 RequestMatcherDelegatingAuthorizationManager.builder()
                         .add(permitAll,(context,other)->new AuthorizationDecision(true));
-        managerBuilder.add(new MvcRequestMatcher(introspector,"**/admin/**"),
+        managerBuilder.add(new MvcRequestMatcher(introspector, IcesiAccountApi.ROOT_PATH+"/**"),
+                AuthorityAuthorizationManager.hasAnyAuthority("SCOPE_ADMIN", "SCOPE_USER"));
+        managerBuilder.add(new MvcRequestMatcher(introspector, IcesiRoleApi.ROOT_PATH+"/admin/**"),
                 AuthorityAuthorizationManager.hasAnyAuthority("SCOPE_ADMIN"));
-        managerBuilder.add(new MvcRequestMatcher(introspector,"**/user/**"),
-                AuthorityAuthorizationManager.hasAnyAuthority("SCOPE_USER"));
+
+//        managerBuilder.add(new MvcRequestMatcher(introspector,"/admin/**"),
+//                AuthorityAuthorizationManager.hasAnyAuthority("SCOPE_ADMIN"));
+//        managerBuilder.add(new MvcRequestMatcher(introspector,"/user/**"),
+//                AuthorityAuthorizationManager.hasAnyAuthority("SCOPE_USER"));
 
         AuthorizationManager<HttpServletRequest> manager = managerBuilder.build();
         return (authentication, object) -> manager.check(authentication,object.getRequest());

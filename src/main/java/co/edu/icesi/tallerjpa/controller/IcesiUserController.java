@@ -5,6 +5,7 @@ import co.edu.icesi.tallerjpa.dto.IcesiUserCreateDTO;
 import co.edu.icesi.tallerjpa.dto.IcesiUserShowDTO;
 import co.edu.icesi.tallerjpa.service.IcesiUserService;
 import lombok.AllArgsConstructor;
+import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RestController;
 
 import javax.validation.Valid;
@@ -16,6 +17,11 @@ public class IcesiUserController implements IcesiUserApi {
 
     @Override
     public IcesiUserShowDTO createIcesiUser(IcesiUserCreateDTO userDTO){
+        return icesiUserService.save(userDTO);
+    }
+
+    @PostMapping("")
+    public IcesiUserShowDTO createIcesiU(IcesiUserCreateDTO userDTO){
         return icesiUserService.save(userDTO);
     }
 

@@ -10,6 +10,7 @@ import javax.validation.constraints.NotNull;
 
 @RequestMapping("/icesi_accounts")
 public interface IcesiAccountApi {
+    public static final String ROOT_PATH = "/icesi_accounts";
     @PostMapping
     public IcesiAccountShowDTO createIcesiAccount(@Valid @RequestBody IcesiAccountCreateDTO icesiAccountCreateDTO);
 
@@ -39,4 +40,5 @@ public interface IcesiAccountApi {
                                                              @NotBlank(message = "The account id can not be blank")
                                                              @NotEmpty(message = "The account id can not be empty")
                                                              @PathVariable("accountId") String accountId);
+
 }

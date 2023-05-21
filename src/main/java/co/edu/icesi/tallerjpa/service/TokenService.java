@@ -36,7 +36,6 @@ public class TokenService {
                 .claim("icesiUserId",customAuthentication.getUserId())
                 .build();
         var encoderParameters = JwtEncoderParameters.from(JwsHeader.with(MacAlgorithm.HS256).build(),claims);
-        System.out.println(this.encoder.encode(encoderParameters).getTokenValue());
         return this.encoder.encode(encoderParameters).getTokenValue();
     }
 }

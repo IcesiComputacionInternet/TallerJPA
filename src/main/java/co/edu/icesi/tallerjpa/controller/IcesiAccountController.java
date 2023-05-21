@@ -6,14 +6,12 @@ import co.edu.icesi.tallerjpa.security.IcesiSecurityContext;
 import co.edu.icesi.tallerjpa.service.IcesiAccountService;
 import lombok.AllArgsConstructor;
 import org.springframework.security.core.context.SecurityContextHolder;
-import org.springframework.security.oauth2.server.resource.authentication.JwtAuthenticationToken;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestBody;
+import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
 import javax.validation.Valid;
-
-import static co.edu.icesi.tallerjpa.security.IcesiSecurityContext.getCurrentUserId;
 
 @AllArgsConstructor
 @RestController
@@ -36,7 +34,7 @@ public class IcesiAccountController implements IcesiAccountApi {
     @Override
     public IcesiAccountShowDTO disableAccount(String accountId) {
         String icesiUserId = IcesiSecurityContext.getCurrentUserId();
-        return icesiAccountService.disableAccount(accountId, icesiUserId);
+        return icesiAccountService.disableAccount(accountId, "icesiUserId");
     }
 
     @Override
@@ -62,4 +60,10 @@ public class IcesiAccountController implements IcesiAccountApi {
         String icesiUserId = IcesiSecurityContext.getCurrentUserId();
         return icesiAccountService.getAccountByAccountNumber(accountId, icesiUserId);
     }
+    @GetMapping("/admin/pathTest/")
+    public void pathTest(){
+        var temp = SecurityContextHolder.getContext();
+        System.out.println("It got into the pathTest method");
+    }
+
 }
