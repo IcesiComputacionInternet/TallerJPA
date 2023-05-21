@@ -13,6 +13,7 @@ import co.edu.icesi.tallerjpa.repository.IcesiUserRepository;
 import lombok.AllArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.util.Optional;
 import java.util.UUID;
@@ -106,6 +107,7 @@ public class IcesiAccountService {
                 .collect(Collectors.joining(""));
     }
 
+    @Transactional
     public IcesiAccountShowDTO enableAccount(String accountNumber, String icesiUserId){
         checkIfTheAccountBelongsToTheIcesiUser(accountNumber, icesiUserId);
         IcesiAccount icesiAccount = getAccountByAccountNumber(accountNumber);
@@ -120,6 +122,7 @@ public class IcesiAccountService {
         return icesiAccountMapper.fromIcesiAccountToShowDTO(getAccountByAccountNumber(icesiAccount.getAccountNumber().toString()));
     }
 
+    @Transactional
     public IcesiAccountShowDTO disableAccount(String accountNumber, String icesiUserId){
         checkIfTheAccountBelongsToTheIcesiUser(accountNumber, icesiUserId);
         IcesiAccount icesiAccount = getAccountByAccountNumber(accountNumber);
@@ -134,6 +137,7 @@ public class IcesiAccountService {
         return icesiAccountMapper.fromIcesiAccountToShowDTO(getAccountByAccountNumber(icesiAccount.getAccountNumber()));
     }
 
+    @Transactional
     public TransactionWithOneAccountCreateDTO withdrawalMoney(TransactionWithOneAccountCreateDTO transactionWithdrawalCreateDTO, String icesiUserId){
         IcesiAccount icesiAccount = getAccountByAccountNumber(transactionWithdrawalCreateDTO.getAccountNumber());
         checkIfTheAccountBelongsToTheIcesiUser(icesiAccount, icesiUserId);
@@ -146,7 +150,7 @@ public class IcesiAccountService {
             ).get();
         }
         long newBalance = icesiAccount.getBalance() - transactionWithdrawalCreateDTO.getAmount();
-        icesiAccountRepository.updateBalance(newBalance, icesiAccount.getAccountId().toString());
+        icesiAccountRepository.updateBalance(newBalance, icesiAccount.getAccountId());
         TransactionWithOneAccountCreateDTO transactionWithdrawalCreateDTOCopy = TransactionWithOneAccountCreateDTO.builder()
                 .accountNumber(transactionWithdrawalCreateDTO.getAccountNumber()).build();
         transactionWithdrawalCreateDTOCopy.setAmount(newBalance);
@@ -169,13 +173,14 @@ public class IcesiAccountService {
         checkIfTheAccountBelongsToTheIcesiUser(icesiAccount, icesiUserId);
         checkIfTheAccountIsDisabled(icesiAccount);
         long newBalance = icesiAccount.getBalance() + transactionWithOneAccountCreateDTO.getAmount();
-        icesiAccountRepository.updateBalance(newBalance, icesiAccount.getAccountId().toString());
+        icesiAccountRepository.updateBalance(newBalance, icesiAccount.getAccountId());
         TransactionWithOneAccountCreateDTO transactionWithOneAccountCreateDTOCopy = TransactionWithOneAccountCreateDTO.builder()
                 .accountNumber(transactionWithOneAccountCreateDTO.getAccountNumber()).build();
         transactionWithOneAccountCreateDTOCopy.setAmount(newBalance);
         return transactionWithOneAccountCreateDTOCopy;
     }
 
+    @Transactional
     public TransactionResultDTO transferMoney(TransactionCreateDTO transactionCreateDTO, String icesiUserId){
         IcesiAccount senderIcesiAccount = getAccountByAccountNumber(transactionCreateDTO.getSenderAccountNumber());
         IcesiAccount receiverIcesiAccount = getAccountByAccountNumber(transactionCreateDTO.getReceiverAccountNumber());
@@ -183,10 +188,10 @@ public class IcesiAccountService {
         checkConditionsToTransfer(senderIcesiAccount, receiverIcesiAccount, transactionCreateDTO.getAmount());
         long senderAccountNewBalance = senderIcesiAccount.getBalance() - transactionCreateDTO.getAmount();
         long receiverAccountNewBalance = receiverIcesiAccount.getBalance() + transactionCreateDTO.getAmount();
-        icesiAccountRepository.updateBalance(senderAccountNewBalance, senderIcesiAccount.getAccountId().toString());
-        icesiAccountRepository.updateBalance(receiverAccountNewBalance, receiverIcesiAccount.getAccountId().toString());
+        icesiAccountRepository.updateBalance(senderAccountNewBalance, senderIcesiAccount.getAccountId());
+        icesiAccountRepository.updateBalance(receiverAccountNewBalance, receiverIcesiAccount.getAccountId());
         TransactionResultDTO transactionResultDTO = icesiAccountMapper.fromTransactionCreateDTO(transactionCreateDTO);
-        transactionResultDTO.setBalance(senderAccountNewBalance);
+        transactionResultDTO.setAmount(senderAccountNewBalance);
         transactionResultDTO.setResult("The transfer was successful");
         return transactionResultDTO;
     }

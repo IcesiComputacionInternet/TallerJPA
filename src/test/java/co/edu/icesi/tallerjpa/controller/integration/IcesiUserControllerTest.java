@@ -71,17 +71,17 @@ public class IcesiUserControllerTest {
 
     private void checkThatIcesiUsersDTOsAreTheSame(IcesiUserCreateDTO icesiUserCreateDTO, IcesiUserShowDTO icesiUserShowDTO){
         assertNotNull(icesiUserShowDTO.getUserId());
-        assertTrue(Objects.equals(icesiUserCreateDTO.getFirstName(), icesiUserShowDTO.getFirstName()));
-        assertTrue(Objects.equals(icesiUserCreateDTO.getLastName(), icesiUserShowDTO.getLastName()));
-        assertTrue(Objects.equals(icesiUserCreateDTO.getEmail(), icesiUserShowDTO.getEmail()));
-        assertTrue(Objects.equals(icesiUserCreateDTO.getPhoneNumber(), icesiUserShowDTO.getPhoneNumber()));
-        assertTrue(Objects.equals(icesiUserCreateDTO.getIcesiRoleCreateDTO().getDescription(), icesiUserShowDTO.getIcesiRole().getDescription()));
-        assertTrue(Objects.equals(icesiUserCreateDTO.getIcesiRoleCreateDTO().getName(), icesiUserShowDTO.getIcesiRole().getName()));
+        assertEquals(icesiUserCreateDTO.getFirstName(), icesiUserShowDTO.getFirstName());
+        assertEquals(icesiUserCreateDTO.getLastName(), icesiUserShowDTO.getLastName());
+        assertEquals(icesiUserCreateDTO.getEmail(), icesiUserShowDTO.getEmail());
+        assertEquals(icesiUserCreateDTO.getPhoneNumber(), icesiUserShowDTO.getPhoneNumber());
+        assertEquals(icesiUserCreateDTO.getIcesiRoleCreateDTO().getDescription(), icesiUserShowDTO.getIcesiRole().getDescription());
+        assertEquals(icesiUserCreateDTO.getIcesiRoleCreateDTO().getName(), icesiUserShowDTO.getIcesiRole().getName());
         icesiUserRepository.deleteById(icesiUserShowDTO.getUserId());
     }
 
     @Test
-    public void testEndpointForCreateAUserWithAdminCredentials() throws Exception {
+    public void testForEndpointForCreateAUserWithAdminCredentials() throws Exception {
         loginAsAdmin();
         IcesiUserCreateDTO icesiUserCreateDTO = defaultIcesiUserCreateDTO();
         var result = mockMvc.perform(MockMvcRequestBuilders.post(IcesiUserApi.ROOT_PATH)
@@ -98,7 +98,7 @@ public class IcesiUserControllerTest {
     }
 
     @Test
-    public void testEndpointForCreateAUserWithBankCredentials() throws Exception {
+    public void testForEndpointForCreateAUserWithBankCredentials() throws Exception {
         loginAsBank();
         IcesiUserCreateDTO icesiUserCreateDTO = defaultIcesiUserCreateDTO();
         var result = mockMvc.perform(MockMvcRequestBuilders.post(IcesiUserApi.ROOT_PATH)
@@ -114,7 +114,7 @@ public class IcesiUserControllerTest {
     }
 
     @Test
-    public void testEndpointForCreateAnAdminWithAdminCredentials() throws Exception {
+    public void testForEndpointForCreateAnAdminWithAdminCredentials() throws Exception {
         loginAsAdmin();
         IcesiUserCreateDTO icesiUserCreateDTO = adminIcesiUserCreateDTO();
         var result = mockMvc.perform(MockMvcRequestBuilders.post(IcesiUserApi.ROOT_PATH)
@@ -130,7 +130,7 @@ public class IcesiUserControllerTest {
     }
 
     @Test
-    public void testEndpointForCreateAnAdminWithBankCredentials() throws Exception {
+    public void testForEndpointForCreateAnAdminWithBankCredentials() throws Exception {
         loginAsBank();
         IcesiUserCreateDTO icesiUserCreateDTO = adminIcesiUserCreateDTO();
         var result = mockMvc.perform(MockMvcRequestBuilders.post(IcesiUserApi.ROOT_PATH)
@@ -150,7 +150,7 @@ public class IcesiUserControllerTest {
     }
 
     @Test
-    public void testEndpointForCreateAnAdminWithUserCredentials() throws Exception {
+    public void testForEndpointForCreateAnAdminWithUserCredentials() throws Exception {
         loginAsUser();
         IcesiUserCreateDTO icesiUserCreateDTO = adminIcesiUserCreateDTO();
         var result = mockMvc.perform(MockMvcRequestBuilders.post(IcesiUserApi.ROOT_PATH)
@@ -179,7 +179,7 @@ public class IcesiUserControllerTest {
     }
 
     @Test
-    public void testEndpointForCreateAUserWithAdminCredentialsAndNullFirstName() throws Exception {
+    public void testForEndpointForCreateAUserWithAdminCredentialsAndNullFirstName() throws Exception {
         loginAsAdmin();
         IcesiUserCreateDTO icesiUserCreateDTO = defaultIcesiUserCreateDTO();
         icesiUserCreateDTO.setFirstName(null);
@@ -197,7 +197,7 @@ public class IcesiUserControllerTest {
     }
 
     @Test
-    public void testEndpointForCreateAUserWithAdminCredentialsAndBlankFirstName() throws Exception {
+    public void testForEndpointForCreateAUserWithAdminCredentialsAndBlankFirstName() throws Exception {
         loginAsAdmin();
         IcesiUserCreateDTO icesiUserCreateDTO = defaultIcesiUserCreateDTO();
         icesiUserCreateDTO.setFirstName(" ");
@@ -215,7 +215,7 @@ public class IcesiUserControllerTest {
     }
 
     @Test
-    public void testEndpointForCreateAUserWithAdminCredentialsAndEmptyFirstName() throws Exception {
+    public void testForEndpointForCreateAUserWithAdminCredentialsAndEmptyFirstName() throws Exception {
         loginAsAdmin();
         IcesiUserCreateDTO icesiUserCreateDTO = defaultIcesiUserCreateDTO();
         icesiUserCreateDTO.setFirstName("");
@@ -233,7 +233,7 @@ public class IcesiUserControllerTest {
     }
 
     @Test
-    public void testEndpointForCreateAUserWithAdminCredentialsAndNullLastName() throws Exception {
+    public void testForEndpointForCreateAUserWithAdminCredentialsAndNullLastName() throws Exception {
         loginAsAdmin();
         IcesiUserCreateDTO icesiUserCreateDTO = defaultIcesiUserCreateDTO();
         icesiUserCreateDTO.setLastName(null);
@@ -251,7 +251,7 @@ public class IcesiUserControllerTest {
     }
 
     @Test
-    public void testEndpointForCreateAUserWithAdminCredentialsAndBlankLastName() throws Exception {
+    public void testForEndpointForCreateAUserWithAdminCredentialsAndBlankLastName() throws Exception {
         loginAsAdmin();
         IcesiUserCreateDTO icesiUserCreateDTO = defaultIcesiUserCreateDTO();
         icesiUserCreateDTO.setLastName(" ");
@@ -269,7 +269,7 @@ public class IcesiUserControllerTest {
     }
 
     @Test
-    public void testEndpointForCreateAUserWithAdminCredentialsAndEmptyLastName() throws Exception {
+    public void testForEndpointForCreateAUserWithAdminCredentialsAndEmptyLastName() throws Exception {
         loginAsAdmin();
         IcesiUserCreateDTO icesiUserCreateDTO = defaultIcesiUserCreateDTO();
         icesiUserCreateDTO.setLastName("");
@@ -287,7 +287,7 @@ public class IcesiUserControllerTest {
     }
 
     @Test
-    public void testEndpointForCreateAUserWithAdminCredentialsAndNullEmail() throws Exception {
+    public void testForEndpointForCreateAUserWithAdminCredentialsAndNullEmail() throws Exception {
         loginAsAdmin();
         IcesiUserCreateDTO icesiUserCreateDTO = defaultIcesiUserCreateDTO();
         icesiUserCreateDTO.setEmail(null);
@@ -305,7 +305,7 @@ public class IcesiUserControllerTest {
     }
 
     @Test
-    public void testEndpointForCreateAUserWithAdminCredentialsAndBlankEmail() throws Exception {
+    public void testForEndpointForCreateAUserWithAdminCredentialsAndBlankEmail() throws Exception {
         loginAsAdmin();
         IcesiUserCreateDTO icesiUserCreateDTO = defaultIcesiUserCreateDTO();
         icesiUserCreateDTO.setEmail(" ");
@@ -323,7 +323,7 @@ public class IcesiUserControllerTest {
     }
 
     @Test
-    public void testEndpointForCreateAUserWithAdminCredentialsAndEmptyEmail() throws Exception {
+    public void testForEndpointForCreateAUserWithAdminCredentialsAndEmptyEmail() throws Exception {
         loginAsAdmin();
         IcesiUserCreateDTO icesiUserCreateDTO = defaultIcesiUserCreateDTO();
         icesiUserCreateDTO.setEmail("");
@@ -341,7 +341,7 @@ public class IcesiUserControllerTest {
     }
 
     @Test
-    public void testEndpointForCreateAUserWithAdminCredentialsAndInvalidEmail() throws Exception {
+    public void testForEndpointForCreateAUserWithAdminCredentialsAndInvalidEmail() throws Exception {
         loginAsAdmin();
         IcesiUserCreateDTO icesiUserCreateDTO = defaultIcesiUserCreateDTO();
         icesiUserCreateDTO.setEmail("pepitoperezgmail.com");
@@ -359,7 +359,7 @@ public class IcesiUserControllerTest {
     }
 
     @Test
-    public void testEndpointForCreateAUserWithAdminCredentialsAndNullPhoneNumber() throws Exception {
+    public void testForEndpointForCreateAUserWithAdminCredentialsAndNullPhoneNumber() throws Exception {
         loginAsAdmin();
         IcesiUserCreateDTO icesiUserCreateDTO = defaultIcesiUserCreateDTO();
         icesiUserCreateDTO.setPhoneNumber(null);
@@ -377,7 +377,7 @@ public class IcesiUserControllerTest {
     }
 
     @Test
-    public void testEndpointForCreateAUserWithAdminCredentialsAndBlankPhoneNumber() throws Exception {
+    public void testForEndpointForCreateAUserWithAdminCredentialsAndBlankPhoneNumber() throws Exception {
         loginAsAdmin();
         IcesiUserCreateDTO icesiUserCreateDTO = defaultIcesiUserCreateDTO();
         icesiUserCreateDTO.setPhoneNumber(" ");
@@ -395,7 +395,7 @@ public class IcesiUserControllerTest {
     }
 
     @Test
-    public void testEndpointForCreateAUserWithAdminCredentialsAndEmptyPhoneNumber() throws Exception {
+    public void testForEndpointForCreateAUserWithAdminCredentialsAndEmptyPhoneNumber() throws Exception {
         loginAsAdmin();
         IcesiUserCreateDTO icesiUserCreateDTO = defaultIcesiUserCreateDTO();
         icesiUserCreateDTO.setPhoneNumber("");
@@ -413,7 +413,7 @@ public class IcesiUserControllerTest {
     }
 
     @Test
-    public void testEndpointForCreateAUserWithAdminCredentialsAndNullPassword() throws Exception {
+    public void testForEndpointForCreateAUserWithAdminCredentialsAndNullPassword() throws Exception {
         loginAsAdmin();
         IcesiUserCreateDTO icesiUserCreateDTO = defaultIcesiUserCreateDTO();
         icesiUserCreateDTO.setPassword(null);
@@ -431,7 +431,7 @@ public class IcesiUserControllerTest {
     }
 
     @Test
-    public void testEndpointForCreateAUserWithAdminCredentialsAndBlankPassword() throws Exception {
+    public void testForEndpointForCreateAUserWithAdminCredentialsAndBlankPassword() throws Exception {
         loginAsAdmin();
         IcesiUserCreateDTO icesiUserCreateDTO = defaultIcesiUserCreateDTO();
         icesiUserCreateDTO.setPassword(" ");
@@ -449,7 +449,7 @@ public class IcesiUserControllerTest {
     }
 
     @Test
-    public void testEndpointForCreateAUserWithAdminCredentialsAndEmptyPassword() throws Exception {
+    public void testForEndpointForCreateAUserWithAdminCredentialsAndEmptyPassword() throws Exception {
         loginAsAdmin();
         IcesiUserCreateDTO icesiUserCreateDTO = defaultIcesiUserCreateDTO();
         icesiUserCreateDTO.setPassword("");
@@ -467,7 +467,7 @@ public class IcesiUserControllerTest {
     }
 
     @Test
-    public void testEndpointForCreateAUserWithAdminCredentialsAndNullIcesiRoleCreateDTO() throws Exception {
+    public void testForEndpointForCreateAUserWithAdminCredentialsAndNullIcesiRoleCreateDTO() throws Exception {
         loginAsAdmin();
         IcesiUserCreateDTO icesiUserCreateDTO = defaultIcesiUserCreateDTO();
         icesiUserCreateDTO.setIcesiRoleCreateDTO(null);
@@ -485,7 +485,7 @@ public class IcesiUserControllerTest {
     }
 
     @Test
-    public void testEndpointForCreateAUserWithAdminCredentialsAndNullDescriptionInTheIcesiRoleCreateDTO() throws Exception {
+    public void testForEndpointForCreateAUserWithAdminCredentialsAndNullDescriptionInTheIcesiRoleCreateDTO() throws Exception {
         loginAsAdmin();
         IcesiUserCreateDTO icesiUserCreateDTO = defaultIcesiUserCreateDTO();
         icesiUserCreateDTO.getIcesiRoleCreateDTO().setDescription(null);
@@ -503,7 +503,7 @@ public class IcesiUserControllerTest {
     }
 
     @Test
-    public void testEndpointForCreateAUserWithAdminCredentialsAndBlankDescriptionInTheIcesiRoleCreateDTO() throws Exception {
+    public void testForEndpointForCreateAUserWithAdminCredentialsAndBlankDescriptionInTheIcesiRoleCreateDTO() throws Exception {
         loginAsAdmin();
         IcesiUserCreateDTO icesiUserCreateDTO = defaultIcesiUserCreateDTO();
         icesiUserCreateDTO.getIcesiRoleCreateDTO().setDescription(" ");
@@ -521,7 +521,7 @@ public class IcesiUserControllerTest {
     }
 
     @Test
-    public void testEndpointForCreateAUserWithAdminCredentialsAndEmptyDescriptionInTheIcesiRoleCreateDTO() throws Exception {
+    public void testForEndpointForCreateAUserWithAdminCredentialsAndEmptyDescriptionInTheIcesiRoleCreateDTO() throws Exception {
         loginAsAdmin();
         IcesiUserCreateDTO icesiUserCreateDTO = defaultIcesiUserCreateDTO();
         icesiUserCreateDTO.getIcesiRoleCreateDTO().setDescription("");
@@ -539,7 +539,7 @@ public class IcesiUserControllerTest {
     }
 
     @Test
-    public void testEndpointForCreateAUserWithAdminCredentialsAndNullNameInTheIcesiRoleCreateDTO() throws Exception {
+    public void testForEndpointForCreateAUserWithAdminCredentialsAndNullNameInTheIcesiRoleCreateDTO() throws Exception {
         loginAsAdmin();
         IcesiUserCreateDTO icesiUserCreateDTO = defaultIcesiUserCreateDTO();
         icesiUserCreateDTO.getIcesiRoleCreateDTO().setName(null);
@@ -557,7 +557,7 @@ public class IcesiUserControllerTest {
     }
 
     @Test
-    public void testEndpointForCreateAUserWithAdminCredentialsAndBlankNameInTheIcesiRoleCreateDTO() throws Exception {
+    public void testForEndpointForCreateAUserWithAdminCredentialsAndBlankNameInTheIcesiRoleCreateDTO() throws Exception {
         loginAsAdmin();
         IcesiUserCreateDTO icesiUserCreateDTO = defaultIcesiUserCreateDTO();
         icesiUserCreateDTO.getIcesiRoleCreateDTO().setName(" ");
@@ -575,7 +575,7 @@ public class IcesiUserControllerTest {
     }
 
     @Test
-    public void testEndpointForCreateAUserWithAdminCredentialsAndEmptyNameInTheIcesiRoleCreateDTO() throws Exception {
+    public void testForEndpointForCreateAUserWithAdminCredentialsAndEmptyNameInTheIcesiRoleCreateDTO() throws Exception {
         loginAsAdmin();
         IcesiUserCreateDTO icesiUserCreateDTO = defaultIcesiUserCreateDTO();
         icesiUserCreateDTO.getIcesiRoleCreateDTO().setName("");

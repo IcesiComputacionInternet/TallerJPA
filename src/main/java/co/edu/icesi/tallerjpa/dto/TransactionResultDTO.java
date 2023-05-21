@@ -8,6 +8,6 @@ import lombok.Data;
 public class TransactionResultDTO {
     private String senderAccountNumber;
     private String receiverAccountNumber;
-    private long balance;
+    private long amount;
     private String result;
 }

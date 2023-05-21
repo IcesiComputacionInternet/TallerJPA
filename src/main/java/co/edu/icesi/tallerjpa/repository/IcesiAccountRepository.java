@@ -24,5 +24,5 @@ public interface IcesiAccountRepository extends JpaRepository<IcesiAccount, UUID
 
     @Modifying
     @Query("UPDATE IcesiAccount ia SET ia.balance = :newBalance WHERE ia.accountId = :accountId")
-    int updateBalance(long newBalance, String accountId);
+    int updateBalance(long newBalance, UUID accountId);
 }

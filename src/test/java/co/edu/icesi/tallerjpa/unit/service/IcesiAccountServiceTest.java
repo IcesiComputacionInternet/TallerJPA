@@ -1,7 +1,6 @@
 package co.edu.icesi.tallerjpa.unit.service;
 
 import co.edu.icesi.tallerjpa.dto.*;
-import co.edu.icesi.tallerjpa.enums.NameIcesiRole;
 import co.edu.icesi.tallerjpa.enums.TypeIcesiAccount;
 import co.edu.icesi.tallerjpa.error.exception.IcesiError;
 import co.edu.icesi.tallerjpa.error.exception.IcesiException;
@@ -9,7 +8,6 @@ import co.edu.icesi.tallerjpa.mapper.IcesiAccountMapper;
 import co.edu.icesi.tallerjpa.mapper.IcesiAccountMapperImpl;
 import co.edu.icesi.tallerjpa.mapper.IcesiUserMapper;
 import co.edu.icesi.tallerjpa.model.IcesiAccount;
-import co.edu.icesi.tallerjpa.model.IcesiRole;
 import co.edu.icesi.tallerjpa.model.IcesiUser;
 import co.edu.icesi.tallerjpa.repository.IcesiAccountRepository;
 import co.edu.icesi.tallerjpa.repository.IcesiUserRepository;
@@ -18,7 +16,6 @@ import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 
 import java.util.Optional;
-import java.util.UUID;
 import java.util.regex.Pattern;
 
 import static co.edu.icesi.tallerjpa.util.DTOBuilder.*;
@@ -376,7 +373,7 @@ public class IcesiAccountServiceTest {
         when(icesiUserRepository.findById(icesiUser.getUserId())).thenReturn(Optional.of(icesiUser));
 
         TransactionResultDTO transactionResultDTO = icesiAccountService.transferMoney(transactionCreateDTO, icesiUser.getUserId().toString());
-        assertEquals(500, transactionResultDTO.getBalance());
+        assertEquals(500, transactionResultDTO.getAmount());
         assertEquals(transactionCreateDTO.getSenderAccountNumber(), transactionResultDTO.getSenderAccountNumber());
         assertEquals(transactionCreateDTO.getReceiverAccountNumber(), transactionResultDTO.getReceiverAccountNumber());
         assertEquals("The transfer was successful", transactionResultDTO.getResult());

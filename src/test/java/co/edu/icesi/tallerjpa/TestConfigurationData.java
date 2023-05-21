@@ -66,8 +66,16 @@ public class TestConfigurationData {
                 .build();
         IcesiAccount icesiAccount = IcesiAccount.builder()
                 .accountId(UUID.fromString("aa14c92e-7505-4fe3-8bb7-2f418504e867"))
-                .accountNumber("123-123456-12")
-                .balance(0)
+                .accountNumber("222-123456-22")
+                .balance(1500)
+                .type(TypeIcesiAccount.REGULAR_ACCOUNT.toString())
+                .active(true)
+                .icesiUser(icesiUser)
+                .build();
+        IcesiAccount icesiAccount2 = IcesiAccount.builder()
+                .accountId(UUID.fromString("cc62238e-ce1b-4026-9ab5-2f47944dd150"))
+                .accountNumber("111-123456-11")
+                .balance(650)
                 .type(TypeIcesiAccount.REGULAR_ACCOUNT.toString())
                 .active(true)
                 .icesiUser(icesiUser2)
@@ -81,6 +89,7 @@ public class TestConfigurationData {
             users.save(icesiUser2);
             users.save(icesiUser3);
             icesiAccountRepository.save(icesiAccount);
+            icesiAccountRepository.save(icesiAccount2);
         };
     }
 }
