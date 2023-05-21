@@ -19,10 +19,4 @@ public class IcesiUserController implements IcesiUserApi {
     public IcesiUserShowDTO createIcesiUser(IcesiUserCreateDTO userDTO){
         return icesiUserService.save(userDTO);
     }
-
-    @PostMapping("")
-    public IcesiUserShowDTO createIcesiU(IcesiUserCreateDTO userDTO){
-        return icesiUserService.save(userDTO);
-    }
-
 }

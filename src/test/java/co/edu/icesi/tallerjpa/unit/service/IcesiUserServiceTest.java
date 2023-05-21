@@ -96,8 +96,8 @@ public class IcesiUserServiceTest {
         IcesiError icesiError = exception.getError();
         assertEquals(1, icesiError.getDetails().size());
         assertEquals(400, icesiError.getStatus().value());
-        assertEquals("field email or phone number: There is already a user with the email "+icesiUserCreateDTO.getEmail()+"\n", icesiError.getDetails().get(0).getErrorMessage());
-        assertEquals("There is already a user with the email " + icesiUserCreateDTO.getEmail() + "\n", exception.getMessage());
+        assertEquals("field email or phone number: There is already a user with the email "+icesiUserCreateDTO.getEmail()+". ", icesiError.getDetails().get(0).getErrorMessage());
+        assertEquals("There is already a user with the email " + icesiUserCreateDTO.getEmail() + ". ", exception.getMessage());
     }
 
     @Test
@@ -108,8 +108,8 @@ public class IcesiUserServiceTest {
         IcesiError icesiError = exception.getError();
         assertEquals(1, icesiError.getDetails().size());
         assertEquals(400, icesiError.getStatus().value());
-        assertEquals("field email or phone number: There is already a user with the phone number "+icesiUserCreateDTO.getPhoneNumber()+"\n", icesiError.getDetails().get(0).getErrorMessage());
-        assertEquals("There is already a user with the phone number " + icesiUserCreateDTO.getPhoneNumber() + "\n", exception.getMessage());
+        assertEquals("field email or phone number: There is already a user with the phone number "+icesiUserCreateDTO.getPhoneNumber()+". ", icesiError.getDetails().get(0).getErrorMessage());
+        assertEquals("There is already a user with the phone number " + icesiUserCreateDTO.getPhoneNumber() + ". ", exception.getMessage());
     }
 
     @Test
@@ -121,12 +121,12 @@ public class IcesiUserServiceTest {
         IcesiError icesiError = exception.getError();
         assertEquals(1, icesiError.getDetails().size());
         assertEquals(400, icesiError.getStatus().value());
-        String exceptionMessage = "field email or phone number: There is already a user with the email "+icesiUserCreateDTO.getEmail()+"\n";
-        exceptionMessage += "There is already a user with the phone number "+icesiUserCreateDTO.getPhoneNumber()+"\n";
+        String exceptionMessage = "field email or phone number: There is already a user with the email "+icesiUserCreateDTO.getEmail()+". ";
+        exceptionMessage += "There is already a user with the phone number "+icesiUserCreateDTO.getPhoneNumber()+". ";
         assertEquals(exceptionMessage, icesiError.getDetails().get(0).getErrorMessage());
 
-        exceptionMessage = "There is already a user with the email " + defaultIcesiUserCreateDTO().getEmail() + "\n";
-        exceptionMessage += "There is already a user with the phone number " + defaultIcesiUserCreateDTO().getPhoneNumber() + "\n";
+        exceptionMessage = "There is already a user with the email " + defaultIcesiUserCreateDTO().getEmail() + ". ";
+        exceptionMessage += "There is already a user with the phone number " + defaultIcesiUserCreateDTO().getPhoneNumber() + ". ";
         assertEquals(exceptionMessage, exception.getMessage());
     }
 

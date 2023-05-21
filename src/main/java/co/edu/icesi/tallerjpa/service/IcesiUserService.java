@@ -29,11 +29,11 @@ public class IcesiUserService {
         ArrayList<String> errors = new ArrayList<>();
 
         if(!isEmailUnique(icesiUserCreateDTO.getEmail())){
-            errors.add("There is already a user with the email " + icesiUserCreateDTO.getEmail() + "\n");
+            errors.add("There is already a user with the email " + icesiUserCreateDTO.getEmail() + ". ");
         }
 
         if(!isPhoneNumberUnique(icesiUserCreateDTO.getPhoneNumber())){
-            errors.add("There is already a user with the phone number " + icesiUserCreateDTO.getPhoneNumber() + "\n");
+            errors.add("There is already a user with the phone number " + icesiUserCreateDTO.getPhoneNumber() + ". ");
         }
 
         if(!errors.isEmpty()){

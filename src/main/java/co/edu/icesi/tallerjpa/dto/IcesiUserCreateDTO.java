@@ -5,6 +5,7 @@ import lombok.Builder;
 import lombok.Data;
 
 import javax.validation.Valid;
+import javax.validation.constraints.Email;
 import javax.validation.constraints.NotBlank;
 import javax.validation.constraints.NotEmpty;
 import javax.validation.constraints.NotNull;
@@ -25,6 +26,7 @@ public class IcesiUserCreateDTO {
     @NotNull(message = "The email can not be null")
     @NotBlank(message = "The email can not be blank")
     @NotEmpty(message = "The email can not be empty")
+    @Email
     private String email;
 
     @NotNull(message = "The phone number can not be null")

@@ -11,7 +11,7 @@ import javax.validation.Valid;
 @RequestMapping("/icesi_roles")
 public interface IcesiRoleApi {
     public static final String ROOT_PATH = "/icesi_roles";
-    @PostMapping("admin")
+    @PostMapping()
     public IcesiRoleShowDTO createRole(@Valid @RequestBody IcesiRoleCreateDTO icesiRoleCreateDTO);
 
 }
