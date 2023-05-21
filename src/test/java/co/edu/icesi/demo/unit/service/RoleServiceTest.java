@@ -1,6 +1,7 @@
 package co.edu.icesi.demo.unit.service;
 
 import co.edu.icesi.demo.dto.RoleCreateDTO;
+import co.edu.icesi.demo.error.exception.IcesiException;
 import co.edu.icesi.demo.mapper.RoleMapper;
 import co.edu.icesi.demo.mapper.RoleMapperImpl;
 import co.edu.icesi.demo.model.IcesiRole;
@@ -49,7 +50,7 @@ public class RoleServiceTest {
         try{
             roleService.save(defaultRoleCreateDTO());
             fail();
-        }catch(RuntimeException exception){
+        }catch(IcesiException exception){
             String message= exception.getMessage();
             assertEquals("Role name already exists",message);
 

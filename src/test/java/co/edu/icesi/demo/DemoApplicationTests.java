@@ -1,6 +1,7 @@
 package co.edu.icesi.demo;
 
 import co.edu.icesi.demo.dto.LoginDTO;
+import co.edu.icesi.demo.dto.TokenDTO;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import net.jcip.annotations.Immutable;
 import org.junit.jupiter.api.Test;
@@ -13,6 +14,7 @@ import org.springframework.test.context.ActiveProfiles;
 import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.request.MockMvcRequestBuilders;
 
+import static org.junit.jupiter.api.Assertions.assertNotNull;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
 @AutoConfigureMockMvc
@@ -31,15 +33,30 @@ class DemoApplicationTests {
 	}
 
 	@Test public void testTokenEndpoint() throws Exception{
-		var result= mockMvc.perform(MockMvcRequestBuilders.get("/token").content(
-				objectMapper.writeValueAsString(new LoginDTO("johndoe@email.com","password"))
-				)
+		var result= mockMvc.perform(MockMvcRequestBuilders.post("/token").content(
+								objectMapper.writeValueAsString(new LoginDTO("johndoe2@email.com","password"))
+						)
 						.contentType(MediaType.APPLICATION_JSON)
 						.accept(MediaType.APPLICATION_JSON))
 				.andExpect(status().isOk())
 				.andReturn();
 
-				System.out.println(result.getResponse().getContentAsString());
+		TokenDTO token =objectMapper.readValue(result.getResponse().getContentAsString(),TokenDTO.class);
+		assertNotNull(token);
+	}
+
+	@Test
+	public void testTokenEndpointWithInvalidEmail() throws Exception{
+		var result=mockMvc.perform(MockMvcRequestBuilders.get("/token").content(
+								objectMapper.writeValueAsString(new LoginDTO("incorrect@email.com","password"))
+						)
+						.contentType(MediaType.APPLICATION_JSON)
+						.accept(MediaType.APPLICATION_JSON))
+				.andExpect(status().isOk())
+				.andReturn();
+
+		//IcesiError token =objectMapper.readValue(result.getResponse().getContentAsString(),TokenDTO.class);
+		//assertNotNull(token);
 	}
 
 }

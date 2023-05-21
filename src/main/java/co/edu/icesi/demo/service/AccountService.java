@@ -2,17 +2,22 @@ package co.edu.icesi.demo.service;
 
 import co.edu.icesi.demo.dto.AccountCreateDTO;
 import co.edu.icesi.demo.dto.TransactionDTO;
+import co.edu.icesi.demo.error.exception.DetailBuilder;
+import co.edu.icesi.demo.error.exception.ErrorCode;
 import co.edu.icesi.demo.mapper.AccountMapper;
 import co.edu.icesi.demo.model.IcesiAccount;
 import co.edu.icesi.demo.model.IcesiUser;
 import co.edu.icesi.demo.repository.AccountRepository;
 import co.edu.icesi.demo.repository.UserRepository;
 import lombok.AllArgsConstructor;
+import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
 
 import java.util.Random;
 import java.util.UUID;
 import java.util.stream.Collectors;
+
+import static co.edu.icesi.demo.error.util.IcesiExceptionBuilder.createIcesiException;
 
 @Service
 @AllArgsConstructor
@@ -26,7 +31,11 @@ public class AccountService {
 
     public AccountCreateDTO save(AccountCreateDTO account){
 
-        IcesiUser icesiUser= userRepository.findByEmail(account.getUserEmail()).orElseThrow(()-> new RuntimeException("User does not exists"));
+        IcesiUser icesiUser= userRepository.findByEmail(account.getUserEmail()).orElseThrow( createIcesiException(
+                "User does not exists",
+                HttpStatus.NOT_FOUND,
+                new DetailBuilder(ErrorCode.ERR_404, "User with email",account.getUserEmail() )
+        ));
         IcesiAccount icesiAccount= accountMapper.fromIcesiAccountDTO(account);
         icesiAccount.setAccountId(UUID.randomUUID());
         icesiAccount.setAccountNumber(uniqueAccountNumber());
@@ -82,7 +91,11 @@ public class AccountService {
     }
     public void validateTypeToTransfer(IcesiAccount icesiAccount){
         if(icesiAccount.getType().equals("deposit only")){
-            throw new RuntimeException("Deposit only account "+ icesiAccount.getAccountNumber()+" can't transfer or be transferred money");
+            throw createIcesiException(
+                    "Deposit only account "+ icesiAccount.getAccountNumber()+" can't transfer or be transferred money",
+                    HttpStatus.BAD_REQUEST,
+                    new DetailBuilder(ErrorCode.ERR_400, "Account Number",icesiAccount.getAccountNumber() )
+            ).get();
         }
     }
     public TransactionDTO transferMoney(TransactionDTO transactionDTO){
@@ -106,7 +119,11 @@ public class AccountService {
 
     public AccountCreateDTO enableAccount(String accountNumber){
 
-        IcesiAccount icesiAccount=accountRepository.findByAccountNumber(accountNumber,false).orElseThrow( ()-> new RuntimeException("Inactive account not found"));
+        IcesiAccount icesiAccount=accountRepository.findByAccountNumber(accountNumber,false).orElseThrow(createIcesiException(
+                "Inactive account not found",
+                HttpStatus.NOT_FOUND,
+                new DetailBuilder(ErrorCode.ERR_404, "Inactive account number",accountNumber )
+        ));
         icesiAccount.setActive(true);
 
         accountRepository.save(icesiAccount); //update
@@ -117,10 +134,19 @@ public class AccountService {
 
     public AccountCreateDTO disableAccount(String accountNumber){
 
-        IcesiAccount icesiAccount=accountRepository.findByAccountNumber(accountNumber,true).orElseThrow( ()-> new RuntimeException("Active account not found"));
+        IcesiAccount icesiAccount=accountRepository.findByAccountNumber(accountNumber,true).orElseThrow( createIcesiException(
+                "Active account not found",
+                HttpStatus.NOT_FOUND,
+                new DetailBuilder(ErrorCode.ERR_404, "Active account number",accountNumber )
+        ));
 
         if(icesiAccount.getBalance()>0){
-            throw new RuntimeException("Balance is not 0. Account can't be disabled");
+
+            throw createIcesiException(
+                    "Balance is not 0. Account can't be disabled",
+                    HttpStatus.BAD_REQUEST,
+                    new DetailBuilder(ErrorCode.ERR_400, "","")
+            ).get();
         }
 
         icesiAccount.setActive(false);
@@ -133,13 +159,22 @@ public class AccountService {
 
     public void validateAccountBalanceWithAmountToPull(long balance, long money){
         if(balance<money){
-            throw new RuntimeException("Not enough money in the account to do this transaction");
+
+            throw createIcesiException(
+                    "Not enough money in the account to do this transaction",
+                    HttpStatus.BAD_REQUEST,
+                    new DetailBuilder(ErrorCode.ERR_400, "","" )
+            ).get();
         }
     }
 
     public IcesiAccount getAccountFromRepository(String accountNumber){
 
-        return accountRepository.findByAccountNumber(accountNumber,true).orElseThrow( ()-> new RuntimeException("Transaction can't be made, active account "+accountNumber+" not found"));
+        return accountRepository.findByAccountNumber(accountNumber,true).orElseThrow(createIcesiException(
+                "Transaction can't be made",
+                HttpStatus.NOT_FOUND,
+                new DetailBuilder(ErrorCode.ERR_404, "Active account",accountNumber )
+        ));
     }
 
 }

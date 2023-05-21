@@ -4,6 +4,7 @@ import co.edu.icesi.demo.dto.AccountCreateDTO;
 import co.edu.icesi.demo.dto.TransactionDTO;
 import org.springframework.web.bind.annotation.*;
 
+import javax.validation.Valid;
 import java.util.List;
 
 public interface AccountAPI {
@@ -17,16 +18,16 @@ public interface AccountAPI {
     List<AccountCreateDTO> getAllAccounts();
 
     @PostMapping
-    AccountCreateDTO addAccount(@RequestBody AccountCreateDTO accountCreateDTO);
+    AccountCreateDTO addAccount(@Valid @RequestBody AccountCreateDTO accountCreateDTO);
 
     @PutMapping("/withdrawal")
-    TransactionDTO withdrawalMoney(@RequestBody TransactionDTO transactionDTO);
+    TransactionDTO withdrawalMoney(@Valid @RequestBody TransactionDTO transactionDTO);
 
     @PutMapping("/deposit")
-    TransactionDTO depositMoney(@RequestBody TransactionDTO transactionDTO);
+    TransactionDTO depositMoney(@Valid @RequestBody TransactionDTO transactionDTO);
 
     @PutMapping("/transfer")
-    TransactionDTO transferMoney(@RequestBody TransactionDTO transactionDTO);
+    TransactionDTO transferMoney(@Valid @RequestBody TransactionDTO transactionDTO);
 
     @PutMapping("/{accountNumber}/enable")
     AccountCreateDTO enableAccount(@PathVariable String accountNumber);

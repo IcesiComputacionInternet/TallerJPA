@@ -1,15 +1,20 @@
 package co.edu.icesi.demo.service;
 
 import co.edu.icesi.demo.dto.UserCreateDTO;
+import co.edu.icesi.demo.error.exception.DetailBuilder;
+import co.edu.icesi.demo.error.exception.ErrorCode;
 import co.edu.icesi.demo.mapper.UserMapper;
 import co.edu.icesi.demo.model.IcesiRole;
 import co.edu.icesi.demo.model.IcesiUser;
 import co.edu.icesi.demo.repository.RoleRepository;
 import co.edu.icesi.demo.repository.UserRepository;
 import lombok.AllArgsConstructor;
+import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
 
 import java.util.UUID;
+
+import static co.edu.icesi.demo.error.util.IcesiExceptionBuilder.createIcesiException;
 
 @Service
 @AllArgsConstructor
@@ -25,7 +30,11 @@ public class UserService {
 
         validateEmailAndPhoneNumber(user);
 
-        IcesiRole icesiRole=roleRepository.findByName(user.getRoleName()).orElseThrow( ()-> new RuntimeException("User role does not exists"));
+        IcesiRole icesiRole=roleRepository.findByName(user.getRoleName()).orElseThrow(createIcesiException(
+                "User role does not exists",
+                HttpStatus.NOT_FOUND,
+                new DetailBuilder(ErrorCode.ERR_404, "User role",user.getRoleName())
+        ));
         IcesiUser icesiUser=userMapper.fromIcesiUserDTO(user);
         icesiUser.setRole(icesiRole);
         icesiUser.setUserId(UUID.randomUUID());
@@ -35,11 +44,25 @@ public class UserService {
 
     public void validateEmailAndPhoneNumber(UserCreateDTO user){
         if(userRepository.findByEmail(user.getEmail()).isPresent() && userRepository.findByPhoneNumber(user.getPhoneNumber()).isPresent()){
-            throw new RuntimeException("User email and phone number are in use");
+
+            throw createIcesiException(
+                    "User email and phone number are in use",
+                    HttpStatus.CONFLICT,
+                    new DetailBuilder(ErrorCode.ERR_DUPLICATED, "User email","Phone number" )
+            ).get();
+
         }else if (userRepository.findByEmail(user.getEmail()).isPresent()){
-            throw new RuntimeException("User email is in use");
+            throw createIcesiException(
+                    "User email is in use",
+                    HttpStatus.CONFLICT,
+                    new DetailBuilder(ErrorCode.ERR_DUPLICATED, "User email",user.getEmail() )
+            ).get();
         }else if(userRepository.findByPhoneNumber(user.getPhoneNumber()).isPresent()){
-            throw new RuntimeException("User phone number is in use");
+            throw createIcesiException(
+                    "User phone number is in use",
+                    HttpStatus.CONFLICT,
+                    new DetailBuilder(ErrorCode.ERR_DUPLICATED, "Phone Number",user.getPhoneNumber())
+            ).get();
         }
     }
 

@@ -2,6 +2,7 @@ package co.edu.icesi.demo.unit.service;
 
 import co.edu.icesi.demo.dto.AccountCreateDTO;
 import co.edu.icesi.demo.dto.TransactionDTO;
+import co.edu.icesi.demo.error.exception.IcesiException;
 import co.edu.icesi.demo.mapper.AccountMapper;
 import co.edu.icesi.demo.mapper.AccountMapperImpl;
 import co.edu.icesi.demo.model.IcesiAccount;
@@ -67,7 +68,7 @@ public class AccountServiceTest {
         try {
             accountService.save(newAccountCreateDTO());
             fail();
-        }catch(RuntimeException exception){
+        }catch(IcesiException exception){
             String message= exception.getMessage();
             assertEquals("User does not exists",message);
 
@@ -110,7 +111,7 @@ public class AccountServiceTest {
         try {
             accountService.enableAccount("111-222222-33");
             fail();
-        }catch(RuntimeException exception){
+        }catch(IcesiException exception){
             String message= exception.getMessage();
             assertEquals("Inactive account not found",message);
 
@@ -141,7 +142,7 @@ public class AccountServiceTest {
         try {
             accountService.disableAccount("111-222222-33");
             fail();
-        }catch(RuntimeException exception){
+        }catch(IcesiException exception){
             String message= exception.getMessage();
             assertEquals("Active account not found",message);
 
@@ -160,7 +161,7 @@ public class AccountServiceTest {
         try {
             accountService.disableAccount(accountNormalWithBalanceNotInZero().getAccountNumber());
             fail();
-        }catch(RuntimeException exception){
+        }catch(IcesiException exception){
             String message= exception.getMessage();
             assertEquals("Balance is not 0. Account can't be disabled",message);
 
@@ -188,9 +189,9 @@ public class AccountServiceTest {
         try {
             accountService.withdrawalMoney(defaultTransactionDTO());
             fail();
-        }catch (RuntimeException exception){
+        }catch (IcesiException exception){
             String message= exception.getMessage();
-            assertEquals("Transaction can't be made, active account "+defaultTransactionDTO().getAccountNumberFrom()+" not found",message);
+            assertEquals("Transaction can't be made",message);
 
             verify(accountRepository,times(1)).findByAccountNumber(any(),eq(true));
             verify(accountRepository,never()).save(any());
@@ -205,7 +206,7 @@ public class AccountServiceTest {
         try {
             accountService.withdrawalMoney(transactionDTOWithAccountFromBalanceInZero());
             fail();
-        }catch (RuntimeException exception){
+        }catch (IcesiException exception){
             String message= exception.getMessage();
             assertEquals("Not enough money in the account to do this transaction",message);
 
@@ -234,9 +235,9 @@ public class AccountServiceTest {
         try {
             accountService.depositMoney(defaultTransactionDTO());
             fail();
-        }catch (RuntimeException exception){
+        }catch (IcesiException exception){
             String message= exception.getMessage();
-            assertEquals("Transaction can't be made, active account "+defaultTransactionDTO().getAccountNumberTo()+" not found",message);
+            assertEquals("Transaction can't be made",message);
 
             verify(accountRepository,times(1)).findByAccountNumber(any(),eq(true));
             verify(accountRepository,never()).save(any());
@@ -261,9 +262,9 @@ public class AccountServiceTest {
         try {
             accountService.transferMoney(defaultTransactionDTO());
             fail();
-        }catch (RuntimeException exception){
+        }catch (IcesiException exception){
             String message= exception.getMessage();
-            assertEquals("Transaction can't be made, active account "+defaultTransactionDTO().getAccountNumberFrom()+" not found",message);
+            assertEquals("Transaction can't be made",message);
 
             verify(accountRepository,times(1)).findByAccountNumber(any(),eq(true));
             verify(accountRepository,never()).save(any());
@@ -277,9 +278,9 @@ public class AccountServiceTest {
         try {
             accountService.transferMoney(defaultTransactionDTO());
             fail();
-        }catch (RuntimeException exception){
+        }catch (IcesiException exception){
             String message= exception.getMessage();
-            assertEquals("Transaction can't be made, active account "+defaultTransactionDTO().getAccountNumberTo()+" not found",message);
+            assertEquals("Transaction can't be made",message);
 
             verify(accountRepository,times(2)).findByAccountNumber(any(),eq(true));
             verify(accountRepository,never()).save(any());
@@ -293,7 +294,7 @@ public class AccountServiceTest {
         try {
             accountService.transferMoney(transactionDTOWithAccountDepositOnlyFrom());
             fail();
-        }catch (RuntimeException exception){
+        }catch (IcesiException exception){
             String message= exception.getMessage();
             assertEquals("Deposit only account "+transactionDTOWithAccountDepositOnlyFrom().getAccountNumberFrom()+" can't transfer or be transferred money",message);
 
@@ -309,7 +310,7 @@ public class AccountServiceTest {
         try {
             accountService.transferMoney(transactionDTOWithAccountDepositOnlyTo());
             fail();
-        }catch (RuntimeException exception){
+        }catch (IcesiException exception){
             String message= exception.getMessage();
             assertEquals("Deposit only account "+transactionDTOWithAccountDepositOnlyTo().getAccountNumberTo()+" can't transfer or be transferred money",message);
 
@@ -326,7 +327,7 @@ public class AccountServiceTest {
         try {
             accountService.transferMoney(transactionDTOWithAccountFromBalanceInZero());
             fail();
-        }catch (RuntimeException exception){
+        }catch (IcesiException exception){
             String message= exception.getMessage();
             assertEquals("Not enough money in the account to do this transaction",message);
 

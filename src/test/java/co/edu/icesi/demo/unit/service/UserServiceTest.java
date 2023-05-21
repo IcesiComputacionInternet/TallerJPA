@@ -1,6 +1,7 @@
 package co.edu.icesi.demo.unit.service;
 
 import co.edu.icesi.demo.dto.UserCreateDTO;
+import co.edu.icesi.demo.error.exception.IcesiException;
 import co.edu.icesi.demo.mapper.UserMapper;
 import co.edu.icesi.demo.mapper.UserMapperImpl;
 import co.edu.icesi.demo.model.IcesiRole;
@@ -58,7 +59,7 @@ public class UserServiceTest {
         try{
             userService.save(defaultUserCreateDTO());
             fail();
-        }catch (RuntimeException exception){
+        }catch (IcesiException exception){
             String message= exception.getMessage();
             assertEquals("User email is in use",message);
 
@@ -78,7 +79,7 @@ public class UserServiceTest {
         try{
             userService.save(defaultUserCreateDTO());
             fail();
-        }catch (RuntimeException exception){
+        }catch (IcesiException exception){
             String message= exception.getMessage();
             assertEquals("User phone number is in use",message);
 
@@ -98,7 +99,7 @@ public class UserServiceTest {
         try{
             userService.save(defaultUserCreateDTO());
             fail();
-        }catch (RuntimeException exception){
+        }catch (IcesiException exception){
             String message= exception.getMessage();
             assertEquals("User email and phone number are in use",message);
 
@@ -117,7 +118,7 @@ public class UserServiceTest {
         try {
             userService.save(defaultUserCreateDTO());
             fail();
-        }catch (RuntimeException exception){
+        }catch (IcesiException exception){
             String message= exception.getMessage();
             assertEquals("User role does not exists",message);
 
