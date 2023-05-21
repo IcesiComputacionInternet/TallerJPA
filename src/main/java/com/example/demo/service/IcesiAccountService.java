@@ -37,10 +37,26 @@ public class IcesiAccountService {
     public ResponseIcesiAccountDTO create(IcesiAccountCreateDTO account) {
         Optional<IcesiAccount> existingIcesiAccount = icesiAccountRepository.findByAccountNumber(account.getAccountNumber());
 
-        existingIcesiAccount.ifPresent(u -> {throw new RuntimeException("This account number is already in use");});
-        if(account.getBalance() < 0) {throw new RuntimeException("The account balance cannot be negative");}
+        existingIcesiAccount.ifPresent(u -> {throw IcesiExceptionBuilder.createIcesiException(
+                "This account number is already in use",
+                HttpStatus.BAD_REQUEST, 
+                new DetailBuilder(ErrorCode.ERR_400, "account", "the number", account.getAccountNumber())
+            ).get();});
+            
+        if(account.getBalance() < 0) {
+            throw IcesiExceptionBuilder.createIcesiException(
+                "The account balance cannot be negative",
+                HttpStatus.BAD_REQUEST, 
+                new DetailBuilder(ErrorCode.ERR_400, "account", "balance", account.getAccountNumber())
+            ).get();
+        }
+
         IcesiUser icesiUser = icesiUserRepository.findByEmail(account.getIcesiUser().getEmail())
-            .orElseThrow(() -> new RuntimeException("This icesi user is not present in the database "));
+            .orElseThrow(() -> IcesiExceptionBuilder.createIcesiException(
+                "This icesi user is not present in the database",
+                HttpStatus.NOT_FOUND,
+                new DetailBuilder(ErrorCode.ERR_404, "icesiUser", "email", account.getIcesiUser().getEmail())
+            ).get());
 
         IcesiAccount icesiAccount = icesiAccountMapper.fromIcesiAccountCreateDTO(account);
 
@@ -88,7 +104,11 @@ public class IcesiAccountService {
             account.setActive(false);
         }
         else {
-            throw new RuntimeException("This accout cannot be disabled, its balances is not 0");
+            throw IcesiExceptionBuilder.createIcesiException(
+                "This account cannot be disabled, its balance is not 0",
+                HttpStatus.BAD_REQUEST,
+                new DetailBuilder(ErrorCode.ERR_400, "account", "balance", String.valueOf(account.getBalance()))
+            ).get();
         }
 
         return icesiAccountMapper.fromIcesiAccountCreateDTOToResponseIcesiAccountDTO(account);
@@ -98,13 +118,21 @@ public class IcesiAccountService {
         IcesiAccount account = findIcesiAccountByAccountNumber(transactionCreateDTO.getSenderAccountNumber());
 
         if(!account.isActive()) {
-            throw new RuntimeException("Account is disabled, it is not possible to withdraw form it");
+            throw IcesiExceptionBuilder.createIcesiException(
+                "Account is disabled, it is not possible to withdraw from it",
+                HttpStatus.BAD_REQUEST,
+                new DetailBuilder(ErrorCode.ERR_400, "account", "status", "disabled")
+            ).get();
         } 
 
         if((account.getBalance() - transactionCreateDTO.getAmount()) < 0) {
-            throw new RuntimeException("This account does not have enough funds");
+            throw IcesiExceptionBuilder.createIcesiException(
+                "This account does not have enough funds",
+                HttpStatus.BAD_REQUEST,
+                new DetailBuilder(ErrorCode.ERR_400, "account", "funds", String.valueOf(account.getBalance()))
+            ).get();
         }
-        
+
         account.setBalance(account.getBalance() - transactionCreateDTO.getAmount());
 
         return icesiAccountMapper.fromTransactionCrateDTO(transactionCreateDTO);
@@ -114,7 +142,11 @@ public class IcesiAccountService {
         IcesiAccount account = findIcesiAccountByAccountNumber(transactionCreateDTO.getReceiverAccountNumber());
 
         if(!account.isActive()) {
-            throw new RuntimeException("Account is disabled, it is not possible to deposit money to it");
+            throw IcesiExceptionBuilder.createIcesiException(
+                "Account is disabled, it is not possible to deposit money to it",
+                HttpStatus.BAD_REQUEST,
+                new DetailBuilder(ErrorCode.ERR_400, "account", "status", "disabled")
+            ).get();
         }
 
         account.setBalance(account.getBalance() + transactionCreateDTO.getAmount());
@@ -127,23 +159,43 @@ public class IcesiAccountService {
         IcesiAccount destinationAccount = findIcesiAccountByAccountNumber(transactionCreateDTO.getReceiverAccountNumber());
 
         if(!originAccount.isActive()) {
-            throw new RuntimeException("The origin account is disabled");
+            throw IcesiExceptionBuilder.createIcesiException(
+                "The origin account is disabled",
+                HttpStatus.BAD_REQUEST,
+                new DetailBuilder(ErrorCode.ERR_400, "account", "status", "disabled")
+            ).get();
         }
 
         if(!destinationAccount.isActive()) {
-            throw new RuntimeException("The destination account is disabled");
+            throw IcesiExceptionBuilder.createIcesiException(
+                "The destination account is disabled",
+                HttpStatus.BAD_REQUEST,
+                new DetailBuilder(ErrorCode.ERR_400, "account", "status", "disabled")
+            ).get();
         }
 
         if (originAccount.getType() == "deposit") {
-            throw new RuntimeException("The origin account is not allowed to be transfer money");
+            throw IcesiExceptionBuilder.createIcesiException(
+                "The origin account is not allowed to transfer money",
+                HttpStatus.BAD_REQUEST,
+                new DetailBuilder(ErrorCode.ERR_400, "account", "type", "deposit")
+            ).get();
         }
     
         if(destinationAccount.getType() == "deposit") {
-            throw new RuntimeException("The destination account is not allowed to be transferred money");
+            throw IcesiExceptionBuilder.createIcesiException(
+                "The destination account is not allowed to receive transferred money",
+                HttpStatus.BAD_REQUEST,
+                new DetailBuilder(ErrorCode.ERR_400, "account", "type", "deposit")
+            ).get();
         }
         
         if((originAccount.getBalance() - transactionCreateDTO.getAmount()) < 0) {
-            throw new RuntimeException("The origin account does not have enough funds");
+            throw IcesiExceptionBuilder.createIcesiException(
+                "The origin account does not have enough funds",
+                HttpStatus.BAD_REQUEST,
+                new DetailBuilder(ErrorCode.ERR_400, "account", "balance", "insufficient")
+            ).get();
         }
     
         originAccount.setBalance(originAccount.getBalance() - transactionCreateDTO.getAmount());
