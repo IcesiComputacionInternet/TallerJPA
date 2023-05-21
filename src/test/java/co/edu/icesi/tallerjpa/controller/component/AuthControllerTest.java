@@ -13,6 +13,7 @@ import org.springframework.http.MediaType;
 import org.springframework.test.context.ActiveProfiles;
 import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.request.MockMvcRequestBuilders;
+import co.edu.icesi.tallerjpa.error.exception.IcesiError;
 
 import static org.junit.jupiter.api.Assertions.assertNotNull;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
@@ -41,18 +42,17 @@ public class AuthControllerTest {
         assertNotNull(token);
     }
 
-    //	@Test
-//	public void testTokenEndpointWithInvalidEmail() throws Exception {
-//		var result = mockMvc.perform(MockMvcRequestBuilders.get("/token").content(
-//								objectMapper.writeValueAsString(new LoginDTO("inorrect@email.com","password"))
-//						)
-//						.contentType(MediaType.APPLICATION_JSON)
-//						.accept(MediaType.APPLICATION_JSON))
-//				.andExpect(status().isOk())
-//				.andReturn();
-//
-//		IcesiError icesiError = objectMapper.readValue(result.getResponse().getContentAsString(), IcesiError.class);
-//		assertNotNull(icesiError);
-//	}
+    @Test
+	public void testTokenEndpointWithInvalidEmail() throws Exception {
+		var result = mockMvc.perform(MockMvcRequestBuilders.post("/token").content(
+								objectMapper.writeValueAsString(new LoginDTO("inorrect@email.com","password"))
+						)
+						.contentType(MediaType.APPLICATION_JSON)
+						.accept(MediaType.APPLICATION_JSON))
+				.andExpect(status().isUnauthorized())
+				.andReturn();
 
+		IcesiError icesiError = objectMapper.readValue(result.getResponse().getContentAsString(), IcesiError.class);
+		assertNotNull(icesiError);
+	}
 }

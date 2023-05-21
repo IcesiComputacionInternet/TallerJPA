@@ -1,6 +1,7 @@
 package co.edu.icesi.tallerjpa.controller;
 
 import co.edu.icesi.tallerjpa.dto.LoginDTO;
+import co.edu.icesi.tallerjpa.dto.TokenDTO;
 import co.edu.icesi.tallerjpa.service.TokenService;
 import lombok.AllArgsConstructor;
 import org.springframework.security.authentication.AuthenticationManager;
@@ -16,7 +17,7 @@ public class AuthController {
     private final TokenService tokenService;
     private final AuthenticationManager authenticationManager;
     @PostMapping("/token")
-    public String token(@RequestBody LoginDTO loginDTO){
+    public TokenDTO token(@RequestBody LoginDTO loginDTO){
         Authentication authentication = authenticationManager
                 .authenticate(new UsernamePasswordAuthenticationToken(loginDTO.username(),loginDTO.password()));
         return tokenService.generateToken(authentication);
