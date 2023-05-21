@@ -10,18 +10,19 @@ import java.util.function.Supplier;
 public class IcesiExceptionBuilder {
 
     public static Supplier<IcesiException> createIcesiException(String message, String details) {
-        return () -> new IcesiException(message, createIcesiError(message, HttpStatus.BAD_REQUEST, details));
+        return () -> new IcesiException(message, createIcesiError(HttpStatus.BAD_REQUEST, details));
     }
 
-    public static Supplier<IcesiException> createIcesiException(String message, HttpStatus httpStatus,String details) {
-        return () -> new IcesiException(message, createIcesiError(message, httpStatus, details));
+    public static IcesiException createIcesiException(String message, HttpStatus httpStatus,String details) {
+        return new IcesiException(message, createIcesiError(httpStatus, details));
     }
 
-    public static IcesiError createIcesiError(String message, HttpStatus httpStatus,String details){
-        return IcesiError.builder().status(httpStatus)
-                .details(
-                        details
-                ).build();
+    public static IcesiError createIcesiError(HttpStatus httpStatus,String details){
+        return IcesiError.builder()
+                .status(httpStatus)
+                .details(details)
+                .build();
+
     }
 
 

@@ -1,7 +1,11 @@
 package co.com.icesi.demojpa.servicio;
 
+import co.com.icesi.demojpa.dto.LoginDTO;
+import co.com.icesi.demojpa.dto.TokenDTO;
 import co.com.icesi.demojpa.security.CustomAuthentication;
 import lombok.AllArgsConstructor;
+import org.springframework.security.authentication.AuthenticationManager;
+import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.oauth2.jose.jws.MacAlgorithm;
@@ -10,6 +14,7 @@ import org.springframework.security.oauth2.jwt.JwtClaimsSet;
 import org.springframework.security.oauth2.jwt.JwtEncoder;
 import org.springframework.security.oauth2.jwt.JwtEncoderParameters;
 import org.springframework.stereotype.Service;
+import org.springframework.web.bind.annotation.RequestBody;
 
 import java.time.Instant;
 import java.time.temporal.ChronoUnit;
@@ -21,7 +26,9 @@ public class TokenSercive {
 
     private final JwtEncoder encoder;
 
-    public String generateToken(Authentication authentication){
+    private final AuthenticationManager authenticationManager;
+
+    public TokenDTO generateToken(Authentication authentication){
         CustomAuthentication customAuthentication =(CustomAuthentication) authentication;
         Instant now = Instant.now();
         String scope = authentication.getAuthorities().stream()
@@ -35,8 +42,21 @@ public class TokenSercive {
                 .claim("scope", scope)
                 .claim("icesiUserId", customAuthentication.getUserId())
                 .build();
-        var encoderParameters= JwtEncoderParameters.from(JwsHeader.with(MacAlgorithm.HS256).build(),claims);
-        return this.encoder.encode(encoderParameters).getTokenValue();
 
+        var encoderParameters= JwtEncoderParameters.from(JwsHeader.with(MacAlgorithm.HS256).build(),claims);
+        return TokenDTO.builder().token(encoder.encode(encoderParameters).getTokenValue()).build();
+
+    }
+
+    public TokenDTO logIn(@RequestBody LoginDTO loginDTO){
+        try {
+            Authentication authentication = authenticationManager
+                    .authenticate(new UsernamePasswordAuthenticationToken(loginDTO.username(), loginDTO.password()));
+            return generateToken(authentication);
+        }catch (Exception e) {
+            //TODO no se si deberia ir como exception porque afecta el funcionamiento del front
+            throw new RuntimeException("Usuario o contraseña incorrectos");
+        }
+        //return null;
     }
 }

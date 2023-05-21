@@ -21,5 +21,52 @@ public class DemoJpaApplication {
 		SpringApplication.run(DemoJpaApplication.class, args);
 	}
 
+	@Bean
+	public CommandLineRunner commandLineRunner(UserRepository users,
+											   RoleRepository roleRepository,
+											   PasswordEncoder encoder) {
+
+		IcesiRole admin = IcesiRole.builder()
+				.roleId(UUID.randomUUID())
+				.description("Role for demo")
+				.name("ADMIN")
+				.build();
+		IcesiRole bank = IcesiRole.builder()
+				.roleId(UUID.randomUUID())
+				.description("Role for demo")
+				.name("BANK")
+				.build();
+		IcesiRole user = IcesiRole.builder()
+				.roleId(UUID.randomUUID())
+				.description("Role for demo")
+				.name("USER")
+				.build();
+		IcesiUser icesiUser = IcesiUser.builder()
+				.userId(UUID.randomUUID())
+				.email("johndoe@email.com")
+				.role(admin)
+				.firstName("John")
+				.lastname("Doe")
+				.phone("+57123123123")
+				.password(encoder.encode("password"))
+				.build();
+		IcesiUser icesiUser2 = IcesiUser.builder()
+				.userId(UUID.randomUUID())
+				.email("johndoe2@email.com")
+				.role(user)
+				.firstName("John")
+				.lastname("Doe")
+				.password(encoder.encode("password"))
+				.build();
+
+		return args -> {
+			roleRepository.save(admin);
+			roleRepository.save(user);
+			roleRepository.save(bank);
+			users.save(icesiUser);
+			users.save(icesiUser2);
+		};
+	}
+
 
 }

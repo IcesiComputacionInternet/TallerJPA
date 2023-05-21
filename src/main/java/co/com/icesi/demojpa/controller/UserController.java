@@ -8,9 +8,9 @@ import org.springframework.web.bind.annotation.*;
 
 import java.util.UUID;
 
-import static co.com.icesi.demojpa.api.UserAPI.BASE_USER_URL;
 
-@RestController(BASE_USER_URL)
+
+@RestController
 public class UserController implements UserAPI {
 
 
@@ -21,12 +21,10 @@ public class UserController implements UserAPI {
     }
 
 
-    @PostMapping("/")
+
+    @Override
     public ResponseUserDTO createIcesiUser(@RequestBody UserCreateDTO user){
         return userService.save(user);
     }
-
-
-
 
 }

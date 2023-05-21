@@ -1,5 +1,6 @@
 package co.com.icesi.demojpa.controller;
 
+import co.com.icesi.demojpa.api.AccountAPI;
 import co.com.icesi.demojpa.dto.AccountCreateDTO;
 import co.com.icesi.demojpa.dto.response.ResponseAccountDTO;
 import co.com.icesi.demojpa.model.IcesiAccount;
@@ -12,8 +13,7 @@ import java.util.Optional;
 import java.util.UUID;
 
 @RestController
-@RequestMapping("/accounts")
-public class AccountController {
+public class AccountController implements AccountAPI {
 
     private final AccountService accountService;
 
@@ -25,16 +25,35 @@ public class AccountController {
         this.accountRepository = accountRepository1;
     }
 
-    @PostMapping("/")
-    public ResponseAccountDTO createIcesiAccount(@RequestBody AccountCreateDTO accountCreateDTO){
+    @Override
+    public ResponseAccountDTO createIcesiAccount(AccountCreateDTO accountCreateDTO){
         return accountService.save(accountCreateDTO);
     }
 
-    @PostMapping("/disableAccount/{accountNumber}")
-    public void disableAccount(@PathVariable String accountNumber){
+    @Override
+    public void disableAccount(String accountNumber){
         accountService.disableAccount(accountNumber);
     }
 
 
+    @Override
+    public void eneableAccount(String accountNumber){
+        accountService.enableAccount(accountNumber);
+    }
 
+    @Override
+    public void withdraw(String accountNumber, long amount){
+        accountService.withdrawal(accountNumber, amount);
+    }
+
+    @Override
+    public void deposit(String accountNumber, long amount){
+        accountService.deposit(accountNumber, amount);
+    }
+
+
+    @Override
+    public void transfer(String accountNumberOrigin, String accountNumberDestination, long amount){
+        accountService.transfer(accountNumberOrigin, accountNumberDestination, amount);
+    }
 }

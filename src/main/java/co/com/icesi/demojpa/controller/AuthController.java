@@ -2,6 +2,7 @@ package co.com.icesi.demojpa.controller;
 
 import antlr.Token;
 import co.com.icesi.demojpa.dto.LoginDTO;
+import co.com.icesi.demojpa.dto.TokenDTO;
 import co.com.icesi.demojpa.servicio.TokenSercive;
 import lombok.AllArgsConstructor;
 import org.springframework.security.authentication.AuthenticationManager;
@@ -20,9 +21,7 @@ public class AuthController {
     private final AuthenticationManager authenticationManager;
 
     @PostMapping("/token")
-    public String token(@RequestBody LoginDTO loginDTO){
-        Authentication authentication = authenticationManager
-                .authenticate(new UsernamePasswordAuthenticationToken(loginDTO.username(),loginDTO.password()));
-        return tokenSercive.generateToken(authentication);
+    public TokenDTO token(@RequestBody LoginDTO loginDTO) {
+        return tokenSercive.logIn(loginDTO);
     }
 }

@@ -154,6 +154,10 @@ public class AccountService {
 
     }
 
+    public ResponseAccountDTO getAccount(String accountNumber){
+        return accountResponseMapper.fromIcesiAccount(accountRepository.findByAccountNumber(accountNumber).orElseThrow(()-> new RuntimeException("No existe una cuenta con este numero")));
+    }
+
     private boolean checkType(IcesiAccount account){
         return account.getType().equalsIgnoreCase("deposit only");
     }
