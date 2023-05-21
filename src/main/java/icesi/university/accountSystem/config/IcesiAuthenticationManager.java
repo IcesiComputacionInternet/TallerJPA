@@ -2,6 +2,7 @@ package icesi.university.accountSystem.config;
 
 import icesi.university.accountSystem.model.SecurityUser;
 import icesi.university.accountSystem.security.CustomAuthentication;
+import icesi.university.accountSystem.services.TokenService;
 import icesi.university.accountSystem.services.UserManagementService;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.authentication.dao.DaoAuthenticationProvider;

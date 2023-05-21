@@ -11,6 +11,7 @@ import icesi.university.accountSystem.repository.IcesiRoleRepository;
 import icesi.university.accountSystem.repository.IcesiUserRepository;
 import lombok.AllArgsConstructor;
 import lombok.SneakyThrows;
+import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.stereotype.Service;
 
 import java.util.ArrayList;
@@ -43,8 +44,8 @@ public class UserService {
         if(!errors.isEmpty()){
             throw new ExistsException(String.join(" ", errors));
         }
-
         IcesiUser user = icesiUserMapper.fromIcesiUserDTO(userDTO);
+        user.setPassword(new BCryptPasswordEncoder().encode(userDTO.getPassword()));
         user.setUserId(UUID.randomUUID());
         var role = roleRepository.findByName(userDTO.getRole()).orElseThrow(() -> new ExistsException("Role doesn't exists"));
         user.setRole(role);
