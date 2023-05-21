@@ -29,7 +29,7 @@ public class GlobalExceptionHandler {
     }
 
     @ExceptionHandler(value = CustomException.class)
-    public ResponseEntity<String> handleUserExistsException(CustomException e){
+    public ResponseEntity<String> handleCustomException(CustomException e){
         e.printStackTrace();
         return ResponseEntity.badRequest().body(e.getMessage());
     }
