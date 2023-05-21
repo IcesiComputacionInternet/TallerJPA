@@ -26,7 +26,7 @@ public class IcesiUserCreateDTO {
     @NotNull(message = "The email can not be null")
     @NotBlank(message = "The email can not be blank")
     @NotEmpty(message = "The email can not be empty")
-    @Email
+    @Email(message = "The email must be a well-formed email address")
     private String email;
 
     @NotNull(message = "The phone number can not be null")
@@ -35,8 +35,8 @@ public class IcesiUserCreateDTO {
     private String phoneNumber;
 
     @NotNull(message = "The password can not be null")
-    @NotBlank(message = "The password name can not be blank")
-    @NotEmpty(message = "The password name can not be empty")
+    @NotBlank(message = "The password can not be blank")
+    @NotEmpty(message = "The password can not be empty")
     private String password;
     @NotNull(message = "The role of the icesi user can not be null")
     @Valid
