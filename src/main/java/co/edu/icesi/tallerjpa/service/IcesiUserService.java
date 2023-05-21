@@ -45,12 +45,7 @@ public class IcesiUserService {
             ).get();
         }
 
-        IcesiRole icesiRole = icesiRoleRepository.findByName(icesiUserCreateDTO.getIcesiRoleCreateDTO().getName())
-                .orElseThrow(createIcesiException(
-                        "There is no role with that name",
-                        HttpStatus.NOT_FOUND,
-                        new DetailBuilder(ErrorCode.ERR_404, "role", "name", icesiUserCreateDTO.getIcesiRoleCreateDTO().getName())
-                ));
+        IcesiRole icesiRole = getIcesiRoleByName(icesiUserCreateDTO.getIcesiRoleCreateDTO().getName());
 
         IcesiUser icesiUser = icesiUserMapper.fromCreateIcesiUserDTO(icesiUserCreateDTO);
         icesiUser.setIcesiRole(icesiRole);
@@ -72,13 +67,40 @@ public class IcesiUserService {
         return true;
     }
 
-    private UUID getUUIDOfRoleByName(String name){
-        IcesiRole icesiRole = icesiRoleRepository.findByName(name)
+    public IcesiUserShowDTO editRole(String icesiUserId, String roleName){
+        IcesiUser icesiUser = getIcesiUserById(icesiUserId);
+        IcesiRole icesiRole = getIcesiRoleByName(roleName);
+        icesiUser.setIcesiRole(icesiRole);
+        return icesiUserMapper.fromIcesiUserToShow(icesiUserRepository.save(icesiUser));
+    }
+
+    private IcesiRole getIcesiRoleByName(String roleName){
+        return icesiRoleRepository.findByName(roleName)
                 .orElseThrow(createIcesiException(
                         "There is no role with that name",
                         HttpStatus.NOT_FOUND,
-                        new DetailBuilder(ErrorCode.ERR_404, "role", "name", name)
+                        new DetailBuilder(ErrorCode.ERR_404, "role", "name", roleName)
                 ));
-        return icesiRole.getRoleId();
+    }
+
+    private IcesiUser getIcesiUserById(String icesiUserId){
+        return icesiUserRepository.findById(fromIdToUUID(icesiUserId)).orElseThrow(
+                createIcesiException(
+                        "There is no icesi user with the id: " + icesiUserId,
+                        HttpStatus.NOT_FOUND,
+                        new DetailBuilder(ErrorCode.ERR_404, "icesi user", "id", icesiUserId))
+        );
+    }
+
+    private UUID fromIdToUUID(String icesiUserId){
+        try{
+            return UUID.fromString(icesiUserId);
+        }catch (IllegalArgumentException illegalArgumentException){
+            throw createIcesiException(
+                    "Invalid account id",
+                    HttpStatus.BAD_REQUEST,
+                    new DetailBuilder(ErrorCode.ERR_400, "id", "Invalid account id")
+            ).get();
+        }
     }
 }

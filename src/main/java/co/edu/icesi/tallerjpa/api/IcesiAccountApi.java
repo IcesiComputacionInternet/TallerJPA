@@ -15,16 +15,10 @@ public interface IcesiAccountApi {
     public IcesiAccountShowDTO createIcesiAccount(@Valid @RequestBody IcesiAccountCreateDTO icesiAccountCreateDTO);
 
     @PatchMapping("enable/{accountId}")
-    public IcesiAccountShowDTO enableAccount(@NotNull(message = "The account id can not be null")
-                                                 @NotBlank(message = "The account id can not be blank")
-                                                 @NotEmpty(message = "The account id can not be empty")
-                                                 @PathVariable("accountId") String accountId);
+    public IcesiAccountShowDTO enableAccount(@PathVariable("accountId") String accountId);
 
     @PatchMapping("disable/{accountId}")
-    public IcesiAccountShowDTO disableAccount(@NotNull(message = "The account id can not be null")
-                                                  @NotBlank(message = "The account id can not be blank")
-                                                  @NotEmpty(message = "The account id can not be empty")
-                                                  @PathVariable("accountId") String accountId);
+    public IcesiAccountShowDTO disableAccount(@PathVariable("accountId") String accountId);
 
     @PatchMapping("withdrawal_money")
     public TransactionResultDTO withdrawalMoney(@Valid @RequestBody TransactionCreateDTO transactionCreateDTO);
@@ -36,9 +30,6 @@ public interface IcesiAccountApi {
     public TransactionResultDTO transferMoney(@Valid @RequestBody TransactionCreateDTO transactionCreateDTO);
 
     @GetMapping("id/{accountId}")
-    public IcesiAccountShowDTO getAccountByAccountNumber(@NotNull(message = "The account id can not be null")
-                                                             @NotBlank(message = "The account id can not be blank")
-                                                             @NotEmpty(message = "The account id can not be empty")
-                                                             @PathVariable("accountId") String accountId);
+    public IcesiAccountShowDTO getAccountByAccountNumber(@PathVariable("accountId") String accountId);
 
 }

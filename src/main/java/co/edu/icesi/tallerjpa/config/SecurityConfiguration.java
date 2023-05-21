@@ -89,6 +89,10 @@ public class SecurityConfiguration {
         tempMvcRequestMatcher.setMethod(HttpMethod.POST);
         managerBuilder.add(tempMvcRequestMatcher, AuthorityAuthorizationManager.hasAnyAuthority("SCOPE_ADMIN"));
 
+        tempMvcRequestMatcher = new MvcRequestMatcher(introspector, IcesiUserApi.ROOT_PATH+"/{icesiUserId}/role/{roleName}");
+        tempMvcRequestMatcher.setMethod(HttpMethod.PATCH);
+        managerBuilder.add(tempMvcRequestMatcher, AuthorityAuthorizationManager.hasAnyAuthority("SCOPE_ADMIN"));
+
         AuthorizationManager<HttpServletRequest> manager = managerBuilder.build();
         return (authentication, object) -> manager.check(authentication,object.getRequest());
     }

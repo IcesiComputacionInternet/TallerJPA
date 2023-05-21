@@ -139,12 +139,13 @@ public class IcesiAccountService {
     }
 
     private IcesiAccount getAccountById(String accountId){
-        return icesiAccountRepository.findById(UUID.fromString(accountId))
+        return icesiAccountRepository.findById(fromIdToUUID(accountId))
                 .orElseThrow(createIcesiException(
                         "There is no account with the id: " + accountId,
                         HttpStatus.NOT_FOUND,
                         new DetailBuilder(ErrorCode.ERR_404, "account", "id", accountId)
                 ));
+
     }
 
     public TransactionResultDTO depositMoney(TransactionCreateDTO transactionCreateDTO, String icesiUserId){
@@ -227,7 +228,7 @@ public class IcesiAccountService {
     }
 
     private void checkIfTheAccountBelongsToTheIcesiUser(IcesiAccount icesiAccount, String icesiUserId){
-        IcesiUser icesiUser = icesiUserRepository.findById(UUID.fromString(icesiUserId)).orElseThrow(createIcesiException(
+        IcesiUser icesiUser = icesiUserRepository.findById(fromIdToUUID(icesiUserId)).orElseThrow(createIcesiException(
                 "There is no icesi user with the id: " + icesiUserId,
                 HttpStatus.NOT_FOUND,
                 new DetailBuilder(ErrorCode.ERR_404, "icesi user", "id", icesiUserId)
@@ -240,6 +241,18 @@ public class IcesiAccountService {
                         new DetailBuilder(ErrorCode.ERR_400, "The account does not belong to" + icesiUser.getEmail())
                 ).get();
             }
+        }
+    }
+
+    private UUID fromIdToUUID(String icesiUserId){
+        try{
+            return UUID.fromString(icesiUserId);
+        }catch (IllegalArgumentException illegalArgumentException){
+            throw createIcesiException(
+                    "Invalid account id",
+                    HttpStatus.BAD_REQUEST,
+                    new DetailBuilder(ErrorCode.ERR_400, "id", "Invalid account id")
+            ).get();
         }
     }
 }
