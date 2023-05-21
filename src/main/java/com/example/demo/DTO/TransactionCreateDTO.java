@@ -6,7 +6,7 @@ import lombok.Data;
 @Data
 @Builder
 public class TransactionCreateDTO {
-    private String senderAccountId;
-    private String receiverAccountId;
+    private String senderAccountNumber;
+    private String receiverAccountNumber;
     private long amount;//Amount to witrawal, deposit or transfer
 }

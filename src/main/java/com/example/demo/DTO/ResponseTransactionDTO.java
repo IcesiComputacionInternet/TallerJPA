@@ -6,8 +6,8 @@ import lombok.Data;
 @Data
 @Builder
 public class ResponseTransactionDTO {
-    private String senderAccountId;
-    private String receiverAccountId;
+    private String senderAccountNumber;
+    private String receiverAccountNumber;
     private long balance;  
     private String result;
 }

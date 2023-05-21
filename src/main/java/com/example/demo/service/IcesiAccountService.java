@@ -6,14 +6,17 @@ import java.util.UUID;
 import java.util.stream.Collectors;
 import java.util.stream.IntStream;
 
+import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
 
 import com.example.demo.DTO.IcesiAccountCreateDTO;
 import com.example.demo.DTO.ResponseIcesiAccountDTO;
+import com.example.demo.DTO.TransactionCreateDTO;
+import com.example.demo.error.exception.DetailBuilder;
+import com.example.demo.error.exception.ErrorCode;
 import com.example.demo.mapper.IcesiAccountMapper;
 import com.example.demo.model.IcesiAccount;
 import com.example.demo.model.IcesiUser;
-import com.example.demo.model.enums.TypeIcesiAccount;
 import com.example.demo.repository.IcesiAccountRepository;
 import com.example.demo.repository.IcesiUserRepository;
 
@@ -25,7 +28,7 @@ public class IcesiAccountService {
     
     private final IcesiAccountRepository icesiAccountRepository;
 
-    private final IcesiAccountMapper IcesiAccountMapper;
+    private final IcesiAccountMapper icesiAccountMapper;
 
     private final IcesiUserRepository icesiUserRepository;
 
@@ -37,14 +40,14 @@ public class IcesiAccountService {
         IcesiUser icesiUser = icesiUserRepository.findByEmail(account.getIcesiUser().getEmail())
             .orElseThrow(() -> new RuntimeException("This icesi user is not present in the database "));
 
-        IcesiAccount icesiAccount = IcesiAccountMapper.fromIcesiAccountCreateDTO(account);
+        IcesiAccount icesiAccount = icesiAccountMapper.fromIcesiAccountCreateDTO(account);
 
         icesiAccount.setIcesiUser(icesiUser);
         icesiAccount.setAccountId(UUID.randomUUID());
         icesiAccount.setAccountNumber(checkAccountNumber(generateAccountNumber()));
         icesiAccount.setActive(true);
 
-        return IcesiAccountMapper.fromIcesiAccountToResponseIcesiAccountDTO(icesiAccountRepository.save(icesiAccount));
+        return icesiAccountMapper.fromIcesiAccountToResponseIcesiAccountDTO(icesiAccountRepository.save(icesiAccount));
     }
 
     /*The following method is used to generate a random account number whose format is XXX-XXXXXX-XX
@@ -73,20 +76,26 @@ public class IcesiAccountService {
         return accountNumber;
     }
 
-    public void enableAccount(IcesiAccountCreateDTO account) {
+    public ResponseIcesiAccountDTO enableAccount(IcesiAccountCreateDTO account) {
         account.setActive(true);
+        return icesiAccountMapper.fromIcesiAccountCreateDTOToResponseIcesiAccountDTO(account);
     }
 
-    public void disableAccount(IcesiAccountCreateDTO account) {
+    public ResponseIcesiAccountDTO disableAccount(IcesiAccountCreateDTO account) {
         if(account.getBalance() == 0) {
             account.setActive(false);
         }
         else {
             throw new RuntimeException("This accout cannot be disabled, its balances is not 0");
         }
+
+        return icesiAccountMapper.fromIcesiAccountCreateDTOToResponseIcesiAccountDTO(account);
     }
 
-    public void withdrawalMoney(long amountToWithdraw, IcesiAccountCreateDTO account) {
+    public ResponseTransactionDTO withdrawalMoney(TransactionCreateDTO transactionCreateDTO) {
+
+        IcesiAccount account = icesiAccountRepository.findByAccountNumber(transactionCreateDTO.getReceiverAccountNumber());
+
         if(!account.isActive()) {
             throw new RuntimeException("Account is disabled, it is not possible to withdraw form it");
         } 
@@ -96,9 +105,11 @@ public class IcesiAccountService {
         }
   
         account.setBalance(account.getBalance() - amountToWithdraw);
+
+        return icesiAccountMapper.fromTransactionCrateDTO(transactionCreateDTO);
     }
 
-    public void depositMoney(long amountToDeposit, IcesiAccountCreateDTO account) {
+    public ResponseTransactionDTO depositMoney(long amountToDeposit, IcesiAccountCreateDTO account) {
         if(!account.isActive()) {
             throw new RuntimeException("Account is disabled, it is not possible to deposit money to it");
         }
@@ -106,7 +117,7 @@ public class IcesiAccountService {
         account.setBalance(account.getBalance() + amountToDeposit);
     }
 
-    public void transferMoneyToAnotherAccount(long amountToTransfer, IcesiAccountCreateDTO originAccount, IcesiAccountCreateDTO destinationAccount) {
+    public ResponseTransactionDTO transferMoneyToAnotherAccount(long amountToTransfer, IcesiAccountCreateDTO originAccount, IcesiAccountCreateDTO destinationAccount) {
         if(!originAccount.isActive()) {
             throw new RuntimeException("The origin account is disabled");
         }
@@ -129,5 +140,14 @@ public class IcesiAccountService {
     
         originAccount.setBalance(originAccount.getBalance() - amountToTransfer);
         destinationAccount.setBalance(destinationAccount.getBalance() + amountToTransfer);
+    }
+
+    private IcesiAccount findIcesiAccountByAccountNumber(String accountNumber) {
+        return icesiAccountRepository.findByAccountNumber(accountNumber)
+        .orElseThrow(createIcesiException(
+                "There is no account with the number: " + accountNumber,
+                HttpStatus.NOT_FOUND,
+                new DetailBuilder(ErrorCode.ERR_404, "account", "the number", accountNumber)
+        ));
     }
 }

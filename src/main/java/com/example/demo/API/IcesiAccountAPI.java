@@ -8,28 +8,29 @@ import org.springframework.web.bind.annotation.RequestMapping;
 
 import com.example.demo.DTO.IcesiAccountCreateDTO;
 import com.example.demo.DTO.ResponseIcesiAccountDTO;
+import com.example.demo.DTO.ResponseTransactionDTO;
+import com.example.demo.DTO.TransactionCreateDTO;
 
 
 @RequestMapping("/accounts")
 public interface IcesiAccountAPI {
 
     @PostMapping("/add")
-    ResponseIcesiAccountDTO create(@Valid @RequestBody IcesiAccountCreateDTO icesiAccountCreateDTO);
+    public ResponseIcesiAccountDTO create(@Valid @RequestBody IcesiAccountCreateDTO icesiAccountCreateDTO);
 
+    @PostMapping("enable/{accountNumber}")
+    public ResponseIcesiAccountDTO enableAccount(@Valid @RequestBody IcesiAccountCreateDTO icesiAccountCreateDTO);
 
-    @PostMapping("")
-    ResponseIcesiAccountDTO enableAccount(@Valid @RequestBody IcesiAccountCreateDTO icesiAccountCreateDTO);
+    @PostMapping("disable/{accountNumber}")
+    public ResponseIcesiAccountDTO disableAccount(@Valid @RequestBody IcesiAccountCreateDTO icesiAccountCreateDTO);
 
-    @PostMapping("")
-    ResponseIcesiAccountDTO disableAccount(@Valid @RequestBody IcesiAccountCreateDTO icesiAccountCreateDTO);
+    @PostMapping("withdrawal")
+    public ResponseTransactionDTO withdrawalMoney(@Valid @RequestBody TransactionCreateDTO transactionCreateDTO);
 
-    @PostMapping
-    void withdrawalMoney(long amountToWithdraw, @Valid @RequestBody IcesiAccountCreateDTO accountCreateDTO);
+    @PostMapping("deposit")
+    public ResponseTransactionDTO depositMoney(@Valid @RequestBody TransactionCreateDTO transactionCreateDTO);
 
-    @PostMapping
-    void depositMoney();
-
-    @PostMapping
-    void transferMoneyToAnotherAccount();
+    @PostMapping("transfer")
+    public ResponseTransactionDTO transferMoneyToAnotherAccount(@Valid @RequestBody TransactionCreateDTO transactionCreateDTO);
     
 }

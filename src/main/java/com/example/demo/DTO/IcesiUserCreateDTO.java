@@ -1,7 +1,5 @@
 package com.example.demo.DTO;
 
-import com.example.demo.model.IcesiRole;
-
 import lombok.Builder;
 import lombok.Data;
 

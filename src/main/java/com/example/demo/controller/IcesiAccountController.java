@@ -8,6 +8,8 @@ import org.springframework.web.bind.annotation.RestController;
 import com.example.demo.API.IcesiAccountAPI;
 import com.example.demo.DTO.IcesiAccountCreateDTO;
 import com.example.demo.DTO.ResponseIcesiAccountDTO;
+import com.example.demo.DTO.ResponseTransactionDTO;
+import com.example.demo.DTO.TransactionCreateDTO;
 import com.example.demo.service.IcesiAccountService;
 
 import lombok.AllArgsConstructor;
@@ -20,37 +22,34 @@ public class IcesiAccountController implements IcesiAccountAPI {
 
     @Override
     public ResponseIcesiAccountDTO create(@Valid IcesiAccountCreateDTO icesiAccountCreateDTO) {
-        throw new UnsupportedOperationException("Unimplemented method 'create'");
+        return icesiAccountService.create(icesiAccountCreateDTO);
     }
 
     @Override
     public ResponseIcesiAccountDTO enableAccount(@Valid IcesiAccountCreateDTO icesiAccountCreateDTO) {
-        // TODO Auto-generated method stub
-        throw new UnsupportedOperationException("Unimplemented method 'enableAccount'");
+        return icesiAccountService.enableAccount(icesiAccountCreateDTO);
     }
 
     @Override
     public ResponseIcesiAccountDTO disableAccount(@Valid IcesiAccountCreateDTO icesiAccountCreateDTO) {
-        // TODO Auto-generated method stub
-        throw new UnsupportedOperationException("Unimplemented method 'disableAccount'");
+        return icesiAccountService.disableAccount(icesiAccountCreateDTO);
     }
 
     @Override
-    public void withdrawalMoney(long amountToWithdraw, @Valid IcesiAccountCreateDTO accountCreateDTO) {
-        // TODO Auto-generated method stub
-        throw new UnsupportedOperationException("Unimplemented method 'withdrawalMoney'");
+    public ResponseTransactionDTO withdrawalMoney(@Valid TransactionCreateDTO transactionCreateDTO) {
+        return icesiAccountService.withdrawalMoney(transactionCreateDTO);
     }
 
     @Override
-    public void depositMoney() {
-        // TODO Auto-generated method stub
-        throw new UnsupportedOperationException("Unimplemented method 'depositMoney'");
+    public ResponseTransactionDTO depositMoney(@Valid TransactionCreateDTO transactionCreateDTO) {
+        return icesiAccountService.depositMoney(transactionCreateDTO);
     }
 
     @Override
-    public void transferMoneyToAnotherAccount() {
-        // TODO Auto-generated method stub
-        throw new UnsupportedOperationException("Unimplemented method 'transferMoneyToAnotherAccount'");
+    public ResponseTransactionDTO transferMoneyToAnotherAccount(@Valid TransactionCreateDTO transactionCreateDTO) {
+        return icesiAccountService.transferMoneyToAnotherAccount(transactionCreateDTO);
     }
+
+    
 
 }
