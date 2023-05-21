@@ -7,6 +7,7 @@ import icesi.university.accountSystem.repository.IcesiRoleRepository;
 import lombok.AllArgsConstructor;
 import org.springframework.stereotype.Service;
 
+import java.util.List;
 import java.util.UUID;
 
 @Service
@@ -27,6 +28,10 @@ public class RoleService {
         IcesiRole icesiRole = icesiRoleMapper.fromIcesiRoleDTO(role);
         icesiRole.setRoleId(UUID.randomUUID());
         return icesiRoleRepository.save(icesiRole);
+    }
+
+    public List<IcesiRole> getAllRoles() {
+        return icesiRoleRepository.findAll();
     }
 
 }

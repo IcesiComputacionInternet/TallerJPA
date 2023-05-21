@@ -1,5 +1,6 @@
 package icesi.university.accountSystem.model;
 
+import icesi.university.accountSystem.enums.TypeAccount;
 import lombok.Builder;
 import lombok.Data;
 
@@ -19,7 +20,7 @@ public class IcesiAccount {
 
     private long balance;
 
-    private String type;
+    private TypeAccount type;
 
     private boolean active;
 

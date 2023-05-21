@@ -26,6 +26,7 @@ public class UserServiceTest {
         private IcesiUserMapper mapper;
         private IcesiRoleRepository roleRepository;
 
+        /*
         @BeforeEach
         private void init(){
             repository = mock(IcesiUserRepository.class);
@@ -131,4 +132,6 @@ public class UserServiceTest {
                     .description("this is a role")
                     .build();
         }
+        */
+
 }

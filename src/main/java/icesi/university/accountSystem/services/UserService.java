@@ -1,13 +1,20 @@
 package icesi.university.accountSystem.services;
 
 import icesi.university.accountSystem.dto.IcesiUserDTO;
+import icesi.university.accountSystem.dto.RequestUserDTO;
+import icesi.university.accountSystem.dto.ResponseUserDTO;
+import icesi.university.accountSystem.exception.ExistsException;
 import icesi.university.accountSystem.mapper.IcesiUserMapper;
 import icesi.university.accountSystem.model.IcesiRole;
 import icesi.university.accountSystem.model.IcesiUser;
+import icesi.university.accountSystem.repository.IcesiRoleRepository;
 import icesi.university.accountSystem.repository.IcesiUserRepository;
 import lombok.AllArgsConstructor;
+import lombok.SneakyThrows;
 import org.springframework.stereotype.Service;
 
+import java.util.ArrayList;
+import java.util.List;
 import java.util.Optional;
 import java.util.UUID;
 
@@ -18,24 +25,44 @@ public class UserService {
 
     private IcesiUserMapper icesiUserMapper;
 
-    public IcesiUser save(IcesiUserDTO user){
-        Optional<IcesiRole> role = Optional.of(user.getRole());
-        Optional<IcesiUser> userByPhoneNumber = icesiUserRepository.findByPhoneNumber(user.getPhoneNumber());
-        Optional<IcesiUser> userByEmail = icesiUserRepository.findByEmail(user.getEmail());
-        if(role.isPresent()) {
-            if (userByPhoneNumber.isPresent() && userByEmail.isPresent()) {
-                throw new RuntimeException("email and phoneNumber already in use");
-            } else if (userByEmail.isPresent()) {
-                throw new RuntimeException("email already in use");
-            } else if (userByPhoneNumber.isPresent()) {
-                throw new RuntimeException("phoneNumber already in use");
-            }
+    private final IcesiRoleRepository roleRepository;
+    @SneakyThrows
+    public ResponseUserDTO save(RequestUserDTO userDTO){
+        boolean emailExists = icesiUserRepository.existsByEmail(userDTO.getEmail());
+        boolean phoneExists = icesiUserRepository.existsByPhoneNumber(userDTO.getPhoneNumber());
+
+        List<String> errors = new ArrayList<>();
+
+        if (emailExists) {
+            errors.add("Email already exists");
+        }
+        if (phoneExists) {
+            errors.add("Phone number already exists");
         }
 
-        IcesiUser icesiUser = icesiUserMapper.fromIcesiUserDTO(user);
-        icesiUser.setUserId(UUID.randomUUID());
+        if(!errors.isEmpty()){
+            throw new ExistsException(String.join(" ", errors));
+        }
 
-        return icesiUserRepository.save(icesiUser);
+        IcesiUser user = icesiUserMapper.fromIcesiUserDTO(userDTO);
+        user.setUserId(UUID.randomUUID());
+        var role = roleRepository.findByName(userDTO.getRole()).orElseThrow(() -> new ExistsException("Role doesn't exists"));
+        user.setRole(role);
+
+        return icesiUserMapper.fromUserToSendUserDTO(icesiUserRepository.save(user));
     }
 
+    public ResponseUserDTO getUser(String userEmail) {
+        Optional<IcesiUser> user = icesiUserRepository.findByEmail(userEmail);
+        if(user.isPresent()){
+            return icesiUserMapper.fromUserToSendUserDTO(user.get());
+        }else{
+            throw new RuntimeException("User doesn't exists");
+        }
+    }
+
+    public List<ResponseUserDTO> getAllUsers() {
+        List<IcesiUser> users = icesiUserRepository.findAll();
+        return icesiUserMapper.fromUsersToSendUsersDTO(users);
+    }
 }

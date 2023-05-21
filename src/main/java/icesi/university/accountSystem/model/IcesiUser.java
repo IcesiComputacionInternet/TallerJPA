@@ -7,8 +7,9 @@ import java.util.List;
 import java.util.UUID;
 
 
-@Data
 @Entity
+@Getter
+@Setter
 @Builder
 @AllArgsConstructor
 @NoArgsConstructor
@@ -28,7 +29,7 @@ public class IcesiUser {
     @OneToMany(mappedBy = "user")
     List<IcesiAccount> accounts;
 
-    @ManyToOne
+    @ManyToOne(optional = false)
     @JoinColumn(name = "role_id",nullable = false)
     private IcesiRole role;
 

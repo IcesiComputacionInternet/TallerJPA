@@ -10,7 +10,7 @@ import org.springframework.stereotype.Component;
 
 @Generated(
     value = "org.mapstruct.ap.MappingProcessor",
-    date = "2023-03-18T09:39:36-0500",
+    date = "2023-05-21T11:51:44-0500",
     comments = "version: 1.5.3.Final, compiler: javac, environment: Java 17.0.4 (Oracle Corporation)"
 )
 @Component
@@ -52,5 +52,19 @@ public class IcesiRoleMapperImpl implements IcesiRoleMapper {
         }
 
         return icesiRoleDTO.build();
+    }
+
+    @Override
+    public List<IcesiRoleDTO> fromIcesiRoles(List<IcesiRole> allRoles) {
+        if ( allRoles == null ) {
+            return null;
+        }
+
+        List<IcesiRoleDTO> list = new ArrayList<IcesiRoleDTO>( allRoles.size() );
+        for ( IcesiRole icesiRole : allRoles ) {
+            list.add( fromIcesiRole( icesiRole ) );
+        }
+
+        return list;
     }
 }
