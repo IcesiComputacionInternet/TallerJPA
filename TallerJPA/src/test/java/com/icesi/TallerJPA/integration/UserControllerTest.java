@@ -142,4 +142,179 @@ class UserControllerTest {
                 .andReturn();
         System.out.println(result.getResponse().getContentAsString());
     }
+
+    @Test
+    @Order(4)
+    public void testValidationEmailOrPhoneCreateUserWhenAuthAdmin() throws Exception {
+        var resultToken = mockMvc.perform(MockMvcRequestBuilders.post("/login").content(
+                                objectMapper.writeValueAsString(new IcesiLoginDTO("admin@email.com", "password"))
+                        )
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .accept(MediaType.APPLICATION_JSON))
+                .andExpect(status().isOk())
+                .andReturn();
+        token = resultToken.getResponse().getContentAsString();
+        var result = mockMvc.perform(post("/user").content(
+                                objectMapper.writeValueAsString(
+                                        IcesiUserDTO.builder()
+                                                .email("")
+                                                .phoneNumber("")
+                                                .firstName("John")
+                                                .lastName("Doe")
+                                                .password("password")
+                                                .rolName("USER")
+                                                .build()
+                                ))
+                        .header("Authorization", "Bearer " + token)
+                        .contentType(MediaType.APPLICATION_JSON).accept(MediaType.APPLICATION_JSON))
+                .andExpect(status().isUnauthorized())
+                .andReturn();
+        System.out.println(result.getResponse().getContentAsString());
+    }
+
+    @Test
+    @Order(5)
+    public void testValidationEmailCreateUserWhenAuthAdmin() throws Exception {
+        var resultToken = mockMvc.perform(MockMvcRequestBuilders.post("/login").content(
+                                objectMapper.writeValueAsString(new IcesiLoginDTO("admin@email.com", "password"))
+                        )
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .accept(MediaType.APPLICATION_JSON))
+                .andExpect(status().isOk())
+                .andReturn();
+        token = resultToken.getResponse().getContentAsString();
+        var result = mockMvc.perform(post("/user").content(
+                                objectMapper.writeValueAsString(
+                                        IcesiUserDTO.builder()
+                                                .email("NoEmail")
+                                                .phoneNumber("+573226227443")
+                                                .firstName("John")
+                                                .lastName("Doe")
+                                                .password("password")
+                                                .rolName("USER")
+                                                .build()
+                                ))
+                        .header("Authorization", "Bearer " + token)
+                        .contentType(MediaType.APPLICATION_JSON).accept(MediaType.APPLICATION_JSON))
+                .andExpect(status().isUnauthorized())
+                .andReturn();
+        System.out.println(result.getResponse().getContentAsString());
+    }
+
+    @Test
+    @Order(6)
+    public void testValidationColombiaPhoneNumberCreateUserWhenAuthAdmin() throws Exception {
+        var resultToken = mockMvc.perform(MockMvcRequestBuilders.post("/login").content(
+                                objectMapper.writeValueAsString(new IcesiLoginDTO("admin@email.com", "password"))
+                        )
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .accept(MediaType.APPLICATION_JSON))
+                .andExpect(status().isOk())
+                .andReturn();
+        token = resultToken.getResponse().getContentAsString();
+        var result = mockMvc.perform(post("/user").content(
+                                objectMapper.writeValueAsString(
+                                        IcesiUserDTO.builder()
+                                                .email("email@email.com")
+                                                .phoneNumber("3226227443")
+                                                .firstName("John")
+                                                .lastName("Doe")
+                                                .password("password")
+                                                .rolName("USER")
+                                                .build()
+                                ))
+                        .header("Authorization", "Bearer " + token)
+                        .contentType(MediaType.APPLICATION_JSON).accept(MediaType.APPLICATION_JSON))
+                .andExpect(status().isUnauthorized())
+                .andReturn();
+        System.out.println(result.getResponse().getContentAsString());
+    }
+
+    @Test
+    @Order(4)
+    public void testValidationEmailOrPhoneCreateUserWhenAuthBank() throws Exception {
+        var resultToken = mockMvc.perform(MockMvcRequestBuilders.post("/login").content(
+                                objectMapper.writeValueAsString(new IcesiLoginDTO("bank@email.com", "password"))
+                        )
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .accept(MediaType.APPLICATION_JSON))
+                .andExpect(status().isOk())
+                .andReturn();
+        token = resultToken.getResponse().getContentAsString();
+        var result = mockMvc.perform(post("/user").content(
+                                objectMapper.writeValueAsString(
+                                        IcesiUserDTO.builder()
+                                                .email("")
+                                                .phoneNumber("")
+                                                .firstName("John")
+                                                .lastName("Doe")
+                                                .password("password")
+                                                .rolName("USER")
+                                                .build()
+                                ))
+                        .header("Authorization", "Bearer " + token)
+                        .contentType(MediaType.APPLICATION_JSON).accept(MediaType.APPLICATION_JSON))
+                .andExpect(status().isUnauthorized())
+                .andReturn();
+        System.out.println(result.getResponse().getContentAsString());
+    }
+
+    @Test
+    @Order(5)
+    public void testValidationEmailCreateUserWhenAuthBank() throws Exception {
+        var resultToken = mockMvc.perform(MockMvcRequestBuilders.post("/login").content(
+                                objectMapper.writeValueAsString(new IcesiLoginDTO("bank@email.com", "password"))
+                        )
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .accept(MediaType.APPLICATION_JSON))
+                .andExpect(status().isOk())
+                .andReturn();
+        token = resultToken.getResponse().getContentAsString();
+        var result = mockMvc.perform(post("/user").content(
+                                objectMapper.writeValueAsString(
+                                        IcesiUserDTO.builder()
+                                                .email("NoEmail")
+                                                .phoneNumber("+573226227443")
+                                                .firstName("John")
+                                                .lastName("Doe")
+                                                .password("password")
+                                                .rolName("USER")
+                                                .build()
+                                ))
+                        .header("Authorization", "Bearer " + token)
+                        .contentType(MediaType.APPLICATION_JSON).accept(MediaType.APPLICATION_JSON))
+                .andExpect(status().isUnauthorized())
+                .andReturn();
+        System.out.println(result.getResponse().getContentAsString());
+    }
+
+    @Test
+    @Order(6)
+    public void testValidationColombiaPhoneNumberCreateUserWhenAuthBank() throws Exception {
+        var resultToken = mockMvc.perform(MockMvcRequestBuilders.post("/login").content(
+                                objectMapper.writeValueAsString(new IcesiLoginDTO("bank@email.com", "password"))
+                        )
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .accept(MediaType.APPLICATION_JSON))
+                .andExpect(status().isOk())
+                .andReturn();
+        token = resultToken.getResponse().getContentAsString();
+        var result = mockMvc.perform(post("/user").content(
+                                objectMapper.writeValueAsString(
+                                        IcesiUserDTO.builder()
+                                                .email("email@email.com")
+                                                .phoneNumber("3226227443")
+                                                .firstName("John")
+                                                .lastName("Doe")
+                                                .password("password")
+                                                .rolName("USER")
+                                                .build()
+                                ))
+                        .header("Authorization", "Bearer " + token)
+                        .contentType(MediaType.APPLICATION_JSON).accept(MediaType.APPLICATION_JSON))
+                .andExpect(status().isUnauthorized())
+                .andReturn();
+        System.out.println(result.getResponse().getContentAsString());
+    }
+
 }

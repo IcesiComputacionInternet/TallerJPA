@@ -99,6 +99,7 @@ public class SecurityConfiguration {
 
         managerBuilder.add(new MvcRequestMatcher(introspector, "/user"), AuthorityAuthorizationManager.hasAnyAuthority("SCOPE_ADMIN", "SCOPE_BANK"));
         managerBuilder.add(new MvcRequestMatcher(introspector, "/role"), AuthorityAuthorizationManager.hasAnyAuthority("SCOPE_ADMIN"));
+        managerBuilder.add(new MvcRequestMatcher(introspector, "/account"), AuthorityAuthorizationManager.hasAnyAuthority("SCOPE_ADMIN", "SCOPE_USER"));
         managerBuilder.add(new MvcRequestMatcher(introspector, "/account/**"), AuthorityAuthorizationManager.hasAnyAuthority("SCOPE_USER"));;
 
 

@@ -16,8 +16,6 @@ import javax.validation.constraints.Min;
 public class IcesiAccountDTO {
 
 
-    @Min(value = 0)
-    @Max(value = 100)
     private long balance;
     private IcesiAccountType type;
     private Boolean active;
