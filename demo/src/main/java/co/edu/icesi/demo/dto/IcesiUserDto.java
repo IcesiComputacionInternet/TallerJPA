@@ -2,6 +2,8 @@ package co.edu.icesi.demo.dto;
 
 import co.edu.icesi.demo.model.IcesiAccount;
 import co.edu.icesi.demo.model.IcesiRole;
+import co.edu.icesi.demo.validation.ContactNumberConstraint;
+import co.edu.icesi.demo.validation.EmailOrPhoneConstraint;
 import lombok.Builder;
 import lombok.Data;
 
@@ -13,6 +15,7 @@ import java.util.UUID;
 
 @Builder
 @Data
+@EmailOrPhoneConstraint
 public class IcesiUserDto {
 
     private UUID userId;
@@ -23,6 +26,7 @@ public class IcesiUserDto {
 
     private String email;
 
+    @ContactNumberConstraint
     private String phoneNumber;
 
     private String password;

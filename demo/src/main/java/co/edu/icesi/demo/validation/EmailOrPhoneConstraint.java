@@ -6,10 +6,10 @@ import java.lang.annotation.*;
 
 @Documented
 @Constraint(validatedBy = ContactNumberValidator.class)
-@Target( { ElementType.METHOD, ElementType.FIELD, ElementType.ANNOTATION_TYPE})
+@Target( { ElementType.METHOD, ElementType.TYPE, ElementType.ANNOTATION_TYPE})
 @Retention(RetentionPolicy.RUNTIME)
-public @interface ContactNumberConstraint {
-    String message() default "Invalid phone number. Not colombian";
+public @interface EmailOrPhoneConstraint {
+    String message() default "At least fill the email or phone";
     Class<?>[] groups() default {};
     Class<? extends Payload>[] payload() default {};
 }
