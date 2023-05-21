@@ -4,6 +4,7 @@ import co.com.icesi.TallerJpa.validations.cellphonenumber.ColombianPhoneNumber;
 import lombok.Builder;
 import lombok.Data;
 
+import javax.validation.constraints.Email;
 import javax.validation.constraints.NotBlank;
 import javax.validation.constraints.NotNull;
 
@@ -14,7 +15,7 @@ public class IcesiUserRequestDTO {
     private String firstName;
     @NotBlank
     private String lastName;
-    //valid email.
+    @Email
     private String email;
     @ColombianPhoneNumber
     private String phoneNumber;

@@ -15,7 +15,7 @@ public interface IcesiRoleRepository extends JpaRepository<IcesiRole, UUID> {
 
     @Query( "SELECT ir " +
             "FROM IcesiRole ir " +
-            "WHERE ir.name =: name")
+            "WHERE ir.name = :name")
     Optional<IcesiRole> findByName(@Param("name") String name);
 
     @Query( "SELECT CASE WHEN (COUNT(ir) > 0) " +

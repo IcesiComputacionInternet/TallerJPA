@@ -49,10 +49,10 @@ public class IcesiRoleServiceTest {
 
         assertEquals(1,icesiError.getDetails().size());
         assertEquals(400, icesiError.getStatus().value());
-        assertEquals("The name "+ defaultIcesiRoleDTO().getName() +" is already in use"
+        assertEquals("The name "+ defaultIcesiRoleDTO().name() +" is already in use"
                 , icesiException.getMessage());
         assertEquals("ERR_DUPLICATED", icesiError.getDetails().get(0).getErrorCode());
-        assertEquals("resource IcesiRole with field name: "+ defaultIcesiRoleDTO().getName() +", already exists"
+        assertEquals("resource IcesiRole with field name: "+ defaultIcesiRoleDTO().name() +", already exists"
                 , icesiError.getDetails().get(0).getErrorMessage());
 
         verify(icesiRoleMapper,times(0)).fromRoleDto(any());
