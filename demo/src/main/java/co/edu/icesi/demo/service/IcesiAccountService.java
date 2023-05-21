@@ -116,13 +116,14 @@ public class IcesiAccountService {
         }
     }
 
-    public void enableAccount(String accountNumber){
+    public String enableAccount(String accountNumber){
         IcesiAccount account = getAccount(accountNumber);
         account.setActive(true);
         accountRepository.save(account);
+        return (accountNumber + " enabled");
     }
 
-    public void disableAccount(String accountNumber){
+    public String disableAccount(String accountNumber){
         IcesiAccount account = getAccount(accountNumber);
 
         if(account.getBalance()>0){
@@ -131,7 +132,7 @@ public class IcesiAccountService {
 
         account.setActive(false);
         accountRepository.save(account);
-
+        return (accountNumber + " disabled");
     }
 
     public IcesiAccount getAccount(String accountNumber) {
