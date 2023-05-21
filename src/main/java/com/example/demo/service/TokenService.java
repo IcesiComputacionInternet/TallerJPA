@@ -21,7 +21,6 @@ import lombok.AllArgsConstructor;
 
 @Service
 @AllArgsConstructor
-
 public class TokenService {
     
     private final JwtEncoder encoder;
@@ -40,7 +39,6 @@ public class TokenService {
             .claim("scope", scope)
             .claim("icesiUserId", customAuthentication.getUserId())
             .build();
-
         var encoderParamenters = JwtEncoderParameters.from(JwsHeader.with(MacAlgorithm.HS512).build(), claims);
         return this.encoder.encode(encoderParamenters).getTokenValue();
     }

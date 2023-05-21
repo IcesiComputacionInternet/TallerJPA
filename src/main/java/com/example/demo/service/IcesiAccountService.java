@@ -13,7 +13,7 @@ import com.example.demo.DTO.ResponseIcesiAccountDTO;
 import com.example.demo.mapper.IcesiAccountMapper;
 import com.example.demo.model.IcesiAccount;
 import com.example.demo.model.IcesiUser;
-import com.example.demo.model.TypeIcesiAccount;
+import com.example.demo.model.enums.TypeIcesiAccount;
 import com.example.demo.repository.IcesiAccountRepository;
 import com.example.demo.repository.IcesiUserRepository;
 
@@ -44,7 +44,7 @@ public class IcesiAccountService {
         icesiAccount.setAccountNumber(checkAccountNumber(generateAccountNumber()));
         icesiAccount.setActive(true);
 
-        return IcesiAccountMapper.fromIcesiAcountToIcesiAccountCreateDTO(icesiAccountRepository.save(icesiAccount));
+        return IcesiAccountMapper.fromIcesiAccountToResponseIcesiAccountDTO(icesiAccountRepository.save(icesiAccount));
     }
 
     /*The following method is used to generate a random account number whose format is XXX-XXXXXX-XX
@@ -115,11 +115,11 @@ public class IcesiAccountService {
             throw new RuntimeException("The destination account is disabled");
         }
 
-        if(originAccount.getType() == TypeIcesiAccount.deposit.name()) {
+        if (originAccount.getType().name() == "deposit") {
             throw new RuntimeException("The origin account is not allowed to be transfer money");
         }
     
-        if(destinationAccount.getType() == TypeIcesiAccount.deposit.name()) {
+        if(destinationAccount.getType().name() == "deposit") {
             throw new RuntimeException("The destination account is not allowed to be transferred money");
         }
         

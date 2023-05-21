@@ -32,14 +32,14 @@ public class IcesiUserService {
         userWithEmail.ifPresent(u -> {throw new RuntimeException("This email is already in use");});
         userWithPhone.ifPresent(u -> {throw new RuntimeException("This phone number is already in use");});
         
-        IcesiRole icesiRole = icesiRoleRepository.findByName(user.getIcesiRole().getName())
+        IcesiRole icesiRole = icesiRoleRepository.findByName(user.getIcesiRoleCreateDTO().getName())
             .orElseThrow(() -> new RuntimeException("This role is not present in the database"));
-        IcesiUser icesiUser = icesiUserMapper.fromIcesiUserDTO(user);
+        IcesiUser icesiUser = icesiUserMapper.fromIcesiUserCreateDTO(user);
 
         icesiUser.setIcesiRole(icesiRole);
         icesiUser.setUserId(UUID.randomUUID());
 
-        return icesiUserMapper.fromIcesiUserToIcesiUserCreateDTO(icesiUserRepository.save(icesiUser));
+        return icesiUserMapper.fromIcesiUserToResponseIcesiUserDTO(icesiUserRepository.save(icesiUser));
 
     }
 

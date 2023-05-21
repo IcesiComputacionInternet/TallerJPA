@@ -5,6 +5,7 @@ import org.springframework.web.bind.annotation.RestController;
 
 import com.example.demo.API.IcesiRoleAPI;
 import com.example.demo.DTO.IcesiRoleCreateDTO;
+import com.example.demo.DTO.ResponseIcesiRoleDTO;
 import com.example.demo.service.IcesiRoleService;
 
 import lombok.AllArgsConstructor;
@@ -16,7 +17,7 @@ public class IcesiRoleController implements IcesiRoleAPI{
     private IcesiRoleService icesiRoleService;
 
     @Override
-    public IcesiRoleCreateDTO add(@RequestBody IcesiRoleCreateDTO role) {
-        return icesiRoleService.create(role);
+    public ResponseIcesiRoleDTO add(@RequestBody IcesiRoleCreateDTO icesiRoleCreateDTO) {
+        return icesiRoleService.create(icesiRoleCreateDTO);
     }
 }
