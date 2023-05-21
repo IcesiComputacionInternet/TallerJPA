@@ -11,7 +11,6 @@ import java.util.UUID;
 
 @Repository
 public interface IcesiRoleRepository extends JpaRepository<IcesiRole, UUID> {
-    //@Query("SELECT * FROM IcesiRole ir WHERE ir.name = :name")
 
     @Query( "SELECT ir " +
             "FROM IcesiRole ir " +

@@ -13,6 +13,8 @@ import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 
+import java.util.List;
+
 import static org.junit.jupiter.api.Assertions.*;
 import static org.mockito.Mockito.*;
 
@@ -60,16 +62,60 @@ public class IcesiRoleServiceTest {
         verify(icesiRoleRepository,times(0)).save(any());
     }
 
+    @Test
+    @DisplayName("Create a list of roles.")
+    public void testCreateListOfRoles(){
+        when(icesiRoleRepository.existsByName(any())).thenReturn(false);
+        icesiRoleService.saveListRoles(defaultIcesiRoleDTOList());
+        verify(icesiRoleMapper,times(3)).fromRoleDto(any());
+        verify(icesiRoleMapper,times(3)).fromIcesiRole(any());
+        defaultIcesiRoleList().stream()
+                .map(IcesiRoleMatcher::new)
+                .forEach(role -> verify(icesiRoleRepository, times(1)).save(argThat(role)));
+    }
+
     private IcesiRoleDTO defaultIcesiRoleDTO(){
         return IcesiRoleDTO.builder()
                 .name("ROLE_ADMIN")
-                .description("Administrador de la aplicación")
+                .description("Administrador de la universidad")
                 .build();
     }
     private IcesiRole defaultIcesiRole(){
         return IcesiRole.builder()
                 .name("ROLE_ADMIN")
-                .description("Administrador de la aplicación")
+                .description("Administrador de la universidad")
                 .build();
+    }
+    private List<IcesiRoleDTO> defaultIcesiRoleDTOList(){
+        return List.of(
+                IcesiRoleDTO.builder()
+                        .name("ROLE_ADMIN")
+                        .description("Administrador de la universidad")
+                        .build(),
+                IcesiRoleDTO.builder()
+                        .name("ROLE_COLABORADOR")
+                        .description("Colaborador de la universidad")
+                        .build(),
+                IcesiRoleDTO.builder()
+                        .name("ROLE_ESTUDIANTE")
+                        .description("Estudiante de la universidad")
+                        .build()
+                );
+    }
+    private List<IcesiRole> defaultIcesiRoleList(){
+        return List.of(
+                IcesiRole.builder()
+                        .name("ROLE_ADMIN")
+                        .description("Administrador de la universidad")
+                        .build(),
+                IcesiRole.builder()
+                        .name("ROLE_COLABORADOR")
+                        .description("Colaborador de la universidad")
+                        .build(),
+                IcesiRole.builder()
+                        .name("ROLE_ESTUDIANTE")
+                        .description("Estudiante de la universidad")
+                        .build()
+        );
     }
 }

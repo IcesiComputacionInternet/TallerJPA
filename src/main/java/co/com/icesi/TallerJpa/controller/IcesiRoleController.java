@@ -20,6 +20,11 @@ public class IcesiRoleController implements IcesiRoleApi {
     }
 
     @Override
+    public List<IcesiRoleDTO> addListIcesiRole(List<IcesiRoleDTO> icesiRoleDTOS) {
+        return icesiRoleService.saveListRoles(icesiRoleDTOS);
+    }
+
+    @Override
     public List<IcesiRoleDTO> getAllIcesiRoles() {
         return icesiRoleService.getAllRoles();
     }

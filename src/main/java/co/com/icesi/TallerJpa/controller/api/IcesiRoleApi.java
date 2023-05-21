@@ -9,12 +9,15 @@ import java.util.List;
 @RequestMapping(value = IcesiRoleApi.ROLE_BASE_URL)
 public interface IcesiRoleApi {
 
-    String ROLE_BASE_URL = "/roles";
+    String ROLE_BASE_URL = "/api/role";
 
     @PostMapping
     IcesiRoleDTO addIcesiRole(@Valid @RequestBody IcesiRoleDTO icesiRoleDTO);
 
-    @GetMapping
+    @PostMapping("/roles")
+    List<IcesiRoleDTO> addListIcesiRole(@Valid @RequestBody List<IcesiRoleDTO> icesiRoleDTOS);
+
+    @GetMapping("/roles")
     List<IcesiRoleDTO> getAllIcesiRoles();
 
     @GetMapping("/{name}")

@@ -37,12 +37,16 @@ public class IcesiRoleService {
         return icesiRoleMapper.fromIcesiRole(icesiRoleRepository.save(icesiRole));
     }
 
+    public List<IcesiRoleDTO> saveListRoles(List<IcesiRoleDTO> icesiRoleDTOS){
+        return icesiRoleDTOS.stream().map(this::saveRole).collect(Collectors.toList());
+    }
+
     public IcesiRoleDTO getRoleByName(String roleName){
         return icesiRoleMapper.fromIcesiRole(icesiRoleRepository.findByName(roleName).orElse(null));
     }
 
     public List<IcesiRoleDTO> getAllRoles(){
         return icesiRoleRepository.findAll().stream()
-                .map(role ->icesiRoleMapper.fromIcesiRole(role)).collect(Collectors.toList());
+                .map(icesiRoleMapper::fromIcesiRole).collect(Collectors.toList());
     }
 }
