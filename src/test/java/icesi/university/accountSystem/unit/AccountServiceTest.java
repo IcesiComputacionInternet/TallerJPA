@@ -1,26 +1,10 @@
 package icesi.university.accountSystem.unit;
 
-import icesi.university.accountSystem.dto.IcesiAccountDTO;
-import icesi.university.accountSystem.enums.TypeAccount;
 import icesi.university.accountSystem.mapper.IcesiAccountMapper;
-import icesi.university.accountSystem.mapper.IcesiAccountMapperImpl;
-import icesi.university.accountSystem.model.IcesiAccount;
-import icesi.university.accountSystem.model.IcesiRole;
-import icesi.university.accountSystem.model.IcesiUser;
 import icesi.university.accountSystem.repository.IcesiAccountRepository;
 import icesi.university.accountSystem.repository.IcesiUserRepository;
 import icesi.university.accountSystem.services.AccountService;
 import icesi.university.accountSystem.services.UserService;
-import icesi.university.accountSystem.unit.matcher.AccountMatcher;
-import org.junit.jupiter.api.BeforeEach;
-import org.junit.jupiter.api.Test;
-
-import java.util.ArrayList;
-import java.util.Optional;
-import java.util.UUID;
-
-import static org.junit.jupiter.api.Assertions.*;
-import static org.mockito.Mockito.*;
 
 public class AccountServiceTest {
 

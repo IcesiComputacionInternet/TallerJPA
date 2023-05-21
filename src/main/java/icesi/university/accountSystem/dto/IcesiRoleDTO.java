@@ -6,6 +6,8 @@ import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
+import javax.validation.constraints.NotBlank;
+import javax.validation.constraints.NotNull;
 import java.util.List;
 import java.util.UUID;
 
@@ -16,6 +18,8 @@ import java.util.UUID;
 public class IcesiRoleDTO {
     private UUID roleId;
     private String description;
+    @NotNull
+    @NotBlank
     private String name;
 
     private List<IcesiUser> icesiUsers;

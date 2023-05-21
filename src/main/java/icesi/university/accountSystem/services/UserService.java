@@ -1,11 +1,9 @@
 package icesi.university.accountSystem.services;
 
-import icesi.university.accountSystem.dto.IcesiUserDTO;
 import icesi.university.accountSystem.dto.RequestUserDTO;
 import icesi.university.accountSystem.dto.ResponseUserDTO;
 import icesi.university.accountSystem.exception.ExistsException;
 import icesi.university.accountSystem.mapper.IcesiUserMapper;
-import icesi.university.accountSystem.model.IcesiRole;
 import icesi.university.accountSystem.model.IcesiUser;
 import icesi.university.accountSystem.repository.IcesiRoleRepository;
 import icesi.university.accountSystem.repository.IcesiUserRepository;

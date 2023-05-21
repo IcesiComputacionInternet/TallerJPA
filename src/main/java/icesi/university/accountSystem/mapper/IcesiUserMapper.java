@@ -1,6 +1,5 @@
 package icesi.university.accountSystem.mapper;
 
-import icesi.university.accountSystem.dto.IcesiUserDTO;
 import icesi.university.accountSystem.dto.RequestUserDTO;
 import icesi.university.accountSystem.dto.ResponseUserDTO;
 import icesi.university.accountSystem.model.IcesiUser;

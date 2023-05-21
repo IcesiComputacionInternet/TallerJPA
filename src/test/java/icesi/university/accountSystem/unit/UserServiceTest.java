@@ -1,23 +1,9 @@
 package icesi.university.accountSystem.unit;
 
-import icesi.university.accountSystem.dto.IcesiRoleDTO;
-import icesi.university.accountSystem.dto.IcesiUserDTO;
 import icesi.university.accountSystem.mapper.IcesiUserMapper;
-import icesi.university.accountSystem.mapper.IcesiUserMapperImpl;
-import icesi.university.accountSystem.model.IcesiRole;
-import icesi.university.accountSystem.model.IcesiUser;
 import icesi.university.accountSystem.repository.IcesiRoleRepository;
 import icesi.university.accountSystem.repository.IcesiUserRepository;
 import icesi.university.accountSystem.services.UserService;
-import icesi.university.accountSystem.unit.matcher.UserMatcher;
-import org.junit.jupiter.api.BeforeEach;
-import org.junit.jupiter.api.Test;
-
-import java.util.ArrayList;
-import java.util.Optional;
-
-import static org.junit.jupiter.api.Assertions.*;
-import static org.mockito.Mockito.*;
 
 public class UserServiceTest {
         private UserService userService;
