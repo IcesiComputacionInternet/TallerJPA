@@ -21,12 +21,7 @@ public class Role {
     @OneToMany(mappedBy = "role")
     private List<IcesiUser> users;
 
-    @ManyToMany(cascade = CascadeType.MERGE, fetch = FetchType.LAZY)
-    @JoinTable(
-            name = "user_permission_roles",
-            joinColumns = @JoinColumn(name = "role_role_id"),
-            inverseJoinColumns = @JoinColumn(name = "user_permission_permission_id")
-    )
+    @ManyToMany(mappedBy = "roles", cascade = CascadeType.ALL, fetch = FetchType.LAZY)
     private List<UserPermission> permissionList;
 
 }

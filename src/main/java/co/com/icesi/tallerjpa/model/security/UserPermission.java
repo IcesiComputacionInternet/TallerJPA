@@ -27,8 +27,12 @@ public class UserPermission {
     private String path;
     @Column(name ="`key`")
     private String key;
-
-    @ManyToMany(mappedBy = "permissionList", cascade = CascadeType.ALL, fetch = FetchType.LAZY)
+    @ManyToMany(cascade = CascadeType.MERGE, fetch = FetchType.LAZY)
+    @JoinTable(
+            name = "user_permission_roles",
+            joinColumns = @JoinColumn(name = "user_permission_permission_id"),
+            inverseJoinColumns = @JoinColumn(name = "role_role_id")
+    )
     private List<Role> roles;
 
 }

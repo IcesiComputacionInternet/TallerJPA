@@ -84,6 +84,8 @@ public class SecurityConfiguration {
                         )
                 );
 
+        System.out.println(roleMap);
+
         RequestMatcher permitAll = new AndRequestMatcher(new MvcRequestMatcher(introspector, "/login"));
 
         RequestMatcherDelegatingAuthorizationManager.Builder managerBuilder = RequestMatcherDelegatingAuthorizationManager.builder()

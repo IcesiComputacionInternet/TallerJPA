@@ -24,34 +24,41 @@ public class TallerJpaApplication {
 
 	//@Bean
 	public CommandLineRunner commandLineRunner(UserRepository users,
+											   PermissionRepository permissions,
 											   PasswordEncoder encoder) {
-		UserPermission adminPermission = UserPermission.builder()
-				.permissionId(UUID.randomUUID())
-				.key("admin")
-				.path("/**")
-				.build();
-		UserPermission accountPermission = UserPermission.builder()
-				.permissionId(UUID.randomUUID())
-				.key("account")
-				.path("/accounts/**")
-				.build();
-		UserPermission addUserPermission = UserPermission.builder()
-				.permissionId(UUID.randomUUID())
-				.key("user")
-				.path("/users")
-				.build();
-
 		Role adminRole = Role.builder()
 				.roleId(UUID.randomUUID())
 				.description("Role for demo")
 				.name("ADMIN")
-				.permissionList(List.of(adminPermission))
 				.build();
 		Role userRole = Role.builder()
 				.roleId(UUID.randomUUID())
 				.description("Role for demo")
 				.name("USER")
-				.permissionList(List.of(accountPermission))
+				.build();
+		Role bankUserRole = Role.builder()
+				.roleId(UUID.randomUUID())
+				.description("Role for demo")
+				.name("BANK_USER")
+				.build();
+
+		UserPermission adminPermission = UserPermission.builder()
+				.permissionId(UUID.randomUUID())
+				.key("admin")
+				.path("/**")
+				.roles(List.of(adminRole))
+				.build();
+		UserPermission accountPermission = UserPermission.builder()
+				.permissionId(UUID.randomUUID())
+				.key("account")
+				.path("/accounts/**")
+				.roles(List.of(userRole))
+				.build();
+		UserPermission addUserPermission = UserPermission.builder()
+				.permissionId(UUID.randomUUID())
+				.key("user")
+				.path("/users")
+				.roles(List.of(bankUserRole, userRole))
 				.build();
 
 		IcesiUser admin = IcesiUser.builder()
@@ -72,10 +79,24 @@ public class TallerJpaApplication {
 				.phoneNumber("+57123123123")
 				.password(encoder.encode("password"))
 				.build();
+		IcesiUser backUser = IcesiUser.builder()
+				.userId(UUID.randomUUID())
+				.email("bank@email.com")
+				.role(bankUserRole)
+				.firstName("John")
+				.lastName("Doe")
+				.phoneNumber("+57123123123")
+				.password(encoder.encode("password"))
+				.build();
 
 		return args -> {
 			users.save(admin);
 			users.save(user);
+			users.save(backUser);
+
+			permissions.save(adminPermission);
+			permissions.save(accountPermission);
+			permissions.save(addUserPermission);
 		};
 	}
 
