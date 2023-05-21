@@ -1,4 +1,4 @@
-package co.edu.icesi.tallerjpa.controller.component;
+package co.edu.icesi.tallerjpa.controller.integration;
 
 import co.edu.icesi.tallerjpa.TestConfigurationData;
 import co.edu.icesi.tallerjpa.dto.LoginDTO;

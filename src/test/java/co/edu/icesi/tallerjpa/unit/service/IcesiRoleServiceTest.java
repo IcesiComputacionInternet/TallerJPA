@@ -37,7 +37,7 @@ public class IcesiRoleServiceTest {
         IcesiRoleCreateDTO icesiRoleCreateDTO = defaultIcesiRoleCreateDTO();
         when(icesiRoleRepository.findByName(icesiRoleCreateDTO.getName())).thenReturn(Optional.ofNullable(null));
         IcesiRole icesiRole1 = IcesiRole.builder()
-                .description("Manage the system")
+                .description("Role for demo")
                 .name(NameIcesiRole.USER.toString())
                 .build();
         icesiRoleService.save(icesiRoleCreateDTO);

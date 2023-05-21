@@ -10,8 +10,16 @@ import co.edu.icesi.tallerjpa.enums.TypeIcesiAccount;
 public class DTOBuilder {
     public static IcesiRoleCreateDTO defaultIcesiRoleCreateDTO(){
         return IcesiRoleCreateDTO.builder()
-                .description("Manage the system")
+                .description("Role for demo")
                 .name(NameIcesiRole.USER.toString())
+                .build();
+
+    }
+
+    public static IcesiRoleCreateDTO adminIcesiRoleCreateDTO(){
+        return IcesiRoleCreateDTO.builder()
+                .description("Role for demo")
+                .name(NameIcesiRole.ADMIN.toString())
                 .build();
 
     }
@@ -24,6 +32,17 @@ public class DTOBuilder {
                 .phoneNumber("3125551223")
                 .password("password")
                 .icesiRoleCreateDTO(defaultIcesiRoleCreateDTO())
+                .build();
+    }
+
+    public static IcesiUserCreateDTO adminIcesiUserCreateDTO(){
+        return IcesiUserCreateDTO.builder()
+                .firstName("Pepito")
+                .lastName("Perez")
+                .email("pepitoperez@gmail.com")
+                .phoneNumber("3125551223")
+                .password("password")
+                .icesiRoleCreateDTO(adminIcesiRoleCreateDTO())
                 .build();
     }
 

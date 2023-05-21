@@ -1,8 +1,11 @@
 package co.edu.icesi.tallerjpa;
 
 import co.edu.icesi.tallerjpa.enums.NameIcesiRole;
+import co.edu.icesi.tallerjpa.enums.TypeIcesiAccount;
+import co.edu.icesi.tallerjpa.model.IcesiAccount;
 import co.edu.icesi.tallerjpa.model.IcesiRole;
 import co.edu.icesi.tallerjpa.model.IcesiUser;
+import co.edu.icesi.tallerjpa.repository.IcesiAccountRepository;
 import co.edu.icesi.tallerjpa.repository.IcesiRoleRepository;
 import co.edu.icesi.tallerjpa.repository.IcesiUserRepository;
 import org.springframework.boot.CommandLineRunner;
@@ -17,6 +20,7 @@ public class TestConfigurationData {
     @Bean
     CommandLineRunner commandLineRunner(IcesiUserRepository users,
                                         IcesiRoleRepository icesiroleRepository,
+                                        IcesiAccountRepository icesiAccountRepository,
                                         PasswordEncoder encoder) {
         IcesiRole icesiRole = IcesiRole.builder()
                 .roleId(UUID.fromString("f218a75c-c6af-4f1e-a2c6-b2b47f1a0678"))
@@ -60,6 +64,14 @@ public class TestConfigurationData {
                 .phoneNumber("+57123123123")
                 .password(encoder.encode("password"))
                 .build();
+        IcesiAccount icesiAccount = IcesiAccount.builder()
+                .accountId(UUID.fromString("aa14c92e-7505-4fe3-8bb7-2f418504e867"))
+                .accountNumber("123-123456-12")
+                .balance(0)
+                .type(TypeIcesiAccount.REGULAR_ACCOUNT.toString())
+                .active(true)
+                .icesiUser(icesiUser2)
+                .build();
 
         return args -> {
             icesiroleRepository.save(icesiRole);
@@ -68,6 +80,7 @@ public class TestConfigurationData {
             users.save(icesiUser);
             users.save(icesiUser2);
             users.save(icesiUser3);
+            icesiAccountRepository.save(icesiAccount);
         };
     }
 }

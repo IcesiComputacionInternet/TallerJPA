@@ -12,7 +12,7 @@ import java.util.UUID;
 public class ModelBuilder {
     public static IcesiRole defaultIcesiRole(){
         return IcesiRole.builder()
-                .description("Manage the system")
+                .description("Role for demo")
                 .name(NameIcesiRole.USER.toString())
                 .build();
 
@@ -20,7 +20,7 @@ public class ModelBuilder {
 
     public static IcesiRole adminIcesiRole(){
         return IcesiRole.builder()
-                .description("Manage the system")
+                .description("Role for demo")
                 .name(NameIcesiRole.ADMIN.toString())
                 .build();
 
