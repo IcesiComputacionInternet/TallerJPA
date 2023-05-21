@@ -42,7 +42,7 @@ public class GlobalExceptionHandler {
     @ExceptionHandler(BadCredentialsException.class)
     public ResponseEntity<String> handleBadCredentialsException(BadCredentialsException badCredentialsException){
         badCredentialsException.printStackTrace();
-        return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(badCredentialsException.getMessage());
+        return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(badCredentialsException.getMessage());
     }
 
     private CustomDetail mapBindingResultToError(ObjectError objectError){

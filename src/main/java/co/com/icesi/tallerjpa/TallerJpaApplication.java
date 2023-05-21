@@ -9,6 +9,8 @@ import org.springframework.boot.CommandLineRunner;
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
 import org.springframework.context.annotation.Bean;
+import org.springframework.context.annotation.ComponentScan;
+import org.springframework.core.annotation.Order;
 import org.springframework.security.crypto.password.PasswordEncoder;
 
 import java.util.List;
@@ -51,7 +53,7 @@ public class TallerJpaApplication {
 				.permissionId(UUID.randomUUID())
 				.key("accounts")
 				.path("/accounts/**")
-				.roles(List.of(userRole))
+				.roles(List.of(adminRole, userRole))
 				.build();
 		UserPermission addUserPermission = UserPermission.builder()
 				.permissionId(UUID.randomUUID())
@@ -98,5 +100,4 @@ public class TallerJpaApplication {
 			permissions.save(addUserPermission);
 		};
 	}
-
 }
