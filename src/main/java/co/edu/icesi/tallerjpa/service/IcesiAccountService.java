@@ -120,7 +120,7 @@ public class IcesiAccountService {
             ).get();
         }
         icesiAccountRepository.enableAccount(icesiAccount.getAccountId().toString());
-        return icesiAccountMapper.fromIcesiAccountToShowDTO(getAccountById(icesiAccount.getAccountId().toString()));
+        return icesiAccountMapper.fromIcesiAccountToShowDTO(getAccountByAccountNumber(icesiAccount.getAccountNumber().toString()));
     }
 
     public IcesiAccountShowDTO disableAccount(String accountNumber, String icesiUserId){
@@ -134,7 +134,7 @@ public class IcesiAccountService {
             ).get();
         }
         icesiAccountRepository.disableAccount(icesiAccount.getAccountId().toString());
-        return icesiAccountMapper.fromIcesiAccountToShowDTO(getAccountById(icesiAccount.getAccountId().toString()));
+        return icesiAccountMapper.fromIcesiAccountToShowDTO(getAccountByAccountNumber(icesiAccount.getAccountNumber()));
     }
 
     public TransactionResultDTO withdrawalMoney(TransactionCreateDTO transactionCreateDTO, String icesiUserId){

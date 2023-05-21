@@ -1,11 +1,13 @@
 package co.edu.icesi.tallerjpa.unit.service;
 
 import co.edu.icesi.tallerjpa.dto.*;
+import co.edu.icesi.tallerjpa.enums.NameIcesiRole;
 import co.edu.icesi.tallerjpa.enums.TypeIcesiAccount;
 import co.edu.icesi.tallerjpa.error.exception.IcesiError;
 import co.edu.icesi.tallerjpa.error.exception.IcesiException;
 import co.edu.icesi.tallerjpa.mapper.IcesiAccountMapper;
 import co.edu.icesi.tallerjpa.mapper.IcesiAccountMapperImpl;
+import co.edu.icesi.tallerjpa.mapper.IcesiUserMapper;
 import co.edu.icesi.tallerjpa.model.IcesiAccount;
 import co.edu.icesi.tallerjpa.model.IcesiRole;
 import co.edu.icesi.tallerjpa.model.IcesiUser;
@@ -27,6 +29,7 @@ public class IcesiAccountServiceTest {
 
     private IcesiAccountRepository icesiAccountRepository;
     private IcesiAccountMapper icesiAccountMapper;
+    private IcesiUserMapper icesiUserMapper;
     private IcesiAccountService icesiAccountService;
     private IcesiUserRepository icesiUserRepository;
 
@@ -35,7 +38,7 @@ public class IcesiAccountServiceTest {
                 .balance(0)
                 .type(TypeIcesiAccount.REGULAR_ACCOUNT)
                 .active(true)
-                .icesiUserDTO(defaultIcesiUserCreateDTO())
+                .icesiUserEmail(defaultIcesiUserCreateDTO().getEmail())
                 .build();
     }
 
@@ -50,9 +53,20 @@ public class IcesiAccountServiceTest {
 
     private IcesiAccount defaultIcesiAccount(){
         return IcesiAccount.builder()
-                .accountId(null)
+                .accountId(UUID.fromString("2d032e11-2bec-4983-9c35-3a00d8750809"))
                 .accountNumber("012-012345-01")
                 .balance(500)
+                .type(TypeIcesiAccount.REGULAR_ACCOUNT.toString())
+                .active(true)
+                .icesiUser(defaultIcesiUser())
+                .build();
+    }
+
+    private IcesiAccount defaultIcesiAccountWith0(){
+        return IcesiAccount.builder()
+                .accountId(null)
+                .accountNumber("012-012345-01")
+                .balance(0)
                 .type(TypeIcesiAccount.REGULAR_ACCOUNT.toString())
                 .active(true)
                 .icesiUser(defaultIcesiUser())
@@ -72,6 +86,7 @@ public class IcesiAccountServiceTest {
 
     private IcesiUser defaultIcesiUser(){
         return IcesiUser.builder()
+                .userId(UUID.fromString("c75bf838-8f38-403d-b64f-cca8b7a181d8"))
                 .firstName("Pepito")
                 .lastName("Perez")
                 .email("pepitoperez@gmail.com")
@@ -81,17 +96,38 @@ public class IcesiAccountServiceTest {
                 .build();
     }
 
+    private IcesiUser adminIcesiUser(){
+        return IcesiUser.builder()
+                .userId(UUID.fromString("7e39d68f-dc03-4634-92d1-37bb4b1865e3"))
+                .firstName("Pepito")
+                .lastName("Perez")
+                .email("pepitoperez@gmail.com")
+                .phoneNumber("3125551223")
+                .password("password")
+                .icesiRole(adminIcesiRole())
+                .icesiAccounts(null)
+                .build();
+    }
+
     private IcesiRole defaultIcesiRole(){
         return IcesiRole.builder()
                 .description("Manage the system")
-                .name("Admin")
+                .name(NameIcesiRole.USER.toString())
                 .build();
+    }
+
+    private IcesiRole adminIcesiRole(){
+        return IcesiRole.builder()
+                .description("Manage the system")
+                .name(NameIcesiRole.ADMIN.toString())
+                .build();
+
     }
 
     private IcesiRoleCreateDTO defaultIcesiRoleCreateDTO(){
         return IcesiRoleCreateDTO.builder()
                 .description("Manage the system")
-                .name("Admin")
+                .name(NameIcesiRole.USER.toString())
                 .build();
     }
 
@@ -123,13 +159,17 @@ public class IcesiAccountServiceTest {
         icesiAccountRepository = mock(IcesiAccountRepository.class);
         icesiAccountMapper = spy(IcesiAccountMapperImpl.class);
         icesiUserRepository = mock(IcesiUserRepository.class);
-        icesiAccountService = new IcesiAccountService(icesiAccountRepository, icesiAccountMapper, icesiUserRepository);
+        icesiUserMapper = spy(IcesiUserMapper.class);
+        icesiAccountService = new IcesiAccountService(icesiAccountRepository, icesiAccountMapper, icesiUserMapper, icesiUserRepository);
     }
 
     @Test
     public void testCreateIcesiAccount(){
+        IcesiUser icesiUser = adminIcesiUser();
         when(icesiUserRepository.findByEmail(any())).thenReturn(Optional.of(defaultIcesiUser()));
-        icesiAccountService.save(regularIcesiAccountCreateDTO());
+        when(icesiUserRepository.findById(icesiUser.getUserId())).thenReturn(Optional.of(icesiUser));
+        when(icesiAccountRepository.save(any())).thenReturn(defaultIcesiAccountWith0());
+        icesiAccountService.save(regularIcesiAccountCreateDTO(), icesiUser.getUserId().toString());
         IcesiAccount icesiAccount = IcesiAccount.builder()
                 .balance(0)
                 .type(TypeIcesiAccount.REGULAR_ACCOUNT.toString())
@@ -141,15 +181,22 @@ public class IcesiAccountServiceTest {
 
     @Test
     public void testGenerateUUID(){
+        IcesiUser icesiUser = adminIcesiUser();
         when(icesiUserRepository.findByEmail(any())).thenReturn(Optional.of(defaultIcesiUser()));
-        icesiAccountService.save(regularIcesiAccountCreateDTO());
+        when(icesiUserRepository.findById(icesiUser.getUserId())).thenReturn(Optional.of(icesiUser));
+        when(icesiAccountRepository.save(any())).thenReturn(defaultIcesiAccountWith0());
+        icesiAccountService.save(regularIcesiAccountCreateDTO(), icesiUser.getUserId().toString());
+
         verify(icesiAccountRepository, times(1)).save(argThat(x -> x.getAccountId() != null));
     }
 
     @Test
     public void testGenerateAccountNumber(){
+        IcesiUser icesiUser = adminIcesiUser();
         when(icesiUserRepository.findByEmail(any())).thenReturn(Optional.of(defaultIcesiUser()));
-        icesiAccountService.save(regularIcesiAccountCreateDTO());
+        when(icesiUserRepository.findById(icesiUser.getUserId())).thenReturn(Optional.of(icesiUser));
+        when(icesiAccountRepository.save(any())).thenReturn(defaultIcesiAccountWith0());
+        icesiAccountService.save(regularIcesiAccountCreateDTO(), icesiUser.getUserId().toString());
         Pattern pattern = Pattern.compile("[0-9]{3}-[0-9]{6}-[0-9]{2}");
         verify(icesiAccountRepository, times(1)).save(argThat(x ->
                         x.getAccountNumber() != null &&
@@ -160,7 +207,7 @@ public class IcesiAccountServiceTest {
     public void testCreateIcesiAccountWithBalanceMinorZero(){
         IcesiAccountCreateDTO icesiAccountCreateDTO = regularIcesiAccountCreateDTO();
         icesiAccountCreateDTO.setBalance(-1);
-        IcesiException exception = assertThrows(IcesiException.class, () -> icesiAccountService.save(icesiAccountCreateDTO));
+        IcesiException exception = assertThrows(IcesiException.class, () -> icesiAccountService.save(icesiAccountCreateDTO, defaultIcesiUser().getUserId().toString()));
         IcesiError icesiError = exception.getError();
         assertEquals(1, icesiError.getDetails().size());
         assertEquals(400, icesiError.getStatus().value());
@@ -174,7 +221,7 @@ public class IcesiAccountServiceTest {
         IcesiAccountCreateDTO icesiAccountCreateDTO = regularIcesiAccountCreateDTO();
         icesiAccountCreateDTO.setBalance(1);
         icesiAccountCreateDTO.setActive(false);
-        IcesiException exception = assertThrows(IcesiException.class, () -> icesiAccountService.save(icesiAccountCreateDTO));
+        IcesiException exception = assertThrows(IcesiException.class, () -> icesiAccountService.save(icesiAccountCreateDTO, defaultIcesiUser().getUserId().toString()));
         IcesiError icesiError = exception.getError();
         assertEquals(1, icesiError.getDetails().size());
         assertEquals(400, icesiError.getStatus().value());
@@ -185,21 +232,23 @@ public class IcesiAccountServiceTest {
     @Test
     public void testCreateAccountWithNotExistingEmail(){
         IcesiAccountCreateDTO icesiAccountCreateDTO = regularIcesiAccountCreateDTO();
-        when(icesiUserRepository.findByEmail(icesiAccountCreateDTO.getIcesiUserDTO().getEmail())).thenReturn(Optional.ofNullable(null));
-        IcesiException exception = assertThrows(IcesiException.class, () -> icesiAccountService.save(icesiAccountCreateDTO));
+        when(icesiUserRepository.findByEmail(icesiAccountCreateDTO.getIcesiUserEmail())).thenReturn(Optional.ofNullable(null));
+        IcesiException exception = assertThrows(IcesiException.class, () -> icesiAccountService.save(icesiAccountCreateDTO, defaultIcesiUser().getUserId().toString()));
         IcesiError icesiError = exception.getError();
         assertEquals(1, icesiError.getDetails().size());
         assertEquals(404, icesiError.getStatus().value());
-        assertEquals("Icesi user with email: "+icesiAccountCreateDTO.getIcesiUserDTO().getEmail()+" not found", icesiError.getDetails().get(0).getErrorMessage());
-        assertEquals("There is no user with the email "+icesiAccountCreateDTO.getIcesiUserDTO().getEmail(), exception.getMessage());
+        assertEquals("Icesi user with email: "+icesiAccountCreateDTO.getIcesiUserEmail()+" not found", icesiError.getDetails().get(0).getErrorMessage());
+        assertEquals("There is no user with the email "+icesiAccountCreateDTO.getIcesiUserEmail(), exception.getMessage());
     }
 
     @Test
     public void testCreateAccountWithErrorsWithTheAccountNumber(){
+        IcesiUser icesiUser = adminIcesiUser();
         IcesiAccountCreateDTO icesiAccountCreateDTO = regularIcesiAccountCreateDTO();
-        when(icesiUserRepository.findByEmail(icesiAccountCreateDTO.getIcesiUserDTO().getEmail())).thenReturn(Optional.ofNullable(defaultIcesiUser()));
+        when(icesiUserRepository.findByEmail(icesiAccountCreateDTO.getIcesiUserEmail())).thenReturn(Optional.ofNullable(defaultIcesiUser()));
         when(icesiAccountRepository.findByAccountNumber(any())).thenReturn(Optional.ofNullable(defaultIcesiAccount()));
-        IcesiException exception = assertThrows(IcesiException.class, () -> icesiAccountService.save(icesiAccountCreateDTO));
+        when(icesiUserRepository.findById(icesiUser.getUserId())).thenReturn(Optional.of(icesiUser));
+        IcesiException exception = assertThrows(IcesiException.class, () -> icesiAccountService.save(icesiAccountCreateDTO, icesiUser.getUserId().toString()));
         IcesiError icesiError = exception.getError();
         assertEquals(1, icesiError.getDetails().size());
         assertEquals("There were errors creating the account number, please try again later", icesiError.getDetails().get(0).getErrorMessage());
@@ -209,10 +258,13 @@ public class IcesiAccountServiceTest {
 
     @Test
     public void testGenerateAccountNumberWithOneExistingAccountNumber(){
+        IcesiUser icesiUser = adminIcesiUser();
         IcesiAccountCreateDTO icesiAccountCreateDTO = regularIcesiAccountCreateDTO();
-        when(icesiUserRepository.findByEmail(icesiAccountCreateDTO.getIcesiUserDTO().getEmail())).thenReturn(Optional.ofNullable(defaultIcesiUser()));
+        when(icesiUserRepository.findByEmail(icesiAccountCreateDTO.getIcesiUserEmail())).thenReturn(Optional.ofNullable(defaultIcesiUser()));
         when(icesiAccountRepository.findByAccountNumber(any())).thenReturn(Optional.ofNullable(defaultIcesiAccount()), Optional.ofNullable(null));
-        icesiAccountService.save(icesiAccountCreateDTO);
+        when(icesiUserRepository.findById(icesiUser.getUserId())).thenReturn(Optional.of(icesiUser));
+        when(icesiAccountRepository.save(any())).thenReturn(defaultIcesiAccountWith0());
+        icesiAccountService.save(icesiAccountCreateDTO, icesiUser.getUserId().toString());
         Pattern pattern = Pattern.compile("[0-9]{3}-[0-9]{6}-[0-9]{2}");
         verify(icesiAccountRepository, times(2)).findByAccountNumber(any());
         verify(icesiAccountRepository, times(1)).save(argThat(x ->
@@ -222,32 +274,37 @@ public class IcesiAccountServiceTest {
 
     @Test
     public void testEnableAccount(){
-        String accountId = "c34f11df-cda3-4d75-a74b-4d8c98d6074f";
+        IcesiUser icesiUser = adminIcesiUser();
         IcesiAccount icesiAccount = defaultIcesiAccount();
         icesiAccount.setActive(false);
-        when(icesiAccountRepository.findById(any())).thenReturn(Optional.of(icesiAccount));
-        icesiAccountService.enableAccount(accountId, "");
-        verify(icesiAccountRepository, times(1)).enableAccount(argThat(x -> x == accountId));
+        when(icesiAccountRepository.findByAccountNumber(icesiAccount.getAccountNumber())).thenReturn(Optional.of(icesiAccount));
+        when(icesiUserRepository.findById(icesiUser.getUserId())).thenReturn(Optional.of(icesiUser));
+        icesiAccountService.enableAccount(icesiAccount.getAccountNumber(), icesiUser.getUserId().toString());
+        verify(icesiAccountRepository, times(1)).enableAccount(argThat(x -> x.equals(icesiAccount.getAccountId().toString())));
     }
 
     @Test
     public void testEnableNotExistingAccount(){
-        String accountId = "c34f11df-cda3-4d75-a74b-4d8c98d6074f";
-        when(icesiUserRepository.findById(any())).thenReturn(Optional.ofNullable(null));
-        IcesiException exception = assertThrows(IcesiException.class, () -> icesiAccountService.enableAccount(accountId, ""));
+        IcesiUser icesiUser = adminIcesiUser();
+        String accountNumber = defaultIcesiAccount().getAccountNumber();
+        when(icesiUserRepository.findById(icesiUser.getUserId())).thenReturn(Optional.of(icesiUser));
+        IcesiException exception = assertThrows(IcesiException.class, () -> icesiAccountService.enableAccount(accountNumber, icesiUser.getUserId().toString()));
         IcesiError icesiError = exception.getError();
         assertEquals(1, icesiError.getDetails().size());
         assertEquals(404, icesiError.getStatus().value());
-        assertEquals("account with id: "+accountId+" not found", icesiError.getDetails().get(0).getErrorMessage());
-        assertEquals("There is no account with the id: "+accountId, exception.getMessage());
+        assertEquals("account with the number: "+accountNumber+" not found", icesiError.getDetails().get(0).getErrorMessage());
+        assertEquals("There is no account with the number: "+accountNumber, exception.getMessage());
         verify(icesiAccountRepository, times(0)).enableAccount(any());
     }
 
     @Test
     public void testEnableAnEnabledAccount(){
-        String accountId = "c34f11df-cda3-4d75-a74b-4d8c98d6074f";
-        when(icesiAccountRepository.findById(any())).thenReturn(Optional.of(defaultIcesiAccount()));
-        IcesiException exception = assertThrows(IcesiException.class, () -> icesiAccountService.enableAccount(accountId, ""));
+        IcesiAccount icesiAccount = defaultIcesiAccount();
+        String accountNumber = icesiAccount.getAccountNumber();
+        IcesiUser icesiUser = adminIcesiUser();
+        when(icesiAccountRepository.findByAccountNumber(accountNumber)).thenReturn(Optional.of(icesiAccount));
+        when(icesiUserRepository.findById(icesiUser.getUserId())).thenReturn(Optional.of(icesiUser));
+        IcesiException exception = assertThrows(IcesiException.class, () -> icesiAccountService.enableAccount(accountNumber, icesiUser.getUserId().toString()));
         IcesiError icesiError = exception.getError();
         assertEquals(1, icesiError.getDetails().size());
         assertEquals(400, icesiError.getStatus().value());
@@ -258,19 +315,23 @@ public class IcesiAccountServiceTest {
 
     @Test
     public void testDisableExistingAccountWithBalanceZero(){
+        IcesiUser icesiUser = adminIcesiUser();
         IcesiAccount icesiAccount = defaultIcesiAccount();
         icesiAccount.setBalance(0);
-        String accountId = "c34f11df-cda3-4d75-a74b-4d8c98d6074f";
-        when(icesiAccountRepository.findById(any())).thenReturn(Optional.of(icesiAccount));
-        icesiAccountService.disableAccount(accountId, "");
-        verify(icesiAccountRepository, times(1)).disableAccount(argThat(x -> x.equals(accountId)));
+        when(icesiAccountRepository.findByAccountNumber(icesiAccount.getAccountNumber())).thenReturn(Optional.of(icesiAccount));
+        when(icesiUserRepository.findById(icesiUser.getUserId())).thenReturn(Optional.of(icesiUser));
+        icesiAccountService.disableAccount(icesiAccount.getAccountNumber(), icesiUser.getUserId().toString());
+        verify(icesiAccountRepository, times(1)).disableAccount(argThat(x -> x.equals(icesiAccount.getAccountId().toString())));
     }
 
     @Test
     public void testDisableExistingAccountWithBalanceDifferentOfZero(){
-        String accountId = "c34f11df-cda3-4d75-a74b-4d8c98d6074f";
-        when(icesiAccountRepository.findById(any())).thenReturn(Optional.of(defaultIcesiAccount()));
-        IcesiException exception = assertThrows(IcesiException.class, () -> icesiAccountService.disableAccount(accountId, ""));
+        IcesiAccount icesiAccount = defaultIcesiAccount();
+        IcesiUser icesiUser = adminIcesiUser();
+        String accountNumber = icesiAccount.getAccountNumber();
+        when(icesiAccountRepository.findByAccountNumber(accountNumber)).thenReturn(Optional.of(icesiAccount));
+        when(icesiUserRepository.findById(icesiUser.getUserId())).thenReturn(Optional.of(icesiUser));
+        IcesiException exception = assertThrows(IcesiException.class, () -> icesiAccountService.disableAccount(accountNumber, icesiUser.getUserId().toString()));
         IcesiError icesiError = exception.getError();
         assertEquals(1, icesiError.getDetails().size());
         assertEquals(400, icesiError.getStatus().value());
@@ -281,14 +342,17 @@ public class IcesiAccountServiceTest {
 
     @Test
     public void testDisableNotExistingAccount(){
-        String accountId = "c34f11df-cda3-4d75-a74b-4d8c98d6074f";
-        when(icesiUserRepository.findById(any())).thenReturn(Optional.ofNullable(null));
-        IcesiException exception = assertThrows(IcesiException.class, () -> icesiAccountService.disableAccount(accountId, ""));
+        IcesiUser icesiUser = adminIcesiUser();
+        IcesiAccount icesiAccount = defaultIcesiAccount();
+        String accountNumber = icesiAccount.getAccountNumber();
+        when(icesiUserRepository.findById(icesiUser.getUserId())).thenReturn(Optional.of(icesiUser));
+        when(icesiAccountRepository.findByAccountNumber(accountNumber)).thenReturn(Optional.ofNullable(null));
+        IcesiException exception = assertThrows(IcesiException.class, () -> icesiAccountService.disableAccount(accountNumber, icesiUser.getUserId().toString()));
         IcesiError icesiError = exception.getError();
         assertEquals(1, icesiError.getDetails().size());
         assertEquals(404, icesiError.getStatus().value());
-        assertEquals("account with id: "+accountId + " not found", icesiError.getDetails().get(0).getErrorMessage());
-        assertEquals("There is no account with the id: "+accountId, exception.getMessage());
+        assertEquals("account with the number: "+accountNumber + " not found", icesiError.getDetails().get(0).getErrorMessage());
+        assertEquals("There is no account with the number: "+accountNumber, exception.getMessage());
         verify(icesiAccountRepository, times(0)).disableAccount(any());
     }
 
@@ -296,8 +360,10 @@ public class IcesiAccountServiceTest {
     public void testWithdrawalMoney(){
         TransactionCreateDTO transactionCreateDTO = defaultWithdrawalTransactionCreateDTO();
         IcesiAccount icesiAccount = regularIcesiAccountCreateWith1000();
+        IcesiUser icesiUser = adminIcesiUser();
         when(icesiAccountRepository.findById(any())).thenReturn(Optional.ofNullable(icesiAccount));
-        TransactionResultDTO transactionResultDTO = icesiAccountService.withdrawalMoney(transactionCreateDTO, "");
+        when(icesiUserRepository.findById(icesiUser.getUserId())).thenReturn(Optional.of(icesiUser));
+        TransactionResultDTO transactionResultDTO = icesiAccountService.withdrawalMoney(transactionCreateDTO, icesiUser.getUserId().toString());
         long newBalance = icesiAccount.getBalance() - transactionCreateDTO.getAmount();
 
         verify(icesiAccountRepository, times(1))
@@ -311,8 +377,13 @@ public class IcesiAccountServiceTest {
     @Test
     public void testWithdrawalMoneyWithNotExistingAccount(){
         TransactionCreateDTO transactionCreateDTO = defaultWithdrawalTransactionCreateDTO();
+        IcesiUser icesiUser = adminIcesiUser();
+
         when(icesiAccountRepository.findById(any())).thenReturn(Optional.ofNullable(null));
-        IcesiException exception = assertThrows(IcesiException.class,() -> icesiAccountService.withdrawalMoney(transactionCreateDTO, ""));
+        when(icesiUserRepository.findById(icesiUser.getUserId())).thenReturn(Optional.of(icesiUser));
+
+
+        IcesiException exception = assertThrows(IcesiException.class,() -> icesiAccountService.withdrawalMoney(transactionCreateDTO, icesiUser.getUserId().toString()));
         IcesiError icesiError = exception.getError();
         assertEquals(1, icesiError.getDetails().size());
         assertEquals(404, icesiError.getStatus().value());
@@ -326,8 +397,12 @@ public class IcesiAccountServiceTest {
         TransactionCreateDTO transactionCreateDTO = defaultWithdrawalTransactionCreateDTO();
         IcesiAccount icesiAccount = regularIcesiAccountCreateWith1000();
         transactionCreateDTO.setAmount(icesiAccount.getBalance()+1);
+        IcesiUser icesiUser = adminIcesiUser();
+
         when(icesiAccountRepository.findById(any())).thenReturn(Optional.ofNullable(icesiAccount));
-        IcesiException exception = assertThrows(IcesiException.class,() -> icesiAccountService.withdrawalMoney(transactionCreateDTO, ""));
+        when(icesiUserRepository.findById(icesiUser.getUserId())).thenReturn(Optional.of(icesiUser));
+
+        IcesiException exception = assertThrows(IcesiException.class,() -> icesiAccountService.withdrawalMoney(transactionCreateDTO, icesiUser.getUserId().toString()));
         IcesiError icesiError = exception.getError();
         assertEquals(1, icesiError.getDetails().size());
         assertEquals(400, icesiError.getStatus().value());
@@ -341,8 +416,12 @@ public class IcesiAccountServiceTest {
         TransactionCreateDTO transactionCreateDTO = defaultWithdrawalTransactionCreateDTO();
         IcesiAccount icesiAccount = regularIcesiAccountCreateWith1000();
         icesiAccount.setActive(false);
+        IcesiUser icesiUser = adminIcesiUser();
+
         when(icesiAccountRepository.findById(any())).thenReturn(Optional.ofNullable(icesiAccount));
-        IcesiException exception = assertThrows(IcesiException.class,() -> icesiAccountService.withdrawalMoney(transactionCreateDTO, ""));
+        when(icesiUserRepository.findById(icesiUser.getUserId())).thenReturn(Optional.of(icesiUser));
+
+        IcesiException exception = assertThrows(IcesiException.class,() -> icesiAccountService.withdrawalMoney(transactionCreateDTO, icesiUser.getUserId().toString()));
         IcesiError icesiError = exception.getError();
         assertEquals(1, icesiError.getDetails().size());
         assertEquals(400, icesiError.getStatus().value());
@@ -355,8 +434,12 @@ public class IcesiAccountServiceTest {
     public void testDepositMoney(){
         TransactionCreateDTO transactionCreateDTO = defaultDepositTransactionCreateDTO();
         IcesiAccount icesiAccount = regularIcesiAccountCreateWith1000();
+        IcesiUser icesiUser = adminIcesiUser();
+
         when(icesiAccountRepository.findById(any())).thenReturn(Optional.ofNullable(icesiAccount));
-        TransactionResultDTO transactionResultDTO = icesiAccountService.depositMoney(transactionCreateDTO, "");
+        when(icesiUserRepository.findById(icesiUser.getUserId())).thenReturn(Optional.of(icesiUser));
+
+        TransactionResultDTO transactionResultDTO = icesiAccountService.depositMoney(transactionCreateDTO, icesiUser.getUserId().toString());
         long newBalance = icesiAccount.getBalance() + transactionCreateDTO.getAmount();
 
         verify(icesiAccountRepository, times(1))
@@ -370,8 +453,12 @@ public class IcesiAccountServiceTest {
     @Test
     public void testDepositMoneyWithNotExistingAccount(){
         TransactionCreateDTO transactionCreateDTO = defaultDepositTransactionCreateDTO();
+        IcesiUser icesiUser = adminIcesiUser();
+
         when(icesiAccountRepository.findById(any())).thenReturn(Optional.ofNullable(null));
-        IcesiException exception = assertThrows(IcesiException.class,() -> icesiAccountService.depositMoney(transactionCreateDTO, ""));
+        when(icesiUserRepository.findById(icesiUser.getUserId())).thenReturn(Optional.of(icesiUser));
+
+        IcesiException exception = assertThrows(IcesiException.class,() -> icesiAccountService.depositMoney(transactionCreateDTO, icesiUser.getUserId().toString()));
         IcesiError icesiError = exception.getError();
         assertEquals(1, icesiError.getDetails().size());
         assertEquals(404, icesiError.getStatus().value());
@@ -385,8 +472,12 @@ public class IcesiAccountServiceTest {
         TransactionCreateDTO transactionCreateDTO = defaultDepositTransactionCreateDTO();
         IcesiAccount icesiAccount = regularIcesiAccountCreateWith1000();
         icesiAccount.setActive(false);
+        IcesiUser icesiUser = adminIcesiUser();
+
         when(icesiAccountRepository.findById(any())).thenReturn(Optional.ofNullable(icesiAccount));
-        IcesiException exception = assertThrows(IcesiException.class,() -> icesiAccountService.depositMoney(transactionCreateDTO, ""));
+        when(icesiUserRepository.findById(icesiUser.getUserId())).thenReturn(Optional.of(icesiUser));
+
+        IcesiException exception = assertThrows(IcesiException.class,() -> icesiAccountService.depositMoney(transactionCreateDTO, icesiUser.getUserId().toString()));
         IcesiError icesiError = exception.getError();
         assertEquals(1, icesiError.getDetails().size());
         assertEquals(400, icesiError.getStatus().value());
@@ -399,9 +490,13 @@ public class IcesiAccountServiceTest {
     @Test
     public void testTransferMoney(){
         TransactionCreateDTO transactionCreateDTO = defaultTransferTransactionCreateDTO();
+        IcesiUser icesiUser = adminIcesiUser();
+
         when(icesiAccountRepository.findById(UUID.fromString(transactionCreateDTO.getSenderAccountId()))).thenReturn(Optional.of(regularIcesiAccountCreateWith1000()));
         when(icesiAccountRepository.findById(UUID.fromString(transactionCreateDTO.getReceiverAccountId()))).thenReturn(Optional.of(regularIcesiAccountCreateWith1000()));
-        TransactionResultDTO transactionResultDTO = icesiAccountService.transferMoney(transactionCreateDTO, "");
+        when(icesiUserRepository.findById(icesiUser.getUserId())).thenReturn(Optional.of(icesiUser));
+
+        TransactionResultDTO transactionResultDTO = icesiAccountService.transferMoney(transactionCreateDTO, icesiUser.getUserId().toString());
         assertEquals(500, transactionResultDTO.getBalance());
         assertEquals(transactionCreateDTO.getSenderAccountId(), transactionResultDTO.getSenderAccountId());
         assertEquals(transactionCreateDTO.getReceiverAccountId(), transactionResultDTO.getReceiverAccountId());
@@ -413,9 +508,13 @@ public class IcesiAccountServiceTest {
 
     @Test
     public void testTransferMoneyWithNotExistingAccountSender(){
+        IcesiUser icesiUser = adminIcesiUser();
         TransactionCreateDTO transactionCreateDTO = defaultTransferTransactionCreateDTO();
+
         when(icesiAccountRepository.findById(UUID.fromString(transactionCreateDTO.getSenderAccountId()))).thenReturn(Optional.ofNullable(null));
-        IcesiException exception = assertThrows(IcesiException.class, () -> icesiAccountService.transferMoney(transactionCreateDTO, ""));
+        when(icesiUserRepository.findById(icesiUser.getUserId())).thenReturn(Optional.of(icesiUser));
+
+        IcesiException exception = assertThrows(IcesiException.class, () -> icesiAccountService.transferMoney(transactionCreateDTO, icesiUser.getUserId().toString()));
         IcesiError icesiError = exception.getError();
         assertEquals(1, icesiError.getDetails().size());
         assertEquals(404, icesiError.getStatus().value());
@@ -427,10 +526,14 @@ public class IcesiAccountServiceTest {
 
     @Test
     public void testTransferMoneyWithNotExistingAccountReceiver(){
+        IcesiUser icesiUser = adminIcesiUser();
         TransactionCreateDTO transactionCreateDTO = defaultTransferTransactionCreateDTO();
+
         when(icesiAccountRepository.findById(UUID.fromString(transactionCreateDTO.getSenderAccountId()))).thenReturn(Optional.of(regularIcesiAccountCreateWith1000()));
         when(icesiAccountRepository.findById(UUID.fromString(transactionCreateDTO.getReceiverAccountId()))).thenReturn(Optional.ofNullable(null));
-        IcesiException exception = assertThrows(IcesiException.class, () -> icesiAccountService.transferMoney(transactionCreateDTO, ""));
+        when(icesiUserRepository.findById(icesiUser.getUserId())).thenReturn(Optional.of(icesiUser));
+
+        IcesiException exception = assertThrows(IcesiException.class, () -> icesiAccountService.transferMoney(transactionCreateDTO, icesiUser.getUserId().toString()));
         IcesiError icesiError = exception.getError();
         assertEquals(1, icesiError.getDetails().size());
         assertEquals(404, icesiError.getStatus().value());
@@ -442,13 +545,17 @@ public class IcesiAccountServiceTest {
 
     @Test
     public void testTransferMoneyToDepositOnlyReceiverUser(){
+        IcesiUser icesiUser = adminIcesiUser();
         TransactionCreateDTO transactionCreateDTO = defaultTransferTransactionCreateDTO();
+
         when(icesiAccountRepository.findById(UUID.fromString(transactionCreateDTO.getSenderAccountId()))).thenReturn(Optional.of(regularIcesiAccountCreateWith1000()));
+        when(icesiUserRepository.findById(icesiUser.getUserId())).thenReturn(Optional.of(icesiUser));
+
         IcesiAccount icesiAccountReceiver = regularIcesiAccountCreateWith1000();
         icesiAccountReceiver.setType(TypeIcesiAccount.DEPOSIT_ONLY.toString());
         icesiAccountReceiver.setAccountId(UUID.fromString(transactionCreateDTO.getReceiverAccountId()));
         when(icesiAccountRepository.findById(UUID.fromString(transactionCreateDTO.getReceiverAccountId()))).thenReturn(Optional.of(icesiAccountReceiver));
-        IcesiException exception = assertThrows(IcesiException.class, () -> icesiAccountService.transferMoney(transactionCreateDTO, ""));
+        IcesiException exception = assertThrows(IcesiException.class, () -> icesiAccountService.transferMoney(transactionCreateDTO, icesiUser.getUserId().toString()));
         IcesiError icesiError = exception.getError();
         assertEquals(1, icesiError.getDetails().size());
         assertEquals(400, icesiError.getStatus().value());
@@ -463,9 +570,13 @@ public class IcesiAccountServiceTest {
         IcesiAccount icesiAccountSender = regularIcesiAccountCreateWith1000();
         icesiAccountSender.setType(TypeIcesiAccount.DEPOSIT_ONLY.toString());
         icesiAccountSender.setAccountId(UUID.fromString(transactionCreateDTO.getSenderAccountId()));
+        IcesiUser icesiUser = adminIcesiUser();
+
         when(icesiAccountRepository.findById(UUID.fromString(transactionCreateDTO.getSenderAccountId()))).thenReturn(Optional.of(icesiAccountSender));
         when(icesiAccountRepository.findById(UUID.fromString(transactionCreateDTO.getReceiverAccountId()))).thenReturn(Optional.of(regularIcesiAccountCreateWith1000()));
-        IcesiException exception = assertThrows(IcesiException.class, () -> icesiAccountService.transferMoney(transactionCreateDTO, ""));
+        when(icesiUserRepository.findById(icesiUser.getUserId())).thenReturn(Optional.of(icesiUser));
+
+        IcesiException exception = assertThrows(IcesiException.class, () -> icesiAccountService.transferMoney(transactionCreateDTO, icesiUser.getUserId().toString()));
         IcesiError icesiError = exception.getError();
         assertEquals(1, icesiError.getDetails().size());
         assertEquals(400, icesiError.getStatus().value());
@@ -479,9 +590,13 @@ public class IcesiAccountServiceTest {
         TransactionCreateDTO transactionCreateDTO = defaultTransferTransactionCreateDTO();
         transactionCreateDTO.setAmount(1001);
         IcesiAccount icesiAccount = regularIcesiAccountCreateWith1000();
+        IcesiUser icesiUser = adminIcesiUser();
+
         when(icesiAccountRepository.findById(UUID.fromString(transactionCreateDTO.getSenderAccountId()))).thenReturn(Optional.of(regularIcesiAccountCreateWith1000()));
         when(icesiAccountRepository.findById(UUID.fromString(transactionCreateDTO.getReceiverAccountId()))).thenReturn(Optional.of(regularIcesiAccountCreateWith1000()));
-        IcesiException exception = assertThrows(IcesiException.class, () -> icesiAccountService.transferMoney(transactionCreateDTO, ""));
+        when(icesiUserRepository.findById(icesiUser.getUserId())).thenReturn(Optional.of(icesiUser));
+
+        IcesiException exception = assertThrows(IcesiException.class, () -> icesiAccountService.transferMoney(transactionCreateDTO, icesiUser.getUserId().toString()));
         IcesiError icesiError = exception.getError();
         assertEquals(1, icesiError.getDetails().size());
         assertEquals(400, icesiError.getStatus().value());
@@ -496,9 +611,13 @@ public class IcesiAccountServiceTest {
         TransactionCreateDTO transactionCreateDTO = defaultTransferTransactionCreateDTO();
         IcesiAccount icesiAccountSender = regularIcesiAccountCreateWith1000();
         icesiAccountSender.setActive(false);
+        IcesiUser icesiUser = adminIcesiUser();
+
         when(icesiAccountRepository.findById(UUID.fromString(transactionCreateDTO.getSenderAccountId()))).thenReturn(Optional.of(icesiAccountSender));
         when(icesiAccountRepository.findById(UUID.fromString(transactionCreateDTO.getReceiverAccountId()))).thenReturn(Optional.of(regularIcesiAccountCreateWith1000()));
-        IcesiException exception = assertThrows(IcesiException.class, () -> icesiAccountService.transferMoney(transactionCreateDTO, ""));
+        when(icesiUserRepository.findById(icesiUser.getUserId())).thenReturn(Optional.of(icesiUser));
+
+        IcesiException exception = assertThrows(IcesiException.class, () -> icesiAccountService.transferMoney(transactionCreateDTO, icesiUser.getUserId().toString()));
         IcesiError icesiError = exception.getError();
         assertEquals(1, icesiError.getDetails().size());
         assertEquals(400, icesiError.getStatus().value());
@@ -513,9 +632,13 @@ public class IcesiAccountServiceTest {
         TransactionCreateDTO transactionCreateDTO = defaultTransferTransactionCreateDTO();
         IcesiAccount icesiAccountReceiver = regularIcesiAccountCreateWith1000();
         icesiAccountReceiver.setActive(false);
+        IcesiUser icesiUser = adminIcesiUser();
+
         when(icesiAccountRepository.findById(UUID.fromString(transactionCreateDTO.getSenderAccountId()))).thenReturn(Optional.of(regularIcesiAccountCreateWith1000()));
         when(icesiAccountRepository.findById(UUID.fromString(transactionCreateDTO.getReceiverAccountId()))).thenReturn(Optional.of(icesiAccountReceiver));
-        IcesiException exception = assertThrows(IcesiException.class, () -> icesiAccountService.transferMoney(transactionCreateDTO, ""));
+        when(icesiUserRepository.findById(icesiUser.getUserId())).thenReturn(Optional.of(icesiUser));
+
+        IcesiException exception = assertThrows(IcesiException.class, () -> icesiAccountService.transferMoney(transactionCreateDTO, icesiUser.getUserId().toString()));
         IcesiError icesiError = exception.getError();
         assertEquals(1, icesiError.getDetails().size());
         assertEquals(400, icesiError.getStatus().value());
@@ -528,8 +651,12 @@ public class IcesiAccountServiceTest {
     @Test
     public void testGetAccountByAccountNumber(){
         IcesiAccount icesiAccount = defaultIcesiAccount();
+        IcesiUser icesiUser = adminIcesiUser();
+
         when(icesiAccountRepository.findByAccountNumber(argThat(x -> x.equals(icesiAccount.getAccountNumber())))).thenReturn(Optional.of(icesiAccount));
-        IcesiAccountShowDTO icesiAccount1 = icesiAccountService.getAccountByAccountNumber(icesiAccount.getAccountNumber(), "");
+        when(icesiUserRepository.findById(icesiUser.getUserId())).thenReturn(Optional.of(icesiUser));
+
+        IcesiAccountShowDTO icesiAccount1 = icesiAccountService.getAccountByAccountNumber(icesiAccount.getAccountNumber(), icesiUser.getUserId().toString());
         assertEquals(icesiAccount.getAccountId(), icesiAccount1.getAccountId());
         verify(icesiAccountRepository, times(0)).findById(any());
         verify(icesiAccountRepository, times(1)).findByAccountNumber(any());
@@ -538,8 +665,12 @@ public class IcesiAccountServiceTest {
     @Test
     public void testGetAccountByAccountNumberNotFound(){
         String accountNumber = defaultIcesiAccount().getAccountNumber();
+        IcesiUser icesiUser = adminIcesiUser();
+
         when(icesiAccountRepository.findByAccountNumber(any())).thenReturn(Optional.ofNullable(null));
-        IcesiException exception = assertThrows(IcesiException.class, () -> icesiAccountService.getAccountByAccountNumber(accountNumber, ""));
+        when(icesiUserRepository.findById(icesiUser.getUserId())).thenReturn(Optional.of(icesiUser));
+
+        IcesiException exception = assertThrows(IcesiException.class, () -> icesiAccountService.getAccountByAccountNumber(accountNumber, icesiUser.getUserId().toString()));
         IcesiError icesiError = exception.getError();
         assertEquals(1, icesiError.getDetails().size());
         assertEquals(404, icesiError.getStatus().value());

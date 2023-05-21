@@ -1,6 +1,7 @@
 package co.edu.icesi.tallerjpa.unit.service;
 
 import co.edu.icesi.tallerjpa.dto.IcesiRoleCreateDTO;
+import co.edu.icesi.tallerjpa.enums.NameIcesiRole;
 import co.edu.icesi.tallerjpa.error.exception.IcesiError;
 import co.edu.icesi.tallerjpa.error.exception.IcesiException;
 import co.edu.icesi.tallerjpa.mapper.IcesiRoleMapper;
@@ -25,14 +26,14 @@ public class IcesiRoleServiceTest {
     private IcesiRole defaultIcesiRole(){
         return IcesiRole.builder()
                 .description("Manage the system")
-                .name("Admin")
+                .name(NameIcesiRole.ADMIN.toString())
                 .build();
     }
 
     private IcesiRoleCreateDTO defaultIcesiRoleCreateDTO(){
         return IcesiRoleCreateDTO.builder()
                 .description("Manage the system")
-                .name("Admin")
+                .name(NameIcesiRole.ADMIN.toString())
                 .build();
     }
 
@@ -49,7 +50,7 @@ public class IcesiRoleServiceTest {
         when(icesiRoleRepository.findByName(icesiRoleCreateDTO.getName())).thenReturn(Optional.ofNullable(null));
         IcesiRole icesiRole1 = IcesiRole.builder()
                 .description("Manage the system")
-                .name("Admin")
+                .name(NameIcesiRole.ADMIN.toString())
                 .build();
         icesiRoleService.save(icesiRoleCreateDTO);
         verify(icesiRoleRepository, times(1)).save(argThat(new IcesiRoleMatcher(icesiRole1)));
@@ -61,7 +62,7 @@ public class IcesiRoleServiceTest {
         when(icesiRoleRepository.findByName(icesiRole.getName())).thenReturn(Optional.ofNullable(icesiRole));
         IcesiRole icesiRole1 = IcesiRole.builder()
                 .description("Manage the system")
-                .name("Admin")
+                .name(NameIcesiRole.ADMIN.toString())
                 .build();
         IcesiException exception = assertThrows(IcesiException.class, () -> icesiRoleService.save(defaultIcesiRoleCreateDTO()));
         IcesiError icesiError = exception.getError();

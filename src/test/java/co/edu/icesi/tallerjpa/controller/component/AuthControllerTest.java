@@ -1,5 +1,6 @@
-package co.edu.icesi.tallerjpa;
+package co.edu.icesi.tallerjpa.controller.component;
 
+import co.edu.icesi.tallerjpa.TestConfigurationData;
 import co.edu.icesi.tallerjpa.dto.LoginDTO;
 import co.edu.icesi.tallerjpa.dto.TokenDTO;
 import com.fasterxml.jackson.databind.ObjectMapper;
@@ -20,31 +21,27 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 @AutoConfigureMockMvc
 @Import(TestConfigurationData.class)
 @ActiveProfiles(profiles = "test")
-class TallerJpaApplicationTests {
+public class AuthControllerTest {
+    @Autowired
+    private MockMvc mockMvc;
 
-	@Autowired
-	private MockMvc mockMvc;
+    @Autowired
+    ObjectMapper objectMapper;
 
-	@Autowired
-	ObjectMapper objectMapper;
-	@Test
-	void contextLoads() {
-	}
+    @Test
+    public void testTokenEndpoint() throws Exception {
+        var result = mockMvc.perform(MockMvcRequestBuilders.post("/token").content(
+                                objectMapper.writeValueAsString(new LoginDTO("johndoe@email.com","password"))
+                        )
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .accept(MediaType.APPLICATION_JSON))
+                .andExpect(status().isOk())
+                .andReturn();
+        TokenDTO token = objectMapper.readValue(result.getResponse().getContentAsString(), TokenDTO.class);
+        assertNotNull(token);
+    }
 
-	@Test
-	public void testTokenEndpoint() throws Exception {
-		var result = mockMvc.perform(MockMvcRequestBuilders.get("/token").content(
-								objectMapper.writeValueAsString(new LoginDTO("johndoe@email.com","password"))
-						)
-						.contentType(MediaType.APPLICATION_JSON)
-						.accept(MediaType.APPLICATION_JSON))
-				.andExpect(status().isOk())
-				.andReturn();
-		TokenDTO token = objectMapper.readValue(result.getResponse().getContentAsString(), TokenDTO.class);
-		assertNotNull(token);
-	}
-
-//	@Test
+    //	@Test
 //	public void testTokenEndpointWithInvalidEmail() throws Exception {
 //		var result = mockMvc.perform(MockMvcRequestBuilders.get("/token").content(
 //								objectMapper.writeValueAsString(new LoginDTO("inorrect@email.com","password"))

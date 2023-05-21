@@ -26,7 +26,6 @@ public class IcesiUserService {
     private final IcesiUserRepository icesiUserRepository;
     private final IcesiRoleRepository icesiRoleRepository;
     private final IcesiUserMapper icesiUserMapper;
-
     private final PasswordEncoder passwordEncoder;
 
     public IcesiUserShowDTO save(IcesiUserCreateDTO icesiUserCreateDTO, String icesiUserId){
