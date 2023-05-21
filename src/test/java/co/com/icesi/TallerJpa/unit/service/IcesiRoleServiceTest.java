@@ -45,21 +45,22 @@ public class IcesiRoleServiceTest {
     public void testCreateRoleWhenNameAlreadyExists(){
         when(icesiRoleRepository.existsByName(any())).thenReturn(true);
 
-        IcesiException icesiException = assertThrows(IcesiException.class
-                , () -> icesiRoleService.saveRole(defaultIcesiRoleDTO()));
+        IcesiException icesiException = assertThrows(IcesiException.class,
+                () -> icesiRoleService.saveRole(defaultIcesiRoleDTO()));
         IcesiError icesiError = icesiException.getError();
 
         assertEquals(1,icesiError.getDetails().size());
         assertEquals(400, icesiError.getStatus().value());
-        assertEquals("The name "+ defaultIcesiRoleDTO().name() +" is already in use"
+        assertEquals("The name "+ defaultIcesiRoleDTO().getName() +" is already in use"
                 , icesiException.getMessage());
         assertEquals("ERR_DUPLICATED", icesiError.getDetails().get(0).getErrorCode());
-        assertEquals("resource IcesiRole with field name: "+ defaultIcesiRoleDTO().name() +", already exists"
+        assertEquals("resource IcesiRole with field name: "+ defaultIcesiRoleDTO().getName() +", already exists"
                 , icesiError.getDetails().get(0).getErrorMessage());
 
+        verify(icesiRoleRepository,times(1)).existsByName(any());
         verify(icesiRoleMapper,times(0)).fromRoleDto(any());
         verify(icesiRoleMapper,times(0)).fromIcesiRole(any());
-        verify(icesiRoleRepository,times(0)).save(any());
+        verify(icesiRoleRepository,times(0)).save(argThat(new IcesiRoleMatcher(defaultIcesiRole())));
     }
 
     @Test

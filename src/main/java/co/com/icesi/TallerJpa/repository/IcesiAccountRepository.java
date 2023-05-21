@@ -63,4 +63,12 @@ public interface IcesiAccountRepository extends JpaRepository<IcesiAccount, UUID
             "FROM IcesiAccount ia " +
             "WHERE ia.accountNumber = :accountNumber")
     boolean existsByAccountNumber(@Param("accountNumber") String accountNumber);
+
+    @Query( "SELECT CASE WHEN (COUNT(ia) > 0) " +
+            "THEN true " +
+            "ELSE false END " +
+            "FROM IcesiAccount ia " +
+            "WHERE ia.accountNumber = :accountNumber " +
+            "AND ia.icesiUser = :userId")
+    boolean isIcesiAccountOwner(@Param("userId") UUID userId, @Param("accountNumber") String accountNumber);
 }

@@ -23,11 +23,11 @@ public class IcesiRoleService {
     private final IcesiRoleMapper icesiRoleMapper;
 
     public IcesiRoleDTO saveRole(IcesiRoleDTO roleDto) {
-        if(icesiRoleRepository.existsByName(roleDto.name())){
+        if(icesiRoleRepository.existsByName(roleDto.getName())){
             throw createIcesiException(
-                    "The name "+roleDto.name()+" is already in use",
+                    "The name "+roleDto.getName()+" is already in use",
                     HttpStatus.BAD_REQUEST,
-                    new DetailBuilder(ErrorCode.ERR_DUPLICATED,"IcesiRole","name", roleDto.name())
+                    new DetailBuilder(ErrorCode.ERR_DUPLICATED,"IcesiRole","name", roleDto.getName())
             ).get();
         }
 
