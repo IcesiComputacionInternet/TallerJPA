@@ -1,5 +1,7 @@
 package com.edu.icesi.TallerJPA.service;
 
+import com.edu.icesi.TallerJPA.Enums.Scopes;
+import com.edu.icesi.TallerJPA.dto.AccountCreateDTO;
 import com.edu.icesi.TallerJPA.dto.RoleCreateDTO;
 import com.edu.icesi.TallerJPA.dto.UserCreateDTO;
 import com.edu.icesi.TallerJPA.error.exception.DetailBuilder;
@@ -9,6 +11,7 @@ import com.edu.icesi.TallerJPA.model.IcesiRole;
 import com.edu.icesi.TallerJPA.model.IcesiUser;
 import com.edu.icesi.TallerJPA.repository.RoleRepository;
 import com.edu.icesi.TallerJPA.repository.UserRepository;
+import com.edu.icesi.TallerJPA.security.IcesiSecurityContext;
 import lombok.AllArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
@@ -30,6 +33,8 @@ public class UserService {
 
     public UserCreateDTO save(UserCreateDTO userCreateDTO){
 
+        definePermissions(userCreateDTO);
+
         verifyEmailAndPhoneNumber(userCreateDTO.getEmail(), userCreateDTO.getPhoneNumber());
 
         findByEmailIfIsDuplicated(userCreateDTO.getEmail());
@@ -43,6 +48,38 @@ public class UserService {
         icesiUser.setIcesiRole(userCreateDTO.getIcesiRole());
 
         return userMapper.fromIcesiUser(userRepository.save(icesiUser));
+    }
+
+    private void definePermissions(UserCreateDTO userCreateDTO){
+
+        String roleName = userCreateDTO.getIcesiRole().getName();
+
+        switch (roleName) {
+            case "Admin" -> verifyUserRoleForAdmin(IcesiSecurityContext.getCurrentRol());
+            case "Bank" -> verifyUserRoleForBank(IcesiSecurityContext.getCurrentRol());
+        }
+    }
+
+    public void verifyUserRoleForAdmin(String roleActualUser){
+
+        if (!roleActualUser.equalsIgnoreCase(String.valueOf(Scopes.ADMIN))){
+            throw createIcesiException(
+                    "User unauthorized",
+                    HttpStatus.UNAUTHORIZED,
+                    new DetailBuilder(ErrorCode.ERR_401)
+            ).get();
+        }
+    }
+
+    public void verifyUserRoleForBank(String roleActualUser){
+
+        if (roleActualUser.equalsIgnoreCase(String.valueOf(Scopes.USER))){
+            throw createIcesiException(
+                    "User unauthorized",
+                    HttpStatus.UNAUTHORIZED,
+                    new DetailBuilder(ErrorCode.ERR_401)
+            ).get();
+        }
     }
 
     private void verifyEmailAndPhoneNumber(String email, String phoneNumber){

@@ -1,6 +1,7 @@
 package com.edu.icesi.TallerJPA.error;
 
 import com.edu.icesi.TallerJPA.error.exception.*;
+import org.apache.tomcat.websocket.AuthenticationException;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.validation.FieldError;
@@ -27,6 +28,11 @@ public class GlobalExceptionHandler {
         return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(error);
     }
 
+    @ExceptionHandler(AuthenticationException.class)
+    public ResponseEntity<IcesiError> handleAuthenticationException(AuthenticationException authenticationException){
+        var error = createIcesiError(authenticationException.getMessage(), HttpStatus.UNAUTHORIZED, new DetailBuilder(ErrorCode.ERR_401));
+        return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(error);
+    }
 
     @ExceptionHandler(MethodArgumentNotValidException.class)
     public ResponseEntity<IcesiError> handleValidationExceptions( MethodArgumentNotValidException ex) {

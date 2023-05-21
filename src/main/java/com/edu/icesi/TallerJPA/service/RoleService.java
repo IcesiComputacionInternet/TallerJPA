@@ -1,11 +1,13 @@
 package com.edu.icesi.TallerJPA.service;
 
+import com.edu.icesi.TallerJPA.Enums.Scopes;
 import com.edu.icesi.TallerJPA.dto.RoleCreateDTO;
 import com.edu.icesi.TallerJPA.error.exception.DetailBuilder;
 import com.edu.icesi.TallerJPA.error.exception.ErrorCode;
 import com.edu.icesi.TallerJPA.mapper.RoleMapper;
 import com.edu.icesi.TallerJPA.model.IcesiRole;
 import com.edu.icesi.TallerJPA.repository.RoleRepository;
+import com.edu.icesi.TallerJPA.security.IcesiSecurityContext;
 import lombok.AllArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
@@ -25,10 +27,22 @@ public class RoleService {
 
     public RoleCreateDTO save(RoleCreateDTO roleCreateDTO){
 
+        verifyUserRole(IcesiSecurityContext.getCurrentRol());
         IcesiRole icesiRole = roleMapper.fromIcesiRoleDTO(roleCreateDTO);
         icesiRole.setRoleId(UUID.randomUUID());
 
         return roleMapper.fromIcesiRole(roleRepository.save(icesiRole));
+    }
+
+    public void verifyUserRole(String roleActualUser){
+
+        if (!roleActualUser.equalsIgnoreCase(String.valueOf(Scopes.ADMIN))){
+            throw createIcesiException(
+                    "User unauthorized",
+                    HttpStatus.UNAUTHORIZED,
+                    new DetailBuilder(ErrorCode.ERR_401)
+            ).get();
+        }
     }
 
     public RoleCreateDTO getRoleByName(String name){

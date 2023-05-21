@@ -11,6 +11,7 @@ public class IcesiSecurityContext {
     }
 
     public static String getCurrentRol(){
-        return SecurityContextHolder.getContext().getAuthentication().getAuthorities().toString();
+        return ((JwtAuthenticationToken) SecurityContextHolder.getContext().getAuthentication())
+                .getToken().getClaimAsString("scope");
     }
 }

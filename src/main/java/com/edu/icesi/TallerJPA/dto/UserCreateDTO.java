@@ -1,9 +1,12 @@
 package com.edu.icesi.TallerJPA.dto;
 
+import com.edu.icesi.TallerJPA.Constraint.ContactNumberConstraint;
+import com.edu.icesi.TallerJPA.Constraint.PhoneAndEmailConstraint;
 import com.edu.icesi.TallerJPA.model.IcesiRole;
 import lombok.Builder;
 import lombok.Data;
 
+import javax.validation.constraints.Email;
 import javax.validation.constraints.NotBlank;
 import javax.validation.constraints.NotNull;
 
@@ -21,10 +24,12 @@ public class UserCreateDTO {
 
     @NotNull(message = "User needs a email")
     @NotBlank(message = "Email can't be blank")
+    @Email
     private String email;
 
     @NotNull(message = "User needs a phone number")
     @NotBlank(message = "Phone number can't be blank")
+    @ContactNumberConstraint
     private String phoneNumber;
 
     @NotNull(message = "User needs a password")
