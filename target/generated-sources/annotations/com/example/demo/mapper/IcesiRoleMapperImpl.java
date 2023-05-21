@@ -1,14 +1,15 @@
 package com.example.demo.mapper;
 
 import com.example.demo.DTO.IcesiRoleCreateDTO;
+import com.example.demo.DTO.ResponseIcesiRoleDTO;
 import com.example.demo.model.IcesiRole;
 import javax.annotation.processing.Generated;
 import org.springframework.stereotype.Component;
 
 @Generated(
     value = "org.mapstruct.ap.MappingProcessor",
-    date = "2023-05-16T15:31:14-0500",
-    comments = "version: 1.5.3.Final, compiler: Eclipse JDT (IDE) 3.33.0.v20230213-1046, environment: Java 17.0.6 (Eclipse Adoptium)"
+    date = "2023-05-21T10:25:05-0500",
+    comments = "version: 1.5.3.Final, compiler: Eclipse JDT (IDE) 3.34.0.v20230413-0857, environment: Java 17.0.7 (Eclipse Adoptium)"
 )
 @Component
 public class IcesiRoleMapperImpl implements IcesiRoleMapper {
@@ -28,16 +29,16 @@ public class IcesiRoleMapperImpl implements IcesiRoleMapper {
     }
 
     @Override
-    public IcesiRoleCreateDTO fromIcesiRole(IcesiRole icesiRole) {
+    public ResponseIcesiRoleDTO fromIcesiRoleToResponseIcesiRoleDTO(IcesiRole icesiRole) {
         if ( icesiRole == null ) {
             return null;
         }
 
-        IcesiRoleCreateDTO.IcesiRoleCreateDTOBuilder icesiRoleCreateDTO = IcesiRoleCreateDTO.builder();
+        ResponseIcesiRoleDTO.ResponseIcesiRoleDTOBuilder responseIcesiRoleDTO = ResponseIcesiRoleDTO.builder();
 
-        icesiRoleCreateDTO.description( icesiRole.getDescription() );
-        icesiRoleCreateDTO.name( icesiRole.getName() );
+        responseIcesiRoleDTO.description( icesiRole.getDescription() );
+        responseIcesiRoleDTO.name( icesiRole.getName() );
 
-        return icesiRoleCreateDTO.build();
+        return responseIcesiRoleDTO.build();
     }
 }

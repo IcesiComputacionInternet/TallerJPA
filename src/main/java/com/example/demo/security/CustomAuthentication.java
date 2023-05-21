@@ -10,9 +10,7 @@ import org.springframework.security.core.GrantedAuthority;
 public class CustomAuthentication implements Authentication {
 
     private final Authentication authentication;
-
     private final String userId;
-
     
     public CustomAuthentication(Authentication authentication, String userId) {
         this.authentication = authentication;

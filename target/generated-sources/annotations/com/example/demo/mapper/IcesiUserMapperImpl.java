@@ -2,38 +2,38 @@ package com.example.demo.mapper;
 
 import com.example.demo.DTO.IcesiUserCreateDTO;
 import com.example.demo.DTO.ResponseIcesiUserDTO;
+import com.example.demo.model.IcesiRole;
 import com.example.demo.model.IcesiUser;
 import javax.annotation.processing.Generated;
 import org.springframework.stereotype.Component;
 
 @Generated(
     value = "org.mapstruct.ap.MappingProcessor",
-    date = "2023-05-16T15:31:14-0500",
-    comments = "version: 1.5.3.Final, compiler: Eclipse JDT (IDE) 3.33.0.v20230213-1046, environment: Java 17.0.6 (Eclipse Adoptium)"
+    date = "2023-05-21T10:25:59-0500",
+    comments = "version: 1.5.3.Final, compiler: Eclipse JDT (IDE) 3.34.0.v20230413-0857, environment: Java 17.0.7 (Eclipse Adoptium)"
 )
 @Component
 public class IcesiUserMapperImpl implements IcesiUserMapper {
 
     @Override
-    public IcesiUser fromIcesiUserDTO(IcesiUserCreateDTO userCreateDTO) {
-        if ( userCreateDTO == null ) {
+    public IcesiUser fromIcesiUserCreateDTO(IcesiUserCreateDTO icesiUserCreateDTO) {
+        if ( icesiUserCreateDTO == null ) {
             return null;
         }
 
         IcesiUser.IcesiUserBuilder icesiUser = IcesiUser.builder();
 
-        icesiUser.email( userCreateDTO.getEmail() );
-        icesiUser.firstName( userCreateDTO.getFirstName() );
-        icesiUser.icesiRole( userCreateDTO.getIcesiRole() );
-        icesiUser.lastName( userCreateDTO.getLastName() );
-        icesiUser.password( userCreateDTO.getPassword() );
-        icesiUser.phoneNumber( userCreateDTO.getPhoneNumber() );
+        icesiUser.email( icesiUserCreateDTO.getEmail() );
+        icesiUser.firstName( icesiUserCreateDTO.getFirstName() );
+        icesiUser.lastName( icesiUserCreateDTO.getLastName() );
+        icesiUser.password( icesiUserCreateDTO.getPassword() );
+        icesiUser.phoneNumber( icesiUserCreateDTO.getPhoneNumber() );
 
         return icesiUser.build();
     }
 
     @Override
-    public IcesiUserCreateDTO fromIcesiUser(IcesiUser icesiUser) {
+    public IcesiUserCreateDTO fromIcesiUserToIUserCreateDTO(IcesiUser icesiUser) {
         if ( icesiUser == null ) {
             return null;
         }
@@ -42,7 +42,6 @@ public class IcesiUserMapperImpl implements IcesiUserMapper {
 
         icesiUserCreateDTO.email( icesiUser.getEmail() );
         icesiUserCreateDTO.firstName( icesiUser.getFirstName() );
-        icesiUserCreateDTO.icesiRole( icesiUser.getIcesiRole() );
         icesiUserCreateDTO.lastName( icesiUser.getLastName() );
         icesiUserCreateDTO.password( icesiUser.getPassword() );
         icesiUserCreateDTO.phoneNumber( icesiUser.getPhoneNumber() );
@@ -51,7 +50,7 @@ public class IcesiUserMapperImpl implements IcesiUserMapper {
     }
 
     @Override
-    public ResponseIcesiUserDTO fromIcesiUserToIcesiUserCreateDTO(IcesiUser icesiUser) {
+    public ResponseIcesiUserDTO fromIcesiUserToResponseIcesiUserDTO(IcesiUser icesiUser) {
         if ( icesiUser == null ) {
             return null;
         }
@@ -65,5 +64,16 @@ public class IcesiUserMapperImpl implements IcesiUserMapper {
         responseIcesiUserDTO.phoneNumber( icesiUser.getPhoneNumber() );
 
         return responseIcesiUserDTO.build();
+    }
+
+    @Override
+    public IcesiRole fromResponseIcesiUserDTO(ResponseIcesiUserDTO responseIcesiUserDTO) {
+        if ( responseIcesiUserDTO == null ) {
+            return null;
+        }
+
+        IcesiRole.IcesiRoleBuilder icesiRole = IcesiRole.builder();
+
+        return icesiRole.build();
     }
 }

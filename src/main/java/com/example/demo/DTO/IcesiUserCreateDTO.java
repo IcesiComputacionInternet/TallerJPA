@@ -19,5 +19,5 @@ public class IcesiUserCreateDTO {
 
     private String password;
 
-    private IcesiRole icesiRole;
+    private IcesiRoleCreateDTO icesiRoleCreateDTO;
 }

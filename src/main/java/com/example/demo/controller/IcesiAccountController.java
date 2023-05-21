@@ -1,5 +1,7 @@
 package com.example.demo.controller;
 
+import javax.validation.Valid;
+
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RestController;
 
@@ -16,8 +18,39 @@ public class IcesiAccountController implements IcesiAccountAPI {
     
     private final IcesiAccountService icesiAccountService;
 
-    public ResponseIcesiAccountDTO save(@RequestBody IcesiAccountCreateDTO account) {
-        return icesiAccountService.create(account);
+    @Override
+    public ResponseIcesiAccountDTO create(@Valid IcesiAccountCreateDTO icesiAccountCreateDTO) {
+        throw new UnsupportedOperationException("Unimplemented method 'create'");
+    }
+
+    @Override
+    public ResponseIcesiAccountDTO enableAccount(@Valid IcesiAccountCreateDTO icesiAccountCreateDTO) {
+        // TODO Auto-generated method stub
+        throw new UnsupportedOperationException("Unimplemented method 'enableAccount'");
+    }
+
+    @Override
+    public ResponseIcesiAccountDTO disableAccount(@Valid IcesiAccountCreateDTO icesiAccountCreateDTO) {
+        // TODO Auto-generated method stub
+        throw new UnsupportedOperationException("Unimplemented method 'disableAccount'");
+    }
+
+    @Override
+    public void withdrawalMoney(long amountToWithdraw, @Valid IcesiAccountCreateDTO accountCreateDTO) {
+        // TODO Auto-generated method stub
+        throw new UnsupportedOperationException("Unimplemented method 'withdrawalMoney'");
+    }
+
+    @Override
+    public void depositMoney() {
+        // TODO Auto-generated method stub
+        throw new UnsupportedOperationException("Unimplemented method 'depositMoney'");
+    }
+
+    @Override
+    public void transferMoneyToAnotherAccount() {
+        // TODO Auto-generated method stub
+        throw new UnsupportedOperationException("Unimplemented method 'transferMoneyToAnotherAccount'");
     }
 
 }

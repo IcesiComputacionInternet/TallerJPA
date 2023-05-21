@@ -2,14 +2,17 @@ package com.example.demo.mapper;
 
 import com.example.demo.DTO.IcesiAccountCreateDTO;
 import com.example.demo.DTO.ResponseIcesiAccountDTO;
+import com.example.demo.DTO.ResponseTransactionDTO;
+import com.example.demo.DTO.TransactionCreateDTO;
 import com.example.demo.model.IcesiAccount;
+import com.example.demo.model.enums.TypeIcesiAccount;
 import javax.annotation.processing.Generated;
 import org.springframework.stereotype.Component;
 
 @Generated(
     value = "org.mapstruct.ap.MappingProcessor",
-    date = "2023-05-16T15:31:14-0500",
-    comments = "version: 1.5.3.Final, compiler: Eclipse JDT (IDE) 3.33.0.v20230213-1046, environment: Java 17.0.6 (Eclipse Adoptium)"
+    date = "2023-05-21T10:27:35-0500",
+    comments = "version: 1.5.3.Final, compiler: Eclipse JDT (IDE) 3.34.0.v20230413-0857, environment: Java 17.0.7 (Eclipse Adoptium)"
 )
 @Component
 public class IcesiAccountMapperImpl implements IcesiAccountMapper {
@@ -26,36 +29,42 @@ public class IcesiAccountMapperImpl implements IcesiAccountMapper {
         icesiAccount.active( IcesiAccountCreateDTO.isActive() );
         icesiAccount.balance( IcesiAccountCreateDTO.getBalance() );
         icesiAccount.icesiUser( IcesiAccountCreateDTO.getIcesiUser() );
-        icesiAccount.type( IcesiAccountCreateDTO.getType() );
+        if ( IcesiAccountCreateDTO.getType() != null ) {
+            icesiAccount.type( IcesiAccountCreateDTO.getType().name() );
+        }
 
         return icesiAccount.build();
     }
 
     @Override
-    public IcesiAccountCreateDTO fromIcesiAccount(IcesiAccount icesiAccount) {
+    public ResponseIcesiAccountDTO fromIcesiAccountToResponseIcesiAccountDTO(IcesiAccount icesiAccount) {
         if ( icesiAccount == null ) {
             return null;
         }
 
-        IcesiAccountCreateDTO.IcesiAccountCreateDTOBuilder icesiAccountCreateDTO = IcesiAccountCreateDTO.builder();
+        ResponseIcesiAccountDTO.ResponseIcesiAccountDTOBuilder responseIcesiAccountDTO = ResponseIcesiAccountDTO.builder();
 
-        icesiAccountCreateDTO.accountNumber( icesiAccount.getAccountNumber() );
-        icesiAccountCreateDTO.active( icesiAccount.isActive() );
-        icesiAccountCreateDTO.balance( icesiAccount.getBalance() );
-        icesiAccountCreateDTO.icesiUser( icesiAccount.getIcesiUser() );
-        icesiAccountCreateDTO.type( icesiAccount.getType() );
+        responseIcesiAccountDTO.accountNumber( icesiAccount.getAccountNumber() );
+        responseIcesiAccountDTO.active( icesiAccount.isActive() );
+        responseIcesiAccountDTO.balance( icesiAccount.getBalance() );
+        if ( icesiAccount.getType() != null ) {
+            responseIcesiAccountDTO.type( Enum.valueOf( TypeIcesiAccount.class, icesiAccount.getType() ) );
+        }
 
-        return icesiAccountCreateDTO.build();
+        return responseIcesiAccountDTO.build();
     }
 
     @Override
-    public ResponseIcesiAccountDTO fromIcesiAcountToIcesiAccountCreateDTO(IcesiAccount icesiAccount) {
-        if ( icesiAccount == null ) {
+    public ResponseTransactionDTO fromTransactionCrateDTO(TransactionCreateDTO transactionCreateDTO) {
+        if ( transactionCreateDTO == null ) {
             return null;
         }
 
-        ResponseIcesiAccountDTO responseIcesiAccountDTO = new ResponseIcesiAccountDTO();
+        ResponseTransactionDTO.ResponseTransactionDTOBuilder responseTransactionDTO = ResponseTransactionDTO.builder();
 
-        return responseIcesiAccountDTO;
+        responseTransactionDTO.receiverAccountId( transactionCreateDTO.getReceiverAccountId() );
+        responseTransactionDTO.senderAccountId( transactionCreateDTO.getSenderAccountId() );
+
+        return responseTransactionDTO.build();
     }
 }

@@ -10,7 +10,7 @@ import com.example.demo.model.IcesiAccount;
 
 @Repository
 public interface IcesiAccountRepository extends JpaRepository<IcesiAccount, UUID> {
+    
     Optional<IcesiAccount> findByAccountNumber(String accountNumber);
-
     Optional<IcesiAccount> findByBalance(long balance);
 }

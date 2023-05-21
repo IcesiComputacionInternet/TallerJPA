@@ -2,6 +2,7 @@ package com.example.demo.DTO;
 
 
 import com.example.demo.model.IcesiUser;
+import com.example.demo.model.enums.TypeIcesiAccount;
 
 import lombok.Builder;
 import lombok.Data;
@@ -13,7 +14,7 @@ public class IcesiAccountCreateDTO {
 
     private long balance;
 
-    private String type;
+    private TypeIcesiAccount type;
 
     private boolean active;
 

@@ -11,7 +11,6 @@ import com.example.demo.model.IcesiUser;
 public interface IcesiUserRepository extends JpaRepository<IcesiUser, UUID> {
     
     Optional<IcesiUser> findByEmail(String email);
-
     Optional<IcesiUser> findByPhoneNumber(String phoneNumber);
 
 }

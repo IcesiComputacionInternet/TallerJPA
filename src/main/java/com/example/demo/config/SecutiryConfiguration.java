@@ -37,7 +37,6 @@ import lombok.AllArgsConstructor;
 public class SecutiryConfiguration {
  
     private final IcesiAuthenticatorManager icesiAuthenticatorManager;
-
     private final String secret = "longenoughsecrettotestjwtencrypt";
 
     @Bean

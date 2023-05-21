@@ -13,8 +13,8 @@ import lombok.AllArgsConstructor;
 @RestController
 @AllArgsConstructor
 public class AuthController {
+    
     private final  TokenService tokenService;
-
     private final AuthenticationManager authenticationManager;
 
     @GetMapping("/token")

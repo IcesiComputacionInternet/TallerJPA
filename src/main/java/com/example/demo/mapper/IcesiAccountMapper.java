@@ -4,12 +4,14 @@ import org.mapstruct.Mapper;
 
 import com.example.demo.DTO.IcesiAccountCreateDTO;
 import com.example.demo.DTO.ResponseIcesiAccountDTO;
+import com.example.demo.DTO.ResponseTransactionDTO;
+import com.example.demo.DTO.TransactionCreateDTO;
 import com.example.demo.model.IcesiAccount;
 
 @Mapper(componentModel = "spring")
 public interface IcesiAccountMapper {
     
     IcesiAccount fromIcesiAccountCreateDTO(IcesiAccountCreateDTO IcesiAccountCreateDTO);
-    IcesiAccountCreateDTO fromIcesiAccount(IcesiAccount icesiAccount);
-    ResponseIcesiAccountDTO fromIcesiAcountToIcesiAccountCreateDTO(IcesiAccount icesiAccount);
+    ResponseIcesiAccountDTO fromIcesiAccountToResponseIcesiAccountDTO(IcesiAccount icesiAccount);
+    ResponseTransactionDTO fromTransactionCrateDTO(TransactionCreateDTO transactionCreateDTO);
 }
