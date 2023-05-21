@@ -10,6 +10,6 @@ import javax.validation.constraints.NotBlank;
 public class RoleDTO {
     @NotBlank
     private String name;
-
+    @NotBlank
     private String description;
 }

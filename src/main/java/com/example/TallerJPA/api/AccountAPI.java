@@ -19,5 +19,7 @@ public interface AccountAPI {
     public AccountResponseDTO enableAccount(@PathVariable String accountNumber);
     @PatchMapping("/disableAccount/{accountNumber}")
     public AccountResponseDTO disableAccount(@PathVariable String accountNumber);
+    @PatchMapping("/testPath")
+    public void testPath(@RequestBody TransferRequestDTO transaction);
 
 }

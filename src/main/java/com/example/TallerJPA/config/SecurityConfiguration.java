@@ -86,6 +86,9 @@ public class SecurityConfiguration {
                 AuthorityAuthorizationManager.hasAnyAuthority("SCOPE_ADMIN"));
         managerBuilder.add(new MvcRequestMatcher(introspector,"/users/**"),
                 AuthorityAuthorizationManager.hasAnyAuthority("SCOPE_ADMIN"));
+        managerBuilder.add(new MvcRequestMatcher(introspector,"/accounts/**"),
+                AuthorityAuthorizationManager.hasAnyAuthority("SCOPE_ADMIN"));
+
         //Bank permissions
         managerBuilder.add(new MvcRequestMatcher(introspector,"**/createIcesiUser/**"),
                 AuthorityAuthorizationManager.hasAnyAuthority("SCOPE_BANK"));

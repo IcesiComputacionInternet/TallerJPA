@@ -101,6 +101,7 @@ public class AccountServiceTest {
     public void testWithdrawWhenBalanceIsNotZero() {
         IcesiAccount account = defaultIcesiAccount();
         account.setBalance(1000);
+
         when(accountRepository.findByAccountNumber(any())).thenReturn(Optional.of(account));
         accountService.withdraw(new TransactionAccountDTO(account.getAccountNumber(), 500));
         assertEquals(500, account.getBalance());

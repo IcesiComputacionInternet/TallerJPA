@@ -8,11 +8,12 @@ import com.example.TallerJPA.service.UserService;
 import lombok.AllArgsConstructor;
 import org.springframework.web.bind.annotation.RestController;
 
+import javax.validation.Valid;
 import java.util.List;
 
 import static com.example.TallerJPA.api.UserAPI.BASE_USER_URL;
 
-@RestController(BASE_USER_URL)
+@RestController
 @AllArgsConstructor
 public class UserController implements UserAPI {
     private final UserService userService;
@@ -20,7 +21,7 @@ public class UserController implements UserAPI {
 
 
     @Override
-    public UserDTO createIcesiUser(UserDTO user) {
+    public UserDTO createIcesiUser(@Valid UserDTO user) {
         return userService.save(user);
     }
 

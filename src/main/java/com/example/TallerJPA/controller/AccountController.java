@@ -7,6 +7,8 @@ import com.example.TallerJPA.service.AccountService;
 import lombok.AllArgsConstructor;
 import org.springframework.web.bind.annotation.*;
 
+import javax.validation.Valid;
+
 import static com.example.TallerJPA.api.AccountAPI.BASE_ACCOUNT_URL;
 
 @AllArgsConstructor
@@ -14,22 +16,22 @@ import static com.example.TallerJPA.api.AccountAPI.BASE_ACCOUNT_URL;
 public class AccountController implements AccountAPI {
     private final AccountService accountService;
     @Override
-    public AccountResponseDTO save(@RequestBody AccountCreateDTO account){
+    public AccountResponseDTO save(@RequestBody @Valid AccountCreateDTO account){
         return accountService.save(account);
     }
 
     @Override
-    public AccountResponseDTO withdraw(@RequestBody TransactionAccountDTO transaction){
+    public AccountResponseDTO withdraw(@RequestBody @Valid TransactionAccountDTO transaction){
         return accountService.withdraw(transaction);
     }
 
     @Override
-    public AccountResponseDTO deposit(@RequestBody TransactionAccountDTO transaction){
+    public AccountResponseDTO deposit(@RequestBody @Valid TransactionAccountDTO transaction){
         return accountService.deposit(transaction);
     }
 
     @Override
-    public TransferResponseDTO transfer(@RequestBody TransferRequestDTO transaction){
+    public TransferResponseDTO transfer(@RequestBody @Valid TransferRequestDTO transaction){
         return accountService.transfer(transaction);
     }
 
@@ -42,10 +44,10 @@ public class AccountController implements AccountAPI {
     public AccountResponseDTO disableAccount(@PathVariable String accountNumber){
         return accountService.disableAccount(accountNumber);
     }
-
-    @GetMapping("/user/pathTest/")
-    public void pathTest2(@RequestBody AccountCreateDTO account){
-        System.out.println("It got into the pathTest2 method");
+    @Override
+    public void testPath(@RequestBody @Valid TransferRequestDTO transaction){
+        System.out.println("It got here!");
     }
+
 
 }

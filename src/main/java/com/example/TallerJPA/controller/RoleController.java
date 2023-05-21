@@ -8,6 +8,8 @@ import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RestController;
 
+import javax.validation.Valid;
+
 import static com.example.TallerJPA.api.RoleAPI.BASE_ROLE_URL;
 
 @AllArgsConstructor
@@ -16,7 +18,7 @@ public class RoleController implements RoleAPI {
     private RoleService roleService;
 
     @Override
-    public RoleDTO createRole(@RequestBody RoleDTO role){
+    public RoleDTO createRole(@RequestBody @Valid RoleDTO role){
         return roleService.save(role);
     }
 }
