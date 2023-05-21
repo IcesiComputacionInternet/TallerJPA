@@ -1,9 +1,6 @@
 package co.edu.icesi.tallerjpa.util;
 
-import co.edu.icesi.tallerjpa.dto.IcesiAccountCreateDTO;
-import co.edu.icesi.tallerjpa.dto.IcesiRoleCreateDTO;
-import co.edu.icesi.tallerjpa.dto.IcesiUserCreateDTO;
-import co.edu.icesi.tallerjpa.dto.TransactionCreateDTO;
+import co.edu.icesi.tallerjpa.dto.*;
 import co.edu.icesi.tallerjpa.enums.NameIcesiRole;
 import co.edu.icesi.tallerjpa.enums.TypeIcesiAccount;
 
@@ -57,22 +54,22 @@ public class DTOBuilder {
 
     public static TransactionCreateDTO defaultTransferTransactionCreateDTO(){
         return TransactionCreateDTO.builder()
-                .senderAccountId("c34f11df-cda3-4d75-a74b-4d8c98d6074f")
-                .receiverAccountId("c34f11df-1234-4d75-a74b-4d8c98d6074f")
+                .senderAccountNumber("111-123456-11")
+                .receiverAccountNumber("222-123456-22")
                 .amount(500)
                 .build();
     }
 
-    public static TransactionCreateDTO defaultWithdrawalTransactionCreateDTO(){
-        return TransactionCreateDTO.builder()
-                .senderAccountId("c34f11df-cda3-4d75-a74b-4d8c98d6074f")
+    public static TransactionWithOneAccountCreateDTO defaultWithdrawalTransactionCreateDTO(){
+        return TransactionWithOneAccountCreateDTO.builder()
+                .accountNumber("111-123456-11")
                 .amount(500)
                 .build();
     }
 
-    public static TransactionCreateDTO defaultDepositTransactionCreateDTO(){
-        return TransactionCreateDTO.builder()
-                .receiverAccountId("c34f11df-1234-4d75-a74b-4d8c98d6074f")
+    public static TransactionWithOneAccountCreateDTO defaultDepositTransactionCreateDTO(){
+        return TransactionWithOneAccountCreateDTO.builder()
+                .accountNumber("111-123456-11")
                 .amount(500)
                 .build();
     }

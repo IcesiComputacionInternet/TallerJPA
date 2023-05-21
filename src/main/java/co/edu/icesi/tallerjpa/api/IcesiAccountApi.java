@@ -21,10 +21,10 @@ public interface IcesiAccountApi {
     public IcesiAccountShowDTO disableAccount(@PathVariable("accountNumber") String accountNumber);
 
     @PatchMapping("withdrawal_money")
-    public TransactionResultDTO withdrawalMoney(@Valid @RequestBody TransactionCreateDTO transactionCreateDTO);
+    public TransactionWithOneAccountCreateDTO withdrawalMoney(@Valid @RequestBody TransactionWithOneAccountCreateDTO transactionCreateDTO);
 
     @PatchMapping("deposit_money")
-    public TransactionResultDTO depositMoney(@Valid @RequestBody TransactionCreateDTO transactionCreateDTO);
+    public TransactionWithOneAccountCreateDTO depositMoney(@Valid @RequestBody TransactionWithOneAccountCreateDTO transactionCreateDTO);
 
     @PatchMapping("transfer_money")
     public TransactionResultDTO transferMoney(@Valid @RequestBody TransactionCreateDTO transactionCreateDTO);

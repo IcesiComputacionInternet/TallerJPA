@@ -28,7 +28,7 @@ public class IcesiUserService {
     private final IcesiUserMapper icesiUserMapper;
     private final PasswordEncoder passwordEncoder;
 
-    public IcesiUserShowDTO save(IcesiUserCreateDTO icesiUserCreateDTO, String icesiUserId){
+    public IcesiUserShowDTO save(IcesiUserCreateDTO icesiUserCreateDTO, String icesiUserRole){
         ArrayList<String> errors = new ArrayList<>();
 
         if(!isEmailUnique(icesiUserCreateDTO.getEmail())){
@@ -49,7 +49,7 @@ public class IcesiUserService {
         }
 
         IcesiRole icesiRole = getIcesiRoleByName(icesiUserCreateDTO.getIcesiRoleCreateDTO().getName());
-        checkPermissionsToCreateUser(icesiUserId, icesiRole.getName());
+        checkPermissionsToCreateUser(icesiUserRole, icesiRole.getName());
 
         IcesiUser icesiUser = icesiUserMapper.fromCreateIcesiUserDTO(icesiUserCreateDTO);
         icesiUser.setIcesiRole(icesiRole);
@@ -108,9 +108,8 @@ public class IcesiUserService {
         }
     }
 
-    private void checkPermissionsToCreateUser(String icesiUserId, String roleName){
-        IcesiUser icesiUser = getIcesiUserById(icesiUserId);
-        boolean userIsNotAnAdmin = !icesiUser.getIcesiRole().getName().equals(NameIcesiRole.ADMIN.toString());
+    private void checkPermissionsToCreateUser(String icesiUserRole, String roleName){
+        boolean userIsNotAnAdmin = !icesiUserRole.equals(NameIcesiRole.ADMIN.toString());
         boolean roleToAssignIsADMIN = roleName.equals(NameIcesiRole.ADMIN.toString());
         if (userIsNotAnAdmin && roleToAssignIsADMIN){
             throw createIcesiException(

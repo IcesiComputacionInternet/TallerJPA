@@ -39,15 +39,15 @@ public class IcesiAccountController implements IcesiAccountApi {
     }
 
     @Override
-    public TransactionResultDTO withdrawalMoney(TransactionCreateDTO transactionCreateDTO) {
+    public TransactionWithOneAccountCreateDTO withdrawalMoney(TransactionWithOneAccountCreateDTO transactionWithOneAccountCreateDTO) {
         String icesiUserId = IcesiSecurityContext.getCurrentUserId();
-        return icesiAccountService.withdrawalMoney(transactionCreateDTO, icesiUserId);
+        return icesiAccountService.withdrawalMoney(transactionWithOneAccountCreateDTO, icesiUserId);
     }
 
     @Override
-    public TransactionResultDTO depositMoney(TransactionCreateDTO transactionCreateDTO) {
+    public TransactionWithOneAccountCreateDTO depositMoney(TransactionWithOneAccountCreateDTO transactionWithOneAccountCreateDTO) {
         String icesiUserId = IcesiSecurityContext.getCurrentUserId();
-        return icesiAccountService.depositMoney(transactionCreateDTO, icesiUserId);
+        return icesiAccountService.depositMoney(transactionWithOneAccountCreateDTO, icesiUserId);
     }
 
     @Override

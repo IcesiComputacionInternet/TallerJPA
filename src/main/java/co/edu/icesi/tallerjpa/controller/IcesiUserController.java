@@ -19,8 +19,8 @@ public class IcesiUserController implements IcesiUserApi {
 
     @Override
     public IcesiUserShowDTO createIcesiUser(IcesiUserCreateDTO userDTO){
-        String icesiUserId = IcesiSecurityContext.getCurrentUserId();
-        return icesiUserService.save(userDTO, icesiUserId);
+        String icesiUserRole = IcesiSecurityContext.getCurrentUserRole();
+        return icesiUserService.save(userDTO, icesiUserRole);
     }
 
     @Override

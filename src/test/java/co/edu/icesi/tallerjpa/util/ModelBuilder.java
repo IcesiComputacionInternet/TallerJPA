@@ -54,6 +54,8 @@ public class ModelBuilder {
 
     public static IcesiAccount regularIcesiAccountCreateWith1000(){
         return IcesiAccount.builder()
+                .accountNumber("111-123456-11")
+                .accountId(UUID.fromString("dfc0b6e1-3076-4d9f-91fd-159f2f142c40"))
                 .balance(1000)
                 .type(TypeIcesiAccount.REGULAR_ACCOUNT.toString())
                 .active(true)

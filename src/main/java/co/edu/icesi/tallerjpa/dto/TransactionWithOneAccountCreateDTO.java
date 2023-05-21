@@ -5,8 +5,7 @@ import lombok.Data;
 
 @Data
 @Builder
-public class TransactionCreateDTO {
-    private String senderAccountNumber;
-    private String receiverAccountNumber;
+public class TransactionWithOneAccountCreateDTO {
+    private String accountNumber;
     private long amount;
 }

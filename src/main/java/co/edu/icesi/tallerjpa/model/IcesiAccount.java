@@ -37,7 +37,7 @@ public class IcesiAccount {
         }
     }
 
-    public boolean isThereEnoughMoney(long necessaryMoney){
+    public boolean isThereEnoughMoneyToWithdraw(long necessaryMoney){
         if(balance - necessaryMoney < 0){
             return false;
         }

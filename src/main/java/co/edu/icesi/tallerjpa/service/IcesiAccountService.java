@@ -1,9 +1,6 @@
 package co.edu.icesi.tallerjpa.service;
 
-import co.edu.icesi.tallerjpa.dto.IcesiAccountCreateDTO;
-import co.edu.icesi.tallerjpa.dto.IcesiAccountShowDTO;
-import co.edu.icesi.tallerjpa.dto.TransactionCreateDTO;
-import co.edu.icesi.tallerjpa.dto.TransactionResultDTO;
+import co.edu.icesi.tallerjpa.dto.*;
 import co.edu.icesi.tallerjpa.enums.NameIcesiRole;
 import co.edu.icesi.tallerjpa.error.exception.DetailBuilder;
 import co.edu.icesi.tallerjpa.error.exception.ErrorCode;
@@ -137,23 +134,23 @@ public class IcesiAccountService {
         return icesiAccountMapper.fromIcesiAccountToShowDTO(getAccountByAccountNumber(icesiAccount.getAccountNumber()));
     }
 
-    public TransactionResultDTO withdrawalMoney(TransactionCreateDTO transactionCreateDTO, String icesiUserId){
-        IcesiAccount icesiAccount = getAccountById(transactionCreateDTO.getSenderAccountId());
+    public TransactionWithOneAccountCreateDTO withdrawalMoney(TransactionWithOneAccountCreateDTO transactionWithdrawalCreateDTO, String icesiUserId){
+        IcesiAccount icesiAccount = getAccountByAccountNumber(transactionWithdrawalCreateDTO.getAccountNumber());
         checkIfTheAccountBelongsToTheIcesiUser(icesiAccount, icesiUserId);
         checkIfTheAccountIsDisabled(icesiAccount);
-        if(!icesiAccount.isThereEnoughMoney(transactionCreateDTO.getAmount())){
+        if(!icesiAccount.isThereEnoughMoneyToWithdraw(transactionWithdrawalCreateDTO.getAmount())){
             throw createIcesiException(
                     "Not enough money to withdraw. At most you can withdraw: " + icesiAccount.getBalance(),
                     HttpStatus.BAD_REQUEST,
                     new DetailBuilder(ErrorCode.ERR_400, "balance", "Not enough money to withdraw. At most you can withdraw: " + icesiAccount.getBalance())
             ).get();
         }
-        long newBalance = icesiAccount.getBalance() - transactionCreateDTO.getAmount();
-        icesiAccountRepository.updateBalance(newBalance, transactionCreateDTO.getSenderAccountId());
-        TransactionResultDTO transactionResultDTO = icesiAccountMapper.fromTransactionCreateDTO(transactionCreateDTO);
-        transactionResultDTO.setBalance(newBalance);
-        transactionResultDTO.setResult("The withdrawal was successful");
-        return transactionResultDTO;
+        long newBalance = icesiAccount.getBalance() - transactionWithdrawalCreateDTO.getAmount();
+        icesiAccountRepository.updateBalance(newBalance, icesiAccount.getAccountId().toString());
+        TransactionWithOneAccountCreateDTO transactionWithdrawalCreateDTOCopy = TransactionWithOneAccountCreateDTO.builder()
+                .accountNumber(transactionWithdrawalCreateDTO.getAccountNumber()).build();
+        transactionWithdrawalCreateDTOCopy.setAmount(newBalance);
+        return transactionWithdrawalCreateDTOCopy;
 
     }
 
@@ -167,27 +164,27 @@ public class IcesiAccountService {
 
     }
 
-    public TransactionResultDTO depositMoney(TransactionCreateDTO transactionCreateDTO, String icesiUserId){
-        IcesiAccount icesiAccount = getAccountById(transactionCreateDTO.getReceiverAccountId());
+    public TransactionWithOneAccountCreateDTO depositMoney(TransactionWithOneAccountCreateDTO transactionWithOneAccountCreateDTO, String icesiUserId){
+        IcesiAccount icesiAccount = getAccountByAccountNumber(transactionWithOneAccountCreateDTO.getAccountNumber());
         checkIfTheAccountBelongsToTheIcesiUser(icesiAccount, icesiUserId);
         checkIfTheAccountIsDisabled(icesiAccount);
-        long newBalance = icesiAccount.getBalance() + transactionCreateDTO.getAmount();
-        icesiAccountRepository.updateBalance(newBalance, transactionCreateDTO.getReceiverAccountId());
-        TransactionResultDTO transactionResultDTO = icesiAccountMapper.fromTransactionCreateDTO(transactionCreateDTO);
-        transactionResultDTO.setBalance(newBalance);
-        transactionResultDTO.setResult("The deposit was successful");
-        return transactionResultDTO;
+        long newBalance = icesiAccount.getBalance() + transactionWithOneAccountCreateDTO.getAmount();
+        icesiAccountRepository.updateBalance(newBalance, icesiAccount.getAccountId().toString());
+        TransactionWithOneAccountCreateDTO transactionWithOneAccountCreateDTOCopy = TransactionWithOneAccountCreateDTO.builder()
+                .accountNumber(transactionWithOneAccountCreateDTO.getAccountNumber()).build();
+        transactionWithOneAccountCreateDTOCopy.setAmount(newBalance);
+        return transactionWithOneAccountCreateDTOCopy;
     }
 
     public TransactionResultDTO transferMoney(TransactionCreateDTO transactionCreateDTO, String icesiUserId){
-        IcesiAccount senderIcesiAccount = getAccountById(transactionCreateDTO.getSenderAccountId());
-        IcesiAccount receiverIcesiAccount = getAccountById(transactionCreateDTO.getReceiverAccountId());
+        IcesiAccount senderIcesiAccount = getAccountByAccountNumber(transactionCreateDTO.getSenderAccountNumber());
+        IcesiAccount receiverIcesiAccount = getAccountByAccountNumber(transactionCreateDTO.getReceiverAccountNumber());
         checkIfTheAccountBelongsToTheIcesiUser(senderIcesiAccount, icesiUserId);
         checkConditionsToTransfer(senderIcesiAccount, receiverIcesiAccount, transactionCreateDTO.getAmount());
         long senderAccountNewBalance = senderIcesiAccount.getBalance() - transactionCreateDTO.getAmount();
         long receiverAccountNewBalance = receiverIcesiAccount.getBalance() + transactionCreateDTO.getAmount();
-        icesiAccountRepository.updateBalance(senderAccountNewBalance, transactionCreateDTO.getSenderAccountId());
-        icesiAccountRepository.updateBalance(receiverAccountNewBalance, transactionCreateDTO.getReceiverAccountId());
+        icesiAccountRepository.updateBalance(senderAccountNewBalance, senderIcesiAccount.getAccountId().toString());
+        icesiAccountRepository.updateBalance(receiverAccountNewBalance, receiverIcesiAccount.getAccountId().toString());
         TransactionResultDTO transactionResultDTO = icesiAccountMapper.fromTransactionCreateDTO(transactionCreateDTO);
         transactionResultDTO.setBalance(senderAccountNewBalance);
         transactionResultDTO.setResult("The transfer was successful");
@@ -198,12 +195,12 @@ public class IcesiAccountService {
         checkIfTheAccountIsDisabled(senderIcesiAccount);
         if(senderIcesiAccount.isMarkedAsDepositOnly()){
             throw createIcesiException(
-                    "The account with id " + senderIcesiAccount.getAccountId() + " is marked as deposit only so it can't transfers money",
+                    "The account with number " + senderIcesiAccount.getAccountNumber() + " is marked as deposit only so it can't transfers money",
                     HttpStatus.BAD_REQUEST,
-                    new DetailBuilder(ErrorCode.ERR_400, "type", "The account with id " + senderIcesiAccount.getAccountId() + " is marked as deposit only so it can't transfers money")
+                    new DetailBuilder(ErrorCode.ERR_400, "type", "The account with number " + senderIcesiAccount.getAccountNumber() + " is marked as deposit only so it can't transfers money")
             ).get();
         }
-        if(!senderIcesiAccount.isThereEnoughMoney(moneyToTransfer)){
+        if(!senderIcesiAccount.isThereEnoughMoneyToWithdraw(moneyToTransfer)){
             throw createIcesiException(
                     "Not enough money to transfer. At most you can transfer: " + senderIcesiAccount.getBalance(),
                     HttpStatus.BAD_REQUEST,
@@ -213,9 +210,9 @@ public class IcesiAccountService {
         checkIfTheAccountIsDisabled(receiverIcesiAccount);
         if(receiverIcesiAccount.isMarkedAsDepositOnly()){
             throw createIcesiException(
-                    "The account with id " + receiverIcesiAccount.getAccountId() + " is marked as deposit only so no money can be transferred",
+                    "The account with number " + receiverIcesiAccount.getAccountNumber() + " is marked as deposit only so no money can be transferred",
                     HttpStatus.BAD_REQUEST,
-                    new DetailBuilder(ErrorCode.ERR_400, "type", "The account with id " + receiverIcesiAccount.getAccountId() + " is marked as deposit only so no money can be transferred")
+                    new DetailBuilder(ErrorCode.ERR_400, "type", "The account with number " + receiverIcesiAccount.getAccountNumber() + " is marked as deposit only so no money can be transferred")
             ).get();
         }
     }
@@ -223,9 +220,9 @@ public class IcesiAccountService {
     private void checkIfTheAccountIsDisabled(IcesiAccount icesiAccount){
         if (icesiAccount.isDisable()){
             throw createIcesiException(
-                    "The account "+icesiAccount.getAccountId()+" is disabled",
+                    "The account "+icesiAccount.getAccountNumber()+" is disabled",
                     HttpStatus.BAD_REQUEST,
-                    new DetailBuilder(ErrorCode.ERR_400, "isActive", "The account "+icesiAccount.getAccountId()+" is disabled")
+                    new DetailBuilder(ErrorCode.ERR_400, "isActive", "The account "+icesiAccount.getAccountNumber()+" is disabled")
             ).get();
         }
     }
@@ -233,9 +230,9 @@ public class IcesiAccountService {
     private IcesiAccount getAccountByAccountNumber(String accountNumber){
         return icesiAccountRepository.findByAccountNumber(accountNumber)
                 .orElseThrow(createIcesiException(
-                        "There is no account with the number: " + accountNumber,
+                        "There is no account with number: " + accountNumber,
                         HttpStatus.NOT_FOUND,
-                        new DetailBuilder(ErrorCode.ERR_404, "account", "the number", accountNumber)
+                        new DetailBuilder(ErrorCode.ERR_404, "account", "number", accountNumber)
                 ));
     }
 
