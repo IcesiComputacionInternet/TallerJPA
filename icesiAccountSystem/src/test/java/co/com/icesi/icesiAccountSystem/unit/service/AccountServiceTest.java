@@ -4,6 +4,7 @@ import co.com.icesi.icesiAccountSystem.dto.RequestAccountDTO;
 import co.com.icesi.icesiAccountSystem.dto.ResponseAccountDTO;
 import co.com.icesi.icesiAccountSystem.dto.TransactionOperationDTO;
 import co.com.icesi.icesiAccountSystem.enums.AccountType;
+import co.com.icesi.icesiAccountSystem.error.exception.AccountSystemException;
 import co.com.icesi.icesiAccountSystem.mapper.AccountMapper;
 import co.com.icesi.icesiAccountSystem.mapper.AccountMapperImpl;
 import co.com.icesi.icesiAccountSystem.model.IcesiAccount;
@@ -17,6 +18,8 @@ import co.com.icesi.icesiAccountSystem.unit.service.matcher.IcesiAccountMatcher;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 
+import javax.validation.constraints.NotBlank;
+import javax.validation.constraints.NotNull;
 import java.util.Optional;
 
 import java.util.UUID;
@@ -62,6 +65,9 @@ public class AccountServiceTest {
         verify(accountMapper, times(1)).fromAccountToResponseAccountDTO(any());
     }
 
+    //EL SIGUIENTE TEST SE PUEDE REEMPLAZAR CON LAS VALIDACIONES
+    //@NotNull(message = "The email of a user can't be null")
+    //@NotBlank(message = "The email of a user can't be blank")
     @Test
     public void testCreateAccountWithoutUserEmail(){
         try {
@@ -74,10 +80,16 @@ public class AccountServiceTest {
                             .build()
             );
             fail();
-        } catch (RuntimeException exception){
+        } catch (AccountSystemException exception){
             String message = exception.getMessage();
+            var error = exception.getError();
+            var details = error.getDetails();
+            assertEquals(1, details.size());
+            var detail = details.get(0);
             // Assert
-            assertEquals("The email of the user was not specified or user does not exists yet, it is not possible to create an account without a user.", message);
+            assertEquals("Some fields of the new account had errors", message);
+            assertEquals("ERR_404", detail.getErrorCode(), "Code doesn't match");
+            assertEquals("User with email:  not found.", detail.getErrorMessage(), "Error message doesn't match");
         }
     }
 
@@ -93,12 +105,21 @@ public class AccountServiceTest {
                             .build()
             );
             fail();
-        } catch (RuntimeException exception){
+        } catch (AccountSystemException exception){
             String message = exception.getMessage();
+            var error = exception.getError();
+            var details = error.getDetails();
+            assertEquals(1, details.size());
+            var detail = details.get(0);
             // Assert
-            assertEquals("The email of the user was not specified or user does not exists yet, it is not possible to create an account without a user.", message);
+            assertEquals("Some fields of the new account had errors", message);
+            assertEquals("ERR_404", detail.getErrorCode(), "Code doesn't match");
+            assertEquals("User with email: ykaar@gmail.com not found.", detail.getErrorMessage(), "Error message doesn't match");
         }
     }
+    /*
+    TEST COMENTADO PORQUE ESTA VALIDACIÓN SE PUEDE REALIZAR CON  @Min(value=0, message = "The amount of a transaction must be greater than 0")
+    ******* VER TEST DE INTEGRACIÓN
 
     @Test
     public void testCreateAccountWithBalanceBelowCero(){
@@ -120,8 +141,11 @@ public class AccountServiceTest {
             // Assert
             assertEquals("Account's balance can not be below 0.", message);
         }
-    }
+    }*/
 
+    //EL SIGUIENTE TEST SE PUEDE REEMPLAZAR CON LAS VALIDACIONES
+    //@NotNull(message = "The type of an account can't be null")
+    //@NotBlank(message = "The type of an account can't be blank")
     @Test
     public void testCreateAccountWithoutType(){
         // Arrange
@@ -137,10 +161,16 @@ public class AccountServiceTest {
                             .build()
             );
             fail();
-        } catch (RuntimeException exception){
+        } catch (AccountSystemException exception){
             String message = exception.getMessage();
+            var error = exception.getError();
+            var details = error.getDetails();
+            assertEquals(1, details.size());
+            var detail = details.get(0);
             // Assert
-            assertEquals("Account's type can not be empty.", message);
+            assertEquals("Some fields of the new account had errors", message);
+            assertEquals("ERR_ACCOUNT_TYPE", detail.getErrorCode(), "Code doesn't match");
+            assertEquals("Account's type has to be deposit only or normal.", detail.getErrorMessage(), "Error message doesn't match");
         }
     }
 
@@ -159,10 +189,16 @@ public class AccountServiceTest {
                             .build()
             );
             fail();
-        } catch (RuntimeException exception){
+        } catch (AccountSystemException exception){
             String message = exception.getMessage();
+            var error = exception.getError();
+            var details = error.getDetails();
+            assertEquals(1, details.size());
+            var detail = details.get(0);
             // Assert
-            assertEquals("Account's type has to be deposit only or normal.", message);
+            assertEquals("Some fields of the new account had errors", message);
+            assertEquals("ERR_ACCOUNT_TYPE", detail.getErrorCode(), "Code doesn't match");
+            assertEquals("Account's type has to be deposit only or normal.", detail.getErrorMessage(), "Error message doesn't match");
 
         }
     }
@@ -211,10 +247,16 @@ public class AccountServiceTest {
             // Act
             accountService.disableAccount(defaultIcesiNormalAccount1().getAccountNumber());
             fail();
-        } catch (RuntimeException exception){
+        } catch (AccountSystemException exception){
             String message = exception.getMessage();
+            var error = exception.getError();
+            var details = error.getDetails();
+            assertEquals(1, details.size());
+            var detail = details.get(0);
             // Assert
             assertEquals("An account can only be disabled if the balance is 0.", message);
+            assertEquals("ERR_DISABLE_ACCOUNT", detail.getErrorCode(), "Code doesn't match");
+            assertEquals("Account's actual balance is 1300000", detail.getErrorMessage(), "Error message doesn't match");
         }
     }
 
@@ -226,10 +268,16 @@ public class AccountServiceTest {
             // Act
             accountService.disableAccount(accNumber);
             fail();
-        } catch (RuntimeException exception){
+        } catch (AccountSystemException exception){
             String message = exception.getMessage();
+            var error = exception.getError();
+            var details = error.getDetails();
+            assertEquals(1, details.size());
+            var detail = details.get(0);
             // Assert
             assertEquals("There is not an account with the entered number.", message);
+            assertEquals("ERR_404", detail.getErrorCode(), "Code doesn't match");
+            assertEquals("Account with number: 025-456829-89 not found.", detail.getErrorMessage(), "Error message doesn't match");
         }
     }
 
@@ -262,10 +310,16 @@ public class AccountServiceTest {
             // Act
             accountService.enableAccount(accNumber);
             fail();
-        } catch (RuntimeException exception){
+        } catch (AccountSystemException exception){
             String message = exception.getMessage();
+            var error = exception.getError();
+            var details = error.getDetails();
+            assertEquals(1, details.size());
+            var detail = details.get(0);
             // Assert
             assertEquals("There is not an account with the entered number.", message);
+            assertEquals("ERR_404", detail.getErrorCode(), "Code doesn't match");
+            assertEquals("Account with number: 025-456829-89 not found.", detail.getErrorMessage(), "Error message doesn't match");
         }
     }
 
@@ -293,10 +347,16 @@ public class AccountServiceTest {
             // Act
             accountService.withdrawMoney(accountDTO);
             fail();
-        } catch (RuntimeException exception){
+        } catch (AccountSystemException exception){
             String message = exception.getMessage();
+            var error = exception.getError();
+            var details = error.getDetails();
+            assertEquals(1, details.size());
+            var detail = details.get(0);
             // Assert
             assertEquals("There is not an account with the entered number.", message);
+            assertEquals("ERR_404", detail.getErrorCode(), "Code doesn't match");
+            assertEquals("Account with number: 025-253568-54 not found.", detail.getErrorMessage(), "Error message doesn't match");
         }
 
     }
@@ -316,10 +376,16 @@ public class AccountServiceTest {
             // Act
             accountService.withdrawMoney(transaction);
             fail();
-        } catch (RuntimeException exception){
+        } catch (AccountSystemException exception){
             String message = exception.getMessage();
+            var error = exception.getError();
+            var details = error.getDetails();
+            assertEquals(1, details.size());
+            var detail = details.get(0);
             // Assert
             assertEquals("Insufficient funds.", message);
+            assertEquals("ERR_400", detail.getErrorCode(), "Code doesn't match");
+            assertEquals("Field amount is greater than balance 1300000.", detail.getErrorMessage(), "Error message doesn't match");
         }
     }
 
@@ -337,10 +403,16 @@ public class AccountServiceTest {
             // Act
             accountService.withdrawMoney(defaultTransactionOperationDTO2());
             fail();
-        } catch (RuntimeException exception){
+        } catch (AccountSystemException exception){
             String message = exception.getMessage();
+            var error = exception.getError();
+            var details = error.getDetails();
+            assertEquals(1, details.size());
+            var detail = details.get(0);
             // Assert
-            assertEquals("The account to/from which you want to make a transaction is disabled.", message);
+            assertEquals("The account to/from which you want to make a transaction is inactive.", message);
+            assertEquals("ERR_400", detail.getErrorCode(), "Code doesn't match");
+            assertEquals("Field active of 025-253568-54 is false.", detail.getErrorMessage(), "Error message doesn't match");
         }
 
     }
@@ -370,10 +442,16 @@ public class AccountServiceTest {
             // Act
             accountService.depositMoney(accountDTO);
             fail();
-        } catch (RuntimeException exception){
+        } catch (AccountSystemException exception){
             String message = exception.getMessage();
+            var error = exception.getError();
+            var details = error.getDetails();
+            assertEquals(1, details.size());
+            var detail = details.get(0);
             // Assert
             assertEquals("There is not an account with the entered number.", message);
+            assertEquals("ERR_404", detail.getErrorCode(), "Code doesn't match");
+            assertEquals("Account with number: 025-456829-89 not found.", detail.getErrorMessage(), "Error message doesn't match");
         }
 
     }
@@ -394,10 +472,16 @@ public class AccountServiceTest {
             // Act
             accountService.depositMoney(accountDTO);
             fail();
-        } catch (RuntimeException exception){
+        } catch (AccountSystemException exception){
             String message = exception.getMessage();
+            var error = exception.getError();
+            var details = error.getDetails();
+            assertEquals(1, details.size());
+            var detail = details.get(0);
             // Assert
-            assertEquals("The account to/from which you want to make a transaction is disabled.", message);
+            assertEquals("The account to/from which you want to make a transaction is inactive.", message);
+            assertEquals("ERR_400", detail.getErrorCode(), "Code doesn't match");
+            assertEquals("Field active of 025-253568-54 is false.", detail.getErrorMessage(), "Error message doesn't match");
         }
 
     }
@@ -436,10 +520,16 @@ public class AccountServiceTest {
             // Act
             accountService.transferMoney(accountDTO);
             fail();
-        } catch (RuntimeException exception){
+        } catch (AccountSystemException exception){
             String message = exception.getMessage();
+            var error = exception.getError();
+            var details = error.getDetails();
+            assertEquals(1, details.size());
+            var detail = details.get(0);
             // Assert
             assertEquals("There is not an account with the entered number.", message);
+            assertEquals("ERR_404", detail.getErrorCode(), "Code doesn't match");
+            assertEquals("Account with number: 025-456829-89 not found.", detail.getErrorMessage(), "Error message doesn't match");
         }
     }
 
@@ -457,10 +547,16 @@ public class AccountServiceTest {
             // Act
             accountService.transferMoney(accountDTO);
             fail();
-        } catch (RuntimeException exception){
+        } catch (AccountSystemException exception){
             String message = exception.getMessage();
+            var error = exception.getError();
+            var details = error.getDetails();
+            assertEquals(1, details.size());
+            var detail = details.get(0);
             // Assert
             assertEquals("There is not an account with the entered number.", message);
+            assertEquals("ERR_404", detail.getErrorCode(), "Code doesn't match");
+            assertEquals("Account with number: 019-202301-03 not found.", detail.getErrorMessage(), "Error message doesn't match");
         }
     }
 
@@ -481,10 +577,16 @@ public class AccountServiceTest {
             // Act
             accountService.transferMoney(transaction);
             fail();
-        } catch (RuntimeException exception){
+        } catch (AccountSystemException exception){
             String message = exception.getMessage();
+            var error = exception.getError();
+            var details = error.getDetails();
+            assertEquals(1, details.size());
+            var detail = details.get(0);
             // Assert
             assertEquals("Insufficient funds.", message);
+            assertEquals("ERR_400", detail.getErrorCode(), "Code doesn't match");
+            assertEquals("Field amount is greater than balance 1300000.", detail.getErrorMessage(), "Error message doesn't match");
         }
     }
 
@@ -505,10 +607,16 @@ public class AccountServiceTest {
             // Act
             accountService.transferMoney(accountDTO);
             fail();
-        } catch (RuntimeException exception){
+        } catch (AccountSystemException exception){
             String message = exception.getMessage();
+            var error = exception.getError();
+            var details = error.getDetails();
+            assertEquals(1, details.size());
+            var detail = details.get(0);
             // Assert
-            assertEquals("The account to/from which you want to make a transaction is disabled.", message);
+            assertEquals("The account to/from which you want to make a transaction is inactive.", message);
+            assertEquals("ERR_400", detail.getErrorCode(), "Code doesn't match");
+            assertEquals("Field active of 025-456829-89 is false.", detail.getErrorMessage(), "Error message doesn't match");
         }
 
     }
@@ -530,10 +638,16 @@ public class AccountServiceTest {
             // Act
             accountService.transferMoney(accountDTO);
             fail();
-        } catch (RuntimeException exception){
+        } catch (AccountSystemException exception){
             String message = exception.getMessage();
+            var error = exception.getError();
+            var details = error.getDetails();
+            assertEquals(1, details.size());
+            var detail = details.get(0);
             // Assert
-            assertEquals("The account to/from which you want to make a transaction is disabled.", message);
+            assertEquals("The account to/from which you want to make a transaction is inactive.", message);
+            assertEquals("ERR_400", detail.getErrorCode(), "Code doesn't match");
+            assertEquals("Field active of 019-202301-03 is false.", detail.getErrorMessage(), "Error message doesn't match");
         }
 
     }
@@ -555,10 +669,16 @@ public class AccountServiceTest {
             // Act
             accountService.transferMoney(accountDTO);
             fail();
-        } catch (RuntimeException exception){
+        } catch (AccountSystemException exception){
             String message = exception.getMessage();
+            var error = exception.getError();
+            var details = error.getDetails();
+            assertEquals(1, details.size());
+            var detail = details.get(0);
             // Assert
             assertEquals("The source or destination account is marked as deposit only, it can't transfer or be transferred money, only withdrawal and deposit.", message);
+            assertEquals("ERR_400", detail.getErrorCode(), "Code doesn't match");
+            assertEquals("Field account from type is DEPOSIT_ONLY and account to is NORMAL.", detail.getErrorMessage(), "Error message doesn't match");
         }
 
     }
@@ -580,10 +700,16 @@ public class AccountServiceTest {
             // Act
             accountService.transferMoney(accountDTO);
             fail();
-        } catch (RuntimeException exception){
+        } catch (AccountSystemException exception){
             String message = exception.getMessage();
+            var error = exception.getError();
+            var details = error.getDetails();
+            assertEquals(1, details.size());
+            var detail = details.get(0);
             // Assert
             assertEquals("The source or destination account is marked as deposit only, it can't transfer or be transferred money, only withdrawal and deposit.", message);
+            assertEquals("ERR_400", detail.getErrorCode(), "Code doesn't match");
+            assertEquals("Field account from type is NORMAL and account to is DEPOSIT_ONLY.", detail.getErrorMessage(), "Error message doesn't match");
         }
 
     }

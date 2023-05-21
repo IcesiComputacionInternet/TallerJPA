@@ -11,12 +11,13 @@ import javax.validation.constraints.NotNull;
 @Builder
 public class RequestAccountDTO {
     @NotNull(message = "The email of a user can't be null")
-    @NotBlank(message = "The email of a user is mandatory")
+    @NotBlank(message = "The email of a user can't be blank")
     private String userEmail;
 
-    @Min(value=0, message = "The balance of an account must be greater than 0")
+    @Min(value=0, message = "The balance of a new account must be greater than 0")
     private long balance;
+
     @NotNull(message = "The type of an account can't be null")
-    @NotBlank(message = "The type of an account is mandatory    ")
+    @NotBlank(message = "The type of an account can't be blank")
     private String type;
 }

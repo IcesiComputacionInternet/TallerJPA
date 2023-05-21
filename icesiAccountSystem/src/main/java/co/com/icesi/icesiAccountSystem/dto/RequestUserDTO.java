@@ -14,11 +14,11 @@ import javax.validation.constraints.NotNull;
 @EmailAndPhoneConstraint
 public class RequestUserDTO {
     @NotNull(message = "The role of a user can't be null")
-    @NotBlank(message = "The role of a user is mandatory")
+    @NotBlank(message = "The role of a user can't be blank")
     private String roleName;
-    @NotBlank(message = "The first name of a user is mandatory")
+    @NotBlank(message = "The first name of a user can't be blank")
     private String firstName;
-    @NotBlank(message = "The lastname of a user is mandatory")
+    @NotBlank(message = "The lastname of a user can't be blank")
     private String lastName;
     @NotNull(message = "The email of a user can't be null")
     @Email(message = "Invalid email address")
@@ -26,7 +26,7 @@ public class RequestUserDTO {
     @NotNull(message = "The phone number of a user can't be null")
     @PhoneNumberConstraint
     private String phoneNumber;
-    @NotBlank(message = "The password of a user is mandatory")
+    @NotBlank(message = "The password of a user can't be blank")
     @NotNull(message = "The password of a user can't be null")
     private String password;
 }

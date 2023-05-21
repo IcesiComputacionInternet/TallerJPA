@@ -3,17 +3,27 @@ package co.com.icesi.icesiAccountSystem.service;
 import co.com.icesi.icesiAccountSystem.dto.RequestAccountDTO;
 import co.com.icesi.icesiAccountSystem.dto.ResponseAccountDTO;
 import co.com.icesi.icesiAccountSystem.dto.TransactionOperationDTO;
+import co.com.icesi.icesiAccountSystem.enums.ErrorCode;
+import co.com.icesi.icesiAccountSystem.error.exception.AccountSystemException;
+import co.com.icesi.icesiAccountSystem.error.exception.DetailBuilder;
 import co.com.icesi.icesiAccountSystem.mapper.AccountMapper;
 import co.com.icesi.icesiAccountSystem.enums.AccountType;
 import co.com.icesi.icesiAccountSystem.model.IcesiAccount;
+import co.com.icesi.icesiAccountSystem.model.IcesiUser;
 import co.com.icesi.icesiAccountSystem.repository.AccountRepository;
 import co.com.icesi.icesiAccountSystem.repository.UserRepository;
 import lombok.AllArgsConstructor;
+import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
+
+import java.util.ArrayList;
 import java.util.List;
 import java.util.UUID;
 import java.util.function.Supplier;
 import java.util.stream.Collectors;
+
+import static co.com.icesi.icesiAccountSystem.error.util.AccountSystemExceptionBuilder.createAccountSystemException;
+
 @Service
 @AllArgsConstructor
 public class AccountService {
@@ -23,20 +33,40 @@ public class AccountService {
     private final AccountMapper accountMapper;
 
     public ResponseAccountDTO saveAccount(RequestAccountDTO requestAccountDTO){
-        var user = userRepository.findByEmail(requestAccountDTO.getUserEmail())
-                .orElseThrow(() -> new RuntimeException("The email of the user was not specified or user does not exists yet, it is not possible to create an account without a user."));
-        if(requestAccountDTO.getBalance()<0){
-            throw new RuntimeException("Account's balance can not be below 0.");
+        List<DetailBuilder> errors = new ArrayList<>();
+        var user = userRepository.findByEmail(requestAccountDTO.getUserEmail());
+        if(!user.isPresent()){
+            errors.add(new DetailBuilder(ErrorCode.ERR_404, "User", "email", requestAccountDTO.getUserEmail()));
         }
-        AccountType accountType = getAccountType(requestAccountDTO);
+        var type = checkAccountType(requestAccountDTO.getType(),errors);
+
+        if (!errors.isEmpty()){
+            throw createAccountSystemException(
+                    "Some fields of the new account had errors",
+                    HttpStatus.BAD_REQUEST,
+                    errors.stream().toArray(DetailBuilder[]::new)
+            ).get();
+        }
+
         IcesiAccount icesiAccount = accountMapper.fromAccountDTO(requestAccountDTO);
         icesiAccount.setAccountId(UUID.randomUUID());
-        icesiAccount.setUser(user);
+        icesiAccount.setUser(user.get());
         icesiAccount.setAccountNumber(getAccountNumber());
-        icesiAccount.setType(accountType);
+        icesiAccount.setType(type);
         icesiAccount.setActive(true);
         accountRepository.save(icesiAccount);
         return accountMapper.fromAccountToResponseAccountDTO(icesiAccount);
+    }
+
+    private AccountType checkAccountType(String type, List<DetailBuilder> errors){
+        var accType=AccountType.NORMAL;
+        if (!type.equalsIgnoreCase("deposit only") && !type.equalsIgnoreCase("normal")){
+            errors.add(new DetailBuilder(ErrorCode.ERR_ACCOUNT_TYPE));
+        }
+        if(type.equalsIgnoreCase("deposit only") ){
+            accType= AccountType.DEPOSIT_ONLY;
+        }
+        return accType;
     }
 
     private String getAccountNumber(){
@@ -65,23 +95,16 @@ public class AccountService {
         return account.toString();
     }
 
-    private AccountType getAccountType(RequestAccountDTO requestAccountDTO){
-        AccountType type = AccountType.NORMAL;
-        if (requestAccountDTO.getType().equals("")){
-            throw new RuntimeException("Account's type can not be empty.");
-        }
-        if (!requestAccountDTO.getType().equalsIgnoreCase("deposit only") && !requestAccountDTO.getType().equalsIgnoreCase("normal")){
-            throw new RuntimeException("Account's type has to be deposit only or normal.");
-        }
-        if(requestAccountDTO.getType().equalsIgnoreCase("deposit only") ){
-            type= AccountType.DEPOSIT_ONLY;
-        }
-        return type;
-    }
-
     private IcesiAccount validateAccountNumber(String accNum){
-        return accountRepository.findByAccountNumber(accNum).
-                orElseThrow(() -> new RuntimeException("There is not an account with the entered number."));
+        var account = accountRepository.findByAccountNumber(accNum)
+                        .orElseThrow(
+                                createAccountSystemException(
+                                        "There is not an account with the entered number.",
+                                        HttpStatus.NOT_FOUND,
+                                        new DetailBuilder(ErrorCode.ERR_404, "Account", "number", accNum)
+                                )
+                        );
+        return account;
     }
 
     public ResponseAccountDTO enableAccount(String accountNumber){
@@ -91,11 +114,19 @@ public class AccountService {
         return accountMapper.fromAccountToResponseAccountDTO(account);
     }
 
+    private void checkBalanceIsZero(long balance) {
+        if(balance>0){
+            throw createAccountSystemException(
+                    "An account can only be disabled if the balance is 0.",
+                    HttpStatus.UNAUTHORIZED,
+                    new DetailBuilder(ErrorCode.ERR_DISABLE_ACCOUNT, balance)
+            ).get();
+        }
+    }
+
     public ResponseAccountDTO disableAccount(String accountNumber){
         var account = validateAccountNumber(accountNumber);
-        if(account.getBalance()>0){
-            throw new RuntimeException("An account can only be disabled if the balance is 0.");
-        }
+        checkBalanceIsZero(account.getBalance());
         account.setActive(false);
         accountRepository.save(account);
         return accountMapper.fromAccountToResponseAccountDTO(account);
@@ -103,13 +134,21 @@ public class AccountService {
 
     private void validateAccountBalance(IcesiAccount account, long amount) {
         if (amount>account.getBalance()) {
-            throw new RuntimeException("Insufficient funds.");
+            throw createAccountSystemException(
+                    "Insufficient funds.",
+                    HttpStatus.FORBIDDEN,
+                    new DetailBuilder(ErrorCode.ERR_400, "amount is greater than balance", account.getBalance())
+            ).get();
         }
     }
 
     private void checkIfAnAccountIsActive(IcesiAccount account){
         if(!account.isActive()){
-            throw new RuntimeException("The account to/from which you want to make a transaction is disabled.");
+            throw createAccountSystemException(
+                    "The account to/from which you want to make a transaction is inactive.",
+                    HttpStatus.FORBIDDEN,
+                    new DetailBuilder(ErrorCode.ERR_400, "active of "+account.getAccountNumber(), "is false")
+            ).get();
         }
     }
 
@@ -139,7 +178,11 @@ public class AccountService {
         checkIfAnAccountIsActive(accountFrom);
         checkIfAnAccountIsActive(accountTo);
         if (accountFrom.getType()==AccountType.DEPOSIT_ONLY || accountTo.getType()==AccountType.DEPOSIT_ONLY){
-            throw new RuntimeException("The source or destination account is marked as deposit only, it can't transfer or be transferred money, only withdrawal and deposit.");
+            throw createAccountSystemException(
+                    "The source or destination account is marked as deposit only, it can't transfer or be transferred money, only withdrawal and deposit.",
+                    HttpStatus.FORBIDDEN,
+                    new DetailBuilder(ErrorCode.ERR_400, "account from type is "+accountFrom.getType()+" and account to is", accountTo.getType())
+            ).get();
         }
         accountTo.setBalance(accountTo.getBalance() + transaction.getAmount());
         accountFrom.setBalance(accountFrom.getBalance() - transaction.getAmount());

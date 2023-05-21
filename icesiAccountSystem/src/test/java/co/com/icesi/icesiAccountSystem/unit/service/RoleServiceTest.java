@@ -1,6 +1,7 @@
 package co.com.icesi.icesiAccountSystem.unit.service;
 
 import co.com.icesi.icesiAccountSystem.dto.RoleDTO;
+import co.com.icesi.icesiAccountSystem.error.exception.AccountSystemException;
 import co.com.icesi.icesiAccountSystem.mapper.RoleMapper;
 import co.com.icesi.icesiAccountSystem.mapper.RoleMapperImpl;
 import co.com.icesi.icesiAccountSystem.model.IcesiRole;
@@ -59,9 +60,15 @@ public class RoleServiceTest {
             // Act
             roleService.saveRole(roleDTO);
             fail();
-        } catch (RuntimeException exception){
+        } catch (AccountSystemException exception){
             String message = exception.getMessage();
+            var error = exception.getError();
+            var details = error.getDetails();
+            assertEquals(1, details.size());
+            var detail = details.get(0);
             // Assert
+            assertEquals("ERR_DUPLICATED", detail.getErrorCode(), "Code doesn't match");
+            assertEquals("Resource Role with field name: Director DMI, already exists.", detail.getErrorMessage(), "Error message doesn't match");
             assertEquals("Another role already has this name.", message);
         }
     }

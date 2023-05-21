@@ -8,9 +8,9 @@ import javax.validation.constraints.NotNull;
 @Data
 @Builder
 public class RoleDTO {
-    @NotBlank(message = "The description of a role is mandatory")
+    @NotBlank(message = "The description of a role can't be blank")
     private String description;
-    @NotBlank(message = "The name of a role is mandatory")
+    @NotBlank(message = "The name of a role can't be blank")
     @NotNull(message = "The name of a role can't be null")
     private String name;
 }

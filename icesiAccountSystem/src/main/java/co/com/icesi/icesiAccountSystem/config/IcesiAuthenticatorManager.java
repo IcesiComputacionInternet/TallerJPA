@@ -15,6 +15,7 @@ public class IcesiAuthenticatorManager extends DaoAuthenticationProvider {
 
     public IcesiAuthenticatorManager(UserManagementService userManagementService,
                                      PasswordEncoder passwordEncoder){
+        super();
         this.setUserDetailsService(userManagementService);
         this.setPasswordEncoder(passwordEncoder);
     }

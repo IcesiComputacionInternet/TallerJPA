@@ -1,16 +1,22 @@
 package co.com.icesi.icesiAccountSystem.service;
 
 import co.com.icesi.icesiAccountSystem.dto.RoleDTO;
+import co.com.icesi.icesiAccountSystem.enums.ErrorCode;
+import co.com.icesi.icesiAccountSystem.error.exception.AccountSystemException;
+import co.com.icesi.icesiAccountSystem.error.exception.DetailBuilder;
 import co.com.icesi.icesiAccountSystem.mapper.RoleMapper;
 import co.com.icesi.icesiAccountSystem.model.IcesiRole;
 import co.com.icesi.icesiAccountSystem.repository.RoleRepository;
 import lombok.AllArgsConstructor;
+import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
 import java.util.Optional;
 import java.util.UUID;
 import java.util.stream.Collectors;
+
+import static co.com.icesi.icesiAccountSystem.error.util.AccountSystemExceptionBuilder.createAccountSystemException;
 
 @Service
 @AllArgsConstructor
@@ -20,7 +26,11 @@ public class RoleService {
 
     public RoleDTO saveRole(RoleDTO roleDTO){
         if(roleRepository.findByName(roleDTO.getName()).isPresent()){
-            throw new RuntimeException("Another role already has this name.");
+            throw createAccountSystemException(
+                    "Another role already has this name.",
+                    HttpStatus.CONFLICT,
+                    new DetailBuilder(ErrorCode.ERR_DUPLICATED, "Role", "name", roleDTO.getName())
+            ).get();
         }
         IcesiRole icesiRole = roleMapper.fromRoleDTO(roleDTO);
         icesiRole.setRoleId(UUID.randomUUID());
@@ -29,11 +39,15 @@ public class RoleService {
     }
 
     public RoleDTO getRole(String roleName) {
-        Optional<IcesiRole> roleByName=roleRepository.findByName(roleName);
-        if (!roleByName.isPresent()){
-            throw new RuntimeException("The role with the specified email does not exists.");
-        }
-        return roleMapper.fromRoleToRoleDTO(roleByName.get());
+        var roleByName=roleRepository.findByName(roleName)
+                .orElseThrow(
+                        createAccountSystemException(
+                                "The role with the specified name does not exists.",
+                                HttpStatus.NOT_FOUND,
+                                new DetailBuilder(ErrorCode.ERR_404, "Role", "name", roleName)
+                        )
+                );
+        return roleMapper.fromRoleToRoleDTO(roleByName);
     }
 
     public List<RoleDTO> getAllRoles() {

@@ -29,6 +29,9 @@ public class UserController implements UserAPI {
 
     @Override
     public ResponseUserDTO createUser(RequestUserDTO requestUserDTO) {
-        return userService.saveUser(requestUserDTO);
+        return userService.saveUser(requestUserDTO, "admin");
     }
+
+    @Override
+    public ResponseUserDTO createUsersForBankUsers(RequestUserDTO requestUserDTO) {return userService.saveUser(requestUserDTO, "bank_user");}
 }
