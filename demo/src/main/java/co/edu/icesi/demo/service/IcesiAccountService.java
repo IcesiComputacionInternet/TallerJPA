@@ -8,6 +8,7 @@ import co.edu.icesi.demo.repository.IcesiAccountRepository;
 import co.edu.icesi.demo.repository.IcesiUserRepository;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
+import lombok.NoArgsConstructor;
 import org.springframework.stereotype.Service;
 
 import java.util.Random;
@@ -17,7 +18,6 @@ import java.util.stream.IntStream;
 
 @Service
 @AllArgsConstructor
-@Builder
 public class IcesiAccountService {
     private final IcesiAccountRepository accountRepository;
     private final IcesiAccountMapper accountMapper;

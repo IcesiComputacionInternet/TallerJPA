@@ -39,7 +39,7 @@ public class SecurityConfiguration {
 
     private final IcesiAuthenticatorManager icesiAuthenticatorManager;
 
-    private final String secret = "longenoughsecrettotestjwt";
+    private final String secret = "longenoughsecrettotestjwtencrypt";
 
     @Bean
     public AuthenticationManager authenticationManager(){
@@ -58,29 +58,35 @@ public class SecurityConfiguration {
     }
 
     @Bean
-    public JwtDecoder jwtDecoder(){
+    public JwtDecoder jwtDecoder() {
         byte[] bytes = secret.getBytes();
         SecretKeySpec key = new SecretKeySpec(bytes, 0, bytes.length, "RSA");
-        return NimbusJwtDecoder.withSecretKey(key).macAlgorithm(MacAlgorithm.HS512).build();
+        return NimbusJwtDecoder.withSecretKey(key).macAlgorithm(MacAlgorithm.HS256).build();
     }
 
     @Bean
-    public JwtEncoder jwtEncoder(){return new NimbusJwtEncoder(new ImmutableSecret<>(secret.getBytes()));}
+    public JwtEncoder jwtEncoder() {
+        return new NimbusJwtEncoder(new ImmutableSecret<>(secret.getBytes()));
+    }
+
 
     @Bean
     public AuthorizationManager<RequestAuthorizationContext> requestMatcherAuthorizationManager
-            (HandlerMappingIntrospector introspector){
-        RequestMatcher permitAll =new AndRequestMatcher(new MvcRequestMatcher(introspector, "/token"));
+            (HandlerMappingIntrospector introspector) {
+        RequestMatcher permitAll = new AndRequestMatcher(new MvcRequestMatcher(introspector, "/token"));
 
-        RequestMatcherDelegatingAuthorizationManager.Builder managerBuilder =
-                RequestMatcherDelegatingAuthorizationManager.builder()
-                        .add(permitAll,(context,other) -> new AuthorizationDecision(true));
+        RequestMatcherDelegatingAuthorizationManager.Builder managerBuilder
+                = RequestMatcherDelegatingAuthorizationManager.builder()
+                .add(permitAll, (context, other) -> new AuthorizationDecision(true));
 
+        managerBuilder.add(new MvcRequestMatcher(introspector, "/admin/**"),
+                AuthorityAuthorizationManager.hasAnyAuthority("SCOPE_ADMIN"));
+        managerBuilder.add(new MvcRequestMatcher(introspector, "/user"),
+                AuthorityAuthorizationManager.hasAnyAuthority("SCOPE_USER"));
 
-        managerBuilder.add(new MvcRequestMatcher(introspector, "/admin/**"), AuthorityAuthorizationManager.hasAuthority("SCOPE_ADMIN"));
 
         AuthorizationManager<HttpServletRequest> manager = managerBuilder.build();
-        return (authentication,object) -> manager.check(authentication,object.getRequest());
+        return (authentication, object) -> manager.check(authentication, object.getRequest());
     }
 }
 

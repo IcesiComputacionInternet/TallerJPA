@@ -33,6 +33,11 @@ public class DemoApplication {
 				.roleDescription("Role for demo")
 				.roleName("USER")
 				.build();
+		IcesiRole icesiRole3 = IcesiRole.builder()
+				.roleId(UUID.randomUUID())
+				.roleDescription("Role for demo")
+				.roleName("BANK")
+				.build();
 		IcesiUser icesiUser = IcesiUser.builder()
 				.userId(UUID.randomUUID())
 				.email("johndoe@email.com")
@@ -49,12 +54,22 @@ public class DemoApplication {
 				.lastName("Doe")
 				.password(encoder.encode("password"))
 				.build();
+		IcesiUser icesiUser3 = IcesiUser.builder()
+				.userId(UUID.randomUUID())
+				.email("johndoe3@email.com")
+				.role(icesiRole3)
+				.firstName("John")
+				.lastName("Doe")
+				.password(encoder.encode("password"))
+				.build();
 
 		return args -> {
 			roleRepository.save(icesiRole);
 			roleRepository.save(icesiRole2);
+			roleRepository.save(icesiRole3);
 			users.save(icesiUser);
 			users.save(icesiUser2);
+			users.save(icesiUser3);
 		};
 	}
 }

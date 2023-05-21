@@ -29,6 +29,8 @@ public class IcesiUser {
 
     private String password;
 
+    private boolean active;
+
     @OneToMany(mappedBy = "user")
     private List<IcesiAccount> icesiAccounts;
     @ManyToOne(cascade = CascadeType.ALL)

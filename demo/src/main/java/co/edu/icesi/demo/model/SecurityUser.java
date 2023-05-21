@@ -41,6 +41,6 @@ public record SecurityUser(IcesiUser icesiUser) implements UserDetails {
 
     @Override
     public boolean isEnabled() {
-        return false;
+        return icesiUser.isActive();
     }
 }
