@@ -6,6 +6,7 @@ import java.util.UUID;
 import org.springframework.stereotype.Service;
 
 import com.example.demo.DTO.IcesiRoleCreateDTO;
+import com.example.demo.DTO.ResponseIcesiRoleDTO;
 import com.example.demo.mapper.IcesiRoleMapper;
 import com.example.demo.model.IcesiRole;
 import com.example.demo.repository.IcesiRoleRepository;
@@ -19,15 +20,15 @@ public class IcesiRoleService {
     private final IcesiRoleRepository icesiRoleRepository;
     private final IcesiRoleMapper icesiRoleMapper;
 
-    public IcesiRoleCreateDTO create(IcesiRoleCreateDTO role) {
+    public ResponseIcesiRoleDTO create(IcesiRoleCreateDTO icesiRoleCreateDTO) {
 
-        Optional<IcesiRole> existingIcesiRole = icesiRoleRepository.findByName(role.getName());
+        Optional<IcesiRole> existingIcesiRole = icesiRoleRepository.findByName(icesiRoleCreateDTO.getName());
 
         existingIcesiRole.ifPresent(u -> {throw new RuntimeException("This role name is already in use");});
 
-        IcesiRole newIcesiRole = icesiRoleMapper.fromIcesiRoleCreateDTO(role);
+        IcesiRole newIcesiRole = icesiRoleMapper.fromIcesiRoleCreateDTO(icesiRoleCreateDTO);
         newIcesiRole.setRoleId(UUID.randomUUID());
         
-        return icesiRoleMapper.fromIcesiRole(icesiRoleRepository.save(newIcesiRole));
+        return icesiRoleMapper.fromIcesiRoleToResponseIcesiRoleDTO(icesiRoleRepository.save(newIcesiRole));
     }
 }
