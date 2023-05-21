@@ -29,11 +29,11 @@ public class IcesiAccountService {
     private final IcesiUserRepository icesiUserRepository;
 
     public IcesiAccountResponseDTO saveAccount(IcesiAccountRequestDTO accountDTO){
-        IcesiUser icesiUser = icesiUserRepository.findByEmail(accountDTO.getUser())
+        IcesiUser icesiUser = icesiUserRepository.findByEmail(accountDTO.getUserEmail())
                 .orElseThrow(createIcesiException(
-                        "User: "+accountDTO.getUser()+" not found",
+                        "User: "+accountDTO.getUserEmail()+" not found",
                         HttpStatus.NOT_FOUND,
-                        new DetailBuilder(ErrorCode.ERR_404,"IcesiUser","Email",accountDTO.getUser())
+                        new DetailBuilder(ErrorCode.ERR_404,"IcesiUser","Email",accountDTO.getUserEmail())
                 ));
         if(accountDTO.getBalance() < 0){
             throw createIcesiException(

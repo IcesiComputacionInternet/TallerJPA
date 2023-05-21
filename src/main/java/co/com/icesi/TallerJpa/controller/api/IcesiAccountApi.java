@@ -6,6 +6,7 @@ import co.com.icesi.TallerJpa.dto.TransactionDTO;
 import org.springframework.web.bind.annotation.*;
 
 import javax.validation.Valid;
+import javax.validation.constraints.Email;
 import java.util.List;
 
 @RequestMapping(value =IcesiAccountApi.ACCOUNT_BASE_URL)
@@ -26,7 +27,7 @@ public interface IcesiAccountApi {
     List<IcesiAccountResponseDTO> getAllAccountsByUserId(@PathVariable String userId);
 
     @GetMapping("/user/{email}/accounts")
-    List<IcesiAccountResponseDTO> getAllAccountsByEmail(@PathVariable String email);
+    List<IcesiAccountResponseDTO> getAllAccountsByEmail(@PathVariable @Valid @Email String email);
 
     @PatchMapping("/enable/{accountNumber}")
     TransactionDTO enableAccount(@PathVariable String accountNumber);

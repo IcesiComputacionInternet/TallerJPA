@@ -9,6 +9,7 @@ import co.com.icesi.TallerJpa.service.IcesiAccountService;
 import lombok.AllArgsConstructor;
 import org.springframework.web.bind.annotation.RestController;
 
+import javax.validation.constraints.Email;
 import java.util.List;
 import java.util.UUID;
 
@@ -39,7 +40,7 @@ public class IcesiAccountController implements IcesiAccountApi {
     }
 
     @Override
-    public List<IcesiAccountResponseDTO> getAllAccountsByEmail(String email) {
+    public List<IcesiAccountResponseDTO> getAllAccountsByEmail(@Email String email) {
         return icesiAccountService.getAllAccountsByEmail(email);
     }
 

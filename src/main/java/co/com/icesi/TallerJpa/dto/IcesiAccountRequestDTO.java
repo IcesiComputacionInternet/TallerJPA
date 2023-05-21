@@ -15,16 +15,16 @@ import javax.validation.constraints.*;
 @AllArgsConstructor
 @NoArgsConstructor
 public class IcesiAccountRequestDTO {
-    @Min(value = 0, message = "El balance de la cuenta debe ser mayor a 0.")
+    @Min(value = 0, message = "The balance must be minimum 0.")
     private Long balance;
 
-    @NotNull(message = "El tipo de cuenta no puede ser nulo.")
-    @Enumerated(EnumType.STRING)
+    @NotNull(message = "of the account can't be null.")
+    @Enumerated()
     private AccountType type;
 
-    @NotNull(message = "El email del usuario no puede ser nulo.")
-    @NotBlank(message = "El email del usuario no puede ser blanco.")
-    @NotEmpty(message = "El email del usuario no puede estar vacio")
-    @Email
-    private String user;
+    @NotNull(message = "can't be null.")
+    @NotBlank(message = "can't be blank.")
+    @NotEmpty(message = "can't be empty.")
+    @Email(message = "is not a valid email.")
+    private String userEmail;
 }

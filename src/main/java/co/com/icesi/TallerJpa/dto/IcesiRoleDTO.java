@@ -14,9 +14,9 @@ import javax.validation.constraints.NotNull;
 @AllArgsConstructor
 @NoArgsConstructor
 public class IcesiRoleDTO {
-    @NotNull
-    @NotBlank
-    @NotEmpty
+    @NotNull(message = "The name of the role can't be null")
+    @NotBlank(message = "The name of the role can't be blank")
+    @NotEmpty(message = "The name of the role can't be empty")
     private String name;
     private String description;
 }
