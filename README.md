@@ -4,7 +4,7 @@
 
 # Description
 
- Your task as a developer of the account system of ICESI University
+Your task as a developer of the account system of ICESI University
 is to create a service that will handle the creation of users and accounts.
 
 You have a simple model as a base, a user with basic information, the account
@@ -57,6 +57,33 @@ Note that we don't need the controllers right now.
 - Names of variables are **IMPORTANT** for each name that doesn't makes sense a penalization of 0.1 will be applied.
 
 ![alt text](./rubrica.jpeg)
+
+### PART 2
+
+## Requirements
+- Add the necesary controllers.
+- Add security to te application.
+- A normal user can only update the state of it's own accounts
+- An admin user should be able to create roles, users and assing roles.
+- A bank user should be able to create users. but no admin users
+- A user can create and update accounts for himself.
+
+The aplication should handle it's custom exceptions and show a JSON response when an error appears:
+- Add a custom exception.
+- Add a controller advice.
+- Handle the custom exception.
+- Return the expected exception.
+- Login exceptions should be handled too.
+
+The application should handle the input validations by using the @Valid @Validated anotations:
+- Use custom anotation if needed.
+- The exception for the validations should be handled by the controller advice.
+
+## Testing
+- Add a integration test for transfering money.
+- Add a integration test for user creation.
+
+The integration test should include the happy path and possible errors throw by the application
 
 
 

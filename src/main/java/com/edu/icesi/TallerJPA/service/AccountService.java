@@ -2,19 +2,22 @@ package com.edu.icesi.TallerJPA.service;
 
 import com.edu.icesi.TallerJPA.dto.AccountCreateDTO;
 import com.edu.icesi.TallerJPA.dto.TransactionDTO;
+import com.edu.icesi.TallerJPA.error.exception.DetailBuilder;
+import com.edu.icesi.TallerJPA.error.exception.ErrorCode;
 import com.edu.icesi.TallerJPA.mapper.AccountMapper;
 import com.edu.icesi.TallerJPA.model.IcesiAccount;
 import com.edu.icesi.TallerJPA.model.IcesiUser;
 import com.edu.icesi.TallerJPA.repository.AccountRepository;
 import com.edu.icesi.TallerJPA.repository.UserRepository;
 import lombok.AllArgsConstructor;
+import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
 
-import java.util.Arrays;
 import java.util.Random;
 import java.util.UUID;
 import java.util.function.Supplier;
-import java.util.regex.Pattern;
+
+import static com.edu.icesi.TallerJPA.error.util.IcesiExceptionBuilder.createIcesiException;
 
 @Service
 @AllArgsConstructor
@@ -29,39 +32,25 @@ public class AccountService {
     public AccountCreateDTO save(AccountCreateDTO accountCreateDTO) {
 
         accountCreateDTO.setAccountNumber(sendToGenerateAccountNumbers());
-        if (accountRepository.findByAccountNumber(accountCreateDTO.getAccountNumber()).isPresent()
-                && validateAccountNumber(accountCreateDTO.getAccountNumber())) {
-            throw new RuntimeException("Account already exists, try again");
-        }
 
-        IcesiUser user = validateUser(accountCreateDTO.getIcesiUser());
+        accountCreateDTO = verifyDuplicatedAccount(accountCreateDTO);
 
-        validateBalance(accountCreateDTO.getBalance());
         IcesiAccount icesiAccount = accountMapper.fromIcesiAccountDTO(accountCreateDTO);
         icesiAccount.setAccountId(UUID.randomUUID());
-        icesiAccount.setIcesiUser(user);
 
         return accountMapper.fromIcesiAccount(accountRepository.save(icesiAccount));
     }
 
-    public IcesiUser validateUser(IcesiUser user){
+    public AccountCreateDTO verifyDuplicatedAccount(AccountCreateDTO accountCreateDTO){
 
-        IcesiUser userByEmail = findUserByEmail(user);
-
-        IcesiUser userByPhoneNumber = findUserByPhoneNumber(user);
-
-        if (!userByPhoneNumber.toString().equals(userByEmail.toString())){
-            throw new RuntimeException("User not found");
+        if (accountRepository.findByAccountNumber(accountCreateDTO.getAccountNumber()).isPresent()) {
+            throw createIcesiException(
+                    "Duplicated account",
+                    HttpStatus.CONFLICT,
+                    new DetailBuilder(ErrorCode.ERR_DUPLICATED, "account","accountNumber", accountCreateDTO.getAccountNumber())
+            ).get();
         }
-       return userByEmail;
-    }
-
-    public IcesiUser findUserByEmail(IcesiUser user){
-        return userRepository.findByEmail(user.getEmail()).orElseThrow(() -> new RuntimeException("User not found"));
-    }
-
-    public IcesiUser findUserByPhoneNumber(IcesiUser user){
-        return userRepository.findByPhoneNumber(user.getPhoneNumber()).orElseThrow(() -> new RuntimeException("User not found"));
+        return accountCreateDTO;
     }
 
     public String sendToGenerateAccountNumbers(){
@@ -92,20 +81,6 @@ public class AccountService {
         return stringWithId;
     }
 
-    public boolean validateAccountNumber(String accountNumber){
-
-        if (!Arrays.stream(accountNumber.split("-")).allMatch(symbol -> Pattern.matches("\\d+",symbol))){
-            throw new RuntimeException("Invalid account number");
-        }
-        return true;
-    }
-
-    public void validateBalance(long balance) {
-        if (balance < 0){
-            throw new RuntimeException("Balance can't be below 0");
-        }
-    }
-
     public TransactionDTO withdrawals(TransactionDTO transactionDTO) {
 
         AccountCreateDTO accountToWithdraw = findByAccountNumber(transactionDTO.getSourceAccount());
@@ -114,13 +89,9 @@ public class AccountService {
 
         validateTransactionBalance(accountToWithdraw, balance);
 
-        validateMoneyForTransaction(balance);
-
         accountToWithdraw.setBalance(accountToWithdraw.getBalance() - balance);
 
         transactionDTO.setResult("Successful withdrawal");
-
-        transactionDTO.setFinalBalanceSourceAccount(accountToWithdraw.getBalance());
 
         accountRepository.save(accountMapper.fromIcesiAccountDTO(accountToWithdraw));
 
@@ -130,25 +101,32 @@ public class AccountService {
     public AccountCreateDTO findByAccountNumber(String accountNumber){
 
         if (accountRepository.findByAccountNumber(accountNumber).isEmpty()){
-            throw new RuntimeException("Account "+accountNumber+" not found");
+            throw createIcesiException(
+                    "Account not found",
+                    HttpStatus.NOT_FOUND,
+                    new DetailBuilder(ErrorCode.ERR_404, "Account", "accountNumber", accountNumber)
+            ).get();
         }
+
         return accountMapper.fromIcesiAccount(accountRepository.findByAccountNumber(accountNumber).get());
     }
 
     public void validateTransactionBalance(AccountCreateDTO accountToTransaction, long moneyToTransaction) {
 
         if (accountToTransaction.getBalance() < moneyToTransaction){
-            throw new RuntimeException("The account "+accountToTransaction.getAccountNumber()+" cannot perform the transaction. Insufficient money");
+            throw createIcesiException(
+                    "Insufficient money",
+                    HttpStatus.BAD_REQUEST,
+                    new DetailBuilder(ErrorCode.ERR_400, "value "+moneyToTransaction,"transaction", "Insufficient money")
+            ).get();
         }
     }
 
     public TransactionDTO depositMoney(TransactionDTO transactionDTO) {
 
-        AccountCreateDTO accountToDeposit = findByAccountNumber(transactionDTO.getSourceAccount());
+        AccountCreateDTO accountToDeposit = findByAccountNumber(transactionDTO.getDestinationAccount());
 
         long moneyToDeposit = transactionDTO.getAmountMoney();
-
-        validateMoneyForTransaction(moneyToDeposit);
 
         accountToDeposit.setBalance(accountToDeposit.getBalance() + moneyToDeposit);
 
@@ -156,16 +134,7 @@ public class AccountService {
 
         transactionDTO.setResult("Successful deposit");
 
-        transactionDTO.setFinalBalanceSourceAccount(accountToDeposit.getBalance());
-
         return transactionDTO;
-    }
-
-    public void validateMoneyForTransaction(long moneyToTransaction){
-
-        if (moneyToTransaction <= 0){
-            throw new RuntimeException("Invalid value for transaction. Value can't be less than zero or zero");
-        }
     }
 
     public TransactionDTO transferMoney(TransactionDTO transactionDTO) {
@@ -178,8 +147,6 @@ public class AccountService {
 
         long moneyToTransfer = transactionDTO.getAmountMoney();
 
-        validateMoneyForTransaction(moneyToTransfer);
-
         validateTransactionBalance(sourceAccountToTransfer, moneyToTransfer);
 
         sourceAccountToTransfer.setBalance(sourceAccountToTransfer.getBalance() - moneyToTransfer);
@@ -191,16 +158,17 @@ public class AccountService {
 
         transactionDTO.setResult("Successful transfer");
 
-        transactionDTO.setFinalBalanceSourceAccount(sourceAccountToTransfer.getBalance());
-        transactionDTO.setFinalBalanceDestinationAccount(destinationAccountToTransfer.getBalance());
-
         return transactionDTO;
     }
 
     public void validateAccountType(AccountCreateDTO sourceAccount, AccountCreateDTO destinationAccount){
 
         if (sourceAccount.getType().equals("Deposit only") || destinationAccount.getType().equals("Deposit only")){
-            throw new RuntimeException("It is not possible to make the transfer. At least one account is deposit only");
+            throw createIcesiException(
+                    "Invalid account",
+                    HttpStatus.BAD_REQUEST,
+                    new DetailBuilder(ErrorCode.ERR_400, "At least one account","transaction", "Is deposit only")
+            ).get();
         }
     }
 
@@ -220,7 +188,11 @@ public class AccountService {
 
     public void validateStatusOfAccount(AccountCreateDTO accountCreateDTO, boolean state){
         if (accountCreateDTO.isActive() == state){
-            throw new RuntimeException("The account is already in that status");
+            throw createIcesiException(
+                    "Invalid change",
+                    HttpStatus.BAD_REQUEST,
+                    new DetailBuilder(ErrorCode.ERR_400, "account "+accountCreateDTO.getAccountNumber(),"change status", "Is already in that status")
+            ).get();
         }
     }
 
@@ -239,9 +211,18 @@ public class AccountService {
         return accountToEnable;
     }
 
+    public void verifyUserRole(AccountCreateDTO account){
+
+        IcesiUser user = account.getIcesiUser();
+    }
+
     public void validateBalanceForDisableAccount(long balance){
         if (balance != 0){
-            throw new RuntimeException("The account balance is not zero");
+            throw createIcesiException(
+                    "Invalid value",
+                    HttpStatus.BAD_REQUEST,
+                    new DetailBuilder(ErrorCode.ERR_400, "value "+balance, "disable account", "The account balance is not zero")
+            ).get();
         }
     }
 

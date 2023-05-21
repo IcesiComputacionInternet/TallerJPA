@@ -20,7 +20,7 @@ public class AccountController implements AccountAPI {
 
     @Override
     public AccountCreateDTO getAccount(String accountNumber) {
-        return accountService.findByAccountNumber(accountNumber);
+        return null;
     }
 
     @Override

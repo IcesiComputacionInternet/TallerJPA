@@ -7,6 +7,7 @@ import org.springframework.web.bind.annotation.PatchMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestBody;
 
+import javax.validation.Valid;
 import java.util.List;
 
 public interface AccountAPI {
@@ -18,16 +19,16 @@ public interface AccountAPI {
 
     List<AccountCreateDTO> getAllUsers();
 
-    AccountCreateDTO addAccount(@RequestBody AccountCreateDTO accountCreateDTO);
+    AccountCreateDTO addAccount(@Valid @RequestBody AccountCreateDTO accountCreateDTO);
 
     @PatchMapping("/withdraw/")
-    TransactionDTO withdraw(@RequestBody TransactionDTO transactionDTO);
+    TransactionDTO withdraw(@Valid @RequestBody TransactionDTO transactionDTO);
 
     @PatchMapping("/deposit/")
-    TransactionDTO deposit(@RequestBody TransactionDTO transactionDTO);
+    TransactionDTO deposit(@Valid @RequestBody TransactionDTO transactionDTO);
 
     @PatchMapping("/transfer/")
-    TransactionDTO transfer(@RequestBody TransactionDTO transactionDTO);
+    TransactionDTO transfer(@Valid @RequestBody TransactionDTO transactionDTO);
 
     @PatchMapping("/enable/{accountNumber}")
     AccountCreateDTO enable(@PathVariable String accountNumber);

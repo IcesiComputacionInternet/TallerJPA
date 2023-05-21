@@ -1,7 +1,9 @@
 package com.edu.icesi.TallerJPA.model;
 
+import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
+import lombok.NoArgsConstructor;
 
 import javax.persistence.*;
 import java.util.List;
@@ -10,6 +12,8 @@ import java.util.UUID;
 @Data
 @Entity
 @Builder
+@AllArgsConstructor
+@NoArgsConstructor
 public class IcesiUser {
 
     @Id
@@ -19,8 +23,10 @@ public class IcesiUser {
 
     private String lastName;
 
+    @Column(unique = true)
     private String email;
 
+    @Column(unique = true)
     private String phoneNumber;
 
     private String password;
@@ -28,7 +34,7 @@ public class IcesiUser {
     @OneToMany(mappedBy = "icesiUser")
     private List<IcesiAccount> accounts;
 
-    @ManyToOne(optional = false)
+    @ManyToOne(optional = false, cascade = CascadeType.ALL)
     @JoinColumn(name = "icesi_role_role_id", nullable = false)
     private IcesiRole icesiRole;
 }
