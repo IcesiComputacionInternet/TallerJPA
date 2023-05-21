@@ -1,6 +1,6 @@
 package co.com.icesi.TallerJpa.service;
 
-import co.com.icesi.TallerJpa.dto.IcesiUserCreateDTO;
+import co.com.icesi.TallerJpa.dto.IcesiUserRequestDTO;
 import co.com.icesi.TallerJpa.exceptions.icesiUserExceptions.RoleCantBeNullException;
 import co.com.icesi.TallerJpa.exceptions.icesiUserExceptions.UserAttributeAlreadyInUseException;
 import co.com.icesi.TallerJpa.mapper.IcesiUserMapper;
@@ -17,7 +17,7 @@ import java.util.UUID;
 public class IcesiUserService {
     private final IcesiUserRepository icesiUserRepository;
     private final IcesiUserMapper icesiUserMapper;
-    public IcesiUser saveUser(IcesiUserCreateDTO user, IcesiRole role) {
+    public IcesiUser saveUser(IcesiUserRequestDTO user, IcesiRole role) {
         if(icesiUserRepository.findByEmail(user.getEmail()).isPresent() &&
         icesiUserRepository.findByPhoneNumber(user.getPhoneNumber()).isPresent()){
             throw new UserAttributeAlreadyInUseException("Email and phone number are already in use");

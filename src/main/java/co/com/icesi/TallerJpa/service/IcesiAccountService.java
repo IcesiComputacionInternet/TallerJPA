@@ -6,7 +6,6 @@ import co.com.icesi.TallerJpa.dto.TransactionDTO;
 import co.com.icesi.TallerJpa.enums.AccountType;
 import co.com.icesi.TallerJpa.error.exception.DetailBuilder;
 import co.com.icesi.TallerJpa.error.exception.ErrorCode;
-import co.com.icesi.TallerJpa.exceptions.icesiAccountExceptions.*;
 import co.com.icesi.TallerJpa.mapper.IcesiAccountMapper;
 import co.com.icesi.TallerJpa.model.IcesiAccount;
 import co.com.icesi.TallerJpa.model.IcesiUser;
@@ -63,6 +62,23 @@ public class IcesiAccountService {
         );
     }
 
+    public List<IcesiAccountResponseDTO> getAllAccountsByUserId(UUID userId){
+        return icesiAccountRepository.findAllByIcesiUser(userId).stream()
+                .map(icesiAccountMapper::fromIcesiAccountToResponse)
+                .collect(Collectors.toList());
+    }
+
+    public List<IcesiAccountResponseDTO> getAllAccountsByEmail(String email){
+        return icesiAccountRepository.findAllByEmail(email).stream()
+                .map(icesiAccountMapper::fromIcesiAccountToResponse)
+                .collect(Collectors.toList());
+    }
+
+    public List<IcesiAccountResponseDTO> getAllAccounts(){
+        return icesiAccountRepository.findAll().stream()
+                .map(icesiAccountMapper::fromIcesiAccountToResponse)
+                .collect(Collectors.toList());
+    }
 
     public TransactionDTO enableAccount(String accountNumber, UUID userId){
         isAccountOwner(accountNumber, userId);

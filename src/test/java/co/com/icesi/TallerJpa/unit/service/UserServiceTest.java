@@ -1,6 +1,6 @@
 package co.com.icesi.TallerJpa.unit.service;
 
-import co.com.icesi.TallerJpa.dto.IcesiUserCreateDTO;
+import co.com.icesi.TallerJpa.dto.IcesiUserRequestDTO;
 import co.com.icesi.TallerJpa.exceptions.icesiUserExceptions.RoleCantBeNullException;
 import co.com.icesi.TallerJpa.exceptions.icesiUserExceptions.UserAttributeAlreadyInUseException;
 import co.com.icesi.TallerJpa.mapper.IcesiUserMapper;
@@ -9,6 +9,7 @@ import co.com.icesi.TallerJpa.model.IcesiRole;
 import co.com.icesi.TallerJpa.model.IcesiUser;
 import co.com.icesi.TallerJpa.repository.IcesiUserRepository;
 import co.com.icesi.TallerJpa.service.IcesiUserService;
+import co.com.icesi.TallerJpa.unit.service.matcher.IcesiUserMatcher;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 
@@ -90,8 +91,8 @@ public class UserServiceTest {
             assertEquals("RoleCantBeNullException: The role in user cant be null", message);
         }
     }
-    private IcesiUserCreateDTO defaultUserCreateDTO(){
-        return IcesiUserCreateDTO.builder()
+    private IcesiUserRequestDTO defaultUserCreateDTO(){
+        return IcesiUserRequestDTO.builder()
                 .firstName("John")
                 .lastName("Doe")
                 .email("johndoe@test.com")

@@ -1,6 +1,6 @@
 package co.com.icesi.TallerJpa.service;
 
-import co.com.icesi.TallerJpa.model.SecurityUser;
+import co.com.icesi.TallerJpa.model.security.SecurityUser;
 import co.com.icesi.TallerJpa.repository.IcesiUserRepository;
 import lombok.AllArgsConstructor;
 import org.springframework.security.core.userdetails.UserDetails;

@@ -32,12 +32,12 @@ import javax.servlet.http.HttpServletRequest;
 @AllArgsConstructor
 @Configuration
 public class SecurityConfiguration {
-    private final IcesiAuthenticationManager icesiAuthenticationManager;
+    private final IcesiAuthenticatorManager icesiAuthenticatorManager;
     private final String secret = "longenoughsecrettotestjwtencrypt";
 
     @Bean
     public AuthenticationManager authenticationManager(){
-        return new ProviderManager(icesiAuthenticationManager);
+        return new ProviderManager(icesiAuthenticatorManager);
     }
     @Bean
     public SecurityFilterChain securityFilterChain(HttpSecurity http, AuthorizationManager<RequestAuthorizationContext> access) throws Exception{

@@ -34,6 +34,13 @@ public interface IcesiAccountRepository extends JpaRepository<IcesiAccount, UUID
             "WHERE ia.icesiUser.userId = :userId")
     List<IcesiAccount> findAllByIcesiUser(@Param("userId") UUID userId);
 
+    @Query( "SELECT ia " +
+            "FROM IcesiAccount ia " +
+            "JOIN IcesiUser iu " +
+            "ON ia.icesiUser.userId = iu.userId " +
+            "WHERE iu.email = :email")
+    List<IcesiAccount> findAllByEmail(@Param("email")String email);
+
     @Modifying
     @Query( "UPDATE IcesiAccount ia " +
             "SET ia.active = true " +
