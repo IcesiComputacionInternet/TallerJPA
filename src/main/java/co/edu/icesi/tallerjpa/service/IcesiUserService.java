@@ -2,6 +2,8 @@ package co.edu.icesi.tallerjpa.service;
 
 import co.edu.icesi.tallerjpa.dto.IcesiUserCreateDTO;
 import co.edu.icesi.tallerjpa.dto.IcesiUserShowDTO;
+import co.edu.icesi.tallerjpa.enums.NameIcesiRole;
+import co.edu.icesi.tallerjpa.enums.TypeIcesiAccount;
 import co.edu.icesi.tallerjpa.error.exception.DetailBuilder;
 import co.edu.icesi.tallerjpa.error.exception.ErrorCode;
 import co.edu.icesi.tallerjpa.mapper.IcesiUserMapper;
@@ -25,7 +27,7 @@ public class IcesiUserService {
     private final IcesiRoleRepository icesiRoleRepository;
     private final IcesiUserMapper icesiUserMapper;
 
-    public IcesiUserShowDTO save(IcesiUserCreateDTO icesiUserCreateDTO){
+    public IcesiUserShowDTO save(IcesiUserCreateDTO icesiUserCreateDTO, String icesiUserId){
         ArrayList<String> errors = new ArrayList<>();
 
         if(!isEmailUnique(icesiUserCreateDTO.getEmail())){
@@ -46,6 +48,7 @@ public class IcesiUserService {
         }
 
         IcesiRole icesiRole = getIcesiRoleByName(icesiUserCreateDTO.getIcesiRoleCreateDTO().getName());
+        checkPermissionsToCreateUser(icesiUserId, icesiRole.getName());
 
         IcesiUser icesiUser = icesiUserMapper.fromCreateIcesiUserDTO(icesiUserCreateDTO);
         icesiUser.setIcesiRole(icesiRole);
@@ -100,6 +103,19 @@ public class IcesiUserService {
                     "Invalid account id",
                     HttpStatus.BAD_REQUEST,
                     new DetailBuilder(ErrorCode.ERR_400, "id", "Invalid account id")
+            ).get();
+        }
+    }
+
+    private void checkPermissionsToCreateUser(String icesiUserId, String roleName){
+        IcesiUser icesiUser = getIcesiUserById(icesiUserId);
+        boolean userIsNotAnAdmin = !icesiUser.getIcesiRole().getName().equals(NameIcesiRole.ADMIN.toString());
+        boolean roleToAssignIsADMIN = roleName.equals(NameIcesiRole.ADMIN.toString());
+        if (userIsNotAnAdmin && roleToAssignIsADMIN){
+            throw createIcesiException(
+                    "Forbidden",
+                    HttpStatus.FORBIDDEN,
+                    new DetailBuilder(ErrorCode.ERR_403, "Forbidden. Only ADMIN users can create ADMIN users")
             ).get();
         }
     }
