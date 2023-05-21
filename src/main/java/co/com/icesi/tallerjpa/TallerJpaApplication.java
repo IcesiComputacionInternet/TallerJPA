@@ -4,7 +4,6 @@ import co.com.icesi.tallerjpa.model.IcesiUser;
 import co.com.icesi.tallerjpa.model.Role;
 import co.com.icesi.tallerjpa.model.security.UserPermission;
 import co.com.icesi.tallerjpa.repository.PermissionRepository;
-import co.com.icesi.tallerjpa.repository.RoleRepository;
 import co.com.icesi.tallerjpa.repository.UserRepository;
 import org.springframework.boot.CommandLineRunner;
 import org.springframework.boot.SpringApplication;
@@ -42,23 +41,23 @@ public class TallerJpaApplication {
 				.name("BANK_USER")
 				.build();
 
-		UserPermission adminPermission = UserPermission.builder()
+		UserPermission rolePermission = UserPermission.builder()
 				.permissionId(UUID.randomUUID())
-				.key("admin")
-				.path("/**")
+				.key("roles")
+				.path("/roles/**")
 				.roles(List.of(adminRole))
 				.build();
 		UserPermission accountPermission = UserPermission.builder()
 				.permissionId(UUID.randomUUID())
-				.key("account")
+				.key("accounts")
 				.path("/accounts/**")
 				.roles(List.of(userRole))
 				.build();
 		UserPermission addUserPermission = UserPermission.builder()
 				.permissionId(UUID.randomUUID())
-				.key("user")
-				.path("/users")
-				.roles(List.of(bankUserRole, userRole))
+				.key("users")
+				.path("/users/**")
+				.roles(List.of(adminRole, bankUserRole))
 				.build();
 
 		IcesiUser admin = IcesiUser.builder()
@@ -94,7 +93,7 @@ public class TallerJpaApplication {
 			users.save(user);
 			users.save(backUser);
 
-			permissions.save(adminPermission);
+			permissions.save(rolePermission);
 			permissions.save(accountPermission);
 			permissions.save(addUserPermission);
 		};
