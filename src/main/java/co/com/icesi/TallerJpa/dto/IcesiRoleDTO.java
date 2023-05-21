@@ -13,9 +13,9 @@ public class IcesiRoleDTO {
     @NotNull
     @NotBlank
     @NotEmpty
-    private String description;
+    private String name;
     @NotNull
     @NotBlank
     @NotEmpty
-    private String name;
+    private String description;
 }

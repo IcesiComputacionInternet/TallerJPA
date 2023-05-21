@@ -1,30 +1,37 @@
 package co.com.icesi.TallerJpa.service;
 
-import co.com.icesi.TallerJpa.dto.IcesiRoleCreateDTO;
-import co.com.icesi.TallerJpa.exceptions.icesiRoleExceptions.RoleNameAlreadyInUseException;
+import co.com.icesi.TallerJpa.dto.IcesiRoleDTO;
+import co.com.icesi.TallerJpa.error.exception.DetailBuilder;
+import co.com.icesi.TallerJpa.error.exception.ErrorCode;
 import co.com.icesi.TallerJpa.mapper.IcesiRoleMapper;
 import co.com.icesi.TallerJpa.model.IcesiRole;
 import co.com.icesi.TallerJpa.repository.IcesiRoleRepository;
 import lombok.AllArgsConstructor;
+import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
 
 import java.util.UUID;
+
+import static co.com.icesi.TallerJpa.error.util.IcesiExceptionBuilder.createIcesiException;
 
 @Service
 @AllArgsConstructor
 public class IcesiRoleService {
     private final IcesiRoleRepository icesiRoleRepository;
     private final IcesiRoleMapper icesiRoleMapper;
-    public IcesiRole saveRole(IcesiRoleCreateDTO roleDto) {
-        if (icesiRoleRepository.findByName(roleDto.getName()).isPresent()){
-            throw new RoleNameAlreadyInUseException();
+
+    public IcesiRoleDTO saveRole(IcesiRoleDTO roleDto) {
+        if(icesiRoleRepository.existsByName(roleDto.getName())){
+            throw createIcesiException(
+                    "The name "+roleDto.getName()+" is already in use",
+                    HttpStatus.BAD_REQUEST,
+                    new DetailBuilder(ErrorCode.ERR_DUPLICATED,"IcesiRole","name", roleDto.getName())
+            ).get();
         }
+
         IcesiRole icesiRole = icesiRoleMapper.fromRoleDto(roleDto);
         icesiRole.setRoleId(UUID.randomUUID());
-        return icesiRoleRepository.save(icesiRole);
-    }
 
-    public IcesiRole getRoleByName(String name) {
-        return icesiRoleRepository.findByName(name).get();
+        return icesiRoleMapper.fromIcesiRole(icesiRoleRepository.save(icesiRole));
     }
 }
