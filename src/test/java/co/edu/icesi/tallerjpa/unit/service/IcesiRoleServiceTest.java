@@ -14,6 +14,8 @@ import org.junit.jupiter.api.Test;
 
 import java.util.Optional;
 
+import static co.edu.icesi.tallerjpa.util.DTOBuilder.defaultIcesiRoleCreateDTO;
+import static co.edu.icesi.tallerjpa.util.ModelBuilder.defaultIcesiRole;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.mockito.Mockito.*;
@@ -22,20 +24,6 @@ public class IcesiRoleServiceTest {
     private IcesiRoleRepository icesiRoleRepository;
     private IcesiRoleMapper icesiRoleMapper;
     private IcesiRoleService icesiRoleService;
-
-    private IcesiRole defaultIcesiRole(){
-        return IcesiRole.builder()
-                .description("Manage the system")
-                .name(NameIcesiRole.ADMIN.toString())
-                .build();
-    }
-
-    private IcesiRoleCreateDTO defaultIcesiRoleCreateDTO(){
-        return IcesiRoleCreateDTO.builder()
-                .description("Manage the system")
-                .name(NameIcesiRole.ADMIN.toString())
-                .build();
-    }
 
     @BeforeEach
     private void init(){
@@ -50,7 +38,7 @@ public class IcesiRoleServiceTest {
         when(icesiRoleRepository.findByName(icesiRoleCreateDTO.getName())).thenReturn(Optional.ofNullable(null));
         IcesiRole icesiRole1 = IcesiRole.builder()
                 .description("Manage the system")
-                .name(NameIcesiRole.ADMIN.toString())
+                .name(NameIcesiRole.USER.toString())
                 .build();
         icesiRoleService.save(icesiRoleCreateDTO);
         verify(icesiRoleRepository, times(1)).save(argThat(new IcesiRoleMatcher(icesiRole1)));

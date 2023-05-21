@@ -25,6 +25,8 @@ import org.springframework.security.crypto.password.PasswordEncoder;
 import java.util.Optional;
 import java.util.UUID;
 
+import static co.edu.icesi.tallerjpa.util.DTOBuilder.defaultIcesiUserCreateDTO;
+import static co.edu.icesi.tallerjpa.util.ModelBuilder.*;
 import static org.junit.jupiter.api.Assertions.*;
 import static org.mockito.Mockito.*;
 
@@ -45,67 +47,6 @@ public class IcesiUserServiceTest {
       icesiUserMapper = spy(IcesiUserMapperImpl.class);
 
       icesiUserService = new IcesiUserService(icesiUserRepository, icesiRoleRepository, icesiUserMapper, passwordEncoder);
-    }
-
-    private IcesiRoleCreateDTO defaultIcesiRoleCreateDTO(){
-        return IcesiRoleCreateDTO.builder()
-                .description("Manage the system")
-                .name(NameIcesiRole.USER.toString())
-                .build();
-
-    }
-
-    private IcesiRole defaultIcesiRole(){
-        return IcesiRole.builder()
-                .description("Manage the system")
-                .name(NameIcesiRole.USER.toString())
-                .build();
-
-    }
-
-    private IcesiRole adminIcesiRole(){
-        return IcesiRole.builder()
-                .description("Manage the system")
-                .name(NameIcesiRole.ADMIN.toString())
-                .build();
-
-    }
-
-    private IcesiUserCreateDTO defaultIcesiUserCreateDTO(){
-        return IcesiUserCreateDTO.builder()
-                .firstName("Pepito")
-                .lastName("Perez")
-                .email("pepitoperez@gmail.com")
-                .phoneNumber("3125551223")
-                .password("password")
-                .icesiRoleCreateDTO(defaultIcesiRoleCreateDTO())
-                .build();
-    }
-
-    private IcesiUser defaultIcesiUser(){
-        return IcesiUser.builder()
-                .userId(UUID.fromString("c75bf838-8f38-403d-b64f-cca8b7a181d8"))
-                .firstName("Pepito")
-                .lastName("Perez")
-                .email("pepitoperez@gmail.com")
-                .phoneNumber("3125551223")
-                .password("password")
-                .icesiRole(defaultIcesiRole())
-                .icesiAccounts(null)
-                .build();
-    }
-
-    private IcesiUser adminIcesiUser(){
-        return IcesiUser.builder()
-                .userId(UUID.fromString("7e39d68f-dc03-4634-92d1-37bb4b1865e3"))
-                .firstName("Pepito")
-                .lastName("Perez")
-                .email("pepitoperez@gmail.com")
-                .phoneNumber("3125551223")
-                .password("password")
-                .icesiRole(adminIcesiRole())
-                .icesiAccounts(null)
-                .build();
     }
 
     @Test
