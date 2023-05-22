@@ -9,7 +9,6 @@ import javax.persistence.*;
 import java.util.UUID;
 
 @Data
-@Table
 @Entity
 @Builder
 @AllArgsConstructor

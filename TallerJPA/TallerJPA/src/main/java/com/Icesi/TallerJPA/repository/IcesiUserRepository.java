@@ -16,10 +16,10 @@ public interface IcesiUserRepository extends JpaRepository<IcesiUser, UUID> {
     @NonNull
     @Query("SELECT user FROM IcesiUser user")
     List<IcesiUser> findAll();
-
+    @Query("SELECT user FROM IcesiUser user WHERE user.email = :email")
     Optional<IcesiUser> findByEmail(String email);
 
-    @Query("SELECT user FROM IcesiUser user WHERE user.phoneNumber =: phoneNumber")
+    @Query("SELECT user FROM IcesiUser user WHERE user.phoneNumber = :phoneNumber")
     Optional<IcesiUser> finByPhoneNumber(String phoneNumber);
 
 

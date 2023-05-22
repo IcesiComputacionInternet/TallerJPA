@@ -102,7 +102,7 @@ public class IcesiAcountControllerTest {
         public void testCreateUserWhenAuthAdmin() throws Exception {
             String token = tokenUser1();
 
-            try {
+
                 var result = mockMvc.perform(post("/accounts")
                                 .content(objectMapper.writeValueAsString(
                                         IcesiAccountDTO.builder()
@@ -116,9 +116,7 @@ public class IcesiAcountControllerTest {
                         .andExpect(status().isOk())
                         .andReturn();
 
-            } catch (AssertionError e) {
 
-            }
 
         }
     @Test
@@ -141,8 +139,6 @@ public class IcesiAcountControllerTest {
                     .andReturn();
 
         } catch (AssertionError e) {
-
-            System.err.println(" ");
         }
 
     }

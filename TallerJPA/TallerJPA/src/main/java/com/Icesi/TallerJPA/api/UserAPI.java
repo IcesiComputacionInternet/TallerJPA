@@ -9,7 +9,7 @@ import java.util.List;
 public interface UserAPI {
     String BASE_USER_URL  = "/users";
 
-    @PostMapping
+    @PostMapping("/create/")
     IcesiUserDTO createIcesiUser(@Valid @RequestBody IcesiUserDTO icesiUserDTO);
 
     @GetMapping

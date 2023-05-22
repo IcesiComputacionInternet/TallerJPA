@@ -1,10 +1,12 @@
 package com.Icesi.TallerJPA.service;
 
+import com.Icesi.TallerJPA.dto.IcesiRoleDTO;
 import com.Icesi.TallerJPA.dto.IcesiUserDTO;
 import com.Icesi.TallerJPA.enums.ErrorConstants;
 import com.Icesi.TallerJPA.error.exception.IcesiError;
 import com.Icesi.TallerJPA.error.exception.IcesiException;
 import com.Icesi.TallerJPA.mapper.IcesiUserMapper;
+import com.Icesi.TallerJPA.model.IcesiRole;
 import com.Icesi.TallerJPA.model.IcesiUser;
 import com.Icesi.TallerJPA.repository.IcesiRoleRepository;
 import com.Icesi.TallerJPA.repository.IcesiUserRepository;
@@ -26,21 +28,6 @@ public class IcesiUserService {
     private final IcesiRoleRepository icesiRoleRepository;
     private final IcesiUserMapper icesiUserMapper;
 
-    public String newUser(IcesiUserDTO icesiUserDTO) {
-        String out = "saved User";
-        IcesiUser icesiUser = icesiUserMapper.fromIcesiUserDTO(icesiUserDTO);
-        save(icesiUserDTO);
-        foundRoleName(icesiUser);
-        Optional<IcesiUserDTO> userDTO = Optional.ofNullable(icesiUserDTO);
-        String roleName = userDTO.flatMap(dto -> Optional.ofNullable(dto.getIcesiRole()))
-                .map(role -> role.getName()).orElseThrow(() -> new IcesiException(HttpStatus.BAD_REQUEST, new IcesiError(ErrorConstants.CODE_UD_04, ErrorConstants.CODE_UD_04.getMessage())));
-
-        icesiUser.setIcesiRole(icesiUserDTO.getIcesiRole());
-        icesiUser.setUserId(UUID.randomUUID());
-        icesiUserRepository.save(icesiUser);
-
-        return out;
-    }
 
 
     public IcesiUserDTO save(IcesiUserDTO icesiUserDTO) {
@@ -60,10 +47,12 @@ public class IcesiUserService {
         if (icesiUserDTO.getIcesiRole() == null) {
             throw new RuntimeException(String.valueOf(ErrorConstants.CODE_UD_04.getMessage()));
         }
+        IcesiRole icesiRoleDTO=  icesiRoleRepository.findByName(icesiUserDTO.getIcesiRole()).orElseThrow(() -> new RuntimeException("The role "+icesiUserDTO.getIcesiRole()+" not exists"));
+
         IcesiUser icesiUser = icesiUserMapper.fromIcesiUserDTO(icesiUserDTO);
+        icesiUser.setIcesiRole(icesiRoleDTO);
         icesiUser.setUserId(UUID.randomUUID());
-        icesiUserRepository.save(icesiUser);
-        return icesiUserMapper.fromIcesiUser(icesiUser);
+        return icesiUserMapper.fromIcesiUser(icesiUserRepository.save(icesiUser)) ;
     }
 
 

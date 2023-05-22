@@ -3,19 +3,20 @@ package com.Icesi.TallerJPA;
 import com.Icesi.TallerJPA.model.IcesiAccount;
 import com.Icesi.TallerJPA.model.IcesiRole;
 import com.Icesi.TallerJPA.model.IcesiUser;
-import com.Icesi.TallerJPA.repository.IcesiAccountRepository;
 import com.Icesi.TallerJPA.repository.IcesiRoleRepository;
 import com.Icesi.TallerJPA.repository.IcesiUserRepository;
+import com.Icesi.TallerJPA.repository.IcesiAccountRepository;
 import org.springframework.boot.CommandLineRunner;
+
 import org.springframework.boot.test.context.TestConfiguration;
 import org.springframework.context.annotation.Bean;
 import org.springframework.security.crypto.password.PasswordEncoder;
 
-import java.util.Collections;
-import java.util.UUID;
+import java.util.*;
+
 @TestConfiguration
 public class TestConfigurationData {
-    @Bean
+   /* @Bean
     CommandLineRunner commandLineRunner(IcesiUserRepository users, IcesiRoleRepository roleRepository, IcesiAccountRepository icesiAccountRepository, PasswordEncoder encoder)
     {
         IcesiRole icesiRole = IcesiRole.builder()
@@ -78,4 +79,8 @@ public class TestConfigurationData {
             users.save(icesiUser3);
         };
     }
+
+
+
+    */
 }

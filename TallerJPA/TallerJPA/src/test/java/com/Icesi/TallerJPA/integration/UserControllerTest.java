@@ -10,17 +10,21 @@ import com.Icesi.TallerJPA.model.IcesiRole;
 import com.Icesi.TallerJPA.model.IcesiUser;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import org.junit.jupiter.api.MethodOrderer;
+import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.TestMethodOrder;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.context.annotation.Import;
+import org.springframework.core.NestedExceptionUtils;
+import org.springframework.core.NestedRuntimeException;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.MediaType;
 import org.springframework.test.context.ActiveProfiles;
 import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.request.MockMvcRequestBuilders;
+import org.springframework.web.util.NestedServletException;
 
 import java.util.Collections;
 import java.util.UUID;
@@ -74,8 +78,8 @@ public class UserControllerTest {
 
         TokenDTO tokenDTO=tokenAdmin();
 
-        try {
-            var result = mockMvc.perform(MockMvcRequestBuilders.post(BASE_USER_URL)
+
+            var result = mockMvc.perform(MockMvcRequestBuilders.post("/users/create/")
                             .content(objectMapper.writeValueAsString(defaultUserCreateDTO()))
                             .contentType(MediaType.APPLICATION_JSON)
                             .accept(MediaType.APPLICATION_JSON)
@@ -84,9 +88,7 @@ public class UserControllerTest {
                     .andReturn();
             IcesiUserDTO userDTO = objectMapper.readValue(result.getResponse().getContentAsString(), IcesiUserDTO.class);
             assertNotNull(userDTO);
-        } catch (Exception e) {
-            System.err.println(" ");
-        }
+
 
 
     }
@@ -96,25 +98,22 @@ public class UserControllerTest {
     public void testCreateUserWhenEmailExists() throws Exception{
 
         TokenDTO tokenDTO = tokenAdmin();
-        IcesiUser userDefault = defaultUserCreateDTO();
-        userDefault.setPhoneNumber("185426235");
+        IcesiUserDTO userDefault = defaultUserCreateDTO();
+        userDefault.setPhoneNumber("+571234567899");
+            try {
+                var result = mockMvc.perform(MockMvcRequestBuilders.post("/users/create/")
+                                .content(objectMapper.writeValueAsString(userDefault))
+                                .contentType(MediaType.APPLICATION_JSON)
+                                .accept(MediaType.APPLICATION_JSON)
+                                .header(HttpHeaders.AUTHORIZATION, "Bearer " + tokenDTO.getToken()))
+                        .andExpect(status().isConflict())
+                        .andReturn();
 
-        try {
-            var result = mockMvc.perform(MockMvcRequestBuilders.post(BASE_USER_URL)
-                            .content(objectMapper.writeValueAsString(userDefault))
-                            .contentType(MediaType.APPLICATION_JSON)
-                            .accept(MediaType.APPLICATION_JSON)
-                            .header(HttpHeaders.AUTHORIZATION, "Bearer " + tokenDTO.getToken()))
-                    .andExpect(status().isConflict())
-                    .andReturn();
-            IcesiError icesiError = objectMapper.readValue(result.getResponse().getContentAsString(), IcesiError.class);
-            assertNotNull(icesiError);
-            assertEquals("Email already exists", icesiError.getCode().getMessage());
-        } catch (Exception e) {
+            }catch (NestedServletException e) {
+                assertEquals("EMAIL ALREADY EXIST",e.getCause().getMessage().toString());
 
-            System.err.println(" ");
-        }
 
+            }
 
     }
 
@@ -123,39 +122,35 @@ public class UserControllerTest {
     public void testCreateUserWhenPhoneNumberExists() throws Exception {
 
         TokenDTO tokenDTO = tokenAdmin();
-        IcesiUser userDefault = defaultUserCreateDTO();
-
-
+        IcesiUserDTO userDefault = defaultUserCreateDTO();
+        userDefault.setEmail("asad@gmail.com");
         try {
-            var result = mockMvc.perform(MockMvcRequestBuilders.post(BASE_USER_URL)
-                            .content(objectMapper.writeValueAsString(userDefault))
-                            .contentType(MediaType.APPLICATION_JSON)
-                            .accept(MediaType.APPLICATION_JSON)
-                            .header(HttpHeaders.AUTHORIZATION, "Bearer " + tokenDTO.getToken()))
-                    .andExpect(status().isConflict())
-                    .andReturn();
-            IcesiError icesiError = objectMapper.readValue(result.getResponse().getContentAsString(), IcesiError.class);
-            assertNotNull(icesiError);
-            assertEquals("Email already exists", icesiError.getCode().getMessage());
-        } catch (Exception e) {
+        var result = mockMvc.perform(MockMvcRequestBuilders.post("/users/create/")
+                        .content(objectMapper.writeValueAsString(userDefault))
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .accept(MediaType.APPLICATION_JSON)
+                        .header(HttpHeaders.AUTHORIZATION, "Bearer " + tokenDTO.getToken()))
+                .andExpect(status().isConflict())
+                .andReturn();
 
-            System.err.println(" ");
-        }
+    }catch (NestedServletException e) {
+        assertEquals("PHONE NUMBER ALREADY EXIST",e.getCause().getMessage().toString());
 
+
+    }
     }
 
 
 
-    private IcesiUser defaultUserCreateDTO(){
+    private IcesiUserDTO defaultUserCreateDTO(){
 
-        return IcesiUser.builder()
-                .email("johndoe@email.com")
+        return IcesiUserDTO.builder()
+                .email("johndoe12@email.com")
                 .firstName("John")
-                .icesiRole(icesiRole1())
+                .icesiRole("ADMIN")
                 .lastName("Doe")
                 .password("password")
-                .phoneNumber("12313423153")
-                .userId(UUID.randomUUID())
+                .phoneNumber("+571231231230")
                 .build();
     }
         private IcesiUser defaultAdminUserCreateDTO(){
@@ -166,7 +161,7 @@ public class UserControllerTest {
                     .icesiRole(icesiRole2())
                     .lastName("Doe")
                     .password("password")
-                    .phoneNumber("1234523123")
+                    .phoneNumber("+57123123123")
                     .userId(UUID.randomUUID())
                     .build();
         }
@@ -179,7 +174,7 @@ public class UserControllerTest {
                     .icesiRole(icesiRole3())
                     .firstName("Ethan")
                     .lastName("Torch")
-                    .phoneNumber("32014354789")
+                    .phoneNumber("+57123123123")
                     .password("password")
                     .build();
         }
@@ -187,21 +182,21 @@ public class UserControllerTest {
     private IcesiRole icesiRole2() {
         return  IcesiRole.builder()
                 .roleId(UUID.randomUUID())
-                .description("Role for demo")
+                .description("Role for un demo")
                 .name("USER")
                 .build();
     }
     private IcesiRole icesiRole1() {
         return  IcesiRole.builder()
                 .roleId(UUID.randomUUID())
-                .description("Role for demo")
+                .description("Role for a demo")
                 .name("ADMIN")
                 .build();
     }
     private IcesiRole icesiRole3() {
         return  IcesiRole.builder()
                 .roleId(UUID.randomUUID())
-                .description("Role for demo")
+                .description("Role for the demo")
                 .name("BANK")
                 .build();
     }

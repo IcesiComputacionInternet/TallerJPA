@@ -24,5 +24,6 @@ public class IcesiUserDTO {
     private String email;
     private String phoneNumber;
     private List<IcesiAccount> accounts;
-    private IcesiRole icesiRole;
+    private String icesiRole;
+    private String password;
 }
