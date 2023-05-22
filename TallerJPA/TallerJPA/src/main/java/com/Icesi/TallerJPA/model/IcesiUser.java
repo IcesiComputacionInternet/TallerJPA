@@ -27,7 +27,7 @@ public class IcesiUser {
     @CustomAnnotations.PasswordValidation
     private String password;
 
-    @OneToMany(mappedBy = "icesiUser")
+    @OneToMany
     private List<IcesiAccount> accounts;
 
     @ManyToOne

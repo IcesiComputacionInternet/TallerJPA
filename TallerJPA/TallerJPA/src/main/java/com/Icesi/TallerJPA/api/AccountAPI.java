@@ -1,15 +1,18 @@
 package com.Icesi.TallerJPA.api;
 
 import com.Icesi.TallerJPA.dto.IcesiAccountDTO;
+import com.Icesi.TallerJPA.dto.IcesiUserDTO;
 import org.springframework.web.bind.annotation.*;
 
 import javax.validation.Valid;
+import java.util.List;
 
 @CrossOrigin(origins = "*")
 @RequestMapping(AccountAPI.BASE_ACCOUNT_URL)
 public interface AccountAPI {
     String BASE_ACCOUNT_URL = "/accounts";
-
+    @GetMapping
+    List<IcesiAccountDTO> getAllAccounts();
     @PostMapping
     IcesiAccountDTO createIcesiAccount(@RequestBody @Valid IcesiAccountDTO icesiAccountDTO);
 

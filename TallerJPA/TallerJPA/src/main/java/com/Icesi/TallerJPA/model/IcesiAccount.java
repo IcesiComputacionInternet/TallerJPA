@@ -21,9 +21,4 @@ public class IcesiAccount {
     private long balance;
     private String type;
     private boolean active;
-
-   @ManyToOne
-   @JoinColumn(name = "icesi_user_user_id", nullable = false)
-   private IcesiUser icesiUser;
-
 }

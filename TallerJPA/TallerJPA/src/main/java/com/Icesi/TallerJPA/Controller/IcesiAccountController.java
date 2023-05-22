@@ -8,10 +8,17 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RestController;
 
+import java.util.List;
+
 @RestController
 @RequiredArgsConstructor
 public class IcesiAccountController implements AccountAPI {
     private final IcesiAccountService IcesiAccountService;
+
+    @Override
+    public List<IcesiAccountDTO> getAllAccounts() {
+        return null;
+    }
 
     @Override
     public IcesiAccountDTO createIcesiAccount(IcesiAccountDTO icesiAccountDTO) {

@@ -65,7 +65,7 @@ public class IcesiAccountService {
         if(icesiAccountRepository.findByAccountNumber(accountNumber).isEmpty()){
             throw new RuntimeException(String.valueOf(ErrorConstants.CODE_UD_08.getMessage()));
         }
-        icesiAccountRepository.enableAccount(accountNumber);
+        //icesiAccountRepository.enableAccount(accountNumber);
         return IcesiAccountDTO.builder().accountNumber(accountNumber).active(true).build();
     }
 
@@ -75,7 +75,7 @@ public class IcesiAccountService {
         if(icesiAccountRepository.findByAccountNumber(accountNumber).isEmpty()){
             throw new RuntimeException(String.valueOf(ErrorConstants.CODE_UD_08.getMessage()));
         }
-        icesiAccountRepository.disableAccount(accountNumber);
+     //   icesiAccountRepository.disableAccount(accountNumber);
         return IcesiAccountDTO.builder().accountNumber(accountNumber).build();
     }
 
