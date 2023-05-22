@@ -1,18 +1,19 @@
-package co.com.icesi.TallerJPA.service;
+package co.com.icesi.TallerJPA.unit.service;
 
 import co.com.icesi.TallerJPA.dto.*;
 import co.com.icesi.TallerJPA.mapper.IcesiAccountMapper;
 import co.com.icesi.TallerJPA.mapper.IcesiAccountMapperImpl;
-import co.com.icesi.TallerJPA.matcher.IcesiAccountMatcher;
-import co.com.icesi.TallerJPA.matcher.IcesiUserMatcher;
+import co.com.icesi.TallerJPA.security.IcesiSecurityContext;
+import co.com.icesi.TallerJPA.unit.matcher.IcesiAccountMatcher;
+import co.com.icesi.TallerJPA.unit.matcher.IcesiUserMatcher;
 import co.com.icesi.TallerJPA.model.IcesiAccount;
 import co.com.icesi.TallerJPA.model.IcesiRole;
 import co.com.icesi.TallerJPA.model.IcesiUser;
 import co.com.icesi.TallerJPA.repository.IcesiAccountRespository;
 import co.com.icesi.TallerJPA.repository.IcesiUserRepository;
+import co.com.icesi.TallerJPA.service.IcesiAccountService;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
-
 import java.util.ArrayList;
 import java.util.Optional;
 import java.util.Random;
@@ -22,6 +23,8 @@ import java.util.stream.IntStream;
 
 import static org.junit.jupiter.api.Assertions.*;
 import static org.mockito.Mockito.*;
+
+//TODO: acomodar el test con las nuevas excepciones
 
 public class IcesiAccountServiceTest {
     private IcesiAccountService accountService;
@@ -35,16 +38,22 @@ public class IcesiAccountServiceTest {
         accountRespository = mock(IcesiAccountRespository.class);
         mapper = spy(IcesiAccountMapperImpl.class);
         userRepository = mock(IcesiUserRepository.class);
-        accountService = new IcesiAccountService(mapper, accountRespository,userRepository);
+        IcesiSecurityContext securityContext = mock(IcesiSecurityContext.class);
+        accountService = new IcesiAccountService(mapper, accountRespository,userRepository, securityContext);
+        when(securityContext.getCurrenUserRole()).thenReturn("ADMIN");
+        when(securityContext.getCurrenUserId()).thenReturn("6ee86844-1e1e-41d1-b7e7-72471a144645");
+        when(userRepository.findById(any())).thenReturn(Optional.ofNullable(defaultUserWithAccount()));
+
+
 
     }
 
     @Test
     public void createAccount(){
-        when(userRepository.findbyName(any())).thenReturn(Optional.ofNullable(defaultUser()));
+        when(userRepository.findByEmail(any())).thenReturn(Optional.ofNullable(defaultUser()));
         accountService.save(defaultDTO("NORMAL"));
         verify(mapper,times(1)).fromAccountDTO(any());
-        verify(userRepository,times(1)).findbyName(any());
+        verify(userRepository,times(1)).findByEmail(any());
         verify(accountRespository,times(1)).save(argThat(new IcesiAccountMatcher(defaultAccount("NORMAL"))));
         verify(userRepository,times(1)).save(argThat(new IcesiUserMatcher(defaultUser())));
 
@@ -54,7 +63,7 @@ public class IcesiAccountServiceTest {
     public void createAccountWhenTheBalanceIsBellowZero(){
        IcesiAccountDTO accountDTO = defaultDTO("NORMAL");
         accountDTO.setBalance(-1L);
-        when(userRepository.findbyName(any())).thenReturn(Optional.ofNullable(defaultUser()));
+        when(userRepository.findByEmail(any())).thenReturn(Optional.ofNullable(defaultUser()));
         try {
             accountService.save(accountDTO);
             fail();
@@ -79,7 +88,7 @@ public class IcesiAccountServiceTest {
         IcesiAccount accountToDesable = defaultAccount("NORMAL");
         accountToDesable.setBalance(0L);
         when(accountRespository.findByAccountNumber(any())).thenReturn(Optional.of(accountToDesable));
-        assertEquals("The account was disabled", accountService.disableAccount(any()));
+        assertEquals("The account was disabled", accountService.disableAccount(any()).getActionPerformed());
         verify(accountRespository,times(1)).save(argThat(new IcesiAccountMatcher(accountToDesable)));
 
     }
@@ -111,7 +120,7 @@ public class IcesiAccountServiceTest {
         IcesiAccount accountToEnable = defaultAccount("NORMAL");
         accountToEnable.setActive(false);
         when(accountRespository.findByAccountNumber(any())).thenReturn(Optional.of(accountToEnable));
-        assertEquals("The account was enabled",accountService.enableAccount(accountToEnable.getAccountNumber()));
+        assertEquals("The account was enabled",accountService.enableAccount(accountToEnable.getAccountNumber()).getActionPerformed());
         verify(accountRespository, times(1)).save(argThat(new IcesiAccountMatcher(accountToEnable)));
     }
 
@@ -306,7 +315,7 @@ public class IcesiAccountServiceTest {
 
     @Test
     public void testUniqueAccountNumber(){
-        when(userRepository.findbyName(any())).thenReturn(Optional.ofNullable(defaultUser()));
+        when(userRepository.findByEmail(any())).thenReturn(Optional.ofNullable(defaultUser()));
         when(accountRespository.findByAccountNumber(any())).thenReturn(Optional.ofNullable(defaultAccount("normal")),Optional.empty());
         accountService.save(defaultDTO("NORMAL"));
         verify(accountRespository,times(2)).findByAccountNumber(any());
@@ -365,9 +374,24 @@ public class IcesiAccountServiceTest {
                 .build();
     }
 
+    private IcesiUser defaultUserWithAccount(){
+        ArrayList<IcesiAccount> accounts = new ArrayList<>();
+        accounts.add(defaultAccount("NORMAL"));
+        return IcesiUser.builder()
+                .userID(UUID.fromString("6ee86844-1e1e-41d1-b7e7-72471a144645"))
+                .firstName("Jhon")
+                .lastName("Doe")
+                .phoneNumber("672155121")
+                .password("12456789")
+                .email("jhon.doe@gmailTest.com")
+                .role(defaultRole())
+                .accounts(accounts)
+                .build();
+    }
+
     private IcesiRole defaultRole(){
         return IcesiRole.builder()
-                .name("FirstRole")
+                .name("ADMIN")
                 .description("This is a test for the role")
                 .users(new ArrayList<>())
                 .build();
@@ -386,7 +410,7 @@ public class IcesiAccountServiceTest {
 
     private IcesiRoleDTO defaultRoleDTO(){
         return   IcesiRoleDTO.builder()
-                .name("FirstRole")
+                .name("ADMIN")
                 .description("This is a test for the role")
                 .build();
     }

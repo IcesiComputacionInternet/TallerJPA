@@ -1,19 +1,17 @@
 package co.com.icesi.TallerJPA.model;
 
 
-import lombok.AllArgsConstructor;
-import lombok.Builder;
-import lombok.Data;
-import lombok.NoArgsConstructor;
+import lombok.*;
 
 
 import javax.persistence.*;
 import java.util.List;
 import java.util.UUID;
 
-@Data
 @Entity
 @Builder
+@Getter
+@Setter
 @AllArgsConstructor
 @NoArgsConstructor
 public class IcesiUser {

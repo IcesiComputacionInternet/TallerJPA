@@ -1,16 +1,19 @@
-package co.com.icesi.TallerJPA.service;
+package co.com.icesi.TallerJPA.unit.service;
 
 import co.com.icesi.TallerJPA.dto.IcesiRoleDTO;
 import co.com.icesi.TallerJPA.dto.IcesiUserDTO;
 import co.com.icesi.TallerJPA.mapper.IcesiUserMapper;
 import co.com.icesi.TallerJPA.mapper.IcesiUserMapperImpl;
-import co.com.icesi.TallerJPA.matcher.IcesiUserMatcher;
+import co.com.icesi.TallerJPA.security.IcesiSecurityContext;
+import co.com.icesi.TallerJPA.unit.matcher.IcesiUserMatcher;
 import co.com.icesi.TallerJPA.model.IcesiRole;
 import co.com.icesi.TallerJPA.model.IcesiUser;
 import co.com.icesi.TallerJPA.repository.IcesiRoleRepository;
 import co.com.icesi.TallerJPA.repository.IcesiUserRepository;
+import co.com.icesi.TallerJPA.service.IcesiUserService;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
+import org.springframework.security.crypto.password.PasswordEncoder;
 
 import java.util.ArrayList;
 import java.util.Optional;
@@ -25,18 +28,25 @@ public class IcesiUserServiceTest {
 
     private IcesiUserMapper userMapper;
     private IcesiRoleRepository roleRepository;
+    private PasswordEncoder encoder;
 
     @BeforeEach
     public void init(){
         userRepository = mock(IcesiUserRepository.class);
         roleRepository = mock(IcesiRoleRepository.class);
         userMapper = spy(IcesiUserMapperImpl.class);
-        userService = new IcesiUserService(userRepository,roleRepository, userMapper);
+        encoder = mock(PasswordEncoder.class);
+        IcesiSecurityContext securityContext = mock(IcesiSecurityContext.class);
+        userService = new IcesiUserService(userRepository,roleRepository, userMapper,encoder,securityContext);
+        when(securityContext.getCurrenUserRole()).thenReturn("ADMIN");
+
+
     }
 
 
     @Test
     public void createUser(){
+        when(encoder.encode(any())).thenReturn(defaultUser().getPassword());
         when(roleRepository.findByName(any())).thenReturn(Optional.ofNullable(defaultRole()));
         userService.save(defaultDTO());
         verify(roleRepository,times(1)).findByName(any());

@@ -1,11 +1,13 @@
-package co.com.icesi.TallerJPA.service;
+package co.com.icesi.TallerJPA.unit.service;
 
 import co.com.icesi.TallerJPA.dto.IcesiRoleDTO;
 import co.com.icesi.TallerJPA.mapper.IcesiRoleMapper;
 import co.com.icesi.TallerJPA.mapper.IcesiRoleMapperImpl;
-import co.com.icesi.TallerJPA.matcher.IcesiRoleMatcher;
+import co.com.icesi.TallerJPA.repository.IcesiUserRepository;
+import co.com.icesi.TallerJPA.unit.matcher.IcesiRoleMatcher;
 import co.com.icesi.TallerJPA.model.IcesiRole;
 import co.com.icesi.TallerJPA.repository.IcesiRoleRepository;
+import co.com.icesi.TallerJPA.service.IcesiRoleService;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 
@@ -14,17 +16,22 @@ import java.util.Optional;
 import static org.junit.jupiter.api.Assertions.*;
 import static org.mockito.Mockito.*;
 
+
+//TODO: ACTUALIZAR CON EL NUEVO METODO
 public class IcesiRoleServiceTest {
     private IcesiRoleService roleService;
     private IcesiRoleRepository roleRepository;
 
     private IcesiRoleMapper roleMapper;
 
+    private IcesiUserRepository userRepository;
+
     @BeforeEach
     public void init(){
         roleRepository = mock(IcesiRoleRepository.class);
         roleMapper = spy(IcesiRoleMapperImpl.class);
-        roleService = new IcesiRoleService(roleRepository, roleMapper);
+        userRepository = mock(IcesiUserRepository.class);
+        roleService = new IcesiRoleService(roleRepository, roleMapper,userRepository);
     }
 
     @Test

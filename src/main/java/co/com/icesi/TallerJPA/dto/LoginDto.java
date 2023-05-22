@@ -11,9 +11,9 @@ import javax.validation.constraints.NotBlank;
 @Builder
 @AllArgsConstructor
 @NoArgsConstructor
-public class IcesiRoleDTO {
+public class LoginDto {
     @NotBlank
-    private String name;
-    private String description;
-
+    private String userName;
+    @NotBlank
+    private String password;
 }
