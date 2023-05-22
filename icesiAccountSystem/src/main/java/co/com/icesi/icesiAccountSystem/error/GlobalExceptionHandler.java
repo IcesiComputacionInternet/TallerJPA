@@ -25,7 +25,7 @@ import static co.com.icesi.icesiAccountSystem.error.util.AccountSystemExceptionB
 
 @ControllerAdvice
 public class GlobalExceptionHandler {
-    @ExceptionHandler(AccountSystemException.class)
+    @ExceptionHandler(value = AccountSystemException.class)
     public ResponseEntity<AccountSystemError> handleAccountSystemException(AccountSystemException icesiException){
         return ResponseEntity.status(icesiException.getError().getStatus()).body(icesiException.getError());
     }
@@ -42,7 +42,7 @@ public class GlobalExceptionHandler {
         return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(error);
     }
 
-    @ExceptionHandler(MethodArgumentNotValidException.class)
+    @ExceptionHandler(value = MethodArgumentNotValidException.class)
     public ResponseEntity<AccountSystemError> handleValidationExceptions( MethodArgumentNotValidException ex) {
         var errorBuilder = AccountSystemError.builder().status(HttpStatus.BAD_REQUEST);
         var details = ex.getBindingResult().getAllErrors().stream().map(this::mapBindingResultToError).toList();
@@ -50,7 +50,7 @@ public class GlobalExceptionHandler {
         return ResponseEntity.status(error.getStatus()).body(error);
     }
 
-    @ExceptionHandler(ConstraintViolationException.class)
+    @ExceptionHandler(value = ConstraintViolationException.class)
     public ResponseEntity<AccountSystemError> handleValidationExceptions1(ConstraintViolationException ex) {
         var errorBuilder = AccountSystemError.builder().status(HttpStatus.BAD_REQUEST);
         var details = ex.getConstraintViolations().stream().map(this::mapConstraintViolationToError).toList();

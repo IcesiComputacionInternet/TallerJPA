@@ -30,7 +30,7 @@ import static org.mockito.Mockito.*;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
 public class UserServiceTest {
-/*
+
     private UserService userService;
 
     private UserRepository userRepository;
@@ -235,5 +235,5 @@ public class UserServiceTest {
                 .build();
     }
 
-*/
+
 }

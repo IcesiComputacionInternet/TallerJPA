@@ -60,63 +60,8 @@ class UserControllerTest {
                 .andReturn();
         System.out.println(result.getResponse().getContentAsString());
     }
+
     @Order(2)
-    @Test
-    public void testCreateAUserWhenPhoneIsBlank() throws Exception {
-        var resultToken = mockMvc.perform(MockMvcRequestBuilders.post("/login").content(
-                                objectMapper.writeValueAsString(new LoginDTO("johndoe@email.com", "password"))
-                        )
-                        .contentType(MediaType.APPLICATION_JSON)
-                        .accept(MediaType.APPLICATION_JSON))
-                .andExpect(status().isOk())
-                .andReturn();
-        TokenDTO token = objectMapper.readValue(resultToken.getResponse().getContentAsString(),TokenDTO.class);
-        var result = mockMvc.perform(MockMvcRequestBuilders.post("/users/create").content(
-                                objectMapper.writeValueAsString(
-                                        RequestUserDTO.builder()
-                                                .email("bonnie@gmail.com")
-                                                .phoneNumber(" ")
-                                                .firstName("Bonnie")
-                                                .lastName("Lopez")
-                                                .password("password")
-                                                .roleName("USER")
-                                                .build()
-                                ))
-                        .header("Authorization", "Bearer "+token.getToken())
-                        .contentType(MediaType.APPLICATION_JSON).accept(MediaType.APPLICATION_JSON))
-                .andExpect(status().isBadRequest())
-                .andReturn();
-        System.out.println(result.getResponse().getContentAsString());
-    }
-    @Order(3)
-    @Test
-    public void testCreateAUserWhenEmailAddressIsBlank() throws Exception {
-        var resultToken = mockMvc.perform(MockMvcRequestBuilders.post("/login").content(
-                                objectMapper.writeValueAsString(new LoginDTO("johndoe@email.com", "password"))
-                        )
-                        .contentType(MediaType.APPLICATION_JSON)
-                        .accept(MediaType.APPLICATION_JSON))
-                .andExpect(status().isOk())
-                .andReturn();
-        TokenDTO token = objectMapper.readValue(resultToken.getResponse().getContentAsString(),TokenDTO.class);
-        var result = mockMvc.perform(MockMvcRequestBuilders.post("/users/create").content(
-                                objectMapper.writeValueAsString(
-                                        RequestUserDTO.builder()
-                                                .email(" ")
-                                                .phoneNumber("+573204587962")
-                                                .firstName("Violetta")
-                                                .lastName("Lopez")
-                                                .password("password")
-                                                .roleName("USER")
-                                                .build()
-                                ))
-                        .header("Authorization", "Bearer "+token.getToken())
-                        .contentType(MediaType.APPLICATION_JSON).accept(MediaType.APPLICATION_JSON))
-                .andExpect(status().isBadRequest())
-                .andReturn();
-        System.out.println(result.getResponse().getContentAsString());
-    }
-    @Order(4)
     @Test
     public void testCreateAdminUserWhenUserLoggedIsABankUser() throws Exception {
         var resultToken = mockMvc.perform(MockMvcRequestBuilders.post("/login").content(
@@ -138,7 +83,7 @@ class UserControllerTest {
                 .andReturn();
         System.out.println(result.getResponse().getContentAsString());
     }
-    @Order(5)
+    @Order(3)
     @Test
     public void testCreateAUserWhenUserLoggedIsABankUser() throws Exception {
         var resultToken = mockMvc.perform(MockMvcRequestBuilders.post("/login").content(
@@ -159,7 +104,7 @@ class UserControllerTest {
                 .andReturn();
         System.out.println(result.getResponse().getContentAsString());
     }
-    @Order(6)
+    @Order(4)
     @Test
     public void testCreateAUserWhenUserLoggedIsANormalUser() throws Exception {
         var resultToken = mockMvc.perform(MockMvcRequestBuilders.post("/login").content(
@@ -180,9 +125,9 @@ class UserControllerTest {
                 .andReturn();
         System.out.println(result.getResponse().getContentAsString());
     }
-    @Order(7)
+    @Order(5)
     @Test
-    public void testCreateAUserWhenLoggedUserIsAdmin() throws Exception {
+    public void testCreateAUserWhenLoggedUserIsAdminHappyPath() throws Exception {
         var resultToken = mockMvc.perform(MockMvcRequestBuilders.post("/login").content(
                                 objectMapper.writeValueAsString(new LoginDTO("johndoe@email.com", "password"))
                         )

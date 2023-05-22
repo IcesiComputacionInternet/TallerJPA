@@ -30,7 +30,7 @@ import static org.mockito.Mockito.*;
 import static org.mockito.Mockito.times;
 
 public class AccountServiceTest {
-   /* private AccountService accountService;
+    private AccountService accountService;
     private AccountRepository accountRepository;
     private UserRepository userRepository;
     private AccountMapper accountMapper;
@@ -118,8 +118,8 @@ public class AccountServiceTest {
         }
     }
 
-    TEST COMENTADO PORQUE ESTA VALIDACIÓN SE PUEDE REALIZAR CON  @Min(value=0, message = "The amount of a transaction must be greater than 0")
-    ******* VER TEST DE INTEGRACIÓN
+    //TEST COMENTADO PORQUE ESTA VALIDACIÓN SE PUEDE REALIZAR CON  @Min(value=0, message = "The amount of a transaction must be greater than 0")
+    //******* VER TEST DE INTEGRACIÓN
 
     @Test
     public void testCreateAccountWithBalanceBelowCero(){
@@ -800,5 +800,5 @@ public class AccountServiceTest {
                 .name("Director SIS")
                 .build();
     }
-*/
+
 }

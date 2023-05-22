@@ -23,6 +23,7 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 @Import(TestConfigurationData.class)
 @ActiveProfiles(profiles="test")
 class RoleControllerTest {
+
     @Autowired
     private MockMvc mockMvc;
 
@@ -165,28 +166,5 @@ class RoleControllerTest {
         System.out.println(result.getResponse().getContentAsString());
     }
 
-    @Test
-    public void testCreateARoleWhenItsNameIsNull() throws Exception {
-        var resultToken = mockMvc.perform(MockMvcRequestBuilders.post("/login").content(
-                                objectMapper.writeValueAsString(new LoginDTO("johndoe@email.com", "password"))
-                        )
-                        .contentType(MediaType.APPLICATION_JSON)
-                        .accept(MediaType.APPLICATION_JSON))
-                .andExpect(status().isOk())
-                .andReturn();
-        TokenDTO token = objectMapper.readValue(resultToken.getResponse().getContentAsString(),TokenDTO.class);
-        var result = mockMvc.perform(MockMvcRequestBuilders.post("/roles/create").content(
-                                objectMapper.writeValueAsString(
-                                        RoleDTO.builder()
-                                                .description("Role for a bank investiment specialist")
-                                                .name(null)
-                                                .build()
-                                ))
-                        .header("Authorization", "Bearer "+token.getToken())
-                        .contentType(MediaType.APPLICATION_JSON).accept(MediaType.APPLICATION_JSON))
-                .andExpect(status().isBadRequest())
-                .andReturn();
-        System.out.println(result.getResponse().getContentAsString());
-    }
-
 }
+

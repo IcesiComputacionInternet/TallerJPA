@@ -12,14 +12,14 @@ import java.util.List;
 public interface AccountAPI {
     String BASE_ACCOUNT_URL="/accounts";
     @GetMapping("/{accountNumber}")
-    ResponseAccountDTO getAccount(@PathVariable String accountNumber);
+    ResponseAccountDTO getAccount(@PathVariable("accountNumber")  String accountNumber);
     List<ResponseAccountDTO> getAllAccounts();
     @PostMapping("/create")
     ResponseAccountDTO createAccount(@Valid @RequestBody RequestAccountDTO requestAccountDTO);
     @PatchMapping("/enable/{accountNumber}")
-    ResponseAccountDTO enableAccount(@PathVariable String accountNumber);
+    ResponseAccountDTO enableAccount(@PathVariable("accountNumber") String accountNumber);
     @PatchMapping("/disable/{accountNumber}")
-    ResponseAccountDTO disableAccount(@PathVariable String accountNumber);
+    ResponseAccountDTO disableAccount(@PathVariable("accountNumber")  String accountNumber);
     @PatchMapping("/withdraw")
     TransactionOperationDTO withdrawMoney(@Valid @RequestBody TransactionOperationDTO transaction);
     @PatchMapping("/deposit")

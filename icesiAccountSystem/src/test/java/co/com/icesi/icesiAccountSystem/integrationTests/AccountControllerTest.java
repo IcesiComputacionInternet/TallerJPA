@@ -3,7 +3,14 @@ package co.com.icesi.icesiAccountSystem.integrationTests;
 import co.com.icesi.icesiAccountSystem.dto.LoginDTO;
 import co.com.icesi.icesiAccountSystem.dto.RequestAccountDTO;
 import co.com.icesi.icesiAccountSystem.dto.TokenDTO;
+import co.com.icesi.icesiAccountSystem.dto.TransactionOperationDTO;
+import co.com.icesi.icesiAccountSystem.mapper.AccountMapper;
+import co.com.icesi.icesiAccountSystem.mapper.AccountMapperImpl;
+import co.com.icesi.icesiAccountSystem.repository.AccountRepository;
+import co.com.icesi.icesiAccountSystem.repository.UserRepository;
+import co.com.icesi.icesiAccountSystem.service.AccountService;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Order;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -15,6 +22,8 @@ import org.springframework.test.context.ActiveProfiles;
 import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.request.MockMvcRequestBuilders;
 
+import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.spy;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
 @AutoConfigureMockMvc
@@ -31,6 +40,7 @@ public class AccountControllerTest {
 
     @Test
     void contextLoads() {
+
     }
 
     @Order(1)
@@ -132,6 +142,71 @@ public class AccountControllerTest {
                         .header("Authorization",  "Bearer "+token.getToken())
                         .contentType(MediaType.APPLICATION_JSON).accept(MediaType.APPLICATION_JSON))
                 .andExpect(status().isForbidden())
+                .andReturn();
+        System.out.println(result.getResponse().getContentAsString());
+    }
+
+    @Order(5)
+    @Test
+    public void testDisableAnAccountWhenLoggedUserIsAdmin() throws Exception {
+        var resultToken = mockMvc.perform(MockMvcRequestBuilders.post("/login").content(
+                                objectMapper.writeValueAsString(new LoginDTO("johndoe@email.com", "password"))
+                        )
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .accept(MediaType.APPLICATION_JSON))
+                .andExpect(status().isOk())
+                .andReturn();
+        TokenDTO token = objectMapper.readValue(resultToken.getResponse().getContentAsString(),TokenDTO.class);
+        var result = mockMvc.perform(MockMvcRequestBuilders.patch("/accounts/disable/{accountNumber}","025-253568-54")
+                        .header("Authorization", "Bearer "+token.getToken())
+                        .contentType(MediaType.APPLICATION_JSON).accept(MediaType.APPLICATION_JSON))
+                .andExpect(status().isOk())
+                .andReturn();
+        System.out.println(result.getResponse().getContentAsString());
+    }
+
+    @Order(6)
+    @Test
+    public void testDisableAnAccountWhenLoggedUserIsNotOwner() throws Exception {
+        var resultToken = mockMvc.perform(MockMvcRequestBuilders.post("/login").content(
+                                objectMapper.writeValueAsString(new LoginDTO("ethan@email.com", "password"))
+                        )
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .accept(MediaType.APPLICATION_JSON))
+                .andExpect(status().isOk())
+                .andReturn();
+        TokenDTO token = objectMapper.readValue(resultToken.getResponse().getContentAsString(),TokenDTO.class);
+        var result = mockMvc.perform(MockMvcRequestBuilders.patch("/accounts/disable/{accountNumber}","025-253568-54")
+                        .header("Authorization", "Bearer "+token.getToken())
+                        .contentType(MediaType.APPLICATION_JSON).accept(MediaType.APPLICATION_JSON))
+                .andExpect(status().isForbidden())
+                .andReturn();
+        System.out.println(result.getResponse().getContentAsString());
+    }
+
+    @Order(7)
+    @Test
+    public void testTransferMoneyHappyPath() throws Exception {
+        var resultToken = mockMvc.perform(MockMvcRequestBuilders.post("/login").content(
+                                objectMapper.writeValueAsString(new LoginDTO("keren@email.com", "password"))
+                        )
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .accept(MediaType.APPLICATION_JSON))
+                .andExpect(status().isOk())
+                .andReturn();
+        TokenDTO token = objectMapper.readValue(resultToken.getResponse().getContentAsString(),TokenDTO.class);
+        var result = mockMvc.perform(MockMvcRequestBuilders.patch("/accounts/transfer").content(
+                                objectMapper.writeValueAsString(
+                                        TransactionOperationDTO.builder()
+                                                .result("")
+                                                .accountFrom("025-253568-25")
+                                                .accountTo("025-253568-33")
+                                                .amount(100000L)
+                                                .build()
+                                ))
+                        .header("Authorization", "Bearer "+token.getToken())
+                        .contentType(MediaType.APPLICATION_JSON).accept(MediaType.APPLICATION_JSON))
+                .andExpect(status().isOk())
                 .andReturn();
         System.out.println(result.getResponse().getContentAsString());
     }

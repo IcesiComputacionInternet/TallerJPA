@@ -115,7 +115,7 @@ public class AccountService {
 
     private void checkPermissionsToCreate(String accUserEmail) {
         System.out.println(IcesiSecurityContext.getCurrentUserEmail());
-        if((IcesiSecurityContext.getCurrentUserRole().equals("BANK_USER"))||(!IcesiSecurityContext.getCurrentUserEmail().equals(accUserEmail))){
+        if((IcesiSecurityContext.getCurrentUserRole().equals("BANK_USER"))||(IcesiSecurityContext.getCurrentUserRole().equals("USER")&&!IcesiSecurityContext.getCurrentUserEmail().equals(accUserEmail))){
             throw createAccountSystemException(
                     "Only an ADMIN user can create new accounts for any user, and a normal USER only can create accounts for himself.",
                     HttpStatus.FORBIDDEN,
@@ -125,7 +125,7 @@ public class AccountService {
     }
 
     private void checkPermissionsToUpdate(String accUserId) {
-        if((IcesiSecurityContext.getCurrentUserRole().equals("BANK_USER"))||(!IcesiSecurityContext.getCurrentUserId().equals(accUserId))){
+        if((IcesiSecurityContext.getCurrentUserRole().equals("BANK_USER"))||(IcesiSecurityContext.getCurrentUserRole().equals("USER")&&IcesiSecurityContext.getCurrentUserId().equals(accUserId))){
             throw createAccountSystemException(
                     "Only an ADMIN user or the owner or the account can update it.",
                     HttpStatus.FORBIDDEN,
