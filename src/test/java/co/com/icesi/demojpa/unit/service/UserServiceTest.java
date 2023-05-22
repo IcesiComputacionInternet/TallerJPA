@@ -149,7 +149,7 @@ public class UserServiceTest {
      return UserCreateDTO.builder()
              .email("5")
              .firstName("John")
-             .lastname("Doe")
+             .lastName("Doe")
              .phone("123")
              .password("123")
              .roleName("rol de prueba")

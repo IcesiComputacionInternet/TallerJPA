@@ -2,6 +2,7 @@ package co.com.icesi.demojpa.servicio;
 
 import co.com.icesi.demojpa.dto.UserCreateDTO;
 import co.com.icesi.demojpa.dto.response.ResponseUserDTO;
+import co.com.icesi.demojpa.error.util.IcesiExceptionBuilder;
 import co.com.icesi.demojpa.mapper.UserMapper;
 import co.com.icesi.demojpa.mapper.response.UserResponseMapper;
 import co.com.icesi.demojpa.model.IcesiAccount;
@@ -10,12 +11,16 @@ import co.com.icesi.demojpa.model.IcesiUser;
 import co.com.icesi.demojpa.repository.AccountRepository;
 import co.com.icesi.demojpa.repository.RoleRepository;
 import co.com.icesi.demojpa.repository.UserRepository;
+import co.com.icesi.demojpa.security.IcesiSecurityContext;
+import lombok.AllArgsConstructor;
+import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
 
 import java.util.Optional;
 import java.util.UUID;
 
 @Service
+@AllArgsConstructor
 public class UserService {
 
     private final UserRepository userRepository;
@@ -29,14 +34,6 @@ public class UserService {
 
     private final UserResponseMapper userResponseMapper;
 
-    public UserService(UserRepository userRepository, UserMapper userMapper, RoleService roleService, RoleRepository roleRepository, AccountRepository accountRepository,  UserResponseMapper userResponseMapper) {
-        this.userRepository = userRepository;
-        this.userMapper = userMapper;
-        this.roleService = roleService;
-        this.roleRepository = roleRepository;
-        this.accountRepository = accountRepository;
-        this.userResponseMapper = userResponseMapper;
-    }
 
     public ResponseUserDTO save(UserCreateDTO user){
 
@@ -44,7 +41,8 @@ public class UserService {
             throw new RuntimeException("El usuario no tiene rol");
         }
 
-        IcesiRole role = roleRepository.findByName(user.getRoleName()).orElseThrow(()->new RuntimeException("Este rol no existe"));
+        IcesiRole role = roleRepository.findByName(user.getRoleName()).orElseThrow(
+                ()->IcesiExceptionBuilder.createIcesiException("No existe un rol con este nombre", HttpStatus.NOT_FOUND,"ROLE_NOT_FOUND") );
 
         if(userRepository.findByEmail(user.getEmail()).isPresent() && userRepository.findByPhone(user.getPhone()).isPresent()) {
             throw new RuntimeException("Ya hay un usuario con este email y celular");
@@ -58,18 +56,25 @@ public class UserService {
             throw new RuntimeException("Ya hay un usuario con este email");
         }
 
+        if(role.getName().equals("ADMIN") && !IcesiSecurityContext.getCurrentUserRole().equals("ADMIN")){
+            throw new RuntimeException("Solo un usuario con rol ADMIN puede crear un usuario con rol ADMIN");
+        }
+
         IcesiUser icesiUser = userMapper.fromIcesiUserDTO(user);
         icesiUser.setUserId(UUID.randomUUID());
-        roleService.addUser(role,icesiUser.getUserId());
         icesiUser.setRole(role);
+        userRepository.save(icesiUser);
+        roleService.addUser(role,icesiUser.getUserId());
 
-        return userResponseMapper.fromIcesUser(userRepository.save(icesiUser));
+
+        return userResponseMapper.fromIcesUser(icesiUser);
     }
 
 
     public void addAccount(IcesiUser icesiUser,String accountNumber){
 
-        IcesiAccount icesiAccount = accountRepository.findByAccountNumber(accountNumber).orElseThrow(()-> new RuntimeException("No existe una cuenta con este numero"));
+        IcesiAccount icesiAccount = accountRepository.findByAccountNumber(accountNumber).orElseThrow(
+                ()-> IcesiExceptionBuilder.createIcesiException("No existe una cuenta con este numero", HttpStatus.NOT_FOUND,"ACCOUNT_NOT_FOUND"));
 
         icesiUser.getAccounts().add(icesiAccount);
 

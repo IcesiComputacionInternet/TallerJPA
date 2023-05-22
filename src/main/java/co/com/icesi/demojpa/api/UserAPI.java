@@ -16,7 +16,7 @@ public interface UserAPI {
 
     String BASE_USER_URL = "/users";
 
-    @PostMapping("/createUser/")
+    @PostMapping("/")
     ResponseUserDTO createIcesiUser(@Valid @RequestBody UserCreateDTO user);
 
 }

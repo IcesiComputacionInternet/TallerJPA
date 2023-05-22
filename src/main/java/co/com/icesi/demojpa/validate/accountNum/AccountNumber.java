@@ -1,7 +1,4 @@
-package co.com.icesi.demojpa.api;
-
-import co.com.icesi.demojpa.model.IcesiAccount;
-import org.springframework.validation.annotation.Validated;
+package co.com.icesi.demojpa.validate.accountNum;
 
 import javax.validation.Constraint;
 import javax.validation.Payload;

@@ -1,4 +1,4 @@
-package co.com.icesi.demojpa.api;
+package co.com.icesi.demojpa.validate.accountNum;
 
 import javax.validation.ConstraintValidator;
 import javax.validation.ConstraintValidatorContext;

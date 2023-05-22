@@ -7,7 +7,7 @@ import javax.security.auth.Subject;
 import java.util.Collection;
 
 public class CustomAuthentication implements Authentication {
-    private Authentication authentication;
+    private final Authentication authentication;
 
     private final String userId;
 

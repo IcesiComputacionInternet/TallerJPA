@@ -24,6 +24,7 @@ public class UserController implements UserAPI {
 
     @Override
     public ResponseUserDTO createIcesiUser(@RequestBody UserCreateDTO user){
+        System.out.println("Creando usuario");
         return userService.save(user);
     }
 

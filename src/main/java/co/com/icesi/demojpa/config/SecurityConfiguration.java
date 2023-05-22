@@ -3,6 +3,7 @@ package co.com.icesi.demojpa.config;
 import com.nimbusds.jose.jwk.source.ImmutableSecret;
 import lombok.AllArgsConstructor;
 import org.springframework.context.annotation.Bean;
+import org.springframework.context.annotation.Configuration;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.ProviderManager;
 import org.springframework.security.authorization.AuthorityAuthorizationManager;
@@ -29,6 +30,7 @@ import org.springframework.web.servlet.handler.HandlerMappingIntrospector;
 import javax.crypto.spec.SecretKeySpec;
 import javax.servlet.http.HttpServletRequest;
 
+@Configuration
 @AllArgsConstructor
 @EnableWebSecurity
 public class SecurityConfiguration {
@@ -73,11 +75,9 @@ public class SecurityConfiguration {
         RequestMatcherDelegatingAuthorizationManager.Builder managerBuilder = RequestMatcherDelegatingAuthorizationManager.builder()
                 .add(permitAll,(context,other)->new AuthorizationDecision(true));
 
-        //permisos de crear usuarios
-        managerBuilder.add(new MvcRequestMatcher(introspector,"/users/createUser/**"), AuthorityAuthorizationManager.hasAnyAuthority("SCOPE_ADMIN","SCOPE_BANK"));
 
-        //permisos para revisar cuentas
-        managerBuilder.add(new MvcRequestMatcher(introspector,"/accounts/**"), AuthorityAuthorizationManager.hasAnyAuthority("SCOPE_USER"));
+
+
 
         AuthorizationManager<HttpServletRequest> manager= managerBuilder.build();
         return (authentication, object)->manager.check(authentication,object.getRequest());

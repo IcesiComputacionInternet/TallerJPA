@@ -1,6 +1,6 @@
 package co.com.icesi.demojpa.dto.response;
 
-import co.com.icesi.demojpa.api.AccountNumber;
+import co.com.icesi.demojpa.validate.accountNum.AccountNumber;
 import lombok.Builder;
 import lombok.Data;
 

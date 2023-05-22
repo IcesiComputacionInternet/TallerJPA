@@ -53,9 +53,10 @@ public class DemoJpaApplication {
 		IcesiUser icesiUser2 = IcesiUser.builder()
 				.userId(UUID.randomUUID())
 				.email("johndoe2@email.com")
-				.role(user)
+				.role(bank)
 				.firstName("John")
 				.lastname("Doe")
+				.phone("+57123123123")
 				.password(encoder.encode("password"))
 				.build();
 

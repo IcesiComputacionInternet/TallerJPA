@@ -10,6 +10,7 @@ import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Component;
 
+
 @Component
 public class IcesiAuthenticatorManager extends DaoAuthenticationProvider {
     public IcesiAuthenticatorManager(UserManagementService userManagementService, PasswordEncoder passwordEncoder){
@@ -19,7 +20,8 @@ public class IcesiAuthenticatorManager extends DaoAuthenticationProvider {
 
     @Override
     public Authentication createSuccessAuthentication(Object principal, Authentication authentication, UserDetails user){
-        UsernamePasswordAuthenticationToken successAuthentication =(UsernamePasswordAuthenticationToken) super.createSuccessAuthentication(principal,authentication,user);
+        UsernamePasswordAuthenticationToken successAuthentication =
+                (UsernamePasswordAuthenticationToken) super.createSuccessAuthentication(principal,authentication,user);
         SecurityUser securityUser =(SecurityUser) user;
         return new CustomAuthentication(successAuthentication,securityUser.getIcesiUser().getUserId().toString());
     }

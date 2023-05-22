@@ -23,5 +23,5 @@ public class ResponseUserDTO {
 
     private String phone;
 
-    private IcesiRole role;
+    private RespondeRoleDTO role;
 }

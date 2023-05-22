@@ -35,7 +35,7 @@ public class RoleService {
     }
 
     public void addUser(IcesiRole role, UUID userid){
-
+        System.out.println("Agregando usuario");
         IcesiUser user = userRepository.findById(userid).orElseThrow(()->new RuntimeException("No existe un usuario con esta id"));
         role.getUser().add(user);
     }
