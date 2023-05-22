@@ -17,6 +17,7 @@ public class AuthController {
 
     @PostMapping("/token")
     public TokenDTO token(@RequestBody LoginDTO loginDTO) {
+        System.out.println("Se ejecuta el endpoint de token");
         return tokenSercive.logIn(loginDTO);
     }
 

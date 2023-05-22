@@ -20,12 +20,12 @@ public class GlobalExceptionHandler {
     public ResponseEntity<IcesiError> handleIcesiException(IcesiException icesiException){
         return ResponseEntity.status(icesiException.getError().getStatus()).body(icesiException.getError());
     }
-    /*
+
     @ExceptionHandler(RuntimeException.class)
     public ResponseEntity<IcesiError> handleRuntimeException(RuntimeException runtimeException){
         var error = IcesiExceptionBuilder.createIcesiError(HttpStatus.INTERNAL_SERVER_ERROR,runtimeException.getMessage());
         System.out.println(runtimeException.getMessage());
         return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(error);
-    }*/
+    }
 
 }

@@ -1,6 +1,13 @@
 package co.com.icesi.demojpa;
 
+
+
 import co.com.icesi.demojpa.dto.LoginDTO;
+import co.com.icesi.demojpa.dto.TokenDTO;
+import co.com.icesi.demojpa.dto.UserCreateDTO;
+import co.com.icesi.demojpa.dto.response.ResponseUserDTO;
+import co.com.icesi.demojpa.error.exception.IcesiError;
+import co.com.icesi.demojpa.error.exception.IcesiException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -12,13 +19,15 @@ import org.springframework.test.context.ActiveProfiles;
 import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.request.MockMvcRequestBuilders;
 
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertNotNull;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
 @AutoConfigureMockMvc
 @SpringBootTest
 @Import(TestConfigurationData.class)
 @ActiveProfiles(profiles = "test")
-class DemoJpaApplicationTests {
+class TallerJpaApplicationTests {
 
     @Autowired
     private MockMvc mocMvc;
@@ -32,16 +41,149 @@ class DemoJpaApplicationTests {
     }
 
     @Test
-    public void testTokenEndpoint() throws Exception {
+    public void testTokenEndpointHappyPath() throws Exception{
         var result = mocMvc.perform(MockMvcRequestBuilders.post("/token").content(
-                                objectMapper.writeValueAsString(new LoginDTO("johndoe@email.com", "password"))
+                                objectMapper.writeValueAsString(new LoginDTO("johndoe@email.com","password"))
                         )
                         .contentType(MediaType.APPLICATION_JSON)
                         .accept(MediaType.APPLICATION_JSON))
                 .andExpect(status().isOk())
                 .andReturn();
-        
-        System.out.println(result.getResponse().getContentAsString());
+        TokenDTO token = objectMapper.readValue(result.getResponse().getContentAsString(), TokenDTO.class);
+        assertNotNull(token);
     }
 
+    @Test
+    public void testTokenEndpointInvalidUser() throws Exception{
+        var result = mocMvc.perform(MockMvcRequestBuilders.post("/token").content(
+                                objectMapper.writeValueAsString(new LoginDTO("johndoe@email4.com","password"))
+                        )
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .accept(MediaType.APPLICATION_JSON))
+                .andExpect(status().is5xxServerError())
+                .andReturn();
+
+        IcesiError error = objectMapper.readValue(result.getResponse().getContentAsString(), IcesiError.class);
+        System.out.println(error.getDetails());
+        assertNotNull(error);
+    }
+
+    @Test
+    public void testTokenEndpointPassword() throws Exception{
+        var result = mocMvc.perform(MockMvcRequestBuilders.post("/token").content(
+                                objectMapper.writeValueAsString(new LoginDTO("johndoe@email4.com","NotApassword"))
+                        )
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .accept(MediaType.APPLICATION_JSON))
+                .andExpect(status().is5xxServerError())
+                .andReturn();
+
+        IcesiError error = objectMapper.readValue(result.getResponse().getContentAsString(), IcesiError.class);
+        System.out.println(error.getDetails());
+        assertNotNull(error);
+        assertEquals("Usuario o contraseÃ±a incorrectos", error.getDetails());
+    }
+
+    @Test
+    public void testCreateAdminUserEndpointHappyPath() throws Exception {
+        mocMvc.perform(MockMvcRequestBuilders.post("/token").content(
+                objectMapper.writeValueAsString(new LoginDTO("johndoe@email.com", "password"))
+                        )
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .accept(MediaType.APPLICATION_JSON))
+                .andExpect(status().isOk())
+                .andReturn();
+        var result = mocMvc.perform(MockMvcRequestBuilders.post("/users/").content(
+                objectMapper.writeValueAsString(new UserCreateDTO(
+                        "nombre",
+                        "apellido",
+                        "123@gmail.co",
+                        "+57 305 123 432",
+                        "123",
+                        "ADMIN")))
+                .contentType(MediaType.APPLICATION_JSON)
+                .accept(MediaType.APPLICATION_JSON))
+                .andExpect(status().isOk());
+        ResponseUserDTO user = objectMapper.readValue(result.andReturn().getResponse().getContentAsString(), ResponseUserDTO.class);
+        assertNotNull(user);
+    }
+
+    @Test
+    public void testCreateAdminUserNotValidEndpoint() throws Exception {
+        mocMvc.perform(MockMvcRequestBuilders.post("/token").content(
+                                objectMapper.writeValueAsString(new LoginDTO("johndoe2@email.com", "password"))
+                        )
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .accept(MediaType.APPLICATION_JSON))
+                .andExpect(status().isOk())
+                .andReturn();
+        var result = mocMvc.perform(MockMvcRequestBuilders.post("/users/").content(
+                                objectMapper.writeValueAsString(new UserCreateDTO(
+                                        "nombre",
+                                        "apellido",
+                                        "123@gmail.co",
+                                        "+57 305 123 432",
+                                        "123",
+                                        "ADMIN")))
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .accept(MediaType.APPLICATION_JSON))
+                .andExpect(status().is5xxServerError());
+        IcesiException exception = objectMapper.readValue(result.andReturn().getResponse().getContentAsString(), IcesiException.class);
+        assertNotNull(exception);
+    }
+
+    @Test
+    public void testCreateUserEndpointHappyPath() throws Exception {
+        mocMvc.perform(MockMvcRequestBuilders.post("/token").content(
+                                objectMapper.writeValueAsString(new LoginDTO("johndoe2@email.com", "password"))
+                        )
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .accept(MediaType.APPLICATION_JSON))
+                .andExpect(status().isOk())
+                .andReturn();
+        var result = mocMvc.perform(MockMvcRequestBuilders.post("/users/").content(
+                                objectMapper.writeValueAsString(new UserCreateDTO(
+                                        "nombre",
+                                        "apellido",
+                                        "123@gmail.co",
+                                        "+57 305 123 432",
+                                        "123",
+                                        "USER")))
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .accept(MediaType.APPLICATION_JSON))
+                .andExpect(status().isOk());
+        ResponseUserDTO user = objectMapper.readValue(result.andReturn().getResponse().getContentAsString(), ResponseUserDTO.class);
+        assertNotNull(user);
+    }
+
+    @Test
+    public void testCreateUserEndpointInvalidRole() throws Exception {
+        mocMvc.perform(MockMvcRequestBuilders.post("/token").content(
+                                objectMapper.writeValueAsString(new LoginDTO("johndoe2@email.com", "password"))
+                        )
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .accept(MediaType.APPLICATION_JSON))
+                .andExpect(status().isOk())
+                .andReturn();
+        var result = mocMvc.perform(MockMvcRequestBuilders.post("/users/").content(
+                                objectMapper.writeValueAsString(new UserCreateDTO(
+                                        "nombre",
+                                        "apellido",
+                                        "123@gmail.co",
+                                        "+57 305 123 432",
+                                        "123",
+                                        "a")))
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .accept(MediaType.APPLICATION_JSON))
+                .andExpect(status().is5xxServerError());
+        IcesiException error = objectMapper.readValue(result.andReturn().getResponse().getContentAsString(), IcesiException.class);
+        assertNotNull(error);
+        assertEquals("No existe un rol con este nombre", error.getMessage());
+    }
+
+
+
+
+
 }
+

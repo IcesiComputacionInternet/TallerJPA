@@ -2,12 +2,14 @@ package co.com.icesi.demojpa.servicio;
 
 import co.com.icesi.demojpa.dto.AccountCreateDTO;
 import co.com.icesi.demojpa.dto.response.ResponseAccountDTO;
+import co.com.icesi.demojpa.error.util.IcesiExceptionBuilder;
 import co.com.icesi.demojpa.mapper.AccountMapper;
 import co.com.icesi.demojpa.mapper.response.AccountResponseMapper;
 import co.com.icesi.demojpa.model.IcesiAccount;
 import co.com.icesi.demojpa.model.IcesiUser;
 import co.com.icesi.demojpa.repository.AccountRepository;
 import co.com.icesi.demojpa.repository.UserRepository;
+import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
 
 import javax.transaction.Transactional;
@@ -126,9 +128,12 @@ public class AccountService {
 
     public void transfer(String sendAccNum, String receiveAccNum, long sendValue){
 
-        IcesiAccount sendIcesiAccount = accountRepository.findByAccountNumber(sendAccNum).orElseThrow(()->new RuntimeException("La cuenta que manda el dinero no existe"));
+        IcesiAccount sendIcesiAccount = accountRepository.findByAccountNumber(sendAccNum).orElseThrow(()->
+                IcesiExceptionBuilder.createIcesiException("La cuenta que manda el dinero no existe", HttpStatus.NOT_FOUND,"ACCOUNT_NOT_FOUND") );
 
-        IcesiAccount receiveIcesiAccount = accountRepository.findByAccountNumber(receiveAccNum).orElseThrow(()->new RuntimeException("La cuenta que recibe el dinero no existe"));
+
+        IcesiAccount receiveIcesiAccount = accountRepository.findByAccountNumber(receiveAccNum).orElseThrow(()->
+                IcesiExceptionBuilder.createIcesiException("La cuenta que recibe el dinero no existe", HttpStatus.NOT_FOUND,"ACCOUNT_NOT_FOUND") );
 
         if (sendValue<=0) {
             throw new RuntimeException("La cantidad de dinero que se quiere enviar debe ser mayor que 0");
@@ -155,7 +160,7 @@ public class AccountService {
     }
 
     public ResponseAccountDTO getAccount(String accountNumber){
-        return accountResponseMapper.fromIcesiAccount(accountRepository.findByAccountNumber(accountNumber).orElseThrow(()-> new RuntimeException("No existe una cuenta con este numero")));
+        return accountResponseMapper.fromIcesiAccount(accountRepository.findByAccountNumber(accountNumber).orElseThrow(()-> IcesiExceptionBuilder.createIcesiException("No existe una cuenta con este numero", HttpStatus.NOT_FOUND,"ACCOUNT_NOT_FOUND")));
     }
 
     private boolean checkType(IcesiAccount account){
