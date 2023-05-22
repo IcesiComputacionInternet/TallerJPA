@@ -38,7 +38,6 @@ class DemoApplicationTests {
 
     @Test
     public void testTokenEndpoint() throws Exception {
-
         var result = mockMvc.perform(MockMvcRequestBuilders.post("/token").content(
                                 objectMapper.writeValueAsString(new LoginDTO("johndoe@email.com", "password"))
                         )
@@ -54,13 +53,14 @@ class DemoApplicationTests {
     @Test
     public void testTokenEndpointWithInvalidEmail() throws Exception {
 
-        var result = mockMvc.perform(MockMvcRequestBuilders.("/token").content(
+        var result = mockMvc.perform(MockMvcRequestBuilders.post("/token").content(
                                 objectMapper.writeValueAsString(new LoginDTO("incorrect@email.com", "password"))
                         )
                         .contentType(MediaType.APPLICATION_JSON)
                         .accept(MediaType.APPLICATION_JSON))
-                .andExpect(status().isOk())
+                .andExpect(status().isUnauthorized())
                 .andReturn();
-
     }
+
+
 }
