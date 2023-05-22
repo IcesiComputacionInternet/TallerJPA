@@ -9,6 +9,7 @@ import co.edu.icesi.demo.model.IcesiAccount;
 import co.edu.icesi.demo.model.IcesiUser;
 import co.edu.icesi.demo.repository.AccountRepository;
 import co.edu.icesi.demo.repository.UserRepository;
+import co.edu.icesi.demo.security.IcesiSecurityContext;
 import lombok.AllArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
@@ -36,6 +37,8 @@ public class AccountService {
                 HttpStatus.NOT_FOUND,
                 new DetailBuilder(ErrorCode.ERR_404, "User with email",account.getUserEmail() )
         ));
+        manageAuthorization(icesiUser);
+
         IcesiAccount icesiAccount= accountMapper.fromIcesiAccountDTO(account);
         icesiAccount.setAccountId(UUID.randomUUID());
         icesiAccount.setAccountNumber(uniqueAccountNumber());
@@ -68,6 +71,7 @@ public class AccountService {
     public TransactionDTO withdrawalMoney(TransactionDTO transactionDTO){
 
         IcesiAccount icesiAccount=getAccountFromRepository(transactionDTO.getAccountNumberFrom());
+        manageTransactionAuthorization(icesiAccount.getUser());
         validateAccountBalanceWithAmountToPull(icesiAccount.getBalance(),transactionDTO.getMoney());
 
         icesiAccount.setBalance(icesiAccount.getBalance()-transactionDTO.getMoney());
@@ -101,6 +105,7 @@ public class AccountService {
     public TransactionDTO transferMoney(TransactionDTO transactionDTO){
 
         IcesiAccount icesiAccountFrom=getAccountFromRepository(transactionDTO.getAccountNumberFrom());
+        manageTransactionAuthorization(icesiAccountFrom.getUser());
         IcesiAccount icesiAccountTo=getAccountFromRepository(transactionDTO.getAccountNumberTo());
         validateTypeToTransfer(icesiAccountFrom);
         validateTypeToTransfer(icesiAccountTo);
@@ -124,6 +129,7 @@ public class AccountService {
                 HttpStatus.NOT_FOUND,
                 new DetailBuilder(ErrorCode.ERR_404, "Inactive account number",accountNumber )
         ));
+        manageAuthorization(icesiAccount.getUser());
         icesiAccount.setActive(true);
 
         accountRepository.save(icesiAccount); //update
@@ -139,7 +145,7 @@ public class AccountService {
                 HttpStatus.NOT_FOUND,
                 new DetailBuilder(ErrorCode.ERR_404, "Active account number",accountNumber )
         ));
-
+        manageAuthorization(icesiAccount.getUser());
         if(icesiAccount.getBalance()>0){
 
             throw createIcesiException(
@@ -176,5 +182,26 @@ public class AccountService {
                 new DetailBuilder(ErrorCode.ERR_404, "Active account",accountNumber )
         ));
     }
+
+    public void manageAuthorization(IcesiUser user){
+        if(IcesiSecurityContext.getCurrentUserRole().equals("USER") && !IcesiSecurityContext.getCurrentUserId().equals(user.getUserId().toString()) ){
+            throw createIcesiException(
+                    "Unauthorized: User cannot perform this action",
+                    HttpStatus.FORBIDDEN,
+                    new DetailBuilder(ErrorCode.ERR_403, "Unauthorized: User cannot perform this action")
+            ).get();
+        }
+    }
+
+    public void manageTransactionAuthorization(IcesiUser user){
+        if(!IcesiSecurityContext.getCurrentUserId().equals(user.getUserId().toString()) ){
+            throw createIcesiException(
+                    "Unauthorized: User cannot perform this transaction",
+                    HttpStatus.FORBIDDEN,
+                    new DetailBuilder(ErrorCode.ERR_403, "Unauthorized: User cannot perform this transaction")
+            ).get();
+        }
+    }
+
 
 }
