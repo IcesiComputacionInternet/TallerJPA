@@ -12,6 +12,7 @@ import org.springframework.web.bind.MethodArgumentNotValidException;
 import org.springframework.web.bind.annotation.ControllerAdvice;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 
+import javax.validation.ConstraintViolationException;
 import java.util.List;
 
 @ControllerAdvice
@@ -32,10 +33,20 @@ public class GlobalExceptionHandler {
         return ResponseEntity.status(error.getStatus()).body(error);
     }
 
+    @ExceptionHandler(ConstraintViolationException.class)
+    public ResponseEntity<IcesiError> handleConstraintViolationException(ConstraintViolationException ex){
+        var errorBuilder = IcesiError.builder().status(HttpStatus.BAD_REQUEST);
+        var details = ex.getConstraintViolations().stream()
+                .map(violation -> mapNewResultToError(new ObjectError("role", violation.getMessage())))
+                .toList();
+        var error = errorBuilder.details(details).build();
+        return ResponseEntity.status(error.getStatus()).body(error);
+    }
+
     @ExceptionHandler(HttpMessageNotReadableException.class)
     public ResponseEntity<IcesiError> handleHttpMessageNotReadable(HttpMessageNotReadableException ex){
         var errorBuilder = IcesiError.builder().status(HttpStatus.BAD_REQUEST);
-        var details = mapHttpResultToError(new ObjectError("type","has a not valid account type"));
+        var details = mapNewResultToError(new ObjectError("type","has a not valid account type"));
         var error = errorBuilder.details(List.of(details)).build();
         return ResponseEntity.status(error.getStatus()).body(error);
     }
@@ -53,7 +64,7 @@ public class GlobalExceptionHandler {
                 .errorCode(ErrorCode.ERR_400.getCode())
                 .errorMessage(message).build();
     }
-    private IcesiErrorDetail mapHttpResultToError(ObjectError objectError){
+    private IcesiErrorDetail mapNewResultToError(ObjectError objectError){
         var message = ErrorCode.ERR_400.getMessage().formatted(objectError.getObjectName(), objectError.getDefaultMessage());
         return IcesiErrorDetail.builder()
                 .errorCode(ErrorCode.ERR_400.getCode())

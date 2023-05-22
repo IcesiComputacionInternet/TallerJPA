@@ -15,7 +15,7 @@ import javax.validation.constraints.*;
 @AllArgsConstructor
 @NoArgsConstructor
 public class IcesiAccountRequestDTO {
-    @Min(value = 0, message = "The balance must be minimum 0.")
+    @Min(value = 0, message = "must be minimum 0.")
     private Long balance;
 
     @NotNull(message = "of the account can't be null.")
