@@ -1,7 +1,7 @@
 package co.edu.icesi.demo.controller;
 
 import co.edu.icesi.demo.api.AccountAPI;
-import co.edu.icesi.demo.dto.AccountCreateDTO;
+import co.edu.icesi.demo.dto.AccountDTO;
 import co.edu.icesi.demo.dto.TransactionDTO;
 import co.edu.icesi.demo.service.AccountService;
 import lombok.AllArgsConstructor;
@@ -19,21 +19,21 @@ public class AccountController implements AccountAPI {
 
     private final AccountService accountService;
     @Override
-    public AccountCreateDTO getAccount(String accountNumber) {
+    public AccountDTO getAccount(String accountNumber) {
 
-        return null;
+        return accountService.getAccount(accountNumber);
     }
 
     @Override
-    public List<AccountCreateDTO> getAllAccounts() {
+    public List<AccountDTO> getAllAccounts() {
 
-        return null;
+        return accountService.getAllAccounts();
     }
 
     @Override
-    public AccountCreateDTO addAccount(AccountCreateDTO accountCreateDTO) {
+    public AccountDTO addAccount(AccountDTO accountDTO) {
 
-        return accountService.save(accountCreateDTO);
+        return accountService.save(accountDTO);
     }
 
     @Override
@@ -55,13 +55,13 @@ public class AccountController implements AccountAPI {
     }
 
     @Override
-    public AccountCreateDTO enableAccount(String accountNumber) {
+    public AccountDTO enableAccount(String accountNumber) {
 
         return accountService.enableAccount(accountNumber);
     }
 
     @Override
-    public AccountCreateDTO disableAccount(String accountNumber) {
+    public AccountDTO disableAccount(String accountNumber) {
 
         return accountService.disableAccount(accountNumber);
     }

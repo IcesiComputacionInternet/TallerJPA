@@ -1,7 +1,7 @@
 package co.edu.icesi.demo.controller;
 
 import co.edu.icesi.demo.api.RoleAPI;
-import co.edu.icesi.demo.dto.RoleCreateDTO;
+import co.edu.icesi.demo.dto.RoleDTO;
 import co.edu.icesi.demo.service.RoleService;
 import lombok.AllArgsConstructor;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -19,20 +19,21 @@ public class RoleController  implements RoleAPI {
 
     private final RoleService roleService;
     @Override
-    public RoleCreateDTO getRole(String roleName) {
+    public RoleDTO getRole(String roleName) {
 
-        return null;
+        return roleService.getRole(roleName);
     }
 
     @Override
-    public List<RoleCreateDTO> getAllRoles() {
+    public List<RoleDTO> getAllRoles() {
 
-        return null;
+        return roleService.getAllRoles();
+
     }
 
     @Override
-    public RoleCreateDTO addRole(RoleCreateDTO roleCreateDTO) {
+    public RoleDTO addRole(RoleDTO roleDTO) {
 
-        return roleService.save(roleCreateDTO);
+        return roleService.save(roleDTO);
     }
 }

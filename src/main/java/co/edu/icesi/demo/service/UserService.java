@@ -1,6 +1,6 @@
 package co.edu.icesi.demo.service;
 
-import co.edu.icesi.demo.dto.UserCreateDTO;
+import co.edu.icesi.demo.dto.UserDTO;
 import co.edu.icesi.demo.error.exception.DetailBuilder;
 import co.edu.icesi.demo.error.exception.ErrorCode;
 import co.edu.icesi.demo.mapper.UserMapper;
@@ -14,6 +14,7 @@ import org.springframework.http.HttpStatus;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
+import java.util.List;
 import java.util.UUID;
 
 import static co.edu.icesi.demo.error.util.IcesiExceptionBuilder.createIcesiException;
@@ -30,7 +31,7 @@ public class UserService {
 
     private final PasswordEncoder passwordEncoder;
 
-    public UserCreateDTO save(UserCreateDTO user){
+    public UserDTO save(UserDTO user){
         manageAuthorization(user);
         validateEmailAndPhoneNumber(user);
 
@@ -47,7 +48,7 @@ public class UserService {
 
     }
 
-    public void manageAuthorization(UserCreateDTO user){
+    public void manageAuthorization(UserDTO user){
         if(IcesiSecurityContext.getCurrentUserRole().equals("BANK") && user.getRoleName().equals("ADMIN")){
             throw createIcesiException(
                     "Bank user cannot create Admin users",
@@ -57,7 +58,7 @@ public class UserService {
         }
     }
 
-    public void validateEmailAndPhoneNumber(UserCreateDTO user){
+    public void validateEmailAndPhoneNumber(UserDTO user){
         if(userRepository.findByEmail(user.getEmail()).isPresent() && userRepository.findByPhoneNumber(user.getPhoneNumber()).isPresent()){
 
             throw createIcesiException(
@@ -81,4 +82,31 @@ public class UserService {
         }
     }
 
+    public void AdminAuthorizationOnly(){
+        if(!IcesiSecurityContext.getCurrentUserRole().equals("ADMIN")){
+            throw createIcesiException(
+                    "Unauthorized: Admin only",
+                    HttpStatus.FORBIDDEN,
+                    new DetailBuilder(ErrorCode.ERR_403, "Unauthorized: Admin only")
+            ).get();
+        }
+    }
+
+    public UserDTO getUser(String userEmail) {
+        AdminAuthorizationOnly();
+        return  userMapper.fromIcesiUser(userRepository.findByEmail(userEmail).orElseThrow(
+                createIcesiException(
+                        "User email not found",
+                        HttpStatus.NOT_FOUND,
+                        new DetailBuilder(ErrorCode.ERR_404, "User email",userEmail )
+                )
+        ));
+    }
+
+    public List<UserDTO> getAllUsers() {
+        AdminAuthorizationOnly();
+        return userRepository.findAll().stream()
+                .map(userMapper::fromIcesiUser)
+                .toList();
+    }
 }

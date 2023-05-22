@@ -15,7 +15,7 @@ import javax.validation.constraints.NotBlank;
 @AllArgsConstructor
 @NoArgsConstructor
 @EmailOrPhoneNumberExistConstraint
-public class UserCreateDTO {
+public class UserDTO {
 
 
     @NotBlank(message = "is missing")

@@ -11,7 +11,7 @@ import javax.validation.constraints.NotBlank;
 @Builder
 @AllArgsConstructor
 @NoArgsConstructor
-public class RoleCreateDTO {
+public class RoleDTO {
 
     @NotBlank(message = "is missing")
     private String name;

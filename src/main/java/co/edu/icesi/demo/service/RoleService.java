@@ -1,17 +1,16 @@
 package co.edu.icesi.demo.service;
 
-import co.edu.icesi.demo.dto.RoleCreateDTO;
+import co.edu.icesi.demo.dto.RoleDTO;
 import co.edu.icesi.demo.error.exception.DetailBuilder;
 import co.edu.icesi.demo.error.exception.ErrorCode;
 import co.edu.icesi.demo.mapper.RoleMapper;
 import co.edu.icesi.demo.model.IcesiRole;
-import co.edu.icesi.demo.model.IcesiUser;
 import co.edu.icesi.demo.repository.RoleRepository;
 import lombok.AllArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
 
-import java.util.ArrayList;
+import java.util.List;
 import java.util.UUID;
 
 import static co.edu.icesi.demo.error.util.IcesiExceptionBuilder.createIcesiException;
@@ -24,7 +23,7 @@ public class RoleService {
 
     private RoleMapper roleMapper;
 
-    public RoleCreateDTO save(RoleCreateDTO role){ //Only admin
+    public RoleDTO save(RoleDTO role){ //Only admin
         if(roleRepository.findByName(role.getName()).isPresent()){
 
             throw createIcesiException(
@@ -40,6 +39,24 @@ public class RoleService {
         icesiRole.setRoleId(UUID.randomUUID());
 
         return roleMapper.fromIcesiRole(roleRepository.save(icesiRole));
+    }
+
+    public RoleDTO getRole(String roleName) {
+        return  roleMapper.fromIcesiRole(roleRepository.findByName(roleName).orElseThrow(
+                createIcesiException(
+                        "Role name not found",
+                        HttpStatus.NOT_FOUND,
+                        new DetailBuilder(ErrorCode.ERR_404, "Role name",roleName )
+                )
+        ));
+    }
+
+    public List<RoleDTO> getAllRoles() {
+
+        return roleRepository.findAll().stream()
+                .map(roleMapper::fromIcesiRole)
+                .toList();
+
     }
 
 

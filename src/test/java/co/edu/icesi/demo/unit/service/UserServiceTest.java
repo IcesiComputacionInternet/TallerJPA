@@ -1,6 +1,6 @@
 package co.edu.icesi.demo.unit.service;
 
-import co.edu.icesi.demo.dto.UserCreateDTO;
+import co.edu.icesi.demo.dto.UserDTO;
 import co.edu.icesi.demo.error.exception.IcesiException;
 import co.edu.icesi.demo.mapper.UserMapper;
 import co.edu.icesi.demo.mapper.UserMapperImpl;
@@ -136,9 +136,9 @@ public class UserServiceTest {
         }
     }
 
-    private UserCreateDTO defaultUserCreateDTO(){
+    private UserDTO defaultUserCreateDTO(){
 
-        return UserCreateDTO.builder()
+        return UserDTO.builder()
                 .firstName("Julieta")
                 .lastName("Venegas")
                 .email("julietav@example.com")

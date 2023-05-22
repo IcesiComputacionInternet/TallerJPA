@@ -1,7 +1,7 @@
 package co.edu.icesi.demo.controller;
 
 import co.edu.icesi.demo.api.UserAPI;
-import co.edu.icesi.demo.dto.UserCreateDTO;
+import co.edu.icesi.demo.dto.UserDTO;
 import co.edu.icesi.demo.service.UserService;
 import lombok.AllArgsConstructor;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -18,20 +18,20 @@ public class UserController implements UserAPI {
 
     private final UserService userService;
     @Override
-    public UserCreateDTO getUser(String userEmail) {
+    public UserDTO getUser(String userEmail) {
 
-        return null;
+        return userService.getUser(userEmail);
     }
 
     @Override
-    public List<UserCreateDTO> getAllUsers() {
+    public List<UserDTO> getAllUsers() {
 
-        return null;
+        return userService.getAllUsers();
     }
 
     @Override
-    public UserCreateDTO addUser(UserCreateDTO userCreateDTO) {
+    public UserDTO addUser(UserDTO userDTO) {
 
-        return userService.save(userCreateDTO);
+        return userService.save(userDTO);
     }
 }

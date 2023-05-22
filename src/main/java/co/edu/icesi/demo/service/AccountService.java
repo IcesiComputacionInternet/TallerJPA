@@ -1,6 +1,6 @@
 package co.edu.icesi.demo.service;
 
-import co.edu.icesi.demo.dto.AccountCreateDTO;
+import co.edu.icesi.demo.dto.AccountDTO;
 import co.edu.icesi.demo.dto.TransactionDTO;
 import co.edu.icesi.demo.error.exception.DetailBuilder;
 import co.edu.icesi.demo.error.exception.ErrorCode;
@@ -14,6 +14,7 @@ import lombok.AllArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
 
+import java.util.List;
 import java.util.Random;
 import java.util.UUID;
 import java.util.stream.Collectors;
@@ -30,7 +31,7 @@ public class AccountService {
 
     private UserRepository userRepository;
 
-    public AccountCreateDTO save(AccountCreateDTO account){
+    public AccountDTO save(AccountDTO account){
 
         IcesiUser icesiUser= userRepository.findByEmail(account.getUserEmail()).orElseThrow( createIcesiException(
                 "User does not exists",
@@ -122,7 +123,7 @@ public class AccountService {
         return  transactionDTO;
     }
 
-    public AccountCreateDTO enableAccount(String accountNumber){
+    public AccountDTO enableAccount(String accountNumber){
 
         IcesiAccount icesiAccount=accountRepository.findByAccountNumber(accountNumber,false).orElseThrow(createIcesiException(
                 "Inactive account not found",
@@ -138,7 +139,7 @@ public class AccountService {
 
     }
 
-    public AccountCreateDTO disableAccount(String accountNumber){
+    public AccountDTO disableAccount(String accountNumber){
 
         IcesiAccount icesiAccount=accountRepository.findByAccountNumber(accountNumber,true).orElseThrow( createIcesiException(
                 "Active account not found",
@@ -204,4 +205,30 @@ public class AccountService {
     }
 
 
+    public void AdminAuthorizationOnly(){
+        if(!IcesiSecurityContext.getCurrentUserRole().equals("ADMIN")){
+            throw createIcesiException(
+                    "Unauthorized: Admin only",
+                    HttpStatus.FORBIDDEN,
+                    new DetailBuilder(ErrorCode.ERR_403, "Unauthorized: Admin only")
+            ).get();
+        }
+    }
+    public AccountDTO getAccount(String accountNumber) {
+        AdminAuthorizationOnly();
+        return  accountMapper.fromIcesiAccount(accountRepository.findByAccountNumber(accountNumber).orElseThrow(
+                createIcesiException(
+                        "Account number not found",
+                        HttpStatus.NOT_FOUND,
+                        new DetailBuilder(ErrorCode.ERR_404, "Account number",accountNumber )
+                )
+        ));
+    }
+
+    public List<AccountDTO> getAllAccounts() {
+        AdminAuthorizationOnly();
+        return accountRepository.findAll().stream()
+                .map(accountMapper::fromIcesiAccount)
+                .toList();
+    }
 }

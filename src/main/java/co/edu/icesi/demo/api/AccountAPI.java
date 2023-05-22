@@ -1,6 +1,6 @@
 package co.edu.icesi.demo.api;
 
-import co.edu.icesi.demo.dto.AccountCreateDTO;
+import co.edu.icesi.demo.dto.AccountDTO;
 import co.edu.icesi.demo.dto.TransactionDTO;
 import org.springframework.web.bind.annotation.*;
 
@@ -12,13 +12,13 @@ public interface AccountAPI {
     String BASE_ACCOUNT_URL="/accounts";
 
     @GetMapping("/{accountNumber}")
-    AccountCreateDTO getAccount(@PathVariable String accountNumber);
+    AccountDTO getAccount(@PathVariable String accountNumber);
 
     @GetMapping
-    List<AccountCreateDTO> getAllAccounts();
+    List<AccountDTO> getAllAccounts();
 
     @PostMapping
-    AccountCreateDTO addAccount(@Valid @RequestBody AccountCreateDTO accountCreateDTO);
+    AccountDTO addAccount(@Valid @RequestBody AccountDTO accountDTO);
 
     @PutMapping("/withdrawal")
     TransactionDTO withdrawalMoney(@Valid @RequestBody TransactionDTO transactionDTO);
@@ -30,9 +30,9 @@ public interface AccountAPI {
     TransactionDTO transferMoney(@Valid @RequestBody TransactionDTO transactionDTO);
 
     @PutMapping("/{accountNumber}/enable")
-    AccountCreateDTO enableAccount(@PathVariable String accountNumber);
+    AccountDTO enableAccount(@PathVariable String accountNumber);
 
     @PutMapping("/{accountNumber}/disable")
-    AccountCreateDTO disableAccount(@PathVariable String accountNumber);
+    AccountDTO disableAccount(@PathVariable String accountNumber);
 
 }

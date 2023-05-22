@@ -2,7 +2,7 @@ package co.edu.icesi.demo.integration;
 import co.edu.icesi.demo.TestConfigurationData;
 import co.edu.icesi.demo.dto.LoginDTO;
 import co.edu.icesi.demo.dto.TokenDTO;
-import co.edu.icesi.demo.dto.UserCreateDTO;
+import co.edu.icesi.demo.dto.UserDTO;
 import co.edu.icesi.demo.error.exception.IcesiError;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import org.junit.jupiter.api.MethodOrderer;
@@ -76,8 +76,8 @@ class UserControllerTests {
                         .header(HttpHeaders.AUTHORIZATION, "Bearer "+tokenDTO.getToken()))
                 .andExpect(status().isOk())
                 .andReturn();
-        UserCreateDTO userCreateDTO =objectMapper.readValue(result.getResponse().getContentAsString(),UserCreateDTO.class);
-        assertNotNull(userCreateDTO);
+        UserDTO userDTO =objectMapper.readValue(result.getResponse().getContentAsString(), UserDTO.class);
+        assertNotNull(userDTO);
 
 
     }
@@ -87,7 +87,7 @@ class UserControllerTests {
     public void testCreateUserWhenEmailAlreadyExists() throws Exception{
 
         TokenDTO tokenDTO=tokenAdmin();
-        UserCreateDTO defaultUser=defaultUserCreateDTO();
+        UserDTO defaultUser=defaultUserCreateDTO();
         defaultUser.setPhoneNumber("+573186441235");
 
         var result=mockMvc.perform(MockMvcRequestBuilders.post(BASE_USER_URL).content(
@@ -114,7 +114,7 @@ class UserControllerTests {
 
         TokenDTO tokenDTO=tokenAdmin();
 
-        UserCreateDTO defaultUser=defaultUserCreateDTO();
+        UserDTO defaultUser=defaultUserCreateDTO();
         defaultUser.setEmail("george.harrison5@email.com");
 
 
@@ -165,7 +165,7 @@ class UserControllerTests {
     public void testCreateUserWhenRoleDoesNotExists() throws Exception{
 
         TokenDTO tokenDTO=tokenAdmin();
-        UserCreateDTO defaultUser=defaultUserCreateDTO();
+        UserDTO defaultUser=defaultUserCreateDTO();
         defaultUser.setEmail("george.harrison5@email.com");
         defaultUser.setPhoneNumber("+573186441235");
         defaultUser.setRoleName("OTHER");
@@ -194,7 +194,7 @@ class UserControllerTests {
 
         TokenDTO tokenDTO=tokenBank();
 
-        UserCreateDTO defaultUser=defaultUserCreateDTO();
+        UserDTO defaultUser=defaultUserCreateDTO();
         defaultUser.setEmail("george.harrison4@email.com");
         defaultUser.setPhoneNumber("+573186441234");
         var result=mockMvc.perform(MockMvcRequestBuilders.post(BASE_USER_URL).content(
@@ -205,8 +205,8 @@ class UserControllerTests {
                         .header(HttpHeaders.AUTHORIZATION, "Bearer "+tokenDTO.getToken()))
                 .andExpect(status().isOk())
                 .andReturn();
-        UserCreateDTO userCreateDTO =objectMapper.readValue(result.getResponse().getContentAsString(),UserCreateDTO.class);
-        assertNotNull(userCreateDTO);
+        UserDTO userDTO =objectMapper.readValue(result.getResponse().getContentAsString(), UserDTO.class);
+        assertNotNull(userDTO);
 
     }
 
@@ -225,8 +225,8 @@ class UserControllerTests {
                         .header(HttpHeaders.AUTHORIZATION, "Bearer "+tokenDTO.getToken()))
                 .andExpect(status().isOk())
                 .andReturn();
-        UserCreateDTO userCreateDTO =objectMapper.readValue(result.getResponse().getContentAsString(),UserCreateDTO.class);
-        assertNotNull(userCreateDTO);
+        UserDTO userDTO =objectMapper.readValue(result.getResponse().getContentAsString(), UserDTO.class);
+        assertNotNull(userDTO);
 
     }
 
@@ -236,7 +236,7 @@ class UserControllerTests {
 
         TokenDTO tokenDTO=tokenBank();
 
-        UserCreateDTO defaultBank=defaultBankUserCreateDTO();
+        UserDTO defaultBank=defaultBankUserCreateDTO();
         defaultBank.setEmail("george.harrison5@email.com");
         defaultBank.setPhoneNumber("+573186441235");
 
@@ -248,8 +248,8 @@ class UserControllerTests {
                         .header(HttpHeaders.AUTHORIZATION, "Bearer "+tokenDTO.getToken()))
                 .andExpect(status().isOk())
                 .andReturn();
-        UserCreateDTO userCreateDTO =objectMapper.readValue(result.getResponse().getContentAsString(),UserCreateDTO.class);
-        assertNotNull(userCreateDTO);
+        UserDTO userDTO =objectMapper.readValue(result.getResponse().getContentAsString(), UserDTO.class);
+        assertNotNull(userDTO);
 
     }
 
@@ -267,8 +267,8 @@ class UserControllerTests {
                         .header(HttpHeaders.AUTHORIZATION, "Bearer "+tokenDTO.getToken()))
                 .andExpect(status().isOk())
                 .andReturn();
-        UserCreateDTO userCreateDTO =objectMapper.readValue(result.getResponse().getContentAsString(),UserCreateDTO.class);
-        assertNotNull(userCreateDTO);
+        UserDTO userDTO =objectMapper.readValue(result.getResponse().getContentAsString(), UserDTO.class);
+        assertNotNull(userDTO);
 
 
     }
@@ -317,7 +317,7 @@ class UserControllerTests {
     public void testCreateUserRequestMissingFiled() throws Exception{
 
         TokenDTO tokenDTO=tokenAdmin();
-        UserCreateDTO defaultUser=defaultUserCreateDTO();
+        UserDTO defaultUser=defaultUserCreateDTO();
         defaultUser.setPassword("");
 
         var result=mockMvc.perform(MockMvcRequestBuilders.post(BASE_USER_URL).content(
@@ -342,7 +342,7 @@ class UserControllerTests {
     public void testCreateUserRequestInvalidEmail1() throws Exception{
 
         TokenDTO tokenDTO=tokenAdmin();
-        UserCreateDTO defaultUser=defaultUserCreateDTO();
+        UserDTO defaultUser=defaultUserCreateDTO();
         defaultUser.setEmail("@u.com");
 
         var result=mockMvc.perform(MockMvcRequestBuilders.post(BASE_USER_URL).content(
@@ -368,7 +368,7 @@ class UserControllerTests {
     public void testCreateUserRequestInvalidEmail2() throws Exception{
 
         TokenDTO tokenDTO=tokenAdmin();
-        UserCreateDTO defaultUser=defaultUserCreateDTO();
+        UserDTO defaultUser=defaultUserCreateDTO();
         defaultUser.setEmail("u.com");
         defaultUser.setPhoneNumber("");
 
@@ -394,7 +394,7 @@ class UserControllerTests {
     public void testCreateUserRequestInvalidPhoneNumber() throws Exception{
 
         TokenDTO tokenDTO=tokenAdmin();
-        UserCreateDTO defaultUser=defaultUserCreateDTO();
+        UserDTO defaultUser=defaultUserCreateDTO();
         defaultUser.setEmail("");
         defaultUser.setPhoneNumber("1234567890123");
 
@@ -421,7 +421,7 @@ class UserControllerTests {
     public void testCreateUserRequestMissingEmailAndPhoneNumber() throws Exception{
 
         TokenDTO tokenDTO=tokenAdmin();
-        UserCreateDTO defaultUser=defaultUserCreateDTO();
+        UserDTO defaultUser=defaultUserCreateDTO();
         defaultUser.setEmail("");
         defaultUser.setPhoneNumber("");
 
@@ -443,9 +443,9 @@ class UserControllerTests {
 
     }
 
-    private UserCreateDTO defaultUserCreateDTO(){
+    private UserDTO defaultUserCreateDTO(){
 
-        return UserCreateDTO.builder()
+        return UserDTO.builder()
                 .firstName("George")
                 .lastName("Harrison")
                 .email("george.harrison1@email.com")
@@ -455,9 +455,9 @@ class UserControllerTests {
                 .build();
     }
 
-    private UserCreateDTO defaultAdminUserCreateDTO(){
+    private UserDTO defaultAdminUserCreateDTO(){
 
-        return UserCreateDTO.builder()
+        return UserDTO.builder()
                 .firstName("George")
                 .lastName("Harrison")
                 .email("george.harrison2@email.com")
@@ -467,9 +467,9 @@ class UserControllerTests {
                 .build();
     }
 
-    private UserCreateDTO defaultBankUserCreateDTO(){
+    private UserDTO defaultBankUserCreateDTO(){
 
-        return UserCreateDTO.builder()
+        return UserDTO.builder()
                 .firstName("George")
                 .lastName("Harrison")
                 .email("george.harrison3@email.com")

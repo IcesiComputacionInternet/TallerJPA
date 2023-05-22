@@ -1,6 +1,6 @@
 package co.edu.icesi.demo.unit.service;
 
-import co.edu.icesi.demo.dto.AccountCreateDTO;
+import co.edu.icesi.demo.dto.AccountDTO;
 import co.edu.icesi.demo.dto.TransactionDTO;
 import co.edu.icesi.demo.error.exception.IcesiException;
 import co.edu.icesi.demo.mapper.AccountMapper;
@@ -346,8 +346,8 @@ public class AccountServiceTest {
                 .build();
     }
 
-    private AccountCreateDTO newAccountCreateDTO(){
-        return AccountCreateDTO.builder()
+    private AccountDTO newAccountCreateDTO(){
+        return AccountDTO.builder()
                 .type("normal")
                 .active(true)
                 .balance(0)

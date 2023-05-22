@@ -1,6 +1,6 @@
 package co.edu.icesi.demo.unit.service;
 
-import co.edu.icesi.demo.dto.RoleCreateDTO;
+import co.edu.icesi.demo.dto.RoleDTO;
 import co.edu.icesi.demo.error.exception.IcesiException;
 import co.edu.icesi.demo.mapper.RoleMapper;
 import co.edu.icesi.demo.mapper.RoleMapperImpl;
@@ -68,8 +68,8 @@ public class RoleServiceTest {
                 .build();
     }
 
-    private RoleCreateDTO defaultRoleCreateDTO(){
-        return RoleCreateDTO.builder()
+    private RoleDTO defaultRoleCreateDTO(){
+        return RoleDTO.builder()
                 .name("administrator")
                 .description("is an administrator")
                 .build();

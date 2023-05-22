@@ -1,6 +1,6 @@
 package co.edu.icesi.demo.api;
 
-import co.edu.icesi.demo.dto.UserCreateDTO;
+import co.edu.icesi.demo.dto.UserDTO;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
@@ -14,13 +14,13 @@ public interface UserAPI {
     String BASE_USER_URL="/users";
 
     @GetMapping("/{userEmail}")
-    UserCreateDTO getUser(@PathVariable String userEmail);
+    UserDTO getUser(@PathVariable String userEmail);
 
     @GetMapping
-    List<UserCreateDTO> getAllUsers();
+    List<UserDTO> getAllUsers();
 
     @PostMapping
-    UserCreateDTO addUser(@Valid @RequestBody UserCreateDTO userCreateDTO);
+    UserDTO addUser(@Valid @RequestBody UserDTO userDTO);
 
 
 }

@@ -14,7 +14,7 @@ import javax.validation.constraints.NotBlank;
 @Builder
 @AllArgsConstructor
 @NoArgsConstructor
-public class AccountCreateDTO {
+public class AccountDTO {
 
     private String accountNumber;
 
