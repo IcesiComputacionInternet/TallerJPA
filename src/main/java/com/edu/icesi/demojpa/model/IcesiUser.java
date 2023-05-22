@@ -25,7 +25,7 @@ public class IcesiUser {
     private String phoneNumber;
     private String password;
 
-    @OneToMany(mappedBy = "user")
+    @OneToMany(mappedBy = "icesiUser")
     private Set<IcesiAccount> accounts;
 
     @ManyToOne(optional = false, cascade = CascadeType.ALL)

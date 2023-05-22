@@ -1,7 +1,6 @@
 package com.edu.icesi.demojpa.unit.service.Test;
 
 import com.edu.icesi.demojpa.dto.request.RequestUserDTO;
-import com.edu.icesi.demojpa.error.util.IcesiExceptionBuilder;
 import com.edu.icesi.demojpa.mapper.UserMapper;
 import com.edu.icesi.demojpa.mapper.UserMapperImpl;
 import com.edu.icesi.demojpa.model.IcesiRole;

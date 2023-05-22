@@ -14,9 +14,9 @@ public class IcesiExceptionBuilder {
         return new IcesiException(message, error);
     }
 
-    public IcesiException notFoundException(String message, String field1, String field2, String field3){
+    public IcesiException notFoundException(String message, String field1){
         IcesiError error = createIcesiError(HttpStatus.NOT_FOUND, new DetailBuilder(ErrorCode.ERROR_404,
-                ErrorCode.ERROR_404.getMessage().formatted(field1, field2, field3)));
+                ErrorCode.ERROR_404.getMessage().formatted(field1)));
         return new IcesiException(message, error);
     }
 

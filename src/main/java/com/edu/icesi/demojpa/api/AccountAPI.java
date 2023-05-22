@@ -6,6 +6,7 @@ import com.edu.icesi.demojpa.dto.response.ResponseAccountDTO;
 import com.edu.icesi.demojpa.dto.response.ResponseTransactionDTO;
 import org.springframework.web.bind.annotation.*;
 
+import javax.validation.Valid;
 import java.util.List;
 
 public interface AccountAPI {
@@ -14,16 +15,16 @@ public interface AccountAPI {
     ResponseAccountDTO getAccount(@PathVariable String accountNumber);
     @GetMapping("/getAccounts")
     List<ResponseAccountDTO> getAllAccounts();
-    @PostMapping("/createAccount")
-    ResponseAccountDTO createAccount(@RequestBody RequestAccountDTO requestAccountDTO);
+    @PostMapping("/create")
+    ResponseAccountDTO createAccount(@Valid @RequestBody RequestAccountDTO requestAccountDTO);
     @PatchMapping("/enable")
-    ResponseAccountDTO enableAccount(@RequestBody RequestAccountDTO account);
+    ResponseAccountDTO enableAccount(@Valid @RequestBody RequestAccountDTO account);
     @PatchMapping("/disable")
-    ResponseAccountDTO disableAccount(@RequestBody RequestAccountDTO account);
+    ResponseAccountDTO disableAccount(@Valid @RequestBody RequestAccountDTO account);
     @PatchMapping("/withdraw")
-    ResponseTransactionDTO withdraw(@RequestBody RequestTransactionDTO transaction);
+    ResponseTransactionDTO withdraw(@Valid @RequestBody RequestTransactionDTO transaction);
     @PatchMapping("/deposit")
-    ResponseTransactionDTO deposit(@RequestBody RequestTransactionDTO transaction);
+    ResponseTransactionDTO deposit(@Valid @RequestBody RequestTransactionDTO transaction);
     @PatchMapping("/transfer")
-    ResponseTransactionDTO transfer(@RequestBody RequestTransactionDTO transaction);
+    ResponseTransactionDTO transfer(@Valid @RequestBody RequestTransactionDTO transaction);
 }

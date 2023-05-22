@@ -1,5 +1,6 @@
 package com.edu.icesi.demojpa.config;
 
+import com.edu.icesi.demojpa.Security.CustomAuthentication;
 import com.edu.icesi.demojpa.model.SecurityUser;
 import com.edu.icesi.demojpa.service.UserManagementService;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;

@@ -1,5 +1,6 @@
-package com.edu.icesi.demojpa.config;
+package com.edu.icesi.demojpa.Security;
 
+import lombok.AllArgsConstructor;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.GrantedAuthority;
 
@@ -7,7 +8,9 @@ import javax.security.auth.Subject;
 import java.util.Collection;
 
 public class CustomAuthentication implements Authentication {
+
     private final Authentication authentication;
+
     private final String userId;
 
     public CustomAuthentication(Authentication authentication, String userId){
@@ -43,7 +46,6 @@ public class CustomAuthentication implements Authentication {
     @Override
     public void setAuthenticated(boolean isAuthenticated) throws IllegalArgumentException {
         authentication.setAuthenticated(isAuthenticated);
-
     }
 
     @Override
@@ -53,10 +55,10 @@ public class CustomAuthentication implements Authentication {
 
     @Override
     public boolean implies(Subject subject) {
-        return Authentication.super.implies(subject);
+        return authentication.implies(subject);
     }
 
-    public String getUserId(){
+    public String getUserId() {
         return userId;
     }
 }

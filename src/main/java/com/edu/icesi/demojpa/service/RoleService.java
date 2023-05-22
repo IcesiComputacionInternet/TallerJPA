@@ -1,5 +1,6 @@
 package com.edu.icesi.demojpa.service;
 
+import com.edu.icesi.demojpa.Security.IcesiSecurityContext;
 import com.edu.icesi.demojpa.dto.request.RoleDTO;
 import com.edu.icesi.demojpa.error.util.IcesiExceptionBuilder;
 import com.edu.icesi.demojpa.mapper.RoleMapper;
@@ -20,6 +21,7 @@ public class RoleService {
     private final IcesiExceptionBuilder icesiExceptionBuilder = new IcesiExceptionBuilder();
 
     public RoleDTO save(RoleDTO role) {
+        hasPermission(IcesiSecurityContext.getCurrentRole());
         boolean isNameInUse = roleRepository.findRoleByName(role.getName()).isPresent();
 
         if (isNameInUse) {
@@ -32,11 +34,16 @@ public class RoleService {
         return roleMapper.fromIcesiRole(icesiRole);
     }
 
+    private void hasPermission(String currentRole) {
+        if(!currentRole.equalsIgnoreCase("ADMIN")){
+            throw icesiExceptionBuilder.noPermissionException("No permission to do that");
+        }
+    }
+
     public RoleDTO getRole(String roleName){
         return roleMapper.fromIcesiRole(
                 roleRepository.findRoleByName(roleName)
-                        .orElseThrow(() -> icesiExceptionBuilder.notFoundException("The role with the name " + roleName + "doesn't exists",
-                                "Role", "name", roleName)));
+                        .orElseThrow(() -> icesiExceptionBuilder.notFoundException("The role with the name " + roleName + "doesn't exists", roleName)));
     }
 
     public List<RoleDTO> getAllRoles(){

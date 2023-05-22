@@ -11,7 +11,7 @@ import java.lang.annotation.RetentionPolicy;
 import java.lang.annotation.Target;
 
 @Constraint(validatedBy = PhoneAndNumberValidator.class)
-@Target({ElementType.METHOD, ElementType.FIELD})
+@Target({ElementType.TYPE, ElementType.ANNOTATION_TYPE})
 @Retention(RetentionPolicy.RUNTIME)
 public @interface PhoneAndEmailConstraint {
     String message() default "An email and phone number are required";

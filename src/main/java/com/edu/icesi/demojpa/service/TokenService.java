@@ -1,6 +1,6 @@
 package com.edu.icesi.demojpa.service;
 
-import com.edu.icesi.demojpa.config.CustomAuthentication;
+import com.edu.icesi.demojpa.Security.CustomAuthentication;
 import com.edu.icesi.demojpa.dto.request.TokenDTO;
 import lombok.AllArgsConstructor;
 import org.springframework.security.core.Authentication;
@@ -36,7 +36,7 @@ public class TokenService {
                 .expiresAt(now.plus(1, ChronoUnit.HOURS))
                 .subject(authentication.getName())
                 .claim("scope", scope)
-                .claim("icesiUserId", customAuthentication.getUserId())
+                .claim("userId", customAuthentication.getUserId())
                 .build();
         var encoderParameters = JwtEncoderParameters.from(JwsHeader.with(MacAlgorithm.HS256).build(), claims);
         return new TokenDTO(this.encoder.encode(encoderParameters).getTokenValue());

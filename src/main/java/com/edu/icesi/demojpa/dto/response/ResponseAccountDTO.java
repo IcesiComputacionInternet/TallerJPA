@@ -1,6 +1,7 @@
 package com.edu.icesi.demojpa.dto.response;
 
 import com.edu.icesi.demojpa.dto.request.RequestUserDTO;
+import com.edu.icesi.demojpa.model.IcesiUser;
 import lombok.Builder;
 import lombok.Data;
 
@@ -12,5 +13,5 @@ public class ResponseAccountDTO {
     private String type;
     private boolean active;
     private String accountNumber;
-    private RequestUserDTO icesiUser;
+    private IcesiUser icesiUser;
 }

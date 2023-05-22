@@ -1,5 +1,6 @@
 package com.edu.icesi.demojpa.service;
 
+import com.edu.icesi.demojpa.Security.IcesiSecurityContext;
 import com.edu.icesi.demojpa.dto.request.RequestUserDTO;
 import com.edu.icesi.demojpa.dto.response.ResponseUserDTO;
 import com.edu.icesi.demojpa.error.exception.IcesiException;
@@ -26,6 +27,7 @@ public class UserService {
     private final IcesiExceptionBuilder icesiExceptionBuilder = new IcesiExceptionBuilder();
 
     public ResponseUserDTO save(RequestUserDTO user){
+        hasPermission(user.getRoleType());
         boolean emailInUse = userRepository.isEmailInUse(user.getEmail()).isPresent();
         boolean phoneNumberInUse = userRepository.isPhoneNumberInUse(user.getPhoneNumber()).isPresent();
         IcesiRole role = roleRepository.findRoleByName(user.getRoleType()).orElseThrow(() -> new RuntimeException("The role "+ user.getRoleType() +" doesn't exist"));
@@ -51,10 +53,18 @@ public class UserService {
         return userMapper.fromIcesiUser(icesiUser);
     }
 
+    private void hasPermission(String currentRole) {
+        String accountMakerRole = IcesiSecurityContext.getCurrentRole();
+
+        if(accountMakerRole.equalsIgnoreCase("BANK") && currentRole.equalsIgnoreCase("ADMIN")){
+            throw icesiExceptionBuilder.noPermissionException("No permission to do that");
+        }
+    }
+
     public ResponseUserDTO getUser(String userEmail){
         return userMapper.fromIcesiUser(
                 userRepository.isEmailInUse(userEmail)
-                        .orElseThrow(() -> icesiExceptionBuilder.notFoundException("The user with email " + userEmail + "doesn't exists", "User", "email", userEmail)));
+                        .orElseThrow(() -> icesiExceptionBuilder.notFoundException("The user with email " + userEmail + "doesn't exists", userEmail)));
     }
 
     public List<ResponseUserDTO> getAllUsers(){

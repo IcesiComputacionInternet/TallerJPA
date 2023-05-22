@@ -1,6 +1,7 @@
 package com.edu.icesi.demojpa.service;
 
 import com.edu.icesi.demojpa.Enum.AccountType;
+import com.edu.icesi.demojpa.Security.IcesiSecurityContext;
 import com.edu.icesi.demojpa.dto.request.RequestAccountDTO;
 import com.edu.icesi.demojpa.dto.request.RequestTransactionDTO;
 import com.edu.icesi.demojpa.dto.response.ResponseAccountDTO;
@@ -31,19 +32,15 @@ public class AccountService {
     private final AccountType depositOnly = AccountType.DEPOSIT_ONLY;
 
     public ResponseAccountDTO save(RequestAccountDTO account){
-        IcesiUser icesiUser = userRepository.findUserById(account.getIcesiUserId())
-                .orElseThrow(() -> icesiExceptionBuilder.notFoundException("User with id " + account.getIcesiUserId() + " was not found",
-                        "User", "id", account.getIcesiUserId().toString()));
-
-        if(account.getBalance() < 0){
-           throw icesiExceptionBuilder.badRequestException("The balance can't be below 0", "balance");
-        }
-
+        hasPermission(account.getAccountNumber());
         IcesiAccount icesiAccount = accountMapper.fromIcesiAccountDTO(account);
+        IcesiUser icesiUser = userRepository.findUserById(account.getIcesiUserId())
+                .orElseThrow(() -> icesiExceptionBuilder.notFoundException("User with id " + account.getIcesiUserId() + " was not found", account.getIcesiUserId().toString()));
+
         icesiAccount.setAccountId(UUID.randomUUID());
         String accountNumber = accountNumberGenerator();
         icesiAccount.setAccountNumber(accountNumber);
-        icesiAccount.setUser(icesiUser);
+        icesiAccount.setIcesiUser(icesiUser);
         icesiAccount.setActive(true);
         accountRepository.save(icesiAccount);
         return accountMapper.fromAccountDTO(icesiAccount, "The user has been saved");
@@ -68,7 +65,7 @@ public class AccountService {
     }
 
     public ResponseAccountDTO enableAccount(RequestAccountDTO accountDTO){
-        isOwnerAccount(accountDTO.getIcesiUserId(), accountDTO.getAccountNumber());
+        hasPermission(accountDTO.getAccountNumber());
         IcesiAccount account = accountRepository.findAccountByAccountNumber(accountDTO.getAccountNumber(), true)
                 .orElseThrow(() -> icesiExceptionBuilder.badRequestException("Account with number " + accountDTO.getAccountNumber() + " can't be enabled",
                         "account"));
@@ -78,6 +75,7 @@ public class AccountService {
     }
 
     public ResponseAccountDTO disableAccount(RequestAccountDTO accountDTO){
+        hasPermission(accountDTO.getAccountNumber());
         IcesiAccount account = accountRepository.findAccountByAccountNumber(accountDTO.getAccountNumber(), true)
                 .orElseThrow(() -> icesiExceptionBuilder.badRequestException("Account with number " + accountDTO.getAccountNumber() + " can't be disabled",
                         "account"));
@@ -93,6 +91,7 @@ public class AccountService {
     }
 
     public ResponseTransactionDTO withdraw(RequestTransactionDTO transaction){
+        //hasPermission(transaction.getAccountFrom());
         IcesiAccount account = accountRepository.findAccountByAccountNumber(transaction.getAccountFrom(), true)
                 .orElseThrow(() -> icesiExceptionBuilder.badRequestException("The withdrawal wasn't successful", "account"));
 
@@ -114,8 +113,8 @@ public class AccountService {
         return accountMapper.fromTransactionDTO(transaction, "The deposit was successfully carried out");
     }
 
-    @Transactional
     public ResponseTransactionDTO transfer(RequestTransactionDTO transaction){
+        hasPermission(transaction.getAccountFrom());
         IcesiAccount accountToWithdrawal = accountRepository.findAccountByAccountNumber(transaction.getAccountFrom(), true)
                 .orElseThrow(() -> icesiExceptionBuilder.badRequestException("Money couldn't be transferred. The account is disable", "account to withdrawal"));
         IcesiAccount accountToDeposit = accountRepository.findAccountByAccountNumber(transaction.getAccountTo(), true)
@@ -150,8 +149,7 @@ public class AccountService {
     public ResponseAccountDTO getAccount(String accountNumber){
         return accountMapper.fromAccountToDTO(
                 accountRepository.findAccountByAccountNumber(accountNumber, true)
-                        .orElseThrow(() -> icesiExceptionBuilder.notFoundException("The account with number " + accountNumber + " doesn't exists",
-                                "Account", "number", accountNumber)));
+                        .orElseThrow(() -> icesiExceptionBuilder.notFoundException("The account with number " + accountNumber + " doesn't exists", accountNumber)));
     }
 
     public List<ResponseAccountDTO> getAllAccounts(){
@@ -162,8 +160,16 @@ public class AccountService {
                 .collect(Collectors.toList());
     }
 
-    public void isOwnerAccount(UUID userId, String accountNumber){
-        if(!accountRepository.isOwnerAccount(userId, accountNumber)){
+    public void hasPermission(String accountNumber){
+        UUID userId = IcesiSecurityContext.getCurrentUserId();
+        String role = IcesiSecurityContext.getCurrentRole();
+        IcesiUser icesiUser = userRepository.findUserById(userId)
+                .orElseThrow(() -> icesiExceptionBuilder.notFoundException("User with id " + userId + " was not found", userId.toString()));
+        boolean isOwnerAccount = accountRepository.isOwnerAccount(icesiUser.getUserId(), accountNumber);
+        System.out.println(isOwnerAccount);
+        if((role.equalsIgnoreCase("USER") && isOwnerAccount)
+                || role.equalsIgnoreCase("BANK")){
+            System.out.println("entraaaaaaaaaaaaaaaaaaa");
             throw icesiExceptionBuilder.noPermissionException("No permission to do that");
         }
     }

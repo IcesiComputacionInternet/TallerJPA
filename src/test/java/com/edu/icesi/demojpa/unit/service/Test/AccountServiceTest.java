@@ -240,7 +240,7 @@ public class AccountServiceTest {
                 .active(true)
                 .balance(100L)
                 .type(AccountType.NORMAL.getType())
-                .user(defaultIcesiUser())
+                .icesiUser(defaultIcesiUser())
                 .build();
 
         when(accountRepository.findAccountByAccountNumber("000-000000-00", true)).thenReturn(Optional.of(accountFrom));
@@ -265,7 +265,7 @@ public class AccountServiceTest {
                 .active(true)
                 .balance(100L)
                 .type(AccountType.NORMAL.getType())
-                .user(defaultIcesiUser())
+                .icesiUser(defaultIcesiUser())
                 .build();
 
         when(accountRepository.findAccountByAccountNumber("000-000000-00", true)).thenReturn(Optional.of(accountFrom));
@@ -288,7 +288,7 @@ public class AccountServiceTest {
                 .active(true)
                 .balance(100L)
                 .type(AccountType.DEPOSIT_ONLY.getType())
-                .user(defaultIcesiUser())
+                .icesiUser(defaultIcesiUser())
                 .build();
 
         when(accountRepository.findAccountByAccountNumber("000-000000-00", true)).thenReturn(Optional.of(accountFrom));
@@ -312,7 +312,7 @@ public class AccountServiceTest {
                 .active(true)
                 .balance(100L)
                 .type(AccountType.NORMAL.getType())
-                .user(defaultIcesiUser())
+                .icesiUser(defaultIcesiUser())
                 .build();
 
         when(accountRepository.findAccountByAccountNumber("000-000000-00", true)).thenReturn(Optional.of(accountFrom));
@@ -352,7 +352,7 @@ public class AccountServiceTest {
                 .accountNumber("000-000000-00")
                 .balance(100L)
                 .type(depositOnly.getType())
-                .user(defaultIcesiUser())
+                .icesiUser(defaultIcesiUser())
                 .active(true)
                 .build();
     }

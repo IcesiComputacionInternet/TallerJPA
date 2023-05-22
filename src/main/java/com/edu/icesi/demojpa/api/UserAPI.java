@@ -4,6 +4,7 @@ import com.edu.icesi.demojpa.dto.request.RequestUserDTO;
 import com.edu.icesi.demojpa.dto.response.ResponseUserDTO;
 import org.springframework.web.bind.annotation.*;
 
+import javax.validation.Valid;
 import java.util.List;
 
 public interface UserAPI {
@@ -12,6 +13,6 @@ public interface UserAPI {
     ResponseUserDTO getUser(@PathVariable String userEmail);
     @GetMapping
     List<ResponseUserDTO> getAllUsers();
-    @PostMapping("/createUser")
-    ResponseUserDTO createUser(@RequestBody RequestUserDTO requestUserDTO);
+    @PostMapping("/create")
+    ResponseUserDTO createUser(@Valid @RequestBody RequestUserDTO requestUserDTO);
 }
