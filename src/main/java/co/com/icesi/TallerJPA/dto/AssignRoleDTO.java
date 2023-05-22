@@ -1,14 +1,15 @@
 package co.com.icesi.TallerJPA.dto;
 
+import lombok.Getter;
+
 import javax.validation.constraints.NotBlank;
-import javax.validation.constraints.NotNull;
 
-public record LoginDTO(
 
-        @NotNull
+public record AssignRoleDTO(
+
         @NotBlank
         String username,
-        @NotNull
         @NotBlank
-        String password) {
+        String roleName
+) {
 }

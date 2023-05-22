@@ -1,6 +1,8 @@
 package co.com.icesi.TallerJPA.api;
 
+import co.com.icesi.TallerJPA.dto.AssignRoleDTO;
 import co.com.icesi.TallerJPA.dto.RoleCreateDTO;
+import co.com.icesi.TallerJPA.dto.response.UserResponseDTO;
 import co.com.icesi.TallerJPA.model.IcesiRole;
 import org.springframework.web.bind.annotation.*;
 
@@ -16,6 +18,10 @@ public interface IcesiRoleAPI {
 
     @PostMapping
     RoleCreateDTO createIcesiRole(@Valid @RequestBody RoleCreateDTO role);
+
+    @PatchMapping("/assignRole")
+    UserResponseDTO assignRole(@Valid @RequestBody AssignRoleDTO assignRoleDTO);
+
 
     @GetMapping("/{roleName}")
     RoleCreateDTO getRoleByName(@PathVariable String roleName);

@@ -11,7 +11,9 @@ import co.com.icesi.TallerJPA.mapper.responseMapper.UserResponseMapper;
 import co.com.icesi.TallerJPA.model.IcesiUser;
 import co.com.icesi.TallerJPA.repository.RoleRepository;
 import co.com.icesi.TallerJPA.repository.UserRepository;
+import co.com.icesi.TallerJPA.security.IcesiSecurityContext;
 import lombok.AllArgsConstructor;
+import org.springframework.boot.origin.SystemEnvironmentOrigin;
 import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
 
@@ -29,36 +31,12 @@ public class UserService {
 
 
     public UserResponseDTO save(UserCreateDTO user) {
-        boolean email = userRepository.findByEmail(user.getEmail());
-        boolean phoneNumber = userRepository.findByPhoneNumber(user.getPhoneNumber());
+        roleValidations(user);
+        validateEmailAndPhone(user.getEmail(), user.getPhoneNumber());
 
-        if(email && phoneNumber){
-
-            throw ArgumentsExceptionBuilder.createArgumentsException(
-                    "Existing data",
-                    HttpStatus.BAD_REQUEST,
-                    new DetailBuilder(ErrorCode.ERR_403,"Email","Phone number")
-            );
-            //throw new ArgumentsException("Email and phone number already exist",e);
-        }else if (email) {
-            throw ArgumentsExceptionBuilder.createArgumentsException(
-                    "Existing data",
-                    HttpStatus.BAD_REQUEST,
-                    new DetailBuilder(ErrorCode.ERR_406,"Email")
-            );
-            //throw new ArgumentsException("Email already exist");
-        }else if (phoneNumber) {
-            throw ArgumentsExceptionBuilder.createArgumentsException(
-                    "Existing data",
-                    HttpStatus.BAD_REQUEST,
-                    new DetailBuilder(ErrorCode.ERR_406,"Phone number")
-            );
-            //throw new ArgumentsException("Phone number already exist");
-        }
 
         boolean existRole = roleRepository.findByName(user.getRole());
         if (!existRole) {
-
             throw ArgumentsExceptionBuilder.createArgumentsException(
                     "Not existing data",
                     HttpStatus.BAD_REQUEST,
@@ -85,6 +63,65 @@ public class UserService {
 
         return userResponseDTO;
     }
+
+    private void validateEmailAndPhone(String userEmail, String userPhone){
+        boolean email = userRepository.findByEmail(userEmail);
+        boolean phoneNumber = userRepository.findByPhoneNumber(userPhone);
+
+        if(email && phoneNumber){
+            throw ArgumentsExceptionBuilder.createArgumentsException(
+                    "Existing data",
+                    HttpStatus.BAD_REQUEST,
+                    new DetailBuilder(ErrorCode.ERR_403,"Email","Phone number")
+            );
+            //throw new ArgumentsException("Email and phone number already exist",e);
+        }else if (email) {
+            throw ArgumentsExceptionBuilder.createArgumentsException(
+                    "Existing data",
+                    HttpStatus.BAD_REQUEST,
+                    new DetailBuilder(ErrorCode.ERR_406,"Email")
+            );
+            //throw new ArgumentsException("Email already exist");
+        }else if (phoneNumber) {
+            throw ArgumentsExceptionBuilder.createArgumentsException(
+                    "Existing data",
+                    HttpStatus.BAD_REQUEST,
+                    new DetailBuilder(ErrorCode.ERR_406,"Phone number")
+            );
+            //throw new ArgumentsException("Phone number already exist");
+        }
+    }
+
+
+    private void roleValidations(UserCreateDTO user){
+        var role = IcesiSecurityContext.getCurrentUserRole();
+        System.out.println("Role login: "+ role);
+        validateUserRole(role);
+        validateBankRole(role,user);
+    }
+
+    private void validateUserRole(String role){
+        if(role.equals("USER")){
+            throw ArgumentsExceptionBuilder.createArgumentsException(
+                    "Unauthorized",
+                    HttpStatus.UNAUTHORIZED,
+                    new DetailBuilder(ErrorCode.ERR_401)
+            );
+        }
+    }
+
+    private void validateBankRole(String role,UserCreateDTO user){
+        if(role.equals("BANK")){
+            if(user.getRole().equals("ADMIN")){
+                throw ArgumentsExceptionBuilder.createArgumentsException(
+                        "Unauthorized",
+                        HttpStatus.UNAUTHORIZED,
+                        new DetailBuilder(ErrorCode.ERR_401)
+                );
+            }
+        }
+    }
+
 
     public UserResponseDTO getUserByEmail(String userEmail) {
         return userResponseMapper.fromICesiUSer(userRepository.findUserByEmail(userEmail).orElseThrow(

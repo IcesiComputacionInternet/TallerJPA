@@ -29,7 +29,7 @@ public class IcesiUserControllerTest {
     ObjectMapper objectMapper;
 
     @Test
-    public void testTokenEndpoint() throws Exception{
+    public void testUsersEndpoint() throws Exception{
         var result = mocMvc.perform(MockMvcRequestBuilders.post("/users").content(
                                 objectMapper.writeValueAsString(defaultUserCreateDTO())
                         )

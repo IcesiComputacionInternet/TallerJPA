@@ -9,6 +9,7 @@ import co.com.icesi.TallerJPA.error.util.DetailBuilder;
 import org.springframework.context.support.DefaultMessageSourceResolvable;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.authentication.BadCredentialsException;
 import org.springframework.validation.ObjectError;
 import org.springframework.web.bind.MethodArgumentNotValidException;
 import org.springframework.web.bind.annotation.ControllerAdvice;
@@ -51,6 +52,13 @@ public class GlobalExceptionHandler {
         var error = ArgumentsExceptionBuilder.createArgumentsError(HttpStatus.INTERNAL_SERVER_ERROR,new DetailBuilder(ErrorCode.ERR_500_ACC,runtimeException.getMessage()));
         return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(error);
     }
+
+    @ExceptionHandler(BadCredentialsException.class)
+    public ResponseEntity<ArgumentsError> handleBadCredentialsException(BadCredentialsException badCredentialsException){
+        var error = ArgumentsExceptionBuilder.createArgumentsError(HttpStatus.UNAUTHORIZED,new DetailBuilder(ErrorCode.ERR_500_ACC,badCredentialsException.getMessage()));
+        return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(error);
+    }
+
 
 
 

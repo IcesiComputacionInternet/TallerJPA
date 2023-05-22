@@ -4,13 +4,18 @@ import co.com.icesi.TallerJPA.Enum.AccountType;
 import co.com.icesi.TallerJPA.dto.AccountCreateDTO;
 import co.com.icesi.TallerJPA.dto.TransactionOperationDTO;
 import co.com.icesi.TallerJPA.dto.response.AccountResponseDTO;
+import co.com.icesi.TallerJPA.error.enums.ErrorCode;
+import co.com.icesi.TallerJPA.error.util.ArgumentsExceptionBuilder;
+import co.com.icesi.TallerJPA.error.util.DetailBuilder;
 import co.com.icesi.TallerJPA.mapper.AccountMapper;
 import co.com.icesi.TallerJPA.mapper.responseMapper.AccountResponseMapper;
 import co.com.icesi.TallerJPA.model.IcesiAccount;
 import co.com.icesi.TallerJPA.model.IcesiUser;
 import co.com.icesi.TallerJPA.repository.AccountRepository;
 import co.com.icesi.TallerJPA.repository.UserRepository;
+import co.com.icesi.TallerJPA.security.IcesiSecurityContext;
 import lombok.AllArgsConstructor;
+import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -46,6 +51,30 @@ public class AccountService {
         return accountResponseMapper.fromIcesiAccount(accountRepository.save(icesiAccount));
 
     }
+    private void validateRoleName(){
+        var role = IcesiSecurityContext.getCurrentUserRole();
+        if (role.equals("BANK")){
+            throw ArgumentsExceptionBuilder.createArgumentsException(
+                    "Unauthorized",
+                    HttpStatus.UNAUTHORIZED,
+                    new DetailBuilder(ErrorCode.ERR_401)
+            );
+        }
+
+    }
+
+    private void validateIfUserIsOwner(String accountNumber){
+        var email = IcesiSecurityContext.getCurrentUserId();
+        System.out.println("Hello "+email);
+        var owner = accountRepository.findIfUserIsOwner(accountNumber,userRepository.findUserByEmail(email).orElse(null));
+        if (!owner){
+            throw ArgumentsExceptionBuilder.createArgumentsException(
+                    "Unauthorized, you are not the owner of the account",
+                    HttpStatus.UNAUTHORIZED,
+                    new DetailBuilder(ErrorCode.ERR_401)
+            );
+        }
+    }
 
     public IcesiAccount getAccountByAccountNumber(String accountNumber){
         return accountRepository.findAccount(accountNumber)
@@ -71,6 +100,8 @@ public class AccountService {
     }
     @Transactional
     public String enableAccount(String accountNumber){
+        validateRoleName();
+        validateIfUserIsOwner(accountNumber);
         IcesiAccount account = getAccountByAccountNumber(accountNumber);
         account.setActive(true);
         accountRepository.updateState(accountNumber,true);
@@ -79,6 +110,8 @@ public class AccountService {
 
     @Transactional
     public String disableAccount(String accountNumber){
+        validateRoleName();
+        validateIfUserIsOwner(accountNumber);
         IcesiAccount account = getAccountByAccountNumber(accountNumber);
         account.setActive(false);
         accountRepository.updateState(accountNumber,false);
@@ -88,6 +121,8 @@ public class AccountService {
 
     @Transactional
     public TransactionOperationDTO withdraw(TransactionOperationDTO transaction){
+        validateRoleName();
+        validateIfUserIsOwner(transaction.getAccountFrom());
         IcesiAccount account = getAccountByAccountNumber(transaction.getAccountFrom());
         validateAccountBalance(account,transaction.getAmount());
         validateAccountState(account);
@@ -100,6 +135,8 @@ public class AccountService {
 
     @Transactional
     public TransactionOperationDTO deposit(TransactionOperationDTO transaction){
+        validateRoleName();
+        validateIfUserIsOwner(transaction.getAccountTo());
         IcesiAccount account = getAccountByAccountNumber(transaction.getAccountTo());
         validateAccountState(account);
         validaAccountType(account);
@@ -111,6 +148,8 @@ public class AccountService {
 
     @Transactional
     public TransactionOperationDTO transfer(TransactionOperationDTO transaction){
+        validateRoleName();
+        validateIfUserIsOwner(transaction.getAccountFrom());
         IcesiAccount accountOrigin = getAccountByAccountNumber(transaction.getAccountFrom());
         IcesiAccount accountDestination = getAccountByAccountNumber(transaction.getAccountTo());
         validaAccountType(accountOrigin);
@@ -131,10 +170,12 @@ public class AccountService {
     }
 
     public AccountResponseDTO getAccountByNumber(String accountNumber){
+        validateRoleName();
         return accountResponseMapper.fromIcesiAccount(getAccountByAccountNumber(accountNumber));
     }
 
     public List<AccountResponseDTO> getAllAccounts(){
+        validateRoleName();
         List<IcesiAccount> accounts = accountRepository.findAll();
         return accounts.stream().map(accountResponseMapper::fromIcesiAccount).collect(Collectors.toList());
     }

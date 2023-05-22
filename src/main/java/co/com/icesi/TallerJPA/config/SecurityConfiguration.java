@@ -81,16 +81,22 @@ public class SecurityConfiguration {
         managerBuilder.add(new MvcRequestMatcher(introspector,"/accounts/**"),
                 AuthorityAuthorizationManager.hasAnyAuthority("SCOPE_USER"));
 
+        //Paths that require bank role
+
+        managerBuilder.add(new MvcRequestMatcher(introspector,"/users"),
+                AuthorityAuthorizationManager.hasAnyAuthority("SCOPE_BANK","SCOPE_ADMIN"));
+
+        managerBuilder.add(new MvcRequestMatcher(introspector,"/accounts"),
+                AuthorityAuthorizationManager.hasAnyAuthority("SCOPE_BANK"));
+
         //Paths that require admin role
 
         //admin user should be able to create roles
         managerBuilder.add(new MvcRequestMatcher(introspector,"/roles"),
                 AuthorityAuthorizationManager.hasAnyAuthority("SCOPE_ADMIN"));
 
-        //This is a path that requires bank role
-        //admin user should be able to create users and assign roles
-        managerBuilder.add(new MvcRequestMatcher(introspector,"/users"),
-                AuthorityAuthorizationManager.hasAnyAuthority("SCOPE_ADMIN","SCOPE_BANK"));
+        managerBuilder.add(new MvcRequestMatcher(introspector,"/**"),
+                AuthorityAuthorizationManager.hasAnyAuthority("SCOPE_ADMIN"));
 
 
 

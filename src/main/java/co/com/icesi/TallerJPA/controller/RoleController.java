@@ -1,7 +1,9 @@
 package co.com.icesi.TallerJPA.controller;
 
 import co.com.icesi.TallerJPA.api.IcesiRoleAPI;
+import co.com.icesi.TallerJPA.dto.AssignRoleDTO;
 import co.com.icesi.TallerJPA.dto.RoleCreateDTO;
+import co.com.icesi.TallerJPA.dto.response.UserResponseDTO;
 import co.com.icesi.TallerJPA.model.IcesiRole;
 import co.com.icesi.TallerJPA.service.RoleService;
 import lombok.AllArgsConstructor;
@@ -19,6 +21,11 @@ public class RoleController implements IcesiRoleAPI {
     @Override
     public RoleCreateDTO createIcesiRole(RoleCreateDTO role) {
         return roleService.save(role);
+    }
+
+    @Override
+    public UserResponseDTO assignRole(AssignRoleDTO assignRoleDTO) {
+        return roleService.assignRole(assignRoleDTO);
     }
 
     @Override

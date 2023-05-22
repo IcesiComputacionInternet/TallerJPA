@@ -64,7 +64,7 @@ public class TallerJpaApplication {
 				.userId(UUID.randomUUID())
 				.firstName("John")
 				.lastName("Doe")
-				.email("johndoe2@email.com")
+				.email("johndoe3@email.com")
 				.phoneNumber("+57123123123")
 				.password(encoder.encode("password"))
 				.role(bank)
