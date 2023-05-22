@@ -6,10 +6,7 @@ import lombok.Data;
 import lombok.NoArgsConstructor;
 import org.springframework.data.annotation.Id;
 
-import javax.persistence.CascadeType;
-import javax.persistence.Entity;
-import javax.persistence.JoinColumn;
-import javax.persistence.ManyToOne;
+import javax.persistence.*;
 import javax.transaction.Transaction;
 import java.util.ArrayList;
 import java.util.List;
@@ -26,6 +23,8 @@ public class IcesiAccount {
     @javax.persistence.Id
     private Long id;
     private String accountNumber;
+
+    @Column(name = "balance", nullable=false,columnDefinition = "check Balance>=0")
     private long balance;
     private String type;
     private boolean active;
@@ -38,6 +37,14 @@ public class IcesiAccount {
         this.user = user;
     }
 
+
+    public boolean getActive() {
+        return active;
+    }
+
+    public void setActive(boolean active) {
+        this.active = active;
+    }
 
     private List<Transaction> transactions = new ArrayList<>();
     public void addTransaction(Transaction transaction) {

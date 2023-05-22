@@ -30,14 +30,12 @@ public class IcesiUserService {
     public IcesiUser saveNewUser(IcesiUserDTO icesiUserDTO) throws DuplicateDataException, MissingParameterException {
         IcesiUser icesiUser = icesiUserMapper.toIcesiUser(icesiUserDTO);
 
-        // Validar que los campos obligatorios estén presentes en el DTO
         if (icesiUserDTO.getEmail() == null || icesiUserDTO.getEmail().isEmpty()
                 || icesiUserDTO.getPhoneNumber() == null || icesiUserDTO.getPhoneNumber().isEmpty()
                 || icesiUserDTO.getRoleName() == null || icesiUserDTO.getRoleName().isEmpty()) {
             throw new MissingParameterException("Email, phone number, and role name are required");
         }
 
-        // Validar que el correo electrónico y el número de teléfono no estén duplicados en la base de datos
         if (icesiUserRepository.findByEmail(icesiUserDTO.getEmail()).isPresent()) {
             throw new DuplicateDataException("Email already exists");
         }
@@ -50,7 +48,7 @@ public class IcesiUserService {
             throw new MissingParameterException("Role not found");
         }
 
-        icesiUser.setRole(icesiRole);
+        icesiUser.setIcesirole(icesiRole);
         icesiUser.setUserId(UUID.randomUUID());
         icesiUserRepository.save(icesiUser);
         return icesiUser;

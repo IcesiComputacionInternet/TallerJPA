@@ -15,32 +15,31 @@ import javax.security.auth.login.AccountNotFoundException;
 @AllArgsConstructor
 public class IcesiAccountController {
 
-    private final IcesiAccountService icesiAccountService;
+    private final IcesiAccountService accountService;
 
     @PostMapping("/account/create")
-    public IcesiAccount createAccount(@RequestBody IcesiAccountDTO icesiAccountDTO) throws UserNotFoundException, DuplicateDataException, NegativeBalanceException, MissingParameterException {
-        return icesiAccountService.createAccount(icesiAccountDTO);
+    public IcesiAccount createAccount(@RequestBody IcesiAccountDTO accountDTO) throws UserNotFoundException, DuplicateDataException, NegativeBalanceException, MissingParameterException {
+        return accountService.createAccount(accountDTO);
     }
 
     @PostMapping("/account/activate")
     public String activateAccount(@RequestBody String accountNumber) throws AccountBalanceNotZeroException, AccountNotFoundException {
-        return icesiAccountService.disableAccount(accountNumber);
+        return accountService.disableAccount(accountNumber);
     }
 
     @PostMapping("/account/deactivate")
-    public String enableAccount(@RequestBody String accountNumber) {
-        return icesiAccountService.enableAccount(accountNumber);
+    public String deactivateAccount(@RequestBody String accountNumber) {
+        return accountService.enableAccount(accountNumber);
     }
 
     @PostMapping("/account/withdrawal")
-    public String withdrawMoney(@RequestBody String accountNumber, Long amount) {
-        return icesiAccountService.withdrawMoney(accountNumber, amount);
+    public String withdrawMoney(@RequestBody String accountNumber, @RequestBody Long amount) {
+        return accountService.withdrawMoney(accountNumber, amount);
     }
 
     @PostMapping("/account/deposit")
-    public String deposit(@RequestBody String accountNumber, Long amount) {
-        return icesiAccountService.depositMoney(accountNumber, amount);
+    public String depositMoney(@RequestBody String accountNumber, @RequestBody Long amount) {
+        return accountService.depositMoney(accountNumber, amount);
     }
-
-
 }
+

@@ -1,5 +1,4 @@
 package co.edu.icesi.tallerjpa.service;
-
 import co.edu.icesi.tallerjpa.dto.IcesiAccountDTO;
 import co.edu.icesi.tallerjpa.exception.*;
 import co.edu.icesi.tallerjpa.mapper.IcesiAccountMapper;
@@ -10,7 +9,6 @@ import co.edu.icesi.tallerjpa.repository.IcesiAccountRepository;
 import co.edu.icesi.tallerjpa.repository.IcesiUserRepository;
 import lombok.AllArgsConstructor;
 import org.springframework.stereotype.Service;
-
 import javax.security.auth.login.AccountNotFoundException;
 import javax.transaction.Transaction;
 import java.util.Optional;
@@ -77,7 +75,7 @@ public class IcesiAccountService {
         Optional<IcesiAccount> icesiAccount = icesiAccountRepository.findByAccountNumber(accountNumber);
         if (icesiAccount.isPresent()) {
             IcesiAccount account = icesiAccount.get();
-            if (account.isActive()) {
+            if (account.getActive()) {
                 throw new RuntimeException("The account is already active.");
             }
             account.setActive(true);
@@ -98,7 +96,7 @@ public class IcesiAccountService {
             throw new IllegalArgumentException("There is no account with that number");
         }
         IcesiAccount icesiAccount = icesiAccountOptional.get();
-        if (!icesiAccount.isActive()) {
+        if (!icesiAccount.getActive()) {
             throw new IllegalStateException("The account is not active");
         }
         long balance = icesiAccount.getBalance();
@@ -118,7 +116,7 @@ public class IcesiAccountService {
         Optional<IcesiAccount> icesiAccountOptional = icesiAccountRepository.findByAccountNumber(accountNumber);
         if (icesiAccountOptional.isPresent()){
             IcesiAccount icesiAccount = icesiAccountOptional.get();
-            if (icesiAccount.isActive()) {
+            if (icesiAccount.getActive()) {
                 if (amount > MAX_DEPOSIT_AMOUNT) {
                     throw new RuntimeException("The amount to deposit exceeds the allowed limit");
                 }
