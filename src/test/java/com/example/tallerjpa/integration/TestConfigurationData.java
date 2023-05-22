@@ -1,4 +1,4 @@
-package com.example.tallerjpa;
+package com.example.tallerjpa.integration;
 
 import com.example.tallerjpa.model.IcesiRole;
 import com.example.tallerjpa.model.IcesiUser;

@@ -49,15 +49,15 @@ public class RoleServiceTest {
 
     private IcesiRole defaultRole(){
         return IcesiRole.builder()
-                .name("Student")
-                .description("Students of the Icesi University")
+                .name("ADMIN")
+                .description("Role for admin's")
                 .build();
     }
 
     private RoleDTO defaultRoleDTO(){
         return RoleDTO.builder()
-                .name("Student")
-                .description("Students of the Icesi University")
+                .name("ADMIN")
+                .description("Role for admin's")
                 .build();
     }
 

@@ -1,5 +1,6 @@
 package com.example.tallerjpa.unit.service.service;
 
+import com.example.tallerjpa.dto.RoleDTO;
 import com.example.tallerjpa.dto.UserDTO;
 import com.example.tallerjpa.mapper.UserMapper;
 import com.example.tallerjpa.mapper.UserMapperImpl;
@@ -13,6 +14,7 @@ import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.springframework.security.crypto.password.PasswordEncoder;
 
+import javax.management.relation.Role;
 import java.util.Optional;
 import java.util.UUID;
 
@@ -114,7 +116,7 @@ public class UserServiceTest {
                 .email("juanosorio@hotmail.com")
                 .phoneNumber("12345678")
                 .password(passwordEncoder.encode("password"))
-                .role("Student")
+                .role(defaultRoleDTO())
                 .build();
     }
 
@@ -123,6 +125,13 @@ public class UserServiceTest {
                 .roleId(UUID.randomUUID())
                 .name("Student")
                 .description("Student of the Icesi University")
+                .build();
+    }
+
+    private RoleDTO defaultRoleDTO(){
+        return RoleDTO.builder()
+                .name("Student")
+                .description("Role for student's")
                 .build();
     }
 }

@@ -1,9 +1,6 @@
 package com.example.tallerjpa.unit.service.service;
 
-import com.example.tallerjpa.dto.AccountDTO;
-import com.example.tallerjpa.dto.TransactionRequestDTO;
-import com.example.tallerjpa.dto.TransactionResponseDTO;
-import com.example.tallerjpa.dto.UserDTO;
+import com.example.tallerjpa.dto.*;
 import com.example.tallerjpa.mapper.AccountMapper;
 import com.example.tallerjpa.mapper.AccountMapperImpl;
 import com.example.tallerjpa.enums.AccountType;
@@ -18,6 +15,7 @@ import com.example.tallerjpa.unit.service.matcher.AccountMatcher;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 
+import javax.management.relation.Role;
 import java.util.ArrayList;
 import java.util.Optional;
 import java.util.UUID;
@@ -431,15 +429,22 @@ public class AccountServiceTest {
                 .email("juanosorio@hotmail.com")
                 .phoneNumber("12345678")
                 .password("password")
-                .role("Student")
+                .role(defaultRoleDTO())
                 .build();
     }
 
     private IcesiRole defaultRole(){
         return IcesiRole.builder()
                 .roleId(UUID.randomUUID())
-                .name("Student")
-                .description("Student of the Icesi University")
+                .name("Admin")
+                .description("Role for admin's")
+                .build();
+    }
+
+    private RoleDTO defaultRoleDTO(){
+        return RoleDTO.builder()
+                .name("Admin")
+                .description("Role for admin's")
                 .build();
     }
 

@@ -21,7 +21,9 @@ public class AuthController {
     @PostMapping("/login")
     public String token(@RequestBody LoginDTO loginDTO){
         Authentication authentication = authenticationManager
-                .authenticate(new UsernamePasswordAuthenticationToken(loginDTO.username(), loginDTO.password()));
+                .authenticate(new UsernamePasswordAuthenticationToken(loginDTO.getUsername(), loginDTO.getPassword()));
         return tokenService.generateToken(authentication);
     }
+
+
 }
