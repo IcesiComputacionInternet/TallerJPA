@@ -1,8 +1,8 @@
 package co.com.icesi.TallerJPA.controller;
 
 import co.com.icesi.TallerJPA.api.IcesiAccountAPI;
-import co.com.icesi.TallerJPA.dto.IcesiAccountCreateDTO;
-import co.com.icesi.TallerJPA.dto.IcesiTransactionDTO;
+import co.com.icesi.TallerJPA.dto.requestDTO.IcesiAccountCreateDTO;
+import co.com.icesi.TallerJPA.dto.requestDTO.IcesiTransactionDTO;
 import co.com.icesi.TallerJPA.dto.responseDTO.IcesiAccountCreateResponseDTO;
 import co.com.icesi.TallerJPA.service.IcesiAccountService;
 import lombok.AllArgsConstructor;

@@ -1,6 +1,6 @@
 package co.com.icesi.TallerJPA.mapper;
 
-import co.com.icesi.TallerJPA.dto.IcesiRoleCreateDTO;
+import co.com.icesi.TallerJPA.dto.requestDTO.IcesiRoleCreateDTO;
 import co.com.icesi.TallerJPA.model.IcesiRole;
 import org.mapstruct.Mapper;
 

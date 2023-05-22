@@ -1,9 +1,9 @@
 package co.com.icesi.TallerJPA.unit.service.service;
 
-import co.com.icesi.TallerJPA.dto.IcesiAccountCreateDTO;
-import co.com.icesi.TallerJPA.dto.IcesiRoleCreateDTO;
-import co.com.icesi.TallerJPA.dto.IcesiTransactionDTO;
-import co.com.icesi.TallerJPA.dto.IcesiUserCreateDTO;
+import co.com.icesi.TallerJPA.dto.requestDTO.IcesiAccountCreateDTO;
+import co.com.icesi.TallerJPA.dto.requestDTO.IcesiRoleCreateDTO;
+import co.com.icesi.TallerJPA.dto.requestDTO.IcesiTransactionDTO;
+import co.com.icesi.TallerJPA.dto.requestDTO.IcesiUserCreateDTO;
 import co.com.icesi.TallerJPA.enums.AccountType;
 import co.com.icesi.TallerJPA.mapper.IcesiAccountMapper;
 import co.com.icesi.TallerJPA.mapper.IcesiAccountMapperImpl;

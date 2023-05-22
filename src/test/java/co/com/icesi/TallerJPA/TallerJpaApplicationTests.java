@@ -1,8 +1,8 @@
 package co.com.icesi.TallerJPA;
 
-import co.com.icesi.TallerJPA.dto.IcesiRoleCreateDTO;
-import co.com.icesi.TallerJPA.dto.IcesiUserCreateDTO;
-import co.com.icesi.TallerJPA.dto.LoginDTO;
+import co.com.icesi.TallerJPA.dto.requestDTO.IcesiRoleCreateDTO;
+import co.com.icesi.TallerJPA.dto.requestDTO.IcesiUserCreateDTO;
+import co.com.icesi.TallerJPA.dto.requestDTO.LoginDTO;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;

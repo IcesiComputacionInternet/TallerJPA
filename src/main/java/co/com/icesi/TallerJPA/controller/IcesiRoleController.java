@@ -1,7 +1,7 @@
 package co.com.icesi.TallerJPA.controller;
 
 import co.com.icesi.TallerJPA.api.IcesiRoleAPI;
-import co.com.icesi.TallerJPA.dto.IcesiRoleCreateDTO;
+import co.com.icesi.TallerJPA.dto.requestDTO.IcesiRoleCreateDTO;
 import co.com.icesi.TallerJPA.service.IcesiRoleService;
 import lombok.AllArgsConstructor;
 import org.springframework.web.bind.annotation.RequestMapping;

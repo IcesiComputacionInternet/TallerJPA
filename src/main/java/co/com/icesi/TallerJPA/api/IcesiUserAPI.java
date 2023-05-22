@@ -1,6 +1,6 @@
 package co.com.icesi.TallerJPA.api;
 
-import co.com.icesi.TallerJPA.dto.IcesiUserCreateDTO;
+import co.com.icesi.TallerJPA.dto.requestDTO.IcesiUserCreateDTO;
 import co.com.icesi.TallerJPA.dto.responseDTO.IcesiUserCreateResponseDTO;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;

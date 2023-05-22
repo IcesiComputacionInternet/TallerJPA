@@ -1,6 +1,6 @@
 package co.com.icesi.TallerJPA.controller;
 
-import co.com.icesi.TallerJPA.dto.LoginDTO;
+import co.com.icesi.TallerJPA.dto.requestDTO.LoginDTO;
 import co.com.icesi.TallerJPA.service.TokenService;
 import lombok.AllArgsConstructor;
 import org.springframework.security.authentication.AuthenticationManager;

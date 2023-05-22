@@ -1,6 +1,6 @@
 package co.com.icesi.TallerJPA.service;
 
-import co.com.icesi.TallerJPA.dto.IcesiUserCreateDTO;
+import co.com.icesi.TallerJPA.dto.requestDTO.IcesiUserCreateDTO;
 import co.com.icesi.TallerJPA.dto.responseDTO.IcesiUserCreateResponseDTO;
 import co.com.icesi.TallerJPA.mapper.IcesiUserMapper;
 import co.com.icesi.TallerJPA.model.IcesiRole;
@@ -8,10 +8,8 @@ import co.com.icesi.TallerJPA.model.IcesiUser;
 import co.com.icesi.TallerJPA.repository.IcesiRoleRepository;
 import co.com.icesi.TallerJPA.repository.IcesiUserRepository;
 import lombok.AllArgsConstructor;
-import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
-import java.beans.Encoder;
 import java.util.UUID;
 
 @Service

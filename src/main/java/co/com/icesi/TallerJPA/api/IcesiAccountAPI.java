@@ -1,7 +1,7 @@
 package co.com.icesi.TallerJPA.api;
 
-import co.com.icesi.TallerJPA.dto.IcesiAccountCreateDTO;
-import co.com.icesi.TallerJPA.dto.IcesiTransactionDTO;
+import co.com.icesi.TallerJPA.dto.requestDTO.IcesiAccountCreateDTO;
+import co.com.icesi.TallerJPA.dto.requestDTO.IcesiTransactionDTO;
 import co.com.icesi.TallerJPA.dto.responseDTO.IcesiAccountCreateResponseDTO;
 import org.springframework.web.bind.annotation.*;
 

@@ -1,7 +1,7 @@
 package co.com.icesi.TallerJPA.controller;
 
 import co.com.icesi.TallerJPA.api.IcesiUserAPI;
-import co.com.icesi.TallerJPA.dto.IcesiUserCreateDTO;
+import co.com.icesi.TallerJPA.dto.requestDTO.IcesiUserCreateDTO;
 import co.com.icesi.TallerJPA.dto.responseDTO.IcesiUserCreateResponseDTO;
 import co.com.icesi.TallerJPA.service.IcesiUserService;
 import lombok.AllArgsConstructor;

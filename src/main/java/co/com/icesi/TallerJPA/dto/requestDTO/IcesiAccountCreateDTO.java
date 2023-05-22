@@ -1,4 +1,4 @@
-package co.com.icesi.TallerJPA.dto;
+package co.com.icesi.TallerJPA.dto.requestDTO;
 
 import co.com.icesi.TallerJPA.enums.AccountType;
 import lombok.Builder;

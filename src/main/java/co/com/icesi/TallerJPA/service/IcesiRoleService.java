@@ -1,13 +1,12 @@
 package co.com.icesi.TallerJPA.service;
 
-import co.com.icesi.TallerJPA.dto.IcesiRoleCreateDTO;
+import co.com.icesi.TallerJPA.dto.requestDTO.IcesiRoleCreateDTO;
 import co.com.icesi.TallerJPA.mapper.IcesiRoleMapper;
 import co.com.icesi.TallerJPA.model.IcesiRole;
 import co.com.icesi.TallerJPA.repository.IcesiRoleRepository;
 import lombok.AllArgsConstructor;
 import org.springframework.stereotype.Service;
 
-import java.util.Optional;
 import java.util.UUID;
 
 @Service

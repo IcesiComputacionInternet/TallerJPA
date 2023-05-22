@@ -1,4 +1,4 @@
-package co.com.icesi.TallerJPA.dto;
+package co.com.icesi.TallerJPA.dto.requestDTO;
 
 import co.com.icesi.TallerJPA.validations.ValidatePhoneNumber;
 import co.com.icesi.TallerJPA.validations.ValidatePhoneNumberAndEmail;
