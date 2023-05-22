@@ -27,9 +27,10 @@ public class IcesiUser {
     @CustomAnnotations.PasswordValidation
     private String password;
 
-    @OneToMany
+   // @OneToMany
+    //private List<IcesiAccount> accounts;
+    @OneToMany(mappedBy = "icesiUser")
     private List<IcesiAccount> accounts;
-
     @ManyToOne
     @JoinColumn(name = "role_id", nullable = false)
     private IcesiRole icesiRole;
