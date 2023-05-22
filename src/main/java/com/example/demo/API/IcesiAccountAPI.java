@@ -15,7 +15,6 @@ import com.example.demo.DTO.TransactionCreateDTO;
 @RequestMapping("/accounts")
 public interface IcesiAccountAPI {
 
-    @PostMapping("/add")
     public ResponseIcesiAccountDTO create(@Valid @RequestBody IcesiAccountCreateDTO icesiAccountCreateDTO);
 
     @PostMapping("enable/{accountNumber}")

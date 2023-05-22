@@ -12,11 +12,15 @@ import static org.mockito.Mockito.when;
 
 import java.util.Optional;
 
+import org.apache.catalina.connector.Response;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 
 import com.example.demo.DTO.IcesiRoleCreateDTO;
 import com.example.demo.DTO.IcesiUserCreateDTO;
+import com.example.demo.DTO.ResponseIcesiRoleDTO;
+import com.example.demo.DTO.ResponseIcesiUserDTO;
+import com.example.demo.error.exception.IcesiException;
 import com.example.demo.mapper.IcesiUserMapper;
 import com.example.demo.mapper.IcesiUserMapperImpl;
 import com.example.demo.model.IcesiRole;
@@ -67,10 +71,28 @@ public class IcesiUserServiceTest {
             .build();
     }
 
+    private ResponseIcesiUserDTO defaultResponseIcesiUserDTO() {
+        return ResponseIcesiUserDTO.builder()
+        .firstName("John")
+        .lastName("Doe")
+        .email("testEmail@example.com")
+        .phoneNumber("999999")
+        .password("1234")
+        .icesiRoleCreateDTO(defaultResponseIcesiRoleDTO())
+        .build();
+    }
+
     private IcesiRoleCreateDTO defaultIcesiRoleDTO() {
         return IcesiRoleCreateDTO.builder()
             .description("This role is for students")
-            .name("Student")
+            .name("student")
+            .build();
+    }
+
+    private ResponseIcesiRoleDTO defaultResponseIcesiRoleDTO() {
+        return ResponseIcesiRoleDTO.builder()
+            .description("This role is for students")
+            .name("student")
             .build();
     }
 
@@ -181,8 +203,43 @@ public class IcesiUserServiceTest {
     }
 
     @Test
+    public void testFindIcesiUserByEmailWhenIsPresent() {
+        when(icesiUserRepository.findByEmail(any())).thenReturn(Optional.of(defaultIcesiUser()));
+        IcesiUser result = icesiUserService.findIcesiUserByEmail(defaultIcesiUser().getEmail());
+        verify(icesiUserRepository, times(1)).findByEmail(any());
+        assertEquals(defaultResponseIcesiUserDTO().getEmail(), result.getEmail());
+    }
+
+    @Test
+    public void testFindIcesiUserByEmailWhenIsNotPresent() {
+        try {
+            icesiUserService.findIcesiUserByEmail(defaultIcesiUser().getEmail());
+            fail();
+        } catch (IcesiException exception) {
+            String message = exception.getMessage();
+            assertEquals("This email is not present in the database", message);
+        }
+    }
+
+
+
+    @Test
     public void testUpdateIcesiRoleToAdminAsAdmin() {
+        IcesiUserCreateDTO userToUpdateRole = defaultIcesiUserCreateDTO();
+        String newRole = TypeIcesiRole.admin.name();
+        String userModifier = TypeIcesiRole.admin.name();
         
+        when(icesiUserRepository.findByEmail(any())).thenReturn(Optional.of(defaultIcesiUser()));
+        when(icesiRoleRepository.findByName(any())).thenReturn(Optional.of(defaultIcesiRole()));
+        when(icesiUserRepository.save(any())).thenReturn(Optional.of(defaultResponseIcesiUserDTO()));
+        when(icesiUserRepository.save(any())).thenReturn(Optional.of(defaultIcesiUser()));
+
+        ResponseIcesiUserDTO result = icesiUserService.updateRole(userModifier, userToUpdateRole, defaultResponseIcesiRoleDTO().getName());
+
+        System.out.println(result.toString());
+
+        verify(icesiUserRepository, times(1)).save(any());
+        assertEquals(newRole, result.getIcesiRoleCreateDTO().getName());
     }
 
     @Test

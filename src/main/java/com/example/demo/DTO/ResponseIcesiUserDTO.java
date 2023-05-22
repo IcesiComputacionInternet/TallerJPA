@@ -12,5 +12,5 @@ public class ResponseIcesiUserDTO {
     private String email;
     private String password;
     private String phoneNumber;
-    private IcesiRoleCreateDTO role;
+    private ResponseIcesiRoleDTO icesiRoleCreateDTO;
 }

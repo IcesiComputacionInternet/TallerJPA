@@ -17,7 +17,7 @@ public class IcesiRoleController implements IcesiRoleAPI{
     private IcesiRoleService icesiRoleService;
 
     @Override
-    public ResponseIcesiRoleDTO add(@RequestBody IcesiRoleCreateDTO icesiRoleCreateDTO) {
-        return icesiRoleService.create(icesiRoleCreateDTO);
+    public ResponseIcesiRoleDTO add(@RequestBody String userCreatorRole, IcesiRoleCreateDTO icesiRoleCreateDTO) {
+        return icesiRoleService.create(userCreatorRole, icesiRoleCreateDTO);
     }
 }

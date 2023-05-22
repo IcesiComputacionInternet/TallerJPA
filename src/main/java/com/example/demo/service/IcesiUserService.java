@@ -5,7 +5,6 @@ import java.util.UUID;
 import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
 
-import com.example.demo.DTO.IcesiRoleCreateDTO;
 import com.example.demo.DTO.IcesiUserCreateDTO;
 import com.example.demo.DTO.ResponseIcesiUserDTO;
 import com.example.demo.error.exception.DetailBuilder;
@@ -87,7 +86,7 @@ public class IcesiUserService {
         return icesiUserMapper.fromIcesiUserToResponseIcesiUserDTO(icesiUserRepository.save(user));
     }
 
-    private IcesiUser findIcesiUserByEmail(String email) {
+    public IcesiUser findIcesiUserByEmail(String email) {
         return icesiUserRepository.findByEmail(email)
             .orElseThrow(() -> IcesiExceptionBuilder.createIcesiException(
                 "This email is not present in the database",
@@ -96,7 +95,7 @@ public class IcesiUserService {
             ).get());
     }
 
-    private IcesiRole findIcesiRoleByName(String name) {
+    public IcesiRole findIcesiRoleByName(String name) {
         return icesiRoleRepository.findByName(name)
             .orElseThrow(() -> IcesiExceptionBuilder.createIcesiException(
                 "This role is not present in the database",

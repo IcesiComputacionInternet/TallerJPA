@@ -1,6 +1,5 @@
 package com.example.demo.controller;
 
-import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RestController;
 
 import com.example.demo.API.IcesiUserAPI;
@@ -15,8 +14,11 @@ import lombok.AllArgsConstructor;
 public class IcesiUserController implements IcesiUserAPI {
     
     private final IcesiUserService icesiUserService;
-    
-    public ResponseIcesiUserDTO add(@RequestBody IcesiUserCreateDTO user) {
-        return icesiUserService.create(user);
+
+    @Override
+    public ResponseIcesiUserDTO add(String userCreatorRole, IcesiUserCreateDTO requestIcesiUserCreateDTO) {
+        return icesiUserService.create(userCreatorRole, requestIcesiUserCreateDTO);
     }
+    
+
 }
