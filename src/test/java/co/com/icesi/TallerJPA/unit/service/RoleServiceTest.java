@@ -4,8 +4,11 @@ import co.com.icesi.TallerJPA.dto.RoleCreateDTO;
 import co.com.icesi.TallerJPA.error.exception.ArgumentsException;
 import co.com.icesi.TallerJPA.mapper.RoleMapper;
 import co.com.icesi.TallerJPA.mapper.RoleMapperImpl;
+import co.com.icesi.TallerJPA.mapper.responseMapper.UserResponseMapper;
+import co.com.icesi.TallerJPA.mapper.responseMapper.UserResponseMapperImpl;
 import co.com.icesi.TallerJPA.model.IcesiRole;
 import co.com.icesi.TallerJPA.repository.RoleRepository;
+import co.com.icesi.TallerJPA.repository.UserRepository;
 import co.com.icesi.TallerJPA.service.RoleService;
 import co.com.icesi.TallerJPA.unit.matcher.IcesiRoleMatcher;
 import org.junit.jupiter.api.BeforeEach;
@@ -19,13 +22,17 @@ import static org.mockito.Mockito.*;
 public class RoleServiceTest {
     private RoleService roleService;
     private RoleRepository roleRepository;
+    private UserRepository userRepository;
+    private UserResponseMapper userResponseMapper;
     private RoleMapper roleMapper;
 
     @BeforeEach
     public void init(){
         roleRepository = mock(RoleRepository.class);
         roleMapper = spy(RoleMapperImpl.class);
-        roleService = new RoleService(roleRepository,roleMapper);
+        userRepository = mock(UserRepository.class);
+        userResponseMapper = spy(UserResponseMapperImpl.class);
+        roleService = new RoleService(roleRepository,roleMapper,userRepository,userResponseMapper);
     }
 
     @Test

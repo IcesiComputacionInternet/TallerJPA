@@ -77,6 +77,7 @@ public class SecurityConfiguration {
                 = RequestMatcherDelegatingAuthorizationManager.builder()
                 .add(permitAll,(context,other)-> new AuthorizationDecision(true));
 
+
         //Paths that require user role
         managerBuilder.add(new MvcRequestMatcher(introspector,"/accounts/**"),
                 AuthorityAuthorizationManager.hasAnyAuthority("SCOPE_USER"));

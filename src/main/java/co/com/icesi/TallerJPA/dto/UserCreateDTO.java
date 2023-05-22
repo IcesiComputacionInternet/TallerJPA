@@ -25,10 +25,11 @@ public class UserCreateDTO {
     private String lastName;
 
     @Email
-    @NotBlank
+    @NotNull
     private String email;
 
     @ColombianNumberConstraint
+    @NotNull
     private String phoneNumber;
 
     @NotBlank

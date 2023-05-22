@@ -1,5 +1,6 @@
 package co.com.icesi.TallerJPA.unit.service;
 
+import co.com.icesi.TallerJPA.config.PasswordEncoderConfiguration;
 import co.com.icesi.TallerJPA.dto.RoleCreateDTO;
 import co.com.icesi.TallerJPA.dto.response.UserResponseDTO;
 import co.com.icesi.TallerJPA.error.exception.ArgumentsException;
@@ -30,6 +31,7 @@ public class UserServiceTest {
     private RoleRepository roleRepository;
     private UserMapper userMapper;
     private UserResponseMapper userResponseMapper;
+    private PasswordEncoderConfiguration passwordEncoderConfiguration;
 
     @BeforeEach
     private void init(){
@@ -37,7 +39,8 @@ public class UserServiceTest {
         roleRepository = mock(RoleRepository.class);
         userMapper = spy(UserMapperImpl.class);
         userResponseMapper = spy(UserResponseMapperImpl.class);
-        userService = new UserService(userRepository,roleRepository,userMapper,userResponseMapper);
+        passwordEncoderConfiguration = mock(PasswordEncoderConfiguration.class);
+        userService = new UserService(userRepository,roleRepository,userMapper,userResponseMapper,passwordEncoderConfiguration);
     }
 
     @Test

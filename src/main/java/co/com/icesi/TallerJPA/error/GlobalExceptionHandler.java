@@ -42,7 +42,7 @@ public class GlobalExceptionHandler {
         var message = objectError.getDefaultMessage();
         return ArgumentsErrorDetail.builder()
                 .errorCode("ERR_400")
-                .errorMessage(message)
+                .errorMessage(field+" "+message)
                 .build();
     }
 

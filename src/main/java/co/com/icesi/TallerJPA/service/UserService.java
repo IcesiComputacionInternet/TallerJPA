@@ -13,7 +13,6 @@ import co.com.icesi.TallerJPA.repository.RoleRepository;
 import co.com.icesi.TallerJPA.repository.UserRepository;
 import co.com.icesi.TallerJPA.security.IcesiSecurityContext;
 import lombok.AllArgsConstructor;
-import org.springframework.boot.origin.SystemEnvironmentOrigin;
 import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
 

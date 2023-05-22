@@ -1,10 +1,11 @@
 package co.com.icesi.TallerJPA.dto;
 
-import lombok.Getter;
+import lombok.Builder;
 
 import javax.validation.constraints.NotBlank;
 
 
+@Builder
 public record AssignRoleDTO(
 
         @NotBlank
