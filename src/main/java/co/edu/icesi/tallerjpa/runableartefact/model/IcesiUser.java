@@ -1,5 +1,6 @@
 package co.edu.icesi.tallerjpa.runableartefact.model;
 
+import co.edu.icesi.tallerjpa.runableartefact.validations.phoneValidation.interfaces.ColombianNumber;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
@@ -25,6 +26,7 @@ public class IcesiUser {
 
     private String email;
 
+    @ColombianNumber
     private String phoneNumber;
 
     private String password;
@@ -35,4 +37,7 @@ public class IcesiUser {
     @ManyToOne(cascade = javax.persistence.CascadeType.ALL)
     @JoinColumn(name = "icesi_role_role_id")
     private IcesiRole role;
+
+    @OneToMany(mappedBy = "authorityId")
+    private List<IcesiAuthorities> authorities;
 }

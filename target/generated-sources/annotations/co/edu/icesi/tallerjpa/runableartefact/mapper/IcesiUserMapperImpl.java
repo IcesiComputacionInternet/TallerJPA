@@ -1,13 +1,14 @@
 package co.edu.icesi.tallerjpa.runableartefact.mapper;
 
-import co.edu.icesi.tallerjpa.runableartefact.dto.IcesiUserDTO;
+import co.edu.icesi.tallerjpa.runableartefact.dto.request.IcesiUserDTO;
+import co.edu.icesi.tallerjpa.runableartefact.dto.response.IcesiUserResponseDTO;
 import co.edu.icesi.tallerjpa.runableartefact.model.IcesiUser;
 import javax.annotation.processing.Generated;
 import org.springframework.stereotype.Component;
 
 @Generated(
     value = "org.mapstruct.ap.MappingProcessor",
-    date = "2023-03-09T14:45:07-0500",
+    date = "2023-05-22T08:18:24-0500",
     comments = "version: 1.5.3.Final, compiler: javac, environment: Java 17.0.6 (Eclipse Adoptium)"
 )
 @Component
@@ -19,15 +20,15 @@ public class IcesiUserMapperImpl implements IcesiUserMapper {
             return null;
         }
 
-        IcesiUser icesiUser = new IcesiUser();
+        IcesiUser.IcesiUserBuilder icesiUser = IcesiUser.builder();
 
-        icesiUser.setFirstName( icesiUserDTO.getFirstName() );
-        icesiUser.setLastName( icesiUserDTO.getLastName() );
-        icesiUser.setEmail( icesiUserDTO.getEmail() );
-        icesiUser.setPhoneNumber( icesiUserDTO.getPhoneNumber() );
-        icesiUser.setPassword( icesiUserDTO.getPassword() );
+        icesiUser.firstName( icesiUserDTO.getFirstName() );
+        icesiUser.lastName( icesiUserDTO.getLastName() );
+        icesiUser.email( icesiUserDTO.getEmail() );
+        icesiUser.phoneNumber( icesiUserDTO.getPhoneNumber() );
+        icesiUser.password( icesiUserDTO.getPassword() );
 
-        return icesiUser;
+        return icesiUser.build();
     }
 
     @Override
@@ -45,5 +46,38 @@ public class IcesiUserMapperImpl implements IcesiUserMapper {
         icesiUserDTO.password( icesiUser.getPassword() );
 
         return icesiUserDTO.build();
+    }
+
+    @Override
+    public IcesiUserDTO toIcesiUserDTO(IcesiUserResponseDTO icesiUserResponseDTO) {
+        if ( icesiUserResponseDTO == null ) {
+            return null;
+        }
+
+        IcesiUserDTO.IcesiUserDTOBuilder icesiUserDTO = IcesiUserDTO.builder();
+
+        return icesiUserDTO.build();
+    }
+
+    @Override
+    public IcesiUserResponseDTO toIcesiUserResponseDTO(IcesiUser icesiUser) {
+        if ( icesiUser == null ) {
+            return null;
+        }
+
+        IcesiUserResponseDTO icesiUserResponseDTO = new IcesiUserResponseDTO();
+
+        return icesiUserResponseDTO;
+    }
+
+    @Override
+    public IcesiUserResponseDTO toIcesiUserResponseDTO(IcesiUserDTO icesiUserDTO) {
+        if ( icesiUserDTO == null ) {
+            return null;
+        }
+
+        IcesiUserResponseDTO icesiUserResponseDTO = new IcesiUserResponseDTO();
+
+        return icesiUserResponseDTO;
     }
 }

@@ -1,13 +1,14 @@
 package co.edu.icesi.tallerjpa.runableartefact.mapper;
 
-import co.edu.icesi.tallerjpa.runableartefact.dto.IcesiAccountDTO;
+import co.edu.icesi.tallerjpa.runableartefact.dto.request.IcesiAccountDTO;
+import co.edu.icesi.tallerjpa.runableartefact.dto.response.IcesiAccountResponseDTO;
 import co.edu.icesi.tallerjpa.runableartefact.model.IcesiAccount;
 import javax.annotation.processing.Generated;
 import org.springframework.stereotype.Component;
 
 @Generated(
     value = "org.mapstruct.ap.MappingProcessor",
-    date = "2023-03-10T10:12:25-0500",
+    date = "2023-05-22T08:18:23-0500",
     comments = "version: 1.5.3.Final, compiler: javac, environment: Java 17.0.6 (Eclipse Adoptium)"
 )
 @Component
@@ -19,13 +20,13 @@ public class IcesiAccountMapperImpl implements IcesiAccountMapper {
             return null;
         }
 
-        IcesiAccount icesiAccount = new IcesiAccount();
+        IcesiAccount.IcesiAccountBuilder icesiAccount = IcesiAccount.builder();
 
-        icesiAccount.setBalance( icesiAccountDTO.getBalance() );
-        icesiAccount.setType( icesiAccountDTO.getType() );
-        icesiAccount.setActive( icesiAccountDTO.isActive() );
+        icesiAccount.balance( icesiAccountDTO.getBalance() );
+        icesiAccount.type( icesiAccountDTO.getType() );
+        icesiAccount.active( icesiAccountDTO.isActive() );
 
-        return icesiAccount;
+        return icesiAccount.build();
     }
 
     @Override
@@ -41,5 +42,38 @@ public class IcesiAccountMapperImpl implements IcesiAccountMapper {
         icesiAccountDTO.active( icesiAccount.isActive() );
 
         return icesiAccountDTO.build();
+    }
+
+    @Override
+    public IcesiAccountDTO toIcesiAccountDTO(IcesiAccountResponseDTO icesiAccountResponseDTO) {
+        if ( icesiAccountResponseDTO == null ) {
+            return null;
+        }
+
+        IcesiAccountDTO.IcesiAccountDTOBuilder icesiAccountDTO = IcesiAccountDTO.builder();
+
+        return icesiAccountDTO.build();
+    }
+
+    @Override
+    public IcesiAccountResponseDTO toIcesiAccountResponseDTO(IcesiAccount icesiAccount) {
+        if ( icesiAccount == null ) {
+            return null;
+        }
+
+        IcesiAccountResponseDTO icesiAccountResponseDTO = new IcesiAccountResponseDTO();
+
+        return icesiAccountResponseDTO;
+    }
+
+    @Override
+    public IcesiAccountResponseDTO toIcesiAccountResponseDTO(IcesiAccountDTO icesiAccountDTO) {
+        if ( icesiAccountDTO == null ) {
+            return null;
+        }
+
+        IcesiAccountResponseDTO icesiAccountResponseDTO = new IcesiAccountResponseDTO();
+
+        return icesiAccountResponseDTO;
     }
 }

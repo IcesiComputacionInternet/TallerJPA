@@ -1,9 +1,12 @@
 package co.edu.icesi.tallerjpa.runableartefact.controller;
 
-import co.edu.icesi.tallerjpa.runableartefact.dto.IcesiAccountDTO;
+import co.edu.icesi.tallerjpa.runableartefact.api.IcesiAccountAPI;
+import co.edu.icesi.tallerjpa.runableartefact.dto.request.IcesiAccountDTO;
+import co.edu.icesi.tallerjpa.runableartefact.dto.request.IcesiAccountUpdateDTO;
+import co.edu.icesi.tallerjpa.runableartefact.dto.request.TransactionInformationDTO;
+import co.edu.icesi.tallerjpa.runableartefact.dto.response.TransactionInformationResponseDTO;
 import co.edu.icesi.tallerjpa.runableartefact.service.IcesiAccountService;
 import lombok.AllArgsConstructor;
-import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RestController;
 
@@ -11,41 +14,38 @@ import java.util.Map;
 
 @RestController
 @AllArgsConstructor
-public class IcesiAccountController {
+public class IcesiAccountController implements IcesiAccountAPI {
 
     private final IcesiAccountService icesiAccountService;
 
-    @PostMapping("/account/create")
     public String createAccount(@RequestBody IcesiAccountDTO icesiAccountDTO) {
         return icesiAccountService.saveNewAccount(icesiAccountDTO);
     }
-
-    @PostMapping("/account/activate")
-    public String activateAccount(@RequestBody String accountNumber) {
-        return icesiAccountService.activateAccount(accountNumber);
+    @Override
+    public IcesiAccountDTO updateAccount(IcesiAccountUpdateDTO icesiAccountUpdateDTO) {
+        return icesiAccountService.updateAccount(icesiAccountUpdateDTO);
+    }
+    public String activateAccount(@RequestBody TransactionInformationDTO transactionInformationDTO) {
+        return icesiAccountService.activateAccount(transactionInformationDTO);
     }
 
-    @PostMapping("/account/deactivate")
-    public String deactivateAccount(@RequestBody String accountNumber) {
-        return icesiAccountService.deactivateAccount(accountNumber);
+    public String deactivateAccount(@RequestBody TransactionInformationDTO transactionInformationDTO) {
+        return icesiAccountService.deactivateAccount(transactionInformationDTO);
     }
 
-    @PostMapping("/account/withdrawal")
-    public String withdrawal(@RequestBody Map<String, String> withdrawalInformation, Long amount) {
-        return icesiAccountService.withdrawal(withdrawalInformation.get("accountNumber")
-                , Long.valueOf(withdrawalInformation.get("amount")));
+    @Override
+    public TransactionInformationResponseDTO withdrawal(TransactionInformationDTO withdrawalInformation) {
+        return icesiAccountService.withdrawal(withdrawalInformation);
     }
 
-    @PostMapping("/account/deposit")
-    public String deposit(@RequestBody Map<String, String> depositInformation) {
-        return icesiAccountService.deposit(depositInformation.get("accountNumber"), Long.valueOf(depositInformation.get("amount")));
+
+    public String deposit(@RequestBody TransactionInformationDTO depositInformation) {
+        return icesiAccountService.deposit(depositInformation.getAccountNumberOrigin(), depositInformation.getAmount());
     }
 
-    @PostMapping("/account/transfer")
-    public String transfer(@RequestBody Map<String,String> transferInformation,String accountNumberOrigin, String accountNumberDestination, Long amount) {
-        return icesiAccountService.transfer(transferInformation.get("accountNumberOrigin")
-                , transferInformation.get("accountNumberDestination")
-                , Long.valueOf(transferInformation.get("amount")));
+    //TODO: Cambiar el tipo de dato que recibe por un DTO
+    public TransactionInformationResponseDTO transfer(@RequestBody TransactionInformationDTO transferInformation) {
+        return icesiAccountService.transfer(transferInformation);
     }
 
 }
