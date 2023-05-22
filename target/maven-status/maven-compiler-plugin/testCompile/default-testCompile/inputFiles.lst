@@ -1,7 +1,10 @@
-C:\Users\laura\Downloads\TallerJPA\src\test\java\co\com\icesi\tallerjpa\TallerjpaApplicationTests.java
+C:\Users\laura\Downloads\TallerJPA\src\test\java\co\com\icesi\tallerjpa\integration\TestConfigurationData.java
 C:\Users\laura\Downloads\TallerJPA\src\test\java\co\com\icesi\tallerjpa\unit\service\UserServiceTest.java
-C:\Users\laura\Downloads\TallerJPA\src\test\java\co\com\icesi\tallerjpa\TestConfigurationData.java
+C:\Users\laura\Downloads\TallerJPA\src\test\java\co\com\icesi\tallerjpa\integration\TallerjpaApplicationTests.java
+C:\Users\laura\Downloads\TallerJPA\src\test\java\co\com\icesi\tallerjpa\integration\AccountIntegrationTest.java
+C:\Users\laura\Downloads\TallerJPA\src\test\java\co\com\icesi\tallerjpa\integration\UserIntegrationTest.java
 C:\Users\laura\Downloads\TallerJPA\src\test\java\co\com\icesi\tallerjpa\unit\service\IcesiAccountMatcher.java
+C:\Users\laura\Downloads\TallerJPA\src\test\java\co\com\icesi\tallerjpa\integration\RoleIntegrationTest.java
 C:\Users\laura\Downloads\TallerJPA\src\test\java\co\com\icesi\tallerjpa\unit\service\IcesiRoleMatcher.java
 C:\Users\laura\Downloads\TallerJPA\src\test\java\co\com\icesi\tallerjpa\unit\service\IcesiUserMatcher.java
 C:\Users\laura\Downloads\TallerJPA\src\test\java\co\com\icesi\tallerjpa\unit\service\AccountServiceTest.java

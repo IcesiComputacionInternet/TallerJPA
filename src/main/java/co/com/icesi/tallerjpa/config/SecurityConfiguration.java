@@ -83,14 +83,14 @@ public class SecurityConfiguration {
 
 
         // bloqueo de paths, se indica el tipo de autoridad que se necesita. Agrega Endpoints para asegurarlos
-        managerBuilder.add(new MvcRequestMatcher(introspector, "/admin/**"),
+        managerBuilder.add(new MvcRequestMatcher(introspector, "/roles/**"),
                 AuthorityAuthorizationManager.hasAnyAuthority("SCOPE_ADMIN"));
 
         managerBuilder.add(new MvcRequestMatcher(introspector, "/users/**"),
-                AuthorityAuthorizationManager.hasAnyAuthority("SCOPE_ADMIN","SCOPE_BANKUSER"));
+                AuthorityAuthorizationManager.hasAnyAuthority("SCOPE_ADMIN","SCOPE_BANK"));
 
-        managerBuilder.add(new MvcRequestMatcher(introspector, "/account/**"),
-                AuthorityAuthorizationManager.hasAnyAuthority("SCOPE_USER"));
+        managerBuilder.add(new MvcRequestMatcher(introspector, "/accounts/**"),
+                AuthorityAuthorizationManager.hasAnyAuthority("SCOPE_USER", "SCOPE_ADMIN"));
 
         AuthorizationManager<HttpServletRequest> manager = managerBuilder.build();
         return (authentication, object) -> manager.check(authentication, object.getRequest());

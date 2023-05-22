@@ -9,10 +9,10 @@ import java.lang.annotation.*;
 
 @Documented
 @Constraint(validatedBy = EmailorPhoneValidator.class)
-@Target( { ElementType.METHOD, ElementType.FIELD })
+@Target( { ElementType.TYPE, ElementType.ANNOTATION_TYPE })
 @Retention(RetentionPolicy.RUNTIME)
 public @interface EmailorPhoneConstraint {
-    String message() default "Invalid phone number or email";
+    String message() default "Invalid phone number or email, they may not be blank";
     Class<?>[] groups() default {};
     Class<? extends Payload>[] payload() default {};
 }

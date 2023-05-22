@@ -54,7 +54,7 @@ public class CustomAuthentication implements Authentication {
 
     @Override
     public boolean implies(Subject subject) {
-        return Authentication.super.implies(subject);
+        return authentication.implies(subject);
     }
 
     public String getUserId(){

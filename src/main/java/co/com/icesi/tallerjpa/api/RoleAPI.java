@@ -12,7 +12,7 @@ public interface RoleAPI {
     String ROLE_URL = "/roles";
 
     @GetMapping("/{roleName}")
-    RoleCreateDTO getRole(@PathVariable String roleName);
+    RoleCreateDTO getRole(@PathVariable("roleName") String roleName);
 
     List<RoleCreateDTO> getAllRoles();
 

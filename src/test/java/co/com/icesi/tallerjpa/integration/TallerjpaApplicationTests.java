@@ -1,8 +1,8 @@
-package co.com.icesi.tallerjpa;
+package co.com.icesi.tallerjpa.integration;
 
 import co.com.icesi.tallerjpa.dto.LoginDTO;
 import co.com.icesi.tallerjpa.dto.TokenDTO;
-import co.com.icesi.tallerjpa.error.exception.IcesiError;
+import co.com.icesi.tallerjpa.integration.TestConfigurationData;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -47,19 +47,27 @@ class TallerjpaApplicationTests {
         assertNotNull(token);
     }
 
-    /*@Test
+    @Test
     public void testTokenEndpointWithInvalidEmail() throws Exception{
-        var result = mockMvc.perform(MockMvcRequestBuilders.get("/token").content(
+        var result = mockMvc.perform(MockMvcRequestBuilders.post("/token").content(
                     objectMapper.writeValueAsString(new LoginDTO("incorret@gmail.com", "password"))
                 )
                 .contentType(MediaType.APPLICATION_JSON)
                 .accept(MediaType.APPLICATION_JSON))
-        .andExpect(status().isOk())
+        .andExpect(status().isUnauthorized())
         .andReturn();
+    }
 
-        IcesiError token = objectMapper.readValue(result.getResponse().getContentAsString(),IcesiError.class);
-        assertNotNull(token);
-    }*/
+    @Test
+    public void testTokenEndpointWithInvalidPassword() throws Exception{
+        var result = mockMvc.perform(MockMvcRequestBuilders.post("/token").content(
+                                objectMapper.writeValueAsString(new LoginDTO("johndoe@email.com", "passwo"))
+                        )
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .accept(MediaType.APPLICATION_JSON))
+                .andExpect(status().isUnauthorized())
+                .andReturn();
+    }
 
 }
 

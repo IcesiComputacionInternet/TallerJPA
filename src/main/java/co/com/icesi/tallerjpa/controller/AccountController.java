@@ -19,30 +19,32 @@ public class AccountController implements AccountAPI {
     private final AccountService accountService;
 
     @Override
-    public ResponseAccountDTO addAccount(@Valid RequestAccountDTO accountDTO) { return accountService.save(accountDTO);}
+    public ResponseAccountDTO addAccount(@Valid RequestAccountDTO accountDTO) {
+        return accountService.save(accountDTO);
+    }
 
     @Override
-    public ResponseAccountDTO enableAcc(String accNum){
+    public ResponseAccountDTO enableAcc(String accNum) {
         return accountService.enableAccount(accNum);
     }
 
-    @PatchMapping("/disable")
-    public ResponseAccountDTO disableAcc(String accNum){
+    @Override
+    public ResponseAccountDTO disableAcc(String accNum) {
         return accountService.disableAccount(accNum);
     }
 
-    @PatchMapping("/withdrawal")
-    public TransactionDTO withdrawal(TransactionDTO transacDTO){
+    @Override
+    public TransactionDTO withdrawal(TransactionDTO transacDTO) {
         return accountService.withdrawal(transacDTO);
     }
 
-    @PatchMapping("/deposit")
-    public TransactionDTO deposit(TransactionDTO transacDTO){
+    @Override
+    public TransactionDTO deposit(TransactionDTO transacDTO) {
         return accountService.deposit(transacDTO);
     }
 
-    @PatchMapping("/transfer")
-    public TransactionDTO tranfer(TransactionDTO transacDTO){
+    @Override
+    public TransactionDTO transfer(TransactionDTO transacDTO) {
         return accountService.transfer(transacDTO);
     }
 }

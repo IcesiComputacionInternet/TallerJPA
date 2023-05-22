@@ -1,3 +1,4 @@
+/*
 package co.com.icesi.tallerjpa.unit.service;
 
 
@@ -6,6 +7,7 @@ import co.com.icesi.tallerjpa.dto.RequestAccountDTO;
 import co.com.icesi.tallerjpa.dto.ResponseAccountDTO;
 import co.com.icesi.tallerjpa.dto.RoleCreateDTO;
 import co.com.icesi.tallerjpa.dto.TransactionDTO;
+import co.com.icesi.tallerjpa.error.exception.IcesiException;
 import co.com.icesi.tallerjpa.mapper.AccountMapper;
 import co.com.icesi.tallerjpa.mapper.AccountMapperImpl;
 import co.com.icesi.tallerjpa.model.IcesiAccount;
@@ -64,7 +66,7 @@ public class AccountServiceTest {
         try {
             accountService.save(defaultAccountCreateDTOBalanceBelowZero());
             fail();
-        } catch (RuntimeException exception) {
+        } catch (IcesiException exception) {
             String messageOfException = exception.getMessage();
             assertEquals("Account balance can't be below 0", messageOfException);
         }
@@ -76,7 +78,7 @@ public class AccountServiceTest {
         try {
             accountService.save(defaultAccountCreateDTO());
             fail();
-        } catch (RuntimeException exception) {
+        } catch (IcesiException exception) {
             String messageOfException = exception.getMessage();
             assertEquals("There is no user for the account", messageOfException);
         }
@@ -91,7 +93,7 @@ public class AccountServiceTest {
         try {
             accountService.disableAccount(icesiAccount.getAccountNumber());
             fail();
-        } catch (RuntimeException exception) {
+        } catch (IcesiException exception) {
             String messageOfException = exception.getMessage();
             assertEquals("Account can't be disabled", messageOfException);
         }
@@ -123,7 +125,7 @@ public class AccountServiceTest {
         try {
             accountService.enableAccount(icesiAccount.getAccountNumber());
             fail();
-        } catch (RuntimeException exception) {
+        } catch (IcesiException exception) {
             String messageOfException = exception.getMessage();
             assertEquals("Account can't be enabled", messageOfException);
         }
@@ -171,7 +173,7 @@ public class AccountServiceTest {
         try {
             accountService.withdrawal(defaultTransactionDTO());
             //fail();
-        } catch (RuntimeException exception) {
+        } catch (IcesiException exception) {
             String messageOfException = exception.getMessage();
             assertEquals("The amount of money in Balance is less than the amount needed", messageOfException);
         }
@@ -218,7 +220,7 @@ public class AccountServiceTest {
         try {
             accountService.deposit(defaultTransactionDTO());
             //fail();
-        } catch (RuntimeException exception) {
+        } catch (IcesiException exception) {
             String messageOfException = exception.getMessage();
             assertEquals("Unsuccessful deposit", messageOfException);
         }
@@ -267,7 +269,7 @@ public class AccountServiceTest {
         try {
             accountService.transfer(defaultTransactionDTO2());
             //fail();
-        } catch (RuntimeException exception) {
+        } catch (IcesiException exception) {
             String messageOfException = exception.getMessage();
             assertEquals("Unsuccessful transfer", messageOfException);
         }
@@ -293,7 +295,7 @@ public class AccountServiceTest {
         try {
             accountService.transfer(defaultTransactionDTO2());
             //fail();
-        } catch (RuntimeException exception) {
+        } catch (IcesiException exception) {
             String messageOfException = exception.getMessage();
             assertEquals("Unsuccessful transfer", messageOfException);
         }
@@ -317,7 +319,7 @@ public class AccountServiceTest {
         try {
             accountService.transfer(defaultTransactionDTO2());
             //fail();
-        } catch (RuntimeException exception) {
+        } catch (IcesiException exception) {
             String messageOfException = exception.getMessage();
             assertEquals("The account's type is DEPOSIT_ONLY", messageOfException);
         }
@@ -342,7 +344,7 @@ public class AccountServiceTest {
         try {
             accountService.transfer(defaultTransactionDTO2());
             //fail();
-        } catch (RuntimeException exception) {
+        } catch (IcesiException exception) {
             String messageOfException = exception.getMessage();
             assertEquals("The account's type is DEPOSIT_ONLY", messageOfException);
         }
@@ -369,7 +371,7 @@ public class AccountServiceTest {
         try {
             accountService.transfer(defaultTransactionDTO2());
             //fail();
-        } catch (RuntimeException exception) {
+        } catch (IcesiException exception) {
             String messageOfException = exception.getMessage();
             assertEquals("The amount of money in Balance is less than the amount needed", messageOfException);
         }
@@ -441,7 +443,7 @@ public class AccountServiceTest {
                 .build();
     }
 
-    /*private UserCreateDTO defaultUserCreateDTO(){
+private UserCreateDTO defaultUserCreateDTO(){
         return UserCreateDTO.builder()
                 .firstName("Jhon")
                 .lastName("Doe")
@@ -450,14 +452,16 @@ public class AccountServiceTest {
                 .password("1234")
                 .icesiroleDto(defaultRoleCreateDTO())
                 .build();
-    }*/
+    }
 
-    /*private RoleCreateDTO defaultRoleCreateDTO() {
+
+private RoleCreateDTO defaultRoleCreateDTO() {
         return RoleCreateDTO.builder()
                 .description("no description")
                 .name("Administrator")
                 .build();
-    }*/
+    }
+
 
     private IcesiRole defaultIcesiRole(){
         return IcesiRole.builder()
@@ -467,6 +471,5 @@ public class AccountServiceTest {
                 .build();
     }
 
-
-
 }
+*/

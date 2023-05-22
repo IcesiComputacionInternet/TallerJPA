@@ -1,0 +1,4 @@
+-------------------------------------------------------------------------------
+Test set: co.com.icesi.tallerjpa.integration.TallerjpaApplicationTests
+-------------------------------------------------------------------------------
+Tests run: 2, Failures: 0, Errors: 0, Skipped: 0, Time elapsed: 9.133 s - in co.com.icesi.tallerjpa.integration.TallerjpaApplicationTests

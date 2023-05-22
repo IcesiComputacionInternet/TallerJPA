@@ -10,7 +10,7 @@ import java.util.List;
 
 public interface AccountAPI {
     String ACCOUNT_URL = "/accounts";
-    @PostMapping
+    @PostMapping("/createAccount")
     ResponseAccountDTO addAccount(@Valid @RequestBody RequestAccountDTO accountDTO);
 
     @PatchMapping("/enable")
@@ -26,5 +26,5 @@ public interface AccountAPI {
     TransactionDTO deposit(@Valid @RequestBody TransactionDTO transacDTO);
 
     @PatchMapping("/transfer")
-    TransactionDTO tranfer(@Valid @RequestBody TransactionDTO transacDTO);
+    TransactionDTO transfer(@Valid @RequestBody TransactionDTO transacDTO);
 }

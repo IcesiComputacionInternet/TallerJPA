@@ -17,6 +17,7 @@ co\com\icesi\tallerjpa\error\exception\IcesiError.class
 co\com\icesi\tallerjpa\mapper\RoleMapperImpl.class
 co\com\icesi\tallerjpa\error\util\IcesiExceptionBuilder.class
 co\com\icesi\tallerjpa\repository\RoleRepository.class
+co\com\icesi\tallerjpa\error\exception\IcesiErrorDetail.class
 co\com\icesi\tallerjpa\model\IcesiRole.class
 co\com\icesi\tallerjpa\Enum\AccountType.class
 co\com\icesi\tallerjpa\config\PasswordEncoderConfiguration.class
@@ -26,6 +27,7 @@ co\com\icesi\tallerjpa\mapper\AccountMapperImpl.class
 co\com\icesi\tallerjpa\model\IcesiAccount$IcesiAccountBuilder.class
 co\com\icesi\tallerjpa\model\IcesiAccount.class
 co\com\icesi\tallerjpa\controller\UserController.class
+co\com\icesi\tallerjpa\controller\HomeController.class
 co\com\icesi\tallerjpa\repository\AccountRepository.class
 co\com\icesi\tallerjpa\constraint\EmailorPhoneConstraint.class
 co\com\icesi\tallerjpa\mapper\RoleMapper.class
@@ -36,7 +38,9 @@ co\com\icesi\tallerjpa\repository\UserRepository.class
 co\com\icesi\tallerjpa\service\TokenService.class
 co\com\icesi\tallerjpa\service\UserManagementService.class
 co\com\icesi\tallerjpa\validators\EmailorPhoneValidator.class
+co\com\icesi\tallerjpa\error\exception\IcesiErrorDetail$IcesiErrorDetailBuilder.class
 co\com\icesi\tallerjpa\model\IcesiRole$IcesiRoleBuilder.class
+co\com\icesi\tallerjpa\config\WebConfig.class
 co\com\icesi\tallerjpa\dto\ResponseUserDTO$ResponseUserDTOBuilder.class
 co\com\icesi\tallerjpa\api\AccountAPI.class
 co\com\icesi\tallerjpa\constraint\CellphoneConstraint.class
@@ -45,8 +49,10 @@ co\com\icesi\tallerjpa\dto\ResponseUserDTO.class
 co\com\icesi\tallerjpa\dto\RequestAccountDTO.class
 co\com\icesi\tallerjpa\dto\ResponseAccountDTO.class
 co\com\icesi\tallerjpa\api\UserAPI.class
+co\com\icesi\tallerjpa\error\exception\IcesiError$IcesiErrorBuilder.class
 co\com\icesi\tallerjpa\dto\RoleCreateDTO$RoleCreateDTOBuilder.class
 co\com\icesi\tallerjpa\dto\TokenDTO.class
+co\com\icesi\tallerjpa\error\exception\DetailBuilder.class
 co\com\icesi\tallerjpa\mapper\UserMapper.class
 co\com\icesi\tallerjpa\model\IcesiUser$IcesiUserBuilder.class
 co\com\icesi\tallerjpa\config\IcesiAuthenticationManager.class
@@ -54,4 +60,5 @@ co\com\icesi\tallerjpa\dto\RoleCreateDTO.class
 co\com\icesi\tallerjpa\model\SecurityUser.class
 co\com\icesi\tallerjpa\dto\RequestUserDTO$RequestUserDTOBuilder.class
 co\com\icesi\tallerjpa\security\IcesiSecurityContext.class
+co\com\icesi\tallerjpa\error\exception\ErrorCode.class
 co\com\icesi\tallerjpa\mapper\AccountMapper.class

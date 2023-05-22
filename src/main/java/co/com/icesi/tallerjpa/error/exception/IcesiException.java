@@ -10,7 +10,6 @@ import org.springframework.http.HttpStatus;
 @AllArgsConstructor
 public class IcesiException extends RuntimeException {
     private final IcesiError error;
-    private HttpStatus httpStatus;
     public IcesiException(String message, IcesiError error) {
         super(message);
         this.error = error;

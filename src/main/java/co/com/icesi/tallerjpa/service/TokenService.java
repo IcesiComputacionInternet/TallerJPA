@@ -19,7 +19,7 @@ import java.util.stream.Collectors;
 
 @AllArgsConstructor
 @Service
-public class TokenService {
+public class  TokenService {
 
     private final JwtEncoder encoder;
 
