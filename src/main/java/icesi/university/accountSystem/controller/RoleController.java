@@ -9,9 +9,8 @@ import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RestController;
+import javax.validation.Valid;
 import java.util.List;
-import static icesi.university.accountSystem.api.RoleAPI.ROLE_BASE_URL;
-
 
 @RestController
 @AllArgsConstructor
@@ -24,7 +23,7 @@ public class RoleController implements RoleAPI {
 
     @PostMapping(ROLE_BASE_URL+"/add")
     @Override
-    public IcesiRoleDTO add(@RequestBody IcesiRoleDTO role) {
+    public IcesiRoleDTO add(@RequestBody @Valid IcesiRoleDTO role) {
         return icesiRoleMapper.fromIcesiRole(roleService.save(role));
     }
     @GetMapping(ROLE_BASE_URL+"/all")

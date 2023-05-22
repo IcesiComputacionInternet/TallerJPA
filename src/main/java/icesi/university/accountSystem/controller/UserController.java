@@ -1,6 +1,7 @@
 package icesi.university.accountSystem.controller;
 
 import icesi.university.accountSystem.api.UserAPI;
+import icesi.university.accountSystem.dto.AssignRoleDTO;
 import icesi.university.accountSystem.dto.RequestUserDTO;
 import icesi.university.accountSystem.dto.ResponseUserDTO;
 import icesi.university.accountSystem.services.UserService;
@@ -11,7 +12,6 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RestController;
 
 import java.util.List;
-import static icesi.university.accountSystem.api.UserAPI.BASE_USER_URL;
 @RestController
 @AllArgsConstructor
 public class UserController implements UserAPI {
@@ -32,5 +32,10 @@ public class UserController implements UserAPI {
     @Override
     public ResponseUserDTO addUser(@RequestBody RequestUserDTO requestUserDTO) {
         return userService.save(requestUserDTO);
+    }
+
+    @Override
+    public ResponseUserDTO assignRole(AssignRoleDTO assignRoleDTO) {
+        return userService.assignRole(assignRoleDTO);
     }
 }

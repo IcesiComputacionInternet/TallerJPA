@@ -40,6 +40,7 @@ public class AccountController implements AccountAPI {
     @PatchMapping(BASE_ACCOUNT_URL+"/activate/{accountNumber}")
     @Override
     public String activateAccount(String accountNumber) {
+
         return accountService.activateAccount(accountNumber);
     }
     @PatchMapping(BASE_ACCOUNT_URL+"/deactivate/{accountNumber}")

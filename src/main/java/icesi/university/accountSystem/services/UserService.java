@@ -1,5 +1,6 @@
 package icesi.university.accountSystem.services;
 
+import icesi.university.accountSystem.dto.AssignRoleDTO;
 import icesi.university.accountSystem.dto.RequestUserDTO;
 import icesi.university.accountSystem.dto.ResponseUserDTO;
 import icesi.university.accountSystem.exception.ExistsException;
@@ -7,6 +8,7 @@ import icesi.university.accountSystem.mapper.IcesiUserMapper;
 import icesi.university.accountSystem.model.IcesiUser;
 import icesi.university.accountSystem.repository.IcesiRoleRepository;
 import icesi.university.accountSystem.repository.IcesiUserRepository;
+import icesi.university.accountSystem.security.IcesiSecurityContext;
 import lombok.AllArgsConstructor;
 import lombok.SneakyThrows;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
@@ -62,6 +64,22 @@ public class UserService {
 
     public List<ResponseUserDTO> getAllUsers() {
         List<IcesiUser> users = icesiUserRepository.findAll();
+        System.out.println(getRole());
         return icesiUserMapper.fromUsersToSendUsersDTO(users);
+    }
+
+    private String getRole(){
+       return IcesiSecurityContext.getCurrentUserRole();
+    }
+
+    public ResponseUserDTO assignRole(AssignRoleDTO assignRoleDTO) {
+        Optional<IcesiUser> user = icesiUserRepository.findByEmail(assignRoleDTO.getEmail());
+        if(user.isPresent()){
+            var role = roleRepository.findByName(assignRoleDTO.getName()).orElseThrow(() -> new ExistsException("Role doesn't exists"));
+            user.get().setRole(role);
+            return icesiUserMapper.fromUserToSendUserDTO(icesiUserRepository.save(user.get()));
+        }else{
+            throw new RuntimeException("User doesn't exists");
+        }
     }
 }

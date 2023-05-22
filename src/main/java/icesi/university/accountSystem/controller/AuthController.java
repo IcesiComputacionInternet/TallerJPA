@@ -1,6 +1,7 @@
 package icesi.university.accountSystem.controller;
 
 import icesi.university.accountSystem.dto.LoginDTO;
+import icesi.university.accountSystem.dto.TokenDTO;
 import icesi.university.accountSystem.services.TokenService;
 import lombok.AllArgsConstructor;
 import org.springframework.security.authentication.AuthenticationManager;
@@ -17,9 +18,9 @@ public class AuthController {
     private final TokenService tokenService;
 
     private final AuthenticationManager authenticationManager;
-    @CrossOrigin(origins = "*")
+    @CrossOrigin
     @PostMapping("/token")
-    public String token(@RequestBody LoginDTO loginDTO){
+    public TokenDTO token(@RequestBody LoginDTO loginDTO){
         Authentication authentication = authenticationManager.authenticate(new UsernamePasswordAuthenticationToken(loginDTO.username(),loginDTO.password()));
         return tokenService.generateToken(authentication);
     }

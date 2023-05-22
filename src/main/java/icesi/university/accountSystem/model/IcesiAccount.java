@@ -1,8 +1,7 @@
 package icesi.university.accountSystem.model;
 
 import icesi.university.accountSystem.enums.TypeAccount;
-import lombok.Builder;
-import lombok.Data;
+import lombok.*;
 
 import javax.persistence.Entity;
 import javax.persistence.Id;
@@ -13,6 +12,10 @@ import java.util.UUID;
 @Data
 @Entity
 @Builder
+@Getter
+@Setter
+@AllArgsConstructor
+@NoArgsConstructor
 public class IcesiAccount {
     @Id
     private UUID accountId;
