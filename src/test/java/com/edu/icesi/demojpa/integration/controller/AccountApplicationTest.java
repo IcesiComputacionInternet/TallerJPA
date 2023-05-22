@@ -5,6 +5,7 @@ import com.edu.icesi.demojpa.integration.TestConfigurationData;
 import com.edu.icesi.demojpa.model.IcesiRole;
 import com.edu.icesi.demojpa.model.IcesiUser;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import org.junit.jupiter.api.Order;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;
@@ -43,7 +44,7 @@ public class AccountApplicationTest {
                                         RequestTransactionDTO.builder()
                                                 .accountFrom("000-000000-01")
                                                 .accountTo("000-000000-00")
-                                                .amount(5000L)
+                                                .amount(50L)
                                                 .build()
                                 ))
                         .header("Authorization", "Bearer " + token.getToken())
@@ -112,7 +113,7 @@ public class AccountApplicationTest {
                                         RequestTransactionDTO.builder()
                                                 .accountFrom("000-000000-00")
                                                 .accountTo("000-000000-01")
-                                                .amount(5000L)
+                                                .amount(500L)
                                                 .build()
                                 ))
                         .header("Authorization", "Bearer " + token.getToken())

@@ -166,10 +166,8 @@ public class AccountService {
         IcesiUser icesiUser = userRepository.findUserById(userId)
                 .orElseThrow(() -> icesiExceptionBuilder.notFoundException("User with id " + userId + " was not found", userId.toString()));
         boolean isOwnerAccount = accountRepository.isOwnerAccount(icesiUser.getUserId(), accountNumber);
-        System.out.println(isOwnerAccount);
         if((role.equalsIgnoreCase("USER") && isOwnerAccount)
                 || role.equalsIgnoreCase("BANK")){
-            System.out.println("entraaaaaaaaaaaaaaaaaaa");
             throw icesiExceptionBuilder.noPermissionException("No permission to do that");
         }
     }
