@@ -8,7 +8,6 @@ import co.com.icesi.demojpa.dto.UserCreateDTO;
 import co.com.icesi.demojpa.dto.response.ResponseUserDTO;
 import co.com.icesi.demojpa.error.exception.IcesiError;
 import co.com.icesi.demojpa.error.exception.IcesiException;
-import co.com.icesi.demojpa.repository.AccountRepository;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;

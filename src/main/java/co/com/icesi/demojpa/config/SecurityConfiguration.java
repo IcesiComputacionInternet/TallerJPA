@@ -76,7 +76,8 @@ public class SecurityConfiguration {
                 .add(permitAll,(context,other)->new AuthorizationDecision(true));
 
 
-        managerBuilder.add(new MvcRequestMatcher(introspector,"/**"), AuthorityAuthorizationManager.hasAnyAuthority("SCOPE_ADMIN"));
+        managerBuilder.add(new MvcRequestMatcher(introspector,"/**"),
+                AuthorityAuthorizationManager.hasAnyAuthority("SCOPE_ADMIN"));
 
         managerBuilder.add(new MvcRequestMatcher(introspector,"/accounts/**"),
                 AuthorityAuthorizationManager.hasAnyAuthority("SCOPE_USER","SCOPE_ADMIN"));

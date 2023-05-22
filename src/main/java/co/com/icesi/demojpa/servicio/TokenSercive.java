@@ -42,7 +42,6 @@ public class TokenSercive {
                 .claim("scope", scope)
                 .claim("icesiUserId", customAuthentication.getUserId())
                 .build();
-
         var encoderParameters= JwtEncoderParameters.from(JwsHeader.with(MacAlgorithm.HS256).build(),claims);
         return TokenDTO.builder().token(encoder.encode(encoderParameters).getTokenValue()).build();
 
