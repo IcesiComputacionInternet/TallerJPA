@@ -43,5 +43,38 @@ class JpaProjectApplicationTests {
 				.andReturn();
 		System.out.println(result.getResponse().getContentAsString());
 	}
+	@Test
+	public void testTokenEndpointUser() throws Exception{
+		var result = mockMvc.perform(MockMvcRequestBuilders.post("/token").content(
+								objectMapper.writeValueAsString(new LoginDTO("johndoe2@email.com","password"))
+						)
+						.contentType(MediaType.APPLICATION_JSON)
+						.accept(MediaType.APPLICATION_JSON))
+				.andExpect(status().isOk())
+				.andReturn();
+	}
+
+	@Test
+	public void testTokenEndpointBank() throws Exception{
+		var result = mockMvc.perform(MockMvcRequestBuilders.post("/token").content(
+								objectMapper.writeValueAsString(new LoginDTO("johndoe3@email.com","password"))
+						)
+						.contentType(MediaType.APPLICATION_JSON)
+						.accept(MediaType.APPLICATION_JSON))
+				.andExpect(status().isOk())
+				.andReturn();
+
+	}
+
+	@Test
+	public void testTokenEndpointWithInvalidEmail() throws Exception{
+		var result = mockMvc.perform(MockMvcRequestBuilders.post("/token").content(
+								objectMapper.writeValueAsString(new LoginDTO("johndoe@email.com","password"))
+						)
+						.contentType(MediaType.APPLICATION_JSON)
+						.accept(MediaType.APPLICATION_JSON))
+				.andExpect(status().isOk())
+				.andReturn();
+	}
 
 }

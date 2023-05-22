@@ -24,10 +24,10 @@ public interface AccountAPI {
     List<AccountResponseDTO> getAccount();
 
     @PatchMapping("/enable")
-    String enableAccount(@RequestBody String accountNumber);
+    String enableAccount(@PathVariable("accountNumber") String accountNumber);
 
     @PatchMapping("/disable")
-    String disableAccount(@RequestBody String accountNumber);
+    String disableAccount(@PathVariable("accountNumber") String accountNumber);
 
     @PatchMapping("/deposit")
     TransactionResponseDTO deposit(@RequestBody TransactionRequestDTO accountNumber);

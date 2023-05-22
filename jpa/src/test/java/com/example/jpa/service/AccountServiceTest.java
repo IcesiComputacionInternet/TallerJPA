@@ -89,6 +89,8 @@ public class AccountServiceTest {
         IcesiAccount account = defaultAccount(NORMAL);
         account.setBalance(0L);
         when(accountRepository.getByAccountNumber(any())).thenReturn(Optional.of(account));
+        // Add mock to the user token validation
+        when(userRepository.findByEmail(any())).thenReturn(Optional.ofNullable(defaultUser()));
         assertTrue(accountService.disableAccount(anyString()));
         verify(accountRepository, times(1)).save(argThat(new AccountMatcher(account)));
     }
@@ -430,7 +432,7 @@ public class AccountServiceTest {
 
     private IcesiRole defaultRole(){
         return IcesiRole.builder()
-                .name("FirstRole")
+                .name("ADMIN")
                 .description("This is a test for the role")
                 .icesiUserList(new ArrayList<>())
                 .build();
@@ -438,7 +440,7 @@ public class AccountServiceTest {
 
     private RoleDTO defaultRoleDTO(){
         return   RoleDTO.builder()
-                .name("FirstRole")
+                .name("ADMIN")
                 .description("This is a test for the role")
                 .build();
     }

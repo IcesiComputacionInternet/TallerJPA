@@ -34,12 +34,12 @@ public class IcesiAccountController implements AccountAPI {
     }
 
     @Override
-    public String enableAccount(String accountNumber) {
+    public String enableAccount(@PathVariable("accountNumber") String accountNumber) {
         return accountService.enableAccount(accountNumber) ? "Account enabled" : "Account not found";
     }
 
     @Override
-    public String disableAccount(String accountNumber) {
+    public String disableAccount(@PathVariable("accountNumber") String accountNumber) {
         return accountService.disableAccount(accountNumber) ? "Account disabled" : "Account not found";
     }
 
