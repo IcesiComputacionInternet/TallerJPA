@@ -127,7 +127,7 @@ public class UserServiceTest {
         try{
             userService.save(user, "BANK_USER");
         }catch (CustomException e){
-            assertEquals("Bank users can only create users", e.getMessage());
+            assertEquals("Bank users can only create users or bank users", e.getMessage());
         }
 
     }

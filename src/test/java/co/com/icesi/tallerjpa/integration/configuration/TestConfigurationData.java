@@ -11,12 +11,7 @@ import co.com.icesi.tallerjpa.repository.UserRepository;
 import org.springframework.boot.CommandLineRunner;
 import org.springframework.boot.test.context.TestConfiguration;
 import org.springframework.context.annotation.Bean;
-import org.springframework.context.annotation.ComponentScan;
-import org.springframework.context.annotation.Primary;
-import org.springframework.core.annotation.Order;
 import org.springframework.security.crypto.password.PasswordEncoder;
-import org.springframework.test.annotation.Commit;
-import org.springframework.test.context.ActiveProfiles;
 
 import java.util.List;
 import java.util.UUID;
@@ -57,10 +52,16 @@ public class TestConfigurationData {
                 .path("/accounts/**")
                 .roles(List.of(adminRole, userRole))
                 .build();
+        UserPermission addAccountPermission = UserPermission.builder()
+                .permissionId(UUID.randomUUID())
+                .key("addAccount")
+                .path("/accounts/")
+                .roles(List.of(bankUserRole))
+                .build();
         UserPermission addUserPermission = UserPermission.builder()
                 .permissionId(UUID.randomUUID())
                 .key("users")
-                .path("/users/**")
+                .path("/users/")
                 .roles(List.of(adminRole, bankUserRole))
                 .build();
 
@@ -117,6 +118,7 @@ public class TestConfigurationData {
         permissions.save(rolePermission);
         permissions.save(accountPermission);
         permissions.save(addUserPermission);
+        permissions.save(addAccountPermission);
 
         return args -> {
             accounts.save(account);

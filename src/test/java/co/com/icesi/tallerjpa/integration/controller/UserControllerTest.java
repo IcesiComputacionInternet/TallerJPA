@@ -31,7 +31,7 @@ public class UserControllerTest {
 
     @Test
     public void testCreateUserWhenUserIsNotAuth() throws Exception {
-        var result = mvc.perform(post("/users")
+        var result = mvc.perform(post("/users/")
                         .content(mapper.writeValueAsString(defaultUser()))
                         .contentType(MediaType.APPLICATION_JSON).accept(MediaType.APPLICATION_JSON)
                 )
@@ -43,7 +43,7 @@ public class UserControllerTest {
 
     @Test
     public void testCreateUserWhenUserIsAuth() throws Exception {
-        var result = mvc.perform(post("/users")
+        var result = mvc.perform(post("/users/")
                         .content(mapper.writeValueAsString(defaultUser()))
                         .header("Authorization", "Bearer " + key)
                         .contentType(MediaType.APPLICATION_JSON)
@@ -60,7 +60,7 @@ public class UserControllerTest {
         RequestUserDTO user = defaultUser();
         user.setEmail("12345678910gmail.com");
 
-        var result = mvc.perform(post("/users")
+        var result = mvc.perform(post("/users/")
                         .content(mapper.writeValueAsString(user))
                         .header("Authorization", "Bearer " + key)
                         .contentType(MediaType.APPLICATION_JSON)
@@ -77,7 +77,7 @@ public class UserControllerTest {
         RequestUserDTO user = defaultUser();
         user.setPhoneNumber("12345678910");
 
-        var result = mvc.perform(post("/users")
+        var result = mvc.perform(post("/users/")
                         .content(mapper.writeValueAsString(user))
                         .header("Authorization", "Bearer " + key)
                         .contentType(MediaType.APPLICATION_JSON)
@@ -94,7 +94,7 @@ public class UserControllerTest {
         RequestUserDTO user = defaultUser();
         user.setRole(null);
 
-        var result = mvc.perform(post("/users")
+        var result = mvc.perform(post("/users/")
                         .content(mapper.writeValueAsString(user))
                         .header("Authorization", "Bearer " + key)
                         .contentType(MediaType.APPLICATION_JSON)
@@ -111,7 +111,7 @@ public class UserControllerTest {
         RequestUserDTO user = defaultUser();
         user.setFirstName("");
 
-        var result = mvc.perform(post("/users")
+        var result = mvc.perform(post("/users/")
                         .content(mapper.writeValueAsString(user))
                         .header("Authorization", "Bearer " + key)
                         .contentType(MediaType.APPLICATION_JSON)
@@ -128,7 +128,7 @@ public class UserControllerTest {
         RequestUserDTO user = defaultUser();
         user.setLastName("");
 
-        var result = mvc.perform(post("/users")
+        var result = mvc.perform(post("/users/")
                         .content(mapper.writeValueAsString(user))
                         .header("Authorization", "Bearer " + key)
                         .contentType(MediaType.APPLICATION_JSON)
@@ -145,7 +145,7 @@ public class UserControllerTest {
         RequestUserDTO user = defaultUser();
         user.setPassword("");
 
-        var result = mvc.perform(post("/users")
+        var result = mvc.perform(post("/users/")
                         .content(mapper.writeValueAsString(user))
                         .header("Authorization", "Bearer " + key)
                         .contentType(MediaType.APPLICATION_JSON)
@@ -163,7 +163,7 @@ public class UserControllerTest {
         user.setEmail("");
         user.setPhoneNumber("");
 
-        var result = mvc.perform(post("/users")
+        var result = mvc.perform(post("/users/")
                         .content(mapper.writeValueAsString(user))
                         .header("Authorization", "Bearer " + key)
                         .contentType(MediaType.APPLICATION_JSON)
@@ -180,7 +180,7 @@ public class UserControllerTest {
         RequestUserDTO user = defaultUser();
         user.setEmail(null);
 
-        var result = mvc.perform(post("/users")
+        var result = mvc.perform(post("/users/")
                         .content(mapper.writeValueAsString(user))
                         .header("Authorization", "Bearer " + key)
                         .contentType(MediaType.APPLICATION_JSON)
@@ -197,7 +197,7 @@ public class UserControllerTest {
         RequestUserDTO user = defaultUser();
         user.setPhoneNumber(null);
 
-        var result = mvc.perform(post("/users")
+        var result = mvc.perform(post("/users/")
                         .content(mapper.writeValueAsString(user))
                         .header("Authorization", "Bearer " + key)
                         .contentType(MediaType.APPLICATION_JSON)

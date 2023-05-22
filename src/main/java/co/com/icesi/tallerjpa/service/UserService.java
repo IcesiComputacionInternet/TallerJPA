@@ -24,8 +24,8 @@ public class UserService {
     @SneakyThrows
     public ResponseUserDTO save(RequestUserDTO userDTO, String role){
         if (role.equalsIgnoreCase("BANK_USER")
-                && !userDTO.getRole().equalsIgnoreCase("user")){
-            throw new CustomException("Bank users can only create users");
+                && userDTO.getRole().equalsIgnoreCase("admin")){
+            throw new CustomException("Bank users can only create users or bank users");
         }
 
         boolean emailExists = userRepository.existsByEmail(userDTO.getEmail());
