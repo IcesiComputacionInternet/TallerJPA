@@ -2,18 +2,20 @@ package co.com.icesi.demojpa.service;
 
 import co.com.icesi.demojpa.dto.RoleCreateDTO;
 import co.com.icesi.demojpa.dto.UserCreateDTO;
-import co.com.icesi.demojpa.mapper.RoleMapper;
+import co.com.icesi.demojpa.error.exception.DetailBuilder;
+import co.com.icesi.demojpa.error.exception.ErrorCode;
 import co.com.icesi.demojpa.mapper.UserMapper;
-import co.com.icesi.demojpa.model.IcesiRole;
 import co.com.icesi.demojpa.model.IcesiUser;
 import co.com.icesi.demojpa.repository.RoleRepository;
 import co.com.icesi.demojpa.repository.UserRepository;
 import lombok.AllArgsConstructor;
+import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
 
-import java.util.ArrayList;
 import java.util.Optional;
 import java.util.UUID;
+
+import static co.com.icesi.demojpa.error.util.IcesiExceptionBuilder.createIcesiException;
 
 @Service
 @AllArgsConstructor
@@ -25,19 +27,8 @@ public class UserService {
 
     public UserCreateDTO save(UserCreateDTO user){
 
-        boolean email = validateEmail(user.getEmail());
-        boolean phone = validatePhone(user.getPhoneNumber());
 
-        if(email && phone){
-            throw new RuntimeException("User with both e-mail and phone already exists");
-        }
-        if (email){
-            throw new RuntimeException("User with this e-mail already exists");
-        }
-        if (phone){
-            throw new RuntimeException("User with this phone already exists");
-        }
-
+        validatePhoneAndPhone(user.getPhoneNumber(), user.getEmail());
         validateRole(user.getRole());
 
         IcesiUser icesiUser = userMapper.fromIcesiUserDTO(user);
@@ -54,10 +45,45 @@ public class UserService {
         return userRepository.findByPhone(phone).isPresent();
     }
 
-    public void validateRole(RoleCreateDTO roleName){
-        Optional.ofNullable(roleName).orElseThrow(() -> new RuntimeException("User must have a role"));
+    public void validatePhoneAndPhone(String phoneNumber, String mail){
+        boolean email = validateEmail(mail);
+        boolean phone = validatePhone(phoneNumber);
 
-        roleRepository.findByName(roleName.getName()).orElseThrow(() -> new RuntimeException("Role does not exist"));
+        if(email && phone){
+            throw createIcesiException(
+                    "User with both e-mail and phone already exists",
+                    HttpStatus.BAD_REQUEST,
+                    new DetailBuilder(ErrorCode.ERR_DUPLICATED, "User", "E-mail", mail),
+                    new DetailBuilder(ErrorCode.ERR_DUPLICATED, "User", "Phone", phoneNumber)
+            ).get();}
+        if (email){
+            throw createIcesiException(
+                    "User with this e-mail already exists",
+                    HttpStatus.BAD_REQUEST,
+                    new DetailBuilder(ErrorCode.ERR_DUPLICATED, "User", "E-mail", mail)
+            ).get();}
+        if (phone){
+            throw createIcesiException(
+                    "User with this phone already exists",
+                    HttpStatus.BAD_REQUEST,
+                    new DetailBuilder(ErrorCode.ERR_DUPLICATED, "User", "Phone", phoneNumber)
+            ).get();}
+    }
+
+    public void validateRole(RoleCreateDTO roleName){
+
+        Optional.ofNullable(roleName).orElseThrow(createIcesiException(
+                "User must have a role",
+                HttpStatus.BAD_REQUEST,
+                new DetailBuilder(ErrorCode.ERR_400, "Role", "Name", "null")
+        ));
+
+
+        roleRepository.findByName(roleName.getName()).orElseThrow(createIcesiException(
+                "Role does not exist",
+                HttpStatus.BAD_REQUEST,
+                new DetailBuilder(ErrorCode.ERR_404, "Role", "Name", roleName.getName())
+        ));
     }
 
 

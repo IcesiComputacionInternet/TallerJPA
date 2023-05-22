@@ -2,6 +2,7 @@ package co.com.icesi.demojpa.unit.service;
 
 import co.com.icesi.demojpa.dto.RoleCreateDTO;
 import co.com.icesi.demojpa.dto.UserCreateDTO;
+import co.com.icesi.demojpa.error.exception.IcesiException;
 import co.com.icesi.demojpa.mapper.UserMapper;
 import co.com.icesi.demojpa.mapper.UserMapperImpl;
 import co.com.icesi.demojpa.model.IcesiRole;
@@ -54,8 +55,9 @@ public class UserServiceTest {
         try{
             userService.save(defaultCreateUserDTO());
             fail();
-        }catch (RuntimeException exception){
+        }catch (IcesiException exception){
             String message= exception.getMessage();
+            System.out.println(message);
             assertEquals("User with this e-mail already exists",message);
         }
     }
@@ -68,7 +70,7 @@ public class UserServiceTest {
         try{
             userService.save(defaultCreateUserDTO());
             fail();
-        }catch (RuntimeException exception){
+        }catch (IcesiException exception){
             String message= exception.getMessage();
             assertEquals("User with this phone already exists",message);
         }
@@ -82,7 +84,7 @@ public class UserServiceTest {
         try{
             userService.save(defaultCreateUserDTO());
             fail();
-        }catch (RuntimeException exception){
+        }catch (IcesiException exception){
             String message= exception.getMessage();
             assertEquals("User with both e-mail and phone already exists",message);
         }
@@ -100,7 +102,7 @@ public class UserServiceTest {
         try{
             userService.save(userCreateDTO);
             fail();
-        }catch (RuntimeException exception){
+        }catch (IcesiException exception){
             String message= exception.getMessage();
             assertEquals("User must have a role",message);
         }
@@ -112,7 +114,7 @@ public class UserServiceTest {
         try{
             userService.save(defaultCreateUserDTO());
             fail();
-        }catch (RuntimeException exception){
+        }catch (IcesiException exception){
             String message= exception.getMessage();
             assertEquals("Role does not exist",message);
         }

@@ -100,7 +100,7 @@ public class AccountServiceTest {
             fail();
         }catch (RuntimeException exception){
             String message= exception.getMessage();
-            assertEquals("Account " + createTransactionOperationDTO().getAccountFrom() + " does not exist",message);
+            assertEquals("Account does not exist",message);
         }
     }
 
@@ -120,7 +120,7 @@ public class AccountServiceTest {
             fail();
         }catch (RuntimeException exception){
             String message= exception.getMessage();
-            assertEquals("Account " + createTransactionOperationDTO().getAccountFrom() + " does not exist",message);
+            assertEquals("Account does not exist",message);
         }
     }
 
@@ -167,7 +167,7 @@ public class AccountServiceTest {
             fail();
         }catch (RuntimeException exception){
             String message= exception.getMessage();
-            assertEquals("Account " + createTransactionOperationDTO().getAccountFrom() + " does not exist",message);
+            assertEquals("Account does not exist",message);
         }
     }
 
@@ -225,7 +225,7 @@ public class AccountServiceTest {
             fail();
         }catch (RuntimeException exception){
             String message= exception.getMessage();
-            assertEquals("Account " + createTransactionOperationDTO().getAccountFrom() + " does not exist",message);
+            assertEquals("Account does not exist",message);
         }
     }
 

@@ -1,6 +1,7 @@
 package co.com.icesi.demojpa.unit.service;
 
 import co.com.icesi.demojpa.dto.RoleCreateDTO;
+import co.com.icesi.demojpa.error.exception.IcesiException;
 import co.com.icesi.demojpa.mapper.RoleMapper;
 import co.com.icesi.demojpa.mapper.RoleMapperImpl;
 import co.com.icesi.demojpa.model.IcesiRole;
@@ -46,7 +47,7 @@ public class RoleServiceTest {
     @Test
     public void saveRoleWithExistentName() {
         when(roleRepository.save(any())).thenReturn(defaultRoleCreateDTO());
-        assertThrows(RuntimeException.class, () -> roleService.save(defaultRoleCreateDTO()));
+        assertThrows(IcesiException.class, () -> roleService.save(defaultRoleCreateDTO()));
     }
 
     private IcesiRole defaultRoleCreate(){
