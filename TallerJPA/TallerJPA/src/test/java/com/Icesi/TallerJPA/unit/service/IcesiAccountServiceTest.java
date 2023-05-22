@@ -58,6 +58,9 @@ public class IcesiAccountServiceTest {
         assertTrue(verificationOfAccountNumber);
     }
 
+
+
+
     @Test
     public void testCreateAccountWithBalanceBelowZero() {
 
@@ -272,15 +275,6 @@ public class IcesiAccountServiceTest {
 
         assertEquals(account.getBalance(), account.getBalance());
     }
-
-
-
-
-
-
-
-
-
 
 
 

@@ -1,14 +1,16 @@
 package com.Icesi.TallerJPA.api;
 
 import com.Icesi.TallerJPA.dto.IcesiRoleDTO;
-import com.Icesi.TallerJPA.model.IcesiRole;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 
-@RequestMapping(RoleApi.ROLE_BASE_URL)
-public interface RoleApi {
+import javax.validation.Valid;
+
+@RequestMapping(RoleAPI.ROLE_BASE_URL)
+public interface RoleAPI {
     String ROLE_BASE_URL = "/roles";
+
     @PostMapping
-    IcesiRoleDTO add(@RequestBody IcesiRoleDTO roleDTO);
+    IcesiRoleDTO createIcesiRole(@RequestBody @Valid IcesiRoleDTO roleDTO);
 }

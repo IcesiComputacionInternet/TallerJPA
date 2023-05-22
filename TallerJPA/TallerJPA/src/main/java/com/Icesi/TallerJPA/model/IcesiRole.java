@@ -11,18 +11,14 @@ import java.util.List;
 import java.util.UUID;
 
 @Data
+@Table
 @Entity
 @Builder
+@AllArgsConstructor
+@NoArgsConstructor
 public class IcesiRole {
     @Id
     private UUID roleId;
     private String description;
     private String name;
-
-   @OneToMany(mappedBy = "icesiRole")
-   private List<IcesiUser> icesiUsers;
-    @PrePersist
-    public void generateId() {
-        this.roleId = UUID.randomUUID();
-    }
 }

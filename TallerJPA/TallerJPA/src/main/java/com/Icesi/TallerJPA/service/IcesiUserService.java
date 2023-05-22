@@ -12,24 +12,28 @@ import lombok.AllArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
 
+import java.util.ArrayList;
+import java.util.List;
 import java.util.Optional;
 import java.util.UUID;
+import java.util.stream.Collectors;
+import java.util.stream.StreamSupport;
 
 @Service
 @AllArgsConstructor
-public class IcesiUserService  {
+public class IcesiUserService {
     private final IcesiUserRepository icesiUserRepository;
     private final IcesiRoleRepository icesiRoleRepository;
     private final IcesiUserMapper icesiUserMapper;
 
-    public  String newUser(IcesiUserDTO icesiUserDTO){
+    public String newUser(IcesiUserDTO icesiUserDTO) {
         String out = "saved User";
         IcesiUser icesiUser = icesiUserMapper.fromIcesiUserDTO(icesiUserDTO);
         save(icesiUserDTO);
         foundRoleName(icesiUser);
-            Optional<IcesiUserDTO> userDTO = Optional.ofNullable(icesiUserDTO);
-            String roleName = userDTO.flatMap(dto -> Optional.ofNullable(dto.getIcesiRole()))
-                    .map(role -> role.getName()).orElseThrow(() ->new IcesiException(HttpStatus.BAD_REQUEST, new IcesiError(ErrorConstants.CODE_UD_04, ErrorConstants.CODE_UD_04.getMessage())));
+        Optional<IcesiUserDTO> userDTO = Optional.ofNullable(icesiUserDTO);
+        String roleName = userDTO.flatMap(dto -> Optional.ofNullable(dto.getIcesiRole()))
+                .map(role -> role.getName()).orElseThrow(() -> new IcesiException(HttpStatus.BAD_REQUEST, new IcesiError(ErrorConstants.CODE_UD_04, ErrorConstants.CODE_UD_04.getMessage())));
 
         icesiUser.setIcesiRole(icesiUserDTO.getIcesiRole());
         icesiUser.setUserId(UUID.randomUUID());
@@ -40,22 +44,21 @@ public class IcesiUserService  {
 
 
     public IcesiUserDTO save(IcesiUserDTO icesiUserDTO) {
-
         boolean foundPhone = icesiUserRepository.finByPhoneNumber(icesiUserDTO.getPhoneNumber()).isPresent();
-        boolean foundEmail = icesiUserRepository.finByEmail(icesiUserDTO.getEmail()).isPresent();
-        if(foundEmail && foundPhone){
-            throw  new RuntimeException(String.valueOf( ErrorConstants.CODE_UD_03.getMessage()));
+        boolean foundEmail = icesiUserRepository.findByEmail(icesiUserDTO.getEmail()).isPresent();
+        if (foundEmail && foundPhone) {
+            throw new RuntimeException(String.valueOf(ErrorConstants.CODE_UD_03.getMessage()));
 
         }
-        if(foundEmail){
-            throw new RuntimeException(String.valueOf( ErrorConstants.CODE_UD_01.getMessage()));
+        if (foundEmail) {
+            throw new RuntimeException(String.valueOf(ErrorConstants.CODE_UD_01.getMessage()));
         }
-        if(foundPhone){
-            throw new RuntimeException(String.valueOf( ErrorConstants.CODE_UD_02.getMessage()));
+        if (foundPhone) {
+            throw new RuntimeException(String.valueOf(ErrorConstants.CODE_UD_02.getMessage()));
 
         }
         if (icesiUserDTO.getIcesiRole() == null) {
-            throw new RuntimeException(String.valueOf( ErrorConstants.CODE_UD_04.getMessage()));
+            throw new RuntimeException(String.valueOf(ErrorConstants.CODE_UD_04.getMessage()));
         }
         IcesiUser icesiUser = icesiUserMapper.fromIcesiUserDTO(icesiUserDTO);
         icesiUser.setUserId(UUID.randomUUID());
@@ -65,13 +68,18 @@ public class IcesiUserService  {
 
 
     public void foundRoleName(IcesiUser icesiUser) throws IcesiException {
-        if(icesiRoleRepository.findExistName(icesiUser.getIcesiRole().getName())){
+        if (icesiRoleRepository.findExistName(icesiUser.getIcesiRole().getName())) {
             throw new IcesiException(HttpStatus.BAD_REQUEST, new IcesiError(ErrorConstants.CODE_UD_05, ErrorConstants.CODE_UD_05.getMessage()));
         }
-
-
     }
 
+    public IcesiUser getUserByEmail(String userEmail) {
+        return icesiUserRepository.findByEmail(userEmail).orElseThrow(() -> {
+            throw new IcesiException(HttpStatus.BAD_REQUEST, new IcesiError(ErrorConstants.CODE_UD_15, ErrorConstants.CODE_UD_15.getMessage()));
+        });
+    }
 
-
+    public List<IcesiUser> getUsers() {
+        return new ArrayList<>(icesiUserRepository.findAll());
+    }
 }

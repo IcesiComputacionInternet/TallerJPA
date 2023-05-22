@@ -8,11 +8,13 @@ import org.springframework.stereotype.Repository;
 
 import java.util.Optional;
 import java.util.UUID;
-
+@Repository
 public interface IcesiRoleRepository extends JpaRepository<IcesiRole, UUID> {
 
     @Query("SELECT role FROM IcesiRole role WHERE role.name = :name")
    boolean findExistName(String name);
 
     Optional<IcesiRole> findByName(String name);
+
+
 }

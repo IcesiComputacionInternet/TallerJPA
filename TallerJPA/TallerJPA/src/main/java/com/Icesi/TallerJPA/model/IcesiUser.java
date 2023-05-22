@@ -1,5 +1,6 @@
 package com.Icesi.TallerJPA.model;
 
+import com.Icesi.TallerJPA.validation.CustomAnnotations;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
@@ -11,6 +12,7 @@ import java.util.List;
 import java.util.UUID;
 
 @Data
+@Table
 @Entity
 @Builder
 @NoArgsConstructor
@@ -22,14 +24,13 @@ public class IcesiUser {
     private String lastName;
     private String email;
     private String phoneNumber;
+    @CustomAnnotations.PasswordValidation
     private String password;
-    @OneToMany
-      private List<IcesiAccount> icesiAccounts;
 
     @OneToMany(mappedBy = "icesiUser")
     private List<IcesiAccount> accounts;
 
-    @ManyToOne(optional = false)
-    @JoinColumn(name = "icesi_role_role_id", nullable = false)
+    @ManyToOne
+    @JoinColumn(name = "role_id", nullable = false)
     private IcesiRole icesiRole;
 }

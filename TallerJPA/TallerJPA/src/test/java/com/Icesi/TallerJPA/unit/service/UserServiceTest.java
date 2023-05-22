@@ -40,7 +40,7 @@ public class UserServiceTest {
     }
     @Test
     public void testExistingEmail() {
-        when(icesiUserRepository.finByEmail(any())).thenReturn(Optional.of(createIcesiUser()));
+        when(icesiUserRepository.findByEmail(any())).thenReturn(Optional.of(createIcesiUser()));
 
         try {
             userService.save(icesiUserDTO());
@@ -79,7 +79,7 @@ public class UserServiceTest {
 
     @Test
     public void testIcesiUserWithPhoneNumberAndEmailAlreadyExists() {
-        when(icesiUserRepository.finByEmail(any())).thenReturn(Optional.of(createIcesiUser()));
+        when(icesiUserRepository.findByEmail(any())).thenReturn(Optional.of(createIcesiUser()));
         when(icesiUserRepository.finByPhoneNumber(any())).thenReturn(Optional.of(createIcesiUser()));
         try {
             userService.save(icesiUserDTO1());

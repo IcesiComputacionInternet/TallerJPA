@@ -1,43 +1,34 @@
 package com.Icesi.TallerJPA.Controller;
 
-import com.Icesi.TallerJPA.api.UserApi;
+import com.Icesi.TallerJPA.api.UserAPI;
 import com.Icesi.TallerJPA.dto.IcesiUserDTO;
+import com.Icesi.TallerJPA.mapper.IcesiUserMapper;
+import com.Icesi.TallerJPA.model.IcesiUser;
 import com.Icesi.TallerJPA.service.IcesiUserService;
-import lombok.AllArgsConstructor;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestBody;
+import lombok.RequiredArgsConstructor;
 import org.springframework.web.bind.annotation.RestController;
 
 import java.util.List;
+import java.util.stream.Collectors;
 
-@RestController("BASE_USER_URL")
-@AllArgsConstructor
-public class IcesiUserController implements UserApi {
+@RestController
+@RequiredArgsConstructor
+public class IcesiUserController implements UserAPI {
     private final IcesiUserService userService;
-    @PostMapping
-    public IcesiUserDTO createUser (@RequestBody IcesiUserDTO user){
-        return  userService.save(user);
+    private final IcesiUserMapper userMapper;
+
+    @Override
+    public IcesiUserDTO createIcesiUser(IcesiUserDTO user) {
+        return userService.save(user);
     }
 
     @Override
-    public IcesiUserDTO getUser(String userEmail) {
-        return null;
-    }
-
-    @GetMapping
-    public List<IcesiUserDTO> getAllUsers(){
-        return null;
+    public IcesiUserDTO getUserByEmail(String userEmail) {
+        return userMapper.fromIcesiUser(userService.getUserByEmail(userEmail));
     }
 
     @Override
-    public IcesiUserDTO addUser(IcesiUserDTO icesiUserDTO) {
-        return null;
+    public List<IcesiUserDTO> getAllUsers() {
+        return userService.getUsers().stream().map(userMapper::fromIcesiUser).collect(Collectors.toList());
     }
-
-    @GetMapping("/{userId}")
-    public IcesiUserDTO getUser(){
-        return  null;
-    }
-
 }

@@ -7,7 +7,9 @@ import lombok.NoArgsConstructor;
 
 import javax.persistence.*;
 import java.util.UUID;
+
 @Data
+@Table
 @Entity
 @Builder
 @AllArgsConstructor
@@ -24,8 +26,4 @@ public class IcesiAccount {
    @JoinColumn(name = "icesi_user_user_id", nullable = false)
    private IcesiUser icesiUser;
 
-    @PrePersist
-    public void generateId() {
-        this.accountId = UUID.randomUUID();
-    }
 }

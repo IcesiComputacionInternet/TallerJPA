@@ -23,7 +23,7 @@ public class IcesiAccountService {
     private final IcesiAccountMapper icesiAccountMapper;
 
 
-    public IcesiAccount save(IcesiAccountDTO icesiAccountCreateDto) {
+    public IcesiAccountDTO save(IcesiAccountDTO icesiAccountCreateDto) {
         icesiAccountCreateDto.setAccountNumber(generateAccountNumbers());
         if (icesiAccountRepository.findByAccountNumber(icesiAccountCreateDto.getAccountNumber()).isPresent()) {
             throw new RuntimeException(String.valueOf(ErrorConstants.CODE_UD_06.getMessage()));
@@ -34,7 +34,8 @@ public class IcesiAccountService {
         IcesiAccount icesiAccount = icesiAccountMapper.fromIcesiAccountDTO(icesiAccountCreateDto);
         icesiAccount.setAccountId(UUID.randomUUID());
 
-        return icesiAccountRepository.save(icesiAccount);
+        icesiAccountRepository.save(icesiAccount);
+        return icesiAccountCreateDto;
     }
 
     private void validInformation(IcesiAccountDTO icesiAccountCreateDto) {
@@ -90,14 +91,16 @@ public class IcesiAccountService {
         return idAccount.toString();
     }
 
-    public void withdrawals(IcesiAccountDTO icesiAccountDTO, String numberAccount, int value) {
+    public void withdrawals( String numberAccount, int value) {
         if (icesiAccountRepository.findByAccountNumber(numberAccount).isEmpty()) {
             throw new RuntimeException(String.valueOf(ErrorConstants.CODE_UD_08.getMessage()));
         }
+        IcesiAccountDTO icesiAccountDTO= icesiAccountMapper.fromIcesiAccount( icesiAccountRepository.returnAccount(numberAccount));
         long balance = icesiAccountDTO.getBalance();
         if (balance < value) {
             throw new RuntimeException(String.valueOf(ErrorConstants.CODE_UD_10.getMessage()));
         }
+
         icesiAccountDTO.setBalance(balance - value);
     }
 
