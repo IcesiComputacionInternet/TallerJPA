@@ -66,22 +66,20 @@ public class SecurityConfiguration {
 
     @Bean
     public AuthorizationManager<RequestAuthorizationContext> requestMatcherAuthorizationManager(HandlerMappingIntrospector introspector){
-        RequestMatcher permitAll = new AndRequestMatcher(new MvcRequestMatcher(introspector, "/token"));
+        RequestMatcher permitAll = new AndRequestMatcher(new MvcRequestMatcher(introspector, "/login"));
+
         RequestMatcherDelegatingAuthorizationManager.Builder managerBuilder =
                 RequestMatcherDelegatingAuthorizationManager.builder()
                         .add(permitAll, (context, other) -> new AuthorizationDecision(true));
 
+       managerBuilder.add(new MvcRequestMatcher(introspector, "/users/**"),
+                AuthorityAuthorizationManager.hasAnyAuthority("SCOPE_ADMIN"));
+
         managerBuilder.add(new MvcRequestMatcher(introspector, "/roles/**"),
                 AuthorityAuthorizationManager.hasAnyAuthority("SCOPE_ADMIN"));
 
-        managerBuilder.add(new MvcRequestMatcher(introspector, "/users/**"),
-                AuthorityAuthorizationManager.hasAnyAuthority("SCOPE_ADMIN"));
-
-        managerBuilder.add(new MvcRequestMatcher(introspector, "/users/createForBankUsers"),
-                AuthorityAuthorizationManager.hasAnyAuthority("BANK_USER"));
-
         managerBuilder.add(new MvcRequestMatcher(introspector, "/accounts/**"),
-                AuthorityAuthorizationManager.hasAnyAuthority("BANK_USER"));
+                AuthorityAuthorizationManager.hasAnyAuthority("SCOPE_ADMIN", "USER"));
 
         AuthorizationManager<HttpServletRequest> manager = managerBuilder.build();
         return ((authentication, object) -> manager.check(authentication, object.getRequest()));

@@ -9,6 +9,7 @@ public enum ErrorCode {
     ERR_404("ERR_404", "%s with %s: %s not found."),
     ERR_500("ERR_500", "Oops, we ran into an error."),
     ERR_400("ERR_400", "Field %s %s."),
+    ERR_403("ERR_403", "Not authorized."),
     ERR_DUPLICATED("ERR_DUPLICATED", "Resource %s with field %s: %s, already exists."),
     ERR_BALANCE_BELOW_ZERO("ERR_BALANCE_BELOW_ZERO", "Account's balance can not be below 0."),
     ERR_ACCOUNT_TYPE("ERR_ACCOUNT_TYPE", "Account's type has to be deposit only or normal."),

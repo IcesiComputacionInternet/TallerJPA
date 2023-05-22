@@ -4,7 +4,6 @@ import co.com.icesi.icesiAccountSystem.dto.RequestAccountDTO;
 import co.com.icesi.icesiAccountSystem.dto.ResponseAccountDTO;
 import co.com.icesi.icesiAccountSystem.dto.TransactionOperationDTO;
 import co.com.icesi.icesiAccountSystem.enums.ErrorCode;
-import co.com.icesi.icesiAccountSystem.error.exception.AccountSystemException;
 import co.com.icesi.icesiAccountSystem.error.exception.DetailBuilder;
 import co.com.icesi.icesiAccountSystem.mapper.AccountMapper;
 import co.com.icesi.icesiAccountSystem.enums.AccountType;
@@ -12,6 +11,7 @@ import co.com.icesi.icesiAccountSystem.model.IcesiAccount;
 import co.com.icesi.icesiAccountSystem.model.IcesiUser;
 import co.com.icesi.icesiAccountSystem.repository.AccountRepository;
 import co.com.icesi.icesiAccountSystem.repository.UserRepository;
+import co.com.icesi.icesiAccountSystem.security.IcesiSecurityContext;
 import lombok.AllArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
@@ -34,10 +34,8 @@ public class AccountService {
 
     public ResponseAccountDTO saveAccount(RequestAccountDTO requestAccountDTO){
         List<DetailBuilder> errors = new ArrayList<>();
-        var user = userRepository.findByEmail(requestAccountDTO.getUserEmail());
-        if(!user.isPresent()){
-            errors.add(new DetailBuilder(ErrorCode.ERR_404, "User", "email", requestAccountDTO.getUserEmail()));
-        }
+        checkPermissionsToCreate(requestAccountDTO.getUserEmail());
+        var user = validateIfUserExists(requestAccountDTO.getUserEmail(),errors);
         var type = checkAccountType(requestAccountDTO.getType(),errors);
 
         if (!errors.isEmpty()){
@@ -50,12 +48,20 @@ public class AccountService {
 
         IcesiAccount icesiAccount = accountMapper.fromAccountDTO(requestAccountDTO);
         icesiAccount.setAccountId(UUID.randomUUID());
-        icesiAccount.setUser(user.get());
+        icesiAccount.setUser(user);
         icesiAccount.setAccountNumber(getAccountNumber());
         icesiAccount.setType(type);
         icesiAccount.setActive(true);
         accountRepository.save(icesiAccount);
         return accountMapper.fromAccountToResponseAccountDTO(icesiAccount);
+    }
+
+    private IcesiUser validateIfUserExists(String userEmail, List<DetailBuilder> errors) {
+        var user = userRepository.findByEmail(userEmail);
+        if(!user.isPresent()){
+            errors.add(new DetailBuilder(ErrorCode.ERR_404, "User", "email", userEmail));
+        }
+        return user.get();
     }
 
     private AccountType checkAccountType(String type, List<DetailBuilder> errors){
@@ -107,8 +113,30 @@ public class AccountService {
         return account;
     }
 
+    private void checkPermissionsToCreate(String accUserEmail) {
+        System.out.println(IcesiSecurityContext.getCurrentUserEmail());
+        if((IcesiSecurityContext.getCurrentUserRole().equals("BANK_USER"))||(!IcesiSecurityContext.getCurrentUserEmail().equals(accUserEmail))){
+            throw createAccountSystemException(
+                    "Only an ADMIN user can create new accounts for any user, and a normal USER only can create accounts for himself.",
+                    HttpStatus.FORBIDDEN,
+                    new DetailBuilder(ErrorCode.ERR_403)
+            ).get();
+        }
+    }
+
+    private void checkPermissionsToUpdate(String accUserId) {
+        if((IcesiSecurityContext.getCurrentUserRole().equals("BANK_USER"))||(!IcesiSecurityContext.getCurrentUserId().equals(accUserId))){
+            throw createAccountSystemException(
+                    "Only an ADMIN user or the owner or the account can update it.",
+                    HttpStatus.FORBIDDEN,
+                    new DetailBuilder(ErrorCode.ERR_403)
+            ).get();
+        }
+    }
+
     public ResponseAccountDTO enableAccount(String accountNumber){
         var account = validateAccountNumber(accountNumber);
+        checkPermissionsToUpdate(account.getUser().getUserId().toString());
         account.setActive(true);
         accountRepository.save(account);
         return accountMapper.fromAccountToResponseAccountDTO(account);
@@ -126,6 +154,7 @@ public class AccountService {
 
     public ResponseAccountDTO disableAccount(String accountNumber){
         var account = validateAccountNumber(accountNumber);
+        checkPermissionsToUpdate(account.getUser().getUserId().toString());
         checkBalanceIsZero(account.getBalance());
         account.setActive(false);
         accountRepository.save(account);
@@ -154,6 +183,7 @@ public class AccountService {
 
     public TransactionOperationDTO withdrawMoney(TransactionOperationDTO transaction){
         var account = validateAccountNumber(transaction.getAccountFrom());
+        checkPermissionsToUpdate(account.getUser().getUserId().toString());
         checkIfAnAccountIsActive(account);
         validateAccountBalance(account, transaction.getAmount());
         account.setBalance(account.getBalance() - transaction.getAmount());
@@ -164,6 +194,7 @@ public class AccountService {
 
     public TransactionOperationDTO depositMoney(TransactionOperationDTO transaction){
         var account = validateAccountNumber(transaction.getAccountTo());
+        checkPermissionsToUpdate(account.getUser().getUserId().toString());
         checkIfAnAccountIsActive(account);
         account.setBalance(account.getBalance() + transaction.getAmount());
         accountRepository.save(account);
@@ -174,6 +205,7 @@ public class AccountService {
     public TransactionOperationDTO transferMoney(TransactionOperationDTO transaction){
         var accountFrom = validateAccountNumber(transaction.getAccountFrom());
         var accountTo = validateAccountNumber(transaction.getAccountTo());
+        checkPermissionsToUpdate(accountFrom.getUser().getUserId().toString());
         validateAccountBalance(accountFrom, transaction.getAmount());
         checkIfAnAccountIsActive(accountFrom);
         checkIfAnAccountIsActive(accountTo);

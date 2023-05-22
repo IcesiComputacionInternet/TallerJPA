@@ -1,4 +1,4 @@
-package co.com.icesi.icesiAccountSystem;
+package co.com.icesi.icesiAccountSystem.integrationTests;
 import co.com.icesi.icesiAccountSystem.dto.LoginDTO;
 import co.com.icesi.icesiAccountSystem.dto.TokenDTO;
 import com.fasterxml.jackson.databind.ObjectMapper;
@@ -20,7 +20,7 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 @Import(TestConfigurationData.class)
 @ActiveProfiles(profiles="test")
 
-class IcesiAccountSystemApplicationTests {
+class AuthControllerTest {
 	@Autowired
 	private MockMvc mockMvc;
 
@@ -33,7 +33,7 @@ class IcesiAccountSystemApplicationTests {
 
 	@Test
 	public void testTokenEndPoint() throws Exception{
-		var result = mockMvc.perform(MockMvcRequestBuilders.get("/token").content(
+		var result = mockMvc.perform(MockMvcRequestBuilders.post("/login").content(
 				objectMapper.writeValueAsString(new LoginDTO("johndoe@email.com", "password")))
 				.contentType(MediaType.APPLICATION_JSON)
 				.accept(MediaType.APPLICATION_JSON))
@@ -42,17 +42,29 @@ class IcesiAccountSystemApplicationTests {
 		TokenDTO token =objectMapper.readValue(result.getResponse().getContentAsString(), TokenDTO.class);
 		assertNotNull(token);
 	}
-/*
+
 	@Test
 	public void testTokenEndPointWithInvalidEmail() throws Exception{
-		var result = mockMvc.perform(MockMvcRequestBuilders.get("/token").content(
-								objectMapper.writeValueAsString(new LoginDTO("incorrect@email.com", "password")))
+		var result = mockMvc.perform(MockMvcRequestBuilders.post("/login").content(
+								objectMapper.writeValueAsString(new LoginDTO("johndoeemail.com", "password")))
 						.contentType(MediaType.APPLICATION_JSON)
 						.accept(MediaType.APPLICATION_JSON))
-				.andExpect(status().isOk())
+				.andExpect(status().isBadRequest())
 				.andReturn();
-		IcesiError token =objectMapper.readValue(result.getResponse().getContentAsString(), TokenDTO.class);
+		TokenDTO token =objectMapper.readValue(result.getResponse().getContentAsString(), TokenDTO.class);
 		assertNotNull(token);
-	}*/
+	}
+
+	@Test
+	public void testTokenEndPointWithAnEmailThatDoesNotExists() throws Exception{
+		var result = mockMvc.perform(MockMvcRequestBuilders.post("/login").content(
+								objectMapper.writeValueAsString(new LoginDTO("sara@email.com", "password")))
+						.contentType(MediaType.APPLICATION_JSON)
+						.accept(MediaType.APPLICATION_JSON))
+				.andExpect(status().isBadRequest())
+				.andReturn();
+		TokenDTO token =objectMapper.readValue(result.getResponse().getContentAsString(), TokenDTO.class);
+		assertNotNull(token);
+	}
 
 }

@@ -15,6 +15,4 @@ public interface UserAPI {
     List<ResponseUserDTO> getAllUsers();
     @PostMapping("/create")
     ResponseUserDTO createUser(@Valid @RequestBody RequestUserDTO requestUserDTO);
-    @PostMapping("/createForBankUsers")
-    ResponseUserDTO createUsersForBankUsers(@Valid @RequestBody RequestUserDTO requestUserDTO);
 }

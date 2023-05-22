@@ -1,4 +1,4 @@
-package co.com.icesi.icesiAccountSystem;
+package co.com.icesi.icesiAccountSystem.integrationTests;
 
 import co.com.icesi.icesiAccountSystem.model.IcesiRole;
 import co.com.icesi.icesiAccountSystem.model.IcesiUser;

@@ -6,13 +6,18 @@ import co.com.icesi.icesiAccountSystem.dto.ResponseUserDTO;
 import co.com.icesi.icesiAccountSystem.enums.ErrorCode;
 import co.com.icesi.icesiAccountSystem.error.exception.DetailBuilder;
 import co.com.icesi.icesiAccountSystem.mapper.UserMapper;
+import co.com.icesi.icesiAccountSystem.model.IcesiRole;
 import co.com.icesi.icesiAccountSystem.model.IcesiUser;
 import co.com.icesi.icesiAccountSystem.repository.RoleRepository;
 import co.com.icesi.icesiAccountSystem.repository.UserRepository;
+import co.com.icesi.icesiAccountSystem.controller.HomeController;
+import co.com.icesi.icesiAccountSystem.security.IcesiSecurityContext;
 import lombok.AllArgsConstructor;
+import lombok.SneakyThrows;
 import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
 
+import java.text.ParseException;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.UUID;
@@ -27,21 +32,14 @@ public class UserService {
     private final RoleRepository roleRepository;
     private final UserMapper userMapper;
 
-    public ResponseUserDTO saveUser(RequestUserDTO requestUserDTO, String type_user) {
+    public ResponseUserDTO saveUser(RequestUserDTO requestUserDTO) {
         List<DetailBuilder> errors = new ArrayList<>();
-        if(type_user.equals("bank_user") && requestUserDTO.getRoleName().equals("ADMIN")){
-            throw createAccountSystemException(
-                    "A bank user can't create users of type ADMIN.",
-                    HttpStatus.FORBIDDEN,
-                    new DetailBuilder(ErrorCode.ERR_400, "role status is", requestUserDTO.getRoleName())
-            ).get();
-        }
         var role = roleRepository.findByName(requestUserDTO.getRoleName());
         if(!role.isPresent()){
             errors.add(new DetailBuilder(ErrorCode.ERR_404, "Role", "name", requestUserDTO.getRoleName()));
         }
-        validateIfEmailIsAlreadyRegistered(requestUserDTO.getEmail(),errors);
-        validateIfPhoneIsAlreadyRegistered(requestUserDTO.getPhoneNumber(),errors);
+        validateIfEmailIsDuplicated(requestUserDTO.getEmail(),errors);
+        validateIfPhoneIsDuplicated(requestUserDTO.getPhoneNumber(),errors);
 
         if (!errors.isEmpty()){
             throw createAccountSystemException(
@@ -50,7 +48,7 @@ public class UserService {
                     errors.stream().toArray(DetailBuilder[]::new)
             ).get();
         }
-
+        checkPermissions(role.get().getName());
         IcesiUser icesiUser = userMapper.fromUserDTO(requestUserDTO);
         icesiUser.setUserId(UUID.randomUUID());
         icesiUser.setRole(role.get());
@@ -58,13 +56,23 @@ public class UserService {
         return userMapper.fromUserToResponseUserDTO(icesiUser);
     }
 
-    private void validateIfEmailIsAlreadyRegistered(String userEmail, List<DetailBuilder> errors){
+    private void checkPermissions(String roleToAssign) {
+        if((roleToAssign.equals("ADMIN") && IcesiSecurityContext.getCurrentUserRole().equals("BANK_USER"))||(IcesiSecurityContext.getCurrentUserRole().equals("USER"))){
+            throw createAccountSystemException(
+                    "A normal user or a bank user can't create users of type ADMIN.",
+                    HttpStatus.FORBIDDEN,
+                    new DetailBuilder(ErrorCode.ERR_403)
+            ).get();
+        }
+    }
+
+    private void validateIfEmailIsDuplicated(String userEmail, List<DetailBuilder> errors){
         if(userRepository.findByEmail(userEmail).isPresent()){
             errors.add(new DetailBuilder(ErrorCode.ERR_DUPLICATED, "user", "email", userEmail));
         }
     }
 
-    private void validateIfPhoneIsAlreadyRegistered(String userPhone, List<DetailBuilder> errors){
+    private void validateIfPhoneIsDuplicated(String userPhone, List<DetailBuilder> errors){
         if(userRepository.findByPhoneNumber(userPhone).isPresent()){
             errors.add(new DetailBuilder(ErrorCode.ERR_DUPLICATED, "user", "phone", userPhone));
         }

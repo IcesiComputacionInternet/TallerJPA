@@ -18,6 +18,7 @@ public class IcesiAccountSystemApplication {
 	public static void main(String[] args) {
 		SpringApplication.run(IcesiAccountSystemApplication.class, args);
 	}
+
 	/*@Bean
 	CommandLineRunner commandLineRunner(UserRepository userRepository, RoleRepository
 			roleRepository, PasswordEncoder encoder) {

@@ -10,8 +10,8 @@ public interface RoleAPI {
 
     String BASE_ROLE_URL="/roles";
     @GetMapping("/{name}")
-    RoleDTO getRole(@PathVariable String roleName);
+    RoleDTO getRole(@PathVariable("name") String roleName);
     List<RoleDTO> getAllRoles();
     @PostMapping("/create")
-    RoleDTO createRole(@Valid @RequestBody RoleDTO roleDTO);
+    RoleDTO createRole(@RequestBody @Valid RoleDTO roleDTO);
 }

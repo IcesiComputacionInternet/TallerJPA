@@ -15,6 +15,6 @@ public class EmailAndPhoneValidator implements
 
     @Override
     public boolean isValid(RequestUserDTO dto, ConstraintValidatorContext cxt) {
-        return !dto.getPhoneNumber().isBlank() || !dto.getEmail().isBlank();
+        return !dto.getPhoneNumber().isEmpty() || !dto.getEmail().isEmpty();
     }
 }

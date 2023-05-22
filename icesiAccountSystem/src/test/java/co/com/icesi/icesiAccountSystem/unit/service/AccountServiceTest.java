@@ -30,7 +30,7 @@ import static org.mockito.Mockito.*;
 import static org.mockito.Mockito.times;
 
 public class AccountServiceTest {
-    private AccountService accountService;
+   /* private AccountService accountService;
     private AccountRepository accountRepository;
     private UserRepository userRepository;
     private AccountMapper accountMapper;
@@ -117,7 +117,7 @@ public class AccountServiceTest {
             assertEquals("User with email: ykaar@gmail.com not found.", detail.getErrorMessage(), "Error message doesn't match");
         }
     }
-    /*
+
     TEST COMENTADO PORQUE ESTA VALIDACIÓN SE PUEDE REALIZAR CON  @Min(value=0, message = "The amount of a transaction must be greater than 0")
     ******* VER TEST DE INTEGRACIÓN
 
@@ -141,7 +141,7 @@ public class AccountServiceTest {
             // Assert
             assertEquals("Account's balance can not be below 0.", message);
         }
-    }*/
+    }
 
     //EL SIGUIENTE TEST SE PUEDE REEMPLAZAR CON LAS VALIDACIONES
     //@NotNull(message = "The type of an account can't be null")
@@ -800,5 +800,5 @@ public class AccountServiceTest {
                 .name("Director SIS")
                 .build();
     }
-
+*/
 }

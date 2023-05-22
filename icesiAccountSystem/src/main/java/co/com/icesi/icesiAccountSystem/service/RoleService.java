@@ -7,6 +7,7 @@ import co.com.icesi.icesiAccountSystem.error.exception.DetailBuilder;
 import co.com.icesi.icesiAccountSystem.mapper.RoleMapper;
 import co.com.icesi.icesiAccountSystem.model.IcesiRole;
 import co.com.icesi.icesiAccountSystem.repository.RoleRepository;
+import co.com.icesi.icesiAccountSystem.security.IcesiSecurityContext;
 import lombok.AllArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
@@ -25,6 +26,7 @@ public class RoleService {
     private final RoleMapper roleMapper;
 
     public RoleDTO saveRole(RoleDTO roleDTO){
+        checkPermissions();
         if(roleRepository.findByName(roleDTO.getName()).isPresent()){
             throw createAccountSystemException(
                     "Another role already has this name.",
@@ -39,6 +41,7 @@ public class RoleService {
     }
 
     public RoleDTO getRole(String roleName) {
+        checkPermissions();
         var roleByName=roleRepository.findByName(roleName)
                 .orElseThrow(
                         createAccountSystemException(
@@ -48,6 +51,16 @@ public class RoleService {
                         )
                 );
         return roleMapper.fromRoleToRoleDTO(roleByName);
+    }
+
+    private void checkPermissions() {
+        if(!IcesiSecurityContext.getCurrentUserRole().equals("ADMIN")){
+            throw createAccountSystemException(
+                    "Only an ADMIN user can create and see created roles.",
+                    HttpStatus.FORBIDDEN,
+                    new DetailBuilder(ErrorCode.ERR_403)
+            ).get();
+        }
     }
 
     public List<RoleDTO> getAllRoles() {

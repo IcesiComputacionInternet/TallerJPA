@@ -8,6 +8,7 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RestController;
 
 import javax.validation.Valid;
+import java.text.ParseException;
 import java.util.List;
 
 
@@ -29,9 +30,7 @@ public class UserController implements UserAPI {
 
     @Override
     public ResponseUserDTO createUser(RequestUserDTO requestUserDTO) {
-        return userService.saveUser(requestUserDTO, "admin");
+        return userService.saveUser(requestUserDTO);
     }
 
-    @Override
-    public ResponseUserDTO createUsersForBankUsers(RequestUserDTO requestUserDTO) {return userService.saveUser(requestUserDTO, "bank_user");}
 }
