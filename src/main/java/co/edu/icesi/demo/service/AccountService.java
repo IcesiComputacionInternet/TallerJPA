@@ -98,7 +98,7 @@ public class AccountService {
             throw createIcesiException(
                     "Deposit only account "+ icesiAccount.getAccountNumber()+" can't transfer or be transferred money",
                     HttpStatus.BAD_REQUEST,
-                    new DetailBuilder(ErrorCode.ERR_400, "Account Number",icesiAccount.getAccountNumber() )
+                    new DetailBuilder(ErrorCode.ERR_400, "Deposit only account can't transfer or be transferred money: Account Number",icesiAccount.getAccountNumber() )
             ).get();
         }
     }
@@ -151,7 +151,7 @@ public class AccountService {
             throw createIcesiException(
                     "Balance is not 0. Account can't be disabled",
                     HttpStatus.BAD_REQUEST,
-                    new DetailBuilder(ErrorCode.ERR_400, "","")
+                    new DetailBuilder(ErrorCode.ERR_400, "Balance is not 0. Account can't be disabled","")
             ).get();
         }
 
@@ -169,7 +169,7 @@ public class AccountService {
             throw createIcesiException(
                     "Not enough money in the account to do this transaction",
                     HttpStatus.BAD_REQUEST,
-                    new DetailBuilder(ErrorCode.ERR_400, "","" )
+                    new DetailBuilder(ErrorCode.ERR_400, "Not enough money in the account to do this transaction","" )
             ).get();
         }
     }
@@ -179,7 +179,7 @@ public class AccountService {
         return accountRepository.findByAccountNumber(accountNumber,true).orElseThrow(createIcesiException(
                 "Transaction can't be made",
                 HttpStatus.NOT_FOUND,
-                new DetailBuilder(ErrorCode.ERR_404, "Active account",accountNumber )
+                new DetailBuilder(ErrorCode.ERR_404, "Transaction can't be made: Active account",accountNumber )
         ));
     }
 
