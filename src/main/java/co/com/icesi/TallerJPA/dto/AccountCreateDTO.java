@@ -16,7 +16,7 @@ public class AccountCreateDTO {
     @Min(value = 0, message = "The balance must be greater than 0")
     private long balance;
 
-    @NotBlank
+
     private AccountType type;
 
     @NotBlank

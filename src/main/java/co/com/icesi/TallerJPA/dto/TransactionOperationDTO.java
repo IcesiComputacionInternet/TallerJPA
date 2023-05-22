@@ -13,9 +13,10 @@ import javax.validation.constraints.NotNull;
 public class TransactionOperationDTO {
 
 
+
     private String accountFrom;
     private String accountTo;
-    @NotBlank
+    @NotNull
     @Min(value = 0, message = "The amount must be greater than 0")
     private Long amount;
     private String result;

@@ -80,7 +80,7 @@ public class SecurityConfiguration {
 
         //Paths that require user role
         managerBuilder.add(new MvcRequestMatcher(introspector,"/accounts/**"),
-                AuthorityAuthorizationManager.hasAnyAuthority("SCOPE_USER"));
+                AuthorityAuthorizationManager.hasAnyAuthority("SCOPE_USER","SCOPE_ADMIN"));
 
         //Paths that require bank role
 

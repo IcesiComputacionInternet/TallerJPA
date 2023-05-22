@@ -23,13 +23,11 @@ public interface UserRepository extends JpaRepository<IcesiUser, UUID> {
     @Query(value = "SELECT u FROM IcesiUser u WHERE u.email = :email")
     Optional<IcesiUser> findUserByEmail(String email);
 
+    @Query(value = "SELECT u FROM IcesiUser u WHERE u.userId = :id")
+    Optional<IcesiUser> findUserById(UUID id);
+
     @Modifying
     @Query(value = "UPDATE IcesiUser u SET u.role = :role WHERE u.email = :email")
     void updateRole(String email, IcesiRole role);
 
-/*
-@Modifying
-    @Query(value = "UPDATE IcesiAccount a SET a.balance = :balance WHERE a.accountNumber = :accountNumber")
-    void updateAccount(String accountNumber,Long balance);
- */
 }

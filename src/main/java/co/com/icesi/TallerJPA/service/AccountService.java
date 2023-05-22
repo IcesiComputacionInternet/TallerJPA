@@ -64,16 +64,22 @@ public class AccountService {
     }
 
     private void validateIfUserIsOwner(String accountNumber){
-        var email = IcesiSecurityContext.getCurrentUserId();
-        System.out.println("Hello "+email);
-        var owner = accountRepository.findIfUserIsOwner(accountNumber,userRepository.findUserByEmail(email).orElse(null));
-        if (!owner){
+        var userId = IcesiSecurityContext.getCurrentUserId();
+        System.out.println("Hello "+ userId);
+        boolean owner = accountRepository.findIfUserIsOwner(accountNumber,userRepository.findUserById(UUID.fromString(userId)).orElse(null));
+        boolean admin = validateIfUserIsAdmin();
+        if (!owner && !admin){
             throw ArgumentsExceptionBuilder.createArgumentsException(
                     "Unauthorized, you are not the owner of the account",
                     HttpStatus.UNAUTHORIZED,
                     new DetailBuilder(ErrorCode.ERR_401)
             );
         }
+    }
+
+    private boolean validateIfUserIsAdmin(){
+        var role = IcesiSecurityContext.getCurrentUserRole();
+        return role.equals("ADMIN");
     }
 
     public IcesiAccount getAccountByAccountNumber(String accountNumber){
