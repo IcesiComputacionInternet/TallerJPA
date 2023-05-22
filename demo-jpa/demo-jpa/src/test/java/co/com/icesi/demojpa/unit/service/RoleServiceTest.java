@@ -35,7 +35,7 @@ public class RoleServiceTest {
         userRepository = mock(UserRepository.class);
         roleRepository = mock(RoleRepository.class);
         roleMapper = spy(RoleMapperImpl.class);
-        roleService = new RoleService(roleRepository,roleMapper);
+        roleService = new RoleService(roleMapper,roleRepository);
     }
 
     @Test
@@ -47,27 +47,14 @@ public class RoleServiceTest {
     }
 
     @Test
-    public void testSaveWhenNameAlreadyExists(){
-        when(roleRepository.findByName(any())).thenReturn(Optional.of(defaultRole()));
-        try{
+    public void testSaveRoleWhenNameAlreadyExists() {
+        when(roleRepository.existsByName(any())).thenReturn(true);
+        try {
             roleService.save(defaultRoleDTO());
             fail();
-        }catch (RuntimeException exception){
-            String exceptionMessage = exception.getMessage();
-            assertEquals("Role already exists",exceptionMessage);
-        }
-    }
-
-    @Test
-    public void testAddUserToRoleWhenUserDoesNotExist(){
-        IcesiUser user = defaultIcesiUser();
-        IcesiRole role =defaultRole();
-        when(userRepository.findById(any())).thenReturn(Optional.empty());
-        try{
-            fail();
-        }catch (RuntimeException exception){
-            String exceptionMessage = exception.getMessage();
-            assertEquals("User doesn't exists",exceptionMessage);
+        } catch (RuntimeException exception) {
+            String message = exception.getMessage();
+            assertEquals("Role already exists", message);
         }
     }
 

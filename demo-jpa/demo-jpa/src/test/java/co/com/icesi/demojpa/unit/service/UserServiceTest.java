@@ -38,7 +38,7 @@ public class UserServiceTest {
         roleRepository = mock(RoleRepository.class);
         accountRepository = mock(AccountRepository.class);
         userMapper = spy(UserMapperImpl.class);
-        userService = new UserService(userRepository,userMapper,roleRepository, accountRepository);
+        userService = new UserService(userMapper,userRepository,roleRepository);
     }
 
     @Test

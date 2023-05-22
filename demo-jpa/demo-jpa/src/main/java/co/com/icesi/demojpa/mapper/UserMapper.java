@@ -9,9 +9,9 @@ import org.mapstruct.Mapper;
 @Mapper(componentModel = "spring")
 public interface UserMapper {
 
-    //@Mapping(target = "role", source = "role",ignore=true)
-    IcesiUser fromUserCreateDTO(UserCreateDTO icesiUserDTO);
-    //@Mapping(target = "role", source = "role",ignore=true)
-    UserCreateDTO fromUser(IcesiUser icesiUser);
-    UserResponseDTO fromUserToSendUserDTO(IcesiUser icesiUser);
+    IcesiUser fromIcesiUser (UserCreateDTO icesiUserDTO);
+
+    UserCreateDTO fromIcesiUserDTO (IcesiUser icesiUser);
+
+    UserResponseDTO toResponse (IcesiUser icesiUser);
 }
