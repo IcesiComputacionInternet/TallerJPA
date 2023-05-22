@@ -4,6 +4,7 @@ import co.com.icesi.demojpa.model.IcesiAccount;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Modifying;
 import org.springframework.data.jpa.repository.Query;
+import org.springframework.data.repository.query.Param;
 import org.springframework.stereotype.Repository;
 
 import java.util.Optional;
@@ -25,7 +26,7 @@ public interface AccountRepository extends JpaRepository<IcesiAccount, UUID> {
 
     @Modifying
     @Query(value = "UPDATE IcesiAccount a set a.balance= :balance where a.accountNumber= :accountNumber")
-    void updateBalance(String accountNumber, long balance);
+    void updateBalance(@Param("accountNumber")String accountNumber,@Param("balance") long balance);
 
 
 
