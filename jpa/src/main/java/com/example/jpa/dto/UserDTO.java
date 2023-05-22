@@ -6,6 +6,10 @@ import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
 
+import javax.validation.constraints.Email;
+import javax.validation.constraints.NotBlank;
+import javax.validation.constraints.NotNull;
+
 @Data
 @Builder
 @AllArgsConstructor
@@ -15,12 +19,14 @@ public class UserDTO {
 
     private String lastName;
 
+    @NotBlank
     private String password;
 
-    @AtLeastOneNotNull(fields = {"email", "phoneNumber"})
+    @NotNull
+    @Email
     private String email;
 
-    @AtLeastOneNotNull(fields = {"email", "phoneNumber"})
+    @NotNull
     @RegionPhoneNumberValidation
     private String phoneNumber;
 
