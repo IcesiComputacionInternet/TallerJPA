@@ -5,13 +5,12 @@ import com.example.demo.DTO.ResponseIcesiAccountDTO;
 import com.example.demo.DTO.ResponseTransactionDTO;
 import com.example.demo.DTO.TransactionCreateDTO;
 import com.example.demo.model.IcesiAccount;
-import com.example.demo.model.enums.TypeIcesiAccount;
 import javax.annotation.processing.Generated;
 import org.springframework.stereotype.Component;
 
 @Generated(
     value = "org.mapstruct.ap.MappingProcessor",
-    date = "2023-05-21T15:16:56-0500",
+    date = "2023-05-21T21:34:04-0500",
     comments = "version: 1.5.3.Final, compiler: Eclipse JDT (IDE) 3.34.0.v20230413-0857, environment: Java 17.0.7 (Eclipse Adoptium)"
 )
 @Component
@@ -29,9 +28,7 @@ public class IcesiAccountMapperImpl implements IcesiAccountMapper {
         icesiAccount.active( IcesiAccountCreateDTO.isActive() );
         icesiAccount.balance( IcesiAccountCreateDTO.getBalance() );
         icesiAccount.icesiUser( IcesiAccountCreateDTO.getIcesiUser() );
-        if ( IcesiAccountCreateDTO.getType() != null ) {
-            icesiAccount.type( IcesiAccountCreateDTO.getType().name() );
-        }
+        icesiAccount.type( IcesiAccountCreateDTO.getType() );
 
         return icesiAccount.build();
     }
@@ -47,9 +44,7 @@ public class IcesiAccountMapperImpl implements IcesiAccountMapper {
         responseIcesiAccountDTO.accountNumber( icesiAccount.getAccountNumber() );
         responseIcesiAccountDTO.active( icesiAccount.isActive() );
         responseIcesiAccountDTO.balance( icesiAccount.getBalance() );
-        if ( icesiAccount.getType() != null ) {
-            responseIcesiAccountDTO.type( Enum.valueOf( TypeIcesiAccount.class, icesiAccount.getType() ) );
-        }
+        responseIcesiAccountDTO.type( icesiAccount.getType() );
 
         return responseIcesiAccountDTO.build();
     }

@@ -20,11 +20,14 @@ import static org.mockito.ArgumentMatchers.argThat;
 import static org.mockito.Mockito.mock;
 
 import com.example.demo.DTO.IcesiAccountCreateDTO;
+import com.example.demo.DTO.TransactionCreateDTO;
+import com.example.demo.error.exception.IcesiException;
 import com.example.demo.mapper.IcesiAccountMapper;
 import com.example.demo.mapper.IcesiAccountMapperImpl;
 import com.example.demo.model.IcesiAccount;
 import com.example.demo.model.IcesiRole;
 import com.example.demo.model.IcesiUser;
+import com.example.demo.model.enums.TypeIcesiAccount;
 import com.example.demo.repository.IcesiAccountRepository;
 import com.example.demo.repository.IcesiUserRepository;
 import com.example.demo.service.IcesiAccountService;
@@ -38,6 +41,8 @@ public class IcesiAccountServiceTest {
 
     private IcesiUserRepository icesiUserRepository;
 
+    private TypeIcesiAccount typeIcesiAccount;
+
     @BeforeEach
     private void init() {
         icesiAccountMapper = spy(IcesiAccountMapperImpl.class);
@@ -50,7 +55,7 @@ public class IcesiAccountServiceTest {
         return IcesiAccountCreateDTO.builder()
             .accountNumber("123-123456-12")
             .balance(0)
-            .type("deposit")
+            .type(typeIcesiAccount.deposit)
             .active(true)
             .icesiUser(defaultIcesiUser())
             .build();
@@ -60,7 +65,7 @@ public class IcesiAccountServiceTest {
         return IcesiAccount.builder()
             .accountNumber("123-123456-12")
             .balance(0)
-            .type("deposit")
+            .type(typeIcesiAccount.deposit)
             .active(true)
             .icesiUser(defaultIcesiUser())
             .build();
@@ -84,6 +89,14 @@ public class IcesiAccountServiceTest {
             .build();
     }
 
+    private TransactionCreateDTO defaultTransactionCreateDTO() {
+        return TransactionCreateDTO.builder()
+            .senderAccountNumber("123-123456-12")
+            .receiverAccountNumber("698-481203-30")
+            .amount(300L)
+            .build();
+    }
+
     @Test
     public void testCreateIcesiAccount() {
         when(icesiUserRepository.findByEmail(any())).thenReturn(Optional.of(defaultIcesiUser()));
@@ -91,7 +104,7 @@ public class IcesiAccountServiceTest {
         IcesiAccount icesiAccount1 = IcesiAccount.builder()
             .accountNumber("123-123456-12")
             .balance(0)
-            .type("deposit")
+            .type(typeIcesiAccount.deposit)
             .active(true)
             .icesiUser(defaultIcesiUser())
             .build();
@@ -118,114 +131,152 @@ public class IcesiAccountServiceTest {
         account.setBalance(100L);
         RuntimeException exception = assertThrows(RuntimeException.class, () -> icesiAccountService.disableAccount(account));
         String message = exception.getMessage();
-        assertEquals("This accout cannot be disabled, its balances is not 0", message);
+        assertEquals("This account cannot be disabled, its balance is not 0", message);
     }
 
     @Test 
     public void testWitdrawalFromDisabledAccount() {
-        IcesiAccountCreateDTO account = defaultIcesiAccountCreateDTO();
+        
+        IcesiAccount account = defaultIcesiAccount();
         account.setActive(false);
         account.setBalance(300L);
-        RuntimeException exception = assertThrows(RuntimeException.class, () -> icesiAccountService.withdrawalMoney(100L, account));
+
+        when(icesiAccountRepository.findByAccountNumber("123-123456-12")).thenReturn(Optional.of(account));
+
+        IcesiException exception = assertThrows(IcesiException.class, () -> icesiAccountService.withdrawalMoney(defaultTransactionCreateDTO()));
         String message = exception.getMessage();
-        assertEquals("Account is disabled, it is not possible to withdraw form it", message);
+        assertEquals("Account is disabled, it is not possible to withdraw from it", message);
     }
 
     @Test 
-    public void testWithdrawalWithSufficientFunds() {
-        when(icesiUserRepository.findByEmail(any())).thenReturn(Optional.of(defaultIcesiUser()));
-        IcesiAccountCreateDTO account = defaultIcesiAccountCreateDTO();
+    public void testWithdrawalWithSufficientFunds() {  
+
+        IcesiAccount account = defaultIcesiAccount();
         account.setBalance(1000L);
-        icesiAccountService.create(account);
-        icesiAccountService.withdrawalMoney(300L, account);
+
+        when(icesiAccountRepository.findByAccountNumber("123-123456-12")).thenReturn(Optional.of(account));
+
+        icesiAccountService.withdrawalMoney(defaultTransactionCreateDTO());
         assertEquals(account.getBalance(), 700L);
     }
 
     @Test 
     public void testWithdrawalWithInsufficientFunds() {
-        when(icesiUserRepository.findByEmail(any())).thenReturn(Optional.of(defaultIcesiUser()));
-        IcesiAccountCreateDTO account = defaultIcesiAccountCreateDTO();
-        account.setBalance(1000L);
-        icesiAccountService.create(account);
-        RuntimeException exception = assertThrows(RuntimeException.class, () -> icesiAccountService.withdrawalMoney(3000L, account));
+        
+        IcesiAccount account = defaultIcesiAccount();
+        account.setBalance(100L);
+        
+        when(icesiAccountRepository.findByAccountNumber("123-123456-12")).thenReturn(Optional.of(account));
+
+        IcesiException exception = assertThrows(IcesiException.class, () -> icesiAccountService.withdrawalMoney(defaultTransactionCreateDTO()));
         String message = exception.getMessage();
         assertEquals("This account does not have enough funds", message);
     }
 
     @Test
     public void testDepositMoney() {
-        when(icesiUserRepository.findByEmail(any())).thenReturn(Optional.of(defaultIcesiUser()));
-        IcesiAccountCreateDTO account = defaultIcesiAccountCreateDTO();
-        icesiAccountService.create(account);
-        icesiAccountService.depositMoney(3405L, account);
-        assertEquals(account.getBalance(), 3405L);
+        IcesiAccount account = defaultIcesiAccount();
+
+        when(icesiAccountRepository.findByAccountNumber("123-123456-12")).thenReturn(Optional.of(account));
+
+        icesiAccountService.depositMoney(defaultTransactionCreateDTO());
+        assertEquals(account.getBalance(), 300L);
     }
 
     @Test
     public void testTransferFromDepositAccount() {
-        IcesiAccountCreateDTO originAccount = defaultIcesiAccountCreateDTO();
-        IcesiAccountCreateDTO destinationAccount = defaultIcesiAccountCreateDTO();
+        IcesiAccount originAccount = defaultIcesiAccount();
+        IcesiAccount destinationAccount = defaultIcesiAccount();
         originAccount.setBalance(999L);
-        destinationAccount.setType("normal");
-        RuntimeException exception = assertThrows(RuntimeException.class, () -> icesiAccountService.transferMoneyToAnotherAccount(300L, originAccount, destinationAccount));
+        destinationAccount.setType(typeIcesiAccount.normal);
+
+        when(icesiAccountRepository.findByAccountNumber("123-123456-12")).thenReturn(Optional.of(originAccount));
+        when(icesiAccountRepository.findByAccountNumber("698-481203-30")).thenReturn(Optional.of(destinationAccount));
+
+        IcesiException exception = assertThrows(IcesiException.class, () -> icesiAccountService.transferMoneyToAnotherAccount(defaultTransactionCreateDTO()));
         String message = exception.getMessage();
-        assertEquals("The origin account is not allowed to be transfer money", message);
+        assertEquals("The origin account is not allowed to transfer money", message);
     }
 
     @Test
     public void testTransferToDepositAccount() {
-        IcesiAccountCreateDTO originAccount = defaultIcesiAccountCreateDTO();
-        IcesiAccountCreateDTO destinationAccount = defaultIcesiAccountCreateDTO();
+
+        IcesiAccount originAccount = defaultIcesiAccount();
+        IcesiAccount destinationAccount = defaultIcesiAccount();
         originAccount.setBalance(999L);
-        originAccount.setType("normal");
-        RuntimeException exception = assertThrows(RuntimeException.class, () -> icesiAccountService.transferMoneyToAnotherAccount(300L, originAccount, destinationAccount));
+        originAccount.setType(typeIcesiAccount.normal);
+        destinationAccount.setType(typeIcesiAccount.deposit);
+
+        when(icesiAccountRepository.findByAccountNumber("123-123456-12")).thenReturn(Optional.of(originAccount));
+        when(icesiAccountRepository.findByAccountNumber("698-481203-30")).thenReturn(Optional.of(destinationAccount));
+
+        IcesiException exception = assertThrows(IcesiException.class, () -> icesiAccountService.transferMoneyToAnotherAccount(defaultTransactionCreateDTO()));
         String message = exception.getMessage();
-        assertEquals("The destination account is not allowed to be transferred money", message);
+        assertEquals("The destination account is not allowed to receive transferred money", message);
     }
 
     @Test
     public void testTransferFromAccountWithInsufficientFunds() {
-        IcesiAccountCreateDTO originAccount = defaultIcesiAccountCreateDTO();
-        IcesiAccountCreateDTO destinationAccount = defaultIcesiAccountCreateDTO();
-        originAccount.setType("normal");
-        destinationAccount.setType("normal");
-        RuntimeException exception = assertThrows(RuntimeException.class, () -> icesiAccountService.transferMoneyToAnotherAccount(300L, originAccount, destinationAccount));
+
+        IcesiAccount originAccount = defaultIcesiAccount();
+        IcesiAccount destinationAccount = defaultIcesiAccount();
+        originAccount.setType(typeIcesiAccount.normal);
+        destinationAccount.setType(typeIcesiAccount.normal);
+
+        when(icesiAccountRepository.findByAccountNumber("123-123456-12")).thenReturn(Optional.of(originAccount));
+        when(icesiAccountRepository.findByAccountNumber("698-481203-30")).thenReturn(Optional.of(destinationAccount));
+
+        IcesiException exception = assertThrows(IcesiException.class, () -> icesiAccountService.transferMoneyToAnotherAccount(defaultTransactionCreateDTO()));
         String message = exception.getMessage();
         assertEquals("The origin account does not have enough funds", message);
     }
 
     @Test
     public void testSuccessfulTransfer() {
-        IcesiAccountCreateDTO originAccount = defaultIcesiAccountCreateDTO();
-        IcesiAccountCreateDTO destinationAccount = defaultIcesiAccountCreateDTO();
-        originAccount.setType("normal");
+        IcesiAccount originAccount = defaultIcesiAccount();
+        IcesiAccount destinationAccount = defaultIcesiAccount();
+        originAccount.setType(typeIcesiAccount.normal);
         originAccount.setBalance(444L);
-        destinationAccount.setType("normal");
-        icesiAccountService.transferMoneyToAnotherAccount(300L, originAccount, destinationAccount);
+        destinationAccount.setType(typeIcesiAccount.normal);
+
+        when(icesiAccountRepository.findByAccountNumber("123-123456-12")).thenReturn(Optional.of(originAccount));
+        when(icesiAccountRepository.findByAccountNumber("698-481203-30")).thenReturn(Optional.of(destinationAccount));
+
+        icesiAccountService.transferMoneyToAnotherAccount(defaultTransactionCreateDTO());
         assertEquals(destinationAccount.getBalance(), 300L);
         assertEquals(originAccount.getBalance(), 144L);
     }
 
     @Test
     public void testTransferFromDisabledAccount() {
-        IcesiAccountCreateDTO originAccount = defaultIcesiAccountCreateDTO();
-        IcesiAccountCreateDTO destinationAccount = defaultIcesiAccountCreateDTO();
-        originAccount.setType("normal");
+
+        IcesiAccount originAccount = defaultIcesiAccount();
+        IcesiAccount destinationAccount = defaultIcesiAccount();
+        originAccount.setType(typeIcesiAccount.normal);
         originAccount.setActive(false);
-        destinationAccount.setType("normal");
-        RuntimeException exception = assertThrows(RuntimeException.class, () -> icesiAccountService.transferMoneyToAnotherAccount(300L, originAccount, destinationAccount));
+        destinationAccount.setType(typeIcesiAccount.normal);
+
+        when(icesiAccountRepository.findByAccountNumber("123-123456-12")).thenReturn(Optional.of(originAccount));
+        when(icesiAccountRepository.findByAccountNumber("698-481203-30")).thenReturn(Optional.of(destinationAccount));
+
+        RuntimeException exception = assertThrows(RuntimeException.class, () -> icesiAccountService.transferMoneyToAnotherAccount(defaultTransactionCreateDTO()));
         String message = exception.getMessage();
         assertEquals("The origin account is disabled", message);
     }
 
     @Test
     public void testTransferToDisabledAccount() {
-        IcesiAccountCreateDTO originAccount = defaultIcesiAccountCreateDTO();
-        IcesiAccountCreateDTO destinationAccount = defaultIcesiAccountCreateDTO();
-        originAccount.setType("normal");
-        destinationAccount.setType("normal");
+
+        IcesiAccount originAccount = defaultIcesiAccount();
+        IcesiAccount destinationAccount = defaultIcesiAccount();
+        originAccount.setType(typeIcesiAccount.normal);
+        destinationAccount.setType(typeIcesiAccount.normal);
         destinationAccount.setActive(false);
-        RuntimeException exception = assertThrows(RuntimeException.class, () -> icesiAccountService.transferMoneyToAnotherAccount(300L, originAccount, destinationAccount));
+
+        when(icesiAccountRepository.findByAccountNumber("123-123456-12")).thenReturn(Optional.of(originAccount));
+        when(icesiAccountRepository.findByAccountNumber("698-481203-30")).thenReturn(Optional.of(destinationAccount));
+
+        IcesiException exception = assertThrows(IcesiException.class, () -> icesiAccountService.transferMoneyToAnotherAccount(defaultTransactionCreateDTO()));
         String message = exception.getMessage();
         assertEquals("The destination account is disabled", message);
     }

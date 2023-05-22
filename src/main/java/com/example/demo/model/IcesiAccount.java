@@ -7,6 +7,8 @@ import javax.persistence.Id;
 import javax.persistence.JoinColumn;
 import javax.persistence.ManyToOne;
 
+import com.example.demo.model.enums.TypeIcesiAccount;
+
 import lombok.Builder;
 import lombok.Data;
 
@@ -19,7 +21,7 @@ public class IcesiAccount {
     private UUID accountId;
     private String accountNumber;
     private long balance;
-    private String type;
+    private TypeIcesiAccount type;
     private boolean active;
 
     @ManyToOne(optional = false)

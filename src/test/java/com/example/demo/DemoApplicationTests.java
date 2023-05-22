@@ -14,7 +14,8 @@ import static org.junit.jupiter.api.Assertions.assertNotNull;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
 import com.example.demo.DTO.LoginDTO;
-import com.example.demo.exception.IcesiError;
+import com.example.demo.DTO.TokenDTO;
+import com.example.demo.error.exception.IcesiError;
 import com.fasterxml.jackson.databind.ObjectMapper;
 
 @AutoConfigureMockMvc

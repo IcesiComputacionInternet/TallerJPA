@@ -139,7 +139,7 @@ public class IcesiAccountService {
     }
 
     public ResponseTransactionDTO depositMoney(TransactionCreateDTO transactionCreateDTO) {
-        IcesiAccount account = findIcesiAccountByAccountNumber(transactionCreateDTO.getReceiverAccountNumber());
+        IcesiAccount account = findIcesiAccountByAccountNumber(transactionCreateDTO.getSenderAccountNumber());
 
         if(!account.isActive()) {
             throw IcesiExceptionBuilder.createIcesiException(
@@ -174,7 +174,7 @@ public class IcesiAccountService {
             ).get();
         }
 
-        if (originAccount.getType() == "deposit") {
+        if (originAccount.getType().name() == "deposit") {
             throw IcesiExceptionBuilder.createIcesiException(
                 "The origin account is not allowed to transfer money",
                 HttpStatus.BAD_REQUEST,
@@ -182,7 +182,7 @@ public class IcesiAccountService {
             ).get();
         }
     
-        if(destinationAccount.getType() == "deposit") {
+        if(destinationAccount.getType().name() == "deposit") {
             throw IcesiExceptionBuilder.createIcesiException(
                 "The destination account is not allowed to receive transferred money",
                 HttpStatus.BAD_REQUEST,

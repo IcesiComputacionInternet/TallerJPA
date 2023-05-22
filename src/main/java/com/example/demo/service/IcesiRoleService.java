@@ -13,6 +13,7 @@ import com.example.demo.error.exception.ErrorCode;
 import com.example.demo.error.util.IcesiExceptionBuilder;
 import com.example.demo.mapper.IcesiRoleMapper;
 import com.example.demo.model.IcesiRole;
+import com.example.demo.model.enums.TypeIcesiRole;
 import com.example.demo.repository.IcesiRoleRepository;
 
 import lombok.AllArgsConstructor;
@@ -24,7 +25,9 @@ public class IcesiRoleService {
     private final IcesiRoleRepository icesiRoleRepository;
     private final IcesiRoleMapper icesiRoleMapper;
 
-    public ResponseIcesiRoleDTO create(IcesiRoleCreateDTO icesiRoleCreateDTO) {
+    public ResponseIcesiRoleDTO create(String creatorRole, IcesiRoleCreateDTO icesiRoleCreateDTO) {
+
+        validateAdminRole(creatorRole, icesiRoleCreateDTO.getName());
 
         Optional<IcesiRole> existingIcesiRole = icesiRoleRepository.findByName(icesiRoleCreateDTO.getName());
 
@@ -41,4 +44,15 @@ public class IcesiRoleService {
         
         return icesiRoleMapper.fromIcesiRoleToResponseIcesiRoleDTO(icesiRoleRepository.save(newIcesiRole));
     }
+
+    public void validateAdminRole(String creatorRole, String roleToCreate) {
+        if (!creatorRole.equals(TypeIcesiRole.admin.name())) {
+            throw IcesiExceptionBuilder.createIcesiException(
+                "Only an admin can create a new role",
+                HttpStatus.FORBIDDEN,
+                new DetailBuilder(ErrorCode.ERR_403, "role", "name", roleToCreate)
+            ).get();
+        }
+    }
+
 }
