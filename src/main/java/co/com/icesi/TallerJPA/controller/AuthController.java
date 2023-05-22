@@ -6,17 +6,16 @@ import lombok.AllArgsConstructor;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.Authentication;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 
 @RestController
 @AllArgsConstructor
+@CrossOrigin
 public class AuthController {
     private final TokenService tokenService;
     private final AuthenticationManager authenticationManager;
 
-    @GetMapping("/token")
+    @PostMapping("/token")
     public String token(@RequestBody LoginDTO logindDTO){
         Authentication authentication=authenticationManager
                 .authenticate(new UsernamePasswordAuthenticationToken(logindDTO.username(), logindDTO.password()));
