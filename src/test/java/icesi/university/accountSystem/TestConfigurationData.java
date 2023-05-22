@@ -27,9 +27,14 @@ public class TestConfigurationData {
                 .description("Role for demo")
                 .name("USER")
                 .build();
+        IcesiRole icesiRole3 = IcesiRole.builder()
+                .roleId(UUID.randomUUID())
+                .description("Role for demo")
+                .name("BANK")
+                .build();
         IcesiUser icesiUser = IcesiUser.builder()
                 .userId(UUID.randomUUID())
-                .email("johndoe@email.com")
+                .email("johndoe@gmail.com")
                 .role(icesiRole)
                 .firstName("John")
                 .lastName("Doe")
@@ -45,12 +50,23 @@ public class TestConfigurationData {
                 .password(encoder.encode("password"))
                 .phoneNumber("+57323121235")
                 .build();
+        IcesiUser icesiUser3 = IcesiUser.builder()
+                .userId(UUID.randomUUID())
+                .email("johndoe3@email.com")
+                .role(icesiRole3)
+                .firstName("John")
+                .lastName("Doe")
+                .password(encoder.encode("password"))
+                .phoneNumber("+57323121235")
+                .build();
 
         return args -> {
             roleRepository.save(icesiRole);
             roleRepository.save(icesiRole2);
+            roleRepository.save(icesiRole3);
             users.save(icesiUser);
             users.save(icesiUser2);
+            users.save(icesiUser3);
         };
     }
 }

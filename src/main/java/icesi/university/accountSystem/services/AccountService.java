@@ -6,7 +6,6 @@ import icesi.university.accountSystem.dto.TransactionOperationDTO;
 import icesi.university.accountSystem.dto.TransactionResultDTO;
 import icesi.university.accountSystem.enums.TypeAccount;
 import icesi.university.accountSystem.mapper.IcesiAccountMapper;
-import icesi.university.accountSystem.mapper.IcesiUserMapper;
 import icesi.university.accountSystem.model.IcesiAccount;
 import icesi.university.accountSystem.model.IcesiUser;
 import icesi.university.accountSystem.repository.IcesiAccountRepository;
@@ -27,8 +26,6 @@ public class AccountService {
 
     private IcesiUserRepository icesiUserRepository;
 
-    private IcesiUserMapper icesiUserMapper;
-
     public ResponseAccountDTO save(RequestAccountDTO accountDTO){
         var user = icesiUserRepository.findByEmail(accountDTO.getUser()).orElseThrow(()-> new RuntimeException("User doesn't exists"));
         validateAccountHimself(user.getUserId().toString());
@@ -41,7 +38,7 @@ public class AccountService {
     }
 @Transactional
     public String activateAccount(String accountNumber){
-        var account = icesiAccountRepository.findByAccountNumber(accountNumber, false)
+        var account = icesiAccountRepository.findByAccountNumber(accountNumber)
                 .orElseThrow(() -> new RuntimeException("The account: " + accountNumber + " can't be enabled"));
         validateAccountUser(account.getUser().getUserId().toString());
         account.setActive(true);
@@ -51,7 +48,7 @@ public class AccountService {
 
     @Transactional
     public String deactivateAccount(String accountNumber){
-        var account = icesiAccountRepository.findByAccountNumber(accountNumber, true)
+        var account = icesiAccountRepository.findByAccountNumber(accountNumber)
                 .orElseThrow(() -> new RuntimeException("The account: " + accountNumber + " can't be disabled"));
         validateAccountUser(account.getUser().getUserId().toString());
         account.setActive(false);
@@ -113,7 +110,7 @@ public class AccountService {
     }
 
     public IcesiAccount getAccountByAccountNumber(String accountNumber) {
-        return icesiAccountRepository.findByAccountNumber(accountNumber, true)
+        return icesiAccountRepository.findByAccountNumber(accountNumber)
                 .orElseThrow(() -> new RuntimeException("Account not found"));
     }
 
@@ -126,7 +123,7 @@ public class AccountService {
                 accountNumber = accountNumber.replaceFirst(toReplace,number);
         }
 
-        if(icesiAccountRepository.findByAccountNumber(accountNumber,true).isEmpty()){
+        if(icesiAccountRepository.findByAccountNumber(accountNumber).isEmpty()){
             return accountNumber;
         }else{
             return getRandomAccountNumber();

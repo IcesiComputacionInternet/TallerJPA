@@ -1,7 +1,6 @@
 package icesi.university.accountSystem.repository;
 
 import icesi.university.accountSystem.model.IcesiAccount;
-import icesi.university.accountSystem.model.IcesiUser;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Modifying;
 import org.springframework.data.jpa.repository.Query;
@@ -15,7 +14,7 @@ public interface IcesiAccountRepository extends JpaRepository<IcesiAccount, UUID
     @Query("SELECT CASE WHEN (COUNT(u) > 0) THEN true ELSE false END FROM IcesiAccount u WHERE u.accountNumber = :accountNumber")
     boolean existsByAccountNumber(String accountNumber);
     @Query("SELECT a FROM IcesiAccount a WHERE a.accountNumber = :accountNumber AND a.active = :isActive")
-    Optional<IcesiAccount> findByAccountNumber(String accountNumber, boolean isActive);
+    Optional<IcesiAccount> findByAccountNumber(String accountNumber);
     @Modifying
     @Query("UPDATE IcesiAccount a SET a.balance = :balance WHERE a.accountNumber = :accountNumber")
     void updateBalance(Long balance, String accountNumber);
