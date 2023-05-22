@@ -1,9 +1,11 @@
 package co.edu.icesi.demo;
 
+import co.edu.icesi.demo.model.IcesiPermission;
 import co.edu.icesi.demo.model.IcesiRole;
 import co.edu.icesi.demo.model.IcesiUser;
 import co.edu.icesi.demo.repository.IcesiRoleRepository;
 import co.edu.icesi.demo.repository.IcesiUserRepository;
+import co.edu.icesi.demo.repository.PermissionRepository;
 import org.springframework.boot.CommandLineRunner;
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
@@ -21,8 +23,21 @@ public class DemoApplication {
 
 	@Bean
 	CommandLineRunner commandLineRunner(IcesiUserRepository users,
+										PermissionRepository permissionRepository,
 										IcesiRoleRepository roleRepository,
 										PasswordEncoder encoder) {
+		IcesiPermission adminPermission = IcesiPermission.builder()
+				.key("home")
+				.path("/home")
+				.build();
+		IcesiPermission icesiPermission2 = IcesiPermission.builder()
+				.key("admin")
+				.path("/admin")
+				.build();
+		adminPermission = permissionRepository.save(adminPermission);
+		icesiPermission2 = permissionRepository.save(icesiPermission2);
+
+
 		IcesiRole icesiRole = IcesiRole.builder()
 				.roleId(UUID.randomUUID())
 				.roleDescription("Role for demo")
@@ -38,6 +53,8 @@ public class DemoApplication {
 				.roleDescription("Role for demo")
 				.roleName("BANK")
 				.build();
+
+
 		IcesiUser icesiUser = IcesiUser.builder()
 				.userId(UUID.randomUUID())
 				.email("johndoe@email.com")

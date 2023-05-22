@@ -6,6 +6,7 @@ import co.edu.icesi.demo.validation.ContactNumberConstraint;
 import co.edu.icesi.demo.validation.EmailOrPhoneConstraint;
 import lombok.Builder;
 import lombok.Data;
+import lombok.NonNull;
 
 
 import javax.persistence.Entity;
@@ -20,8 +21,10 @@ public class IcesiUserDto {
 
     private UUID userId;
 
+    @NonNull
     private String firstname;
 
+    @NonNull
     private String lastName;
 
     private String email;
