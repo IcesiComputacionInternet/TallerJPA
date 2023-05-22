@@ -18,6 +18,6 @@ public class UserController implements UserApi {
 
     @Override
     public IcesiUserDto createUser(IcesiUserDto user) {
-        return icesiUserService.saveUser(user);
+        return icesiUserService.save(user);
     }
 }

@@ -1,11 +1,16 @@
 package co.edu.icesi.demo.error;
 
+import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
 
-@Data
 @Builder
-public class CustomDetail {
+@Data
+@AllArgsConstructor
+public class IcesiErrorDetail {
+
     private String errorCode;
     private String errorMessage;
+
+
 }

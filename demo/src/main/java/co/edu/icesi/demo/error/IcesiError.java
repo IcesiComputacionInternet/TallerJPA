@@ -8,8 +8,9 @@ import java.util.List;
 
 @Getter
 @Builder
-public class CustomError {
+public class IcesiError {
 
-    HttpStatus status;
-    List<CustomDetail> details;
+    private HttpStatus status;
+    private List<IcesiErrorDetail> details;
+
 }
