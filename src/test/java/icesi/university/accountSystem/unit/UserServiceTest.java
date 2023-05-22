@@ -1,123 +1,114 @@
 package icesi.university.accountSystem.unit;
 
+import icesi.university.accountSystem.dto.RequestUserDTO;
+import icesi.university.accountSystem.exception.ExistsException;
 import icesi.university.accountSystem.mapper.IcesiUserMapper;
+import icesi.university.accountSystem.model.IcesiRole;
+import icesi.university.accountSystem.model.IcesiUser;
 import icesi.university.accountSystem.repository.IcesiRoleRepository;
 import icesi.university.accountSystem.repository.IcesiUserRepository;
 import icesi.university.accountSystem.services.UserService;
+import icesi.university.accountSystem.unit.matcher.UserMatcher;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
+
+import java.util.Optional;
+import java.util.UUID;
+
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.Mockito.*;
 
 public class UserServiceTest {
         private UserService userService;
-        private IcesiUserRepository repository;
+        private IcesiUserRepository userRepository;
 
-        private IcesiUserMapper mapper;
+        private IcesiUserMapper userMapper;
         private IcesiRoleRepository roleRepository;
 
-        /*
         @BeforeEach
-        private void init(){
-            repository = mock(IcesiUserRepository.class);
-            roleRepository = mock(IcesiRoleRepository.class);
-            mapper = spy(IcesiUserMapperImpl.class);
-            userService = new UserService(repository,mapper);
-        }
+        public void init() {
+                userRepository = mock(IcesiUserRepository.class);
+                roleRepository = mock(IcesiRoleRepository.class);
+                userMapper = spy(IcesiUserMapper.class);
 
-
-        @Test
-        public void saveUser(){
-            when(roleRepository.findByName(any())).thenReturn(Optional.of(createDefaultRole()));
-
-            userService.save(createDefaultUserDTO());
-
-            verify(repository,times(1)).save(argThat(new UserMatcher(createDefaultUser())));
-            verify(mapper,times(1)).fromIcesiUserDTO(any());
-
+                userService = new UserService(userRepository, userMapper, roleRepository);
         }
 
         @Test
-        public void saveUserWithEmailAndPhoneNumberExist(){
-            when(repository.findByEmail(any())).thenReturn(Optional.ofNullable(createDefaultUser()));
-            when(repository.findByPhoneNumber(any())).thenReturn(Optional.ofNullable(createDefaultUser()));
-            try {
-                userService.save(createDefaultUserDTO());
-                fail();
-            }catch (Exception e){
-                String exceptionMessage = e.getMessage();
-                assertEquals("email and phoneNumber already in use",exceptionMessage);
-                verify(repository, times(0)).save(any());
-            }
+        public void testCreateUser(){
+                when(roleRepository.findByName(any())).thenReturn(Optional.ofNullable(defaultRole()));
+
+                userService.save(defaultUserDTO());
+                verify(roleRepository, times(1)).findByName(any());
+                verify(userMapper, times(1)).fromIcesiUserDTO(any());
+                verify(userRepository, times(1)).save(argThat(new UserMatcher(defaultIcesiUser())));
+        }
+        @Test
+        public void testCreateUserWhenEmailAlreadyExist(){
+                when(userRepository.existsByEmail(any())).thenReturn(true);
+
+                try{
+                        userService.save(defaultUserDTO());
+                }catch (ExistsException e){
+                        assertEquals("Email already exists", e.getMessage());
+                }
+
         }
 
         @Test
-        public void saveUserWithEmailExist(){
-            when(repository.findByEmail(any())).thenReturn(Optional.ofNullable(createDefaultUser()));
-            try {
-                userService.save(createDefaultUserDTO());
-                fail();
-            }catch (Exception e){
-                String exceptionMessage = e.getMessage();
-                assertEquals("email already in use",exceptionMessage);
-            }
+        public void testCreateUserWhenPhoneNumberAlreadyExist(){
+                when(userRepository.existsByPhoneNumber(any())).thenReturn(true);
+
+                try{
+                        userService.save(defaultUserDTO());
+                }catch (ExistsException e){
+                        assertEquals("Phone number already exists", e.getMessage());
+                }
+
         }
 
         @Test
-        public void saveUserWithPhoneNumberExist(){
-            when(repository.findByPhoneNumber(any())).thenReturn(Optional.ofNullable(createDefaultUser()));
-            try {
-                userService.save(createDefaultUserDTO());
-                fail();
-            }catch (Exception e){
-                String exceptionMessage = e.getMessage();
-                assertEquals("phoneNumber already in use",exceptionMessage);
-            }
+        public void testCreateUserWhenEmailAndPhoneNumberAlreadyExist(){
+                when(userRepository.existsByPhoneNumber(any())).thenReturn(true);
+                when(userRepository.existsByEmail(any())).thenReturn(true);
+
+                try{
+                        userService.save(defaultUserDTO());
+                }catch (ExistsException e){
+                        assertEquals("Email and Phone is already used", e.getMessage());
+                }
+
         }
 
-        @Test
-        public void saveUserWithRoleNull(){
-            when(roleRepository.findByName(any())).thenReturn(Optional.empty());
-            try {
-                userService.save(createDefaultUserDTO());
-            }catch (Exception e){
-                String exceptionMessage = e.getMessage();
-                assertEquals(NullPointerException.class,e.getClass());
-            }
+        private RequestUserDTO defaultUserDTO(){
+                return RequestUserDTO.builder()
+                        .firstName("john")
+                        .lastName("doe")
+                        .email("johndoe@gmail.com")
+                        .phoneNumber("12345")
+                        .password("12345")
+                        .role("ADMIN")
+                        .build();
         }
 
-        private IcesiUser createDefaultUser(){
-            return IcesiUser.builder()
-                    .firstName("Jhon")
-                    .lastName("Doe")
-                    .phoneNumber("312545454")
-                    .password("12456789")
-                    .email("testEmail@example.com")
-                    .role(createDefaultRole())
-                    .build();
+        private IcesiUser defaultIcesiUser(){
+                return IcesiUser.builder()
+                        .firstName("Arturo")
+                        .lastName("Diaz")
+                        .email("prueba@gmail.com")
+                        .phoneNumber("12345")
+                        .password("12345")
+                        .role(defaultRole())
+                        .build();
         }
 
-        private IcesiUserDTO createDefaultUserDTO(){
-            return IcesiUserDTO.builder()
-                    .firstName("Jhon")
-                    .lastName("Doe")
-                    .phoneNumber("312545454")
-                    .password("12456789")
-                    .email("testEmail@example.com")
-                    .role(createDefaultRole())
-                    .build();
+        private IcesiRole defaultRole(){
+                return IcesiRole.builder()
+                        .roleId(UUID.randomUUID())
+                        .name("ADMIN")
+                        .description("Addmin")
+                        .build();
         }
-
-        private IcesiRole createDefaultRole(){
-            return IcesiRole.builder()
-                    .name("Role")
-                    .description("this is a role")
-                    .icesiUsers(new ArrayList<>())
-                    .build();
-        }
-
-        private IcesiRoleDTO defaultRoleDTO(){
-            return   IcesiRoleDTO.builder()
-                    .name("Role")
-                    .description("this is a role")
-                    .build();
-        }
-        */
 
 }
