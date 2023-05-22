@@ -1,6 +1,7 @@
 package co.edu.icesi.tallerJPA.model;
 
 
+import co.edu.icesi.tallerJPA.enums.AccountType;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
@@ -14,21 +15,17 @@ import java.util.UUID;
 @Entity
 @NoArgsConstructor
 @AllArgsConstructor
-public class IcesiAccount {
+public class Account {
     @Id
     private UUID id;
 
-    @Column(nullable = false, unique = true)
     private String accountNumber;
 
-    @Column(nullable = false)
     private long balance;
 
-    @Column(nullable = false)
     private boolean active;
 
-    @Column(nullable = false)
-    private String type;
+    private AccountType type;
 
     @ManyToOne
     @JoinColumn(name = "icesi_user_user_id")

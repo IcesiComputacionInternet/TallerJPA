@@ -1,51 +1,42 @@
 package co.edu.icesi.tallerJPA.service;
 
-import co.edu.icesi.tallerJPA.dto.IcesiUserCreateDTO;
+import co.edu.icesi.tallerJPA.dto.IcesiUserDTO;
+import co.edu.icesi.tallerJPA.exception.ExistingException;
 import co.edu.icesi.tallerJPA.mapper.IcesiUserMapper;
-import co.edu.icesi.tallerJPA.model.IcesiRole;
 import co.edu.icesi.tallerJPA.model.IcesiUser;
-import co.edu.icesi.tallerJPA.repository.IcesiRoleRepository;
+import co.edu.icesi.tallerJPA.repository.RoleRepository;
 import co.edu.icesi.tallerJPA.repository.IcesiUserRepository;
 import lombok.AllArgsConstructor;
+import lombok.SneakyThrows;
 import org.springframework.stereotype.Service;
 
-import java.util.ArrayList;
 import java.util.UUID;
 
 @Service
 @AllArgsConstructor
 public class IcesiUserService {
     private final IcesiUserRepository icesiUserRepository;
-    private final IcesiRoleRepository icesiRoleRepository;
+    private final RoleRepository roleRepository;
     private final IcesiUserMapper icesiUserMapper;
+@SneakyThrows
+    public IcesiUser save(IcesiUserDTO icesiUserDTO){
+    boolean checkEmail = icesiUserRepository.isByEmail(icesiUserDTO.getEmail());
+    boolean checkPhone = icesiUserRepository.findByPhone(icesiUserDTO.getPhoneNumber());
 
-    public IcesiUser save(IcesiUserCreateDTO user){
-        checkEmailAndPhoneNumber(user);
-        checkExistingRole(user);
-        IcesiRole icesiRole = icesiRoleRepository.findByName(user.getIcesiRoleCreateDTO().getName()).
-        orElseThrow(()-> new RuntimeException("This user role not exist, please register it or use other"));
-        IcesiUser icesiUser = icesiUserMapper.fromIcesiUserCreateDTO(user);
-        icesiUser.setRole(icesiRole);
-        icesiUser.setUserId(UUID.randomUUID());
-        icesiUser.setAccounts(new ArrayList<>());
-        icesiRole.getUsers().add(icesiUser);
-        return icesiUserRepository.save(icesiUser);
-    }
+    if(checkEmail && checkPhone)
+        throw new ExistingException("Email and phone already exists");
+    if (checkEmail)
+        throw new ExistingException("Email  is in use");
+    if (checkPhone)
+        throw new ExistingException("Phone is in use");
 
-    private void checkExistingRole(IcesiUserCreateDTO user) {
-        if (user.getIcesiRoleCreateDTO()==null){
-            throw new RuntimeException("Please register a role");
-        }
-    }
 
-    private void checkEmailAndPhoneNumber(IcesiUserCreateDTO user) {
-        if (icesiUserRepository.findByEmail(user.getEmail()).isPresent()){
-            throw new RuntimeException("The user email are registered");
-        }else  if (icesiUserRepository.findByPhoneNumber(user.getPhone()).isPresent()){
-            throw new RuntimeException("The user phone number are registered");
-        }else  if (icesiUserRepository.findByEmail(user.getEmail()).isPresent() &&
-                icesiUserRepository.findByPhoneNumber(user.getPhone()).isPresent()){
-            throw new RuntimeException("The user email and  phone number are registered");
-        }
-    }
+    icesiUserDTO.setUserId(UUID.randomUUID());
+    return     icesiUserRepository.save(icesiUserMapper.fromIcesiUserDTO(icesiUserDTO));
+
+}
+
+
+
+
 }

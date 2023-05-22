@@ -16,13 +16,11 @@ import java.util.UUID;
 @Builder
 @AllArgsConstructor
 @NoArgsConstructor
-public class IcesiRole {
+public class Role {
     @Id
     private UUID roleId;
-    @Column(nullable = false)
     private String description;
 
-    @Column(nullable = false, unique = true)
     private String name;
 
     @OneToMany(mappedBy = "role")

@@ -1,11 +1,9 @@
 package co.edu.icesi.tallerJPA.service;
 
-import co.edu.icesi.tallerJPA.dto.IcesiAccountCreateDTO;
-import co.edu.icesi.tallerJPA.dto.IcesiAccountToShowDTO;
-import co.edu.icesi.tallerJPA.mapper.IcesiAccountMapper;
-import co.edu.icesi.tallerJPA.model.IcesiAccount;
-import co.edu.icesi.tallerJPA.model.IcesiUser;
-import co.edu.icesi.tallerJPA.repository.IcesiAccountRepository;
+import co.edu.icesi.tallerJPA.dto.AccountDTO;
+import co.edu.icesi.tallerJPA.mapper.AccountMapper;
+import co.edu.icesi.tallerJPA.model.Account;
+import co.edu.icesi.tallerJPA.repository.AccountRepository;
 import co.edu.icesi.tallerJPA.repository.IcesiUserRepository;
 import lombok.AllArgsConstructor;
 import org.springframework.stereotype.Service;
@@ -14,20 +12,26 @@ import java.util.UUID;
 
 @Service
 @AllArgsConstructor
-public class IcesiAccountService {
-    private final IcesiAccountRepository icesiAccountRepository;
-    private final IcesiAccountMapper icesiAccountMapper;
+public class AccountService {
+    private final AccountRepository accountRepository;
+    private final AccountMapper accountMapper;
     private final IcesiUserRepository icesiUserRepository;
 
-    public IcesiAccountToShowDTO save(IcesiAccountCreateDTO account){
-        checkAccount(account);
-        IcesiAccount icesiAccount = icesiAccountMapper.fromIcesiAccountCreateDTO(account);
-        IcesiUser icesiUser = icesiUserRepository.findByEmail(account.getIcesiUserDTO().getEmail()).
-                orElseThrow(()-> new RuntimeException("Not exist an user"));
-        icesiAccount.setUser(icesiUser);
-        icesiAccount.setAccountNumber(generateAccountNumber());
-        icesiAccount.setId(UUID.randomUUID());
-        return icesiAccountMapper.fromIcesiAccountToShowDTO(icesiAccountRepository.save(icesiAccount));
+    public void save(AccountDTO account) {
+        account.setId(UUID.randomUUID());
+        account.setAccountNumber(checkAccountNumber(generateAccountNumber()));
+        account.setActive(true);
+        account.setIcesiUser(IcesiUserRepository.findByEmail(account.getIcesiUser().getEmail())
+                .orElseThrow(() -> new RuntimeException("User NOT exists")));
+
+        accountRepository.save(accountMapper.fromAccountDTO(account));
+    }
+
+    private String checkAccountNumber(String accountNumber){
+        if(accountRepository.isByAccountNumber(accountNumber)){
+            return checkAccountNumber(generateAccountNumber());
+        }
+        return accountNumber;
     }
 
     private String generateAccountNumber() {
@@ -40,15 +44,13 @@ public class IcesiAccountService {
                 suffix += Integer.toString((int) (Math.random() * 10));
             }
             String accountNumber = prefix + "-" + suffix + "-00";
-            IcesiAccount existingAccount = icesiAccountRepository.findByAccountNumber(accountNumber).orElse(null);
-            if (existingAccount == null) {
-                unique = true;
-            }
+
+
         }
         return prefix + "-" + suffix + "-00";
     }
 
-    private void checkAccount(IcesiAccountCreateDTO account) {
+    private void checkAccount(AccountDTO account) {
         if (account.getBalance() < 0){
             throw new RuntimeException("Account balance can't be negative");
         }
@@ -57,34 +59,30 @@ public class IcesiAccountService {
         }
     }
 
-    public void checkAccountNumber(String accountNumber){
-        if(icesiAccountRepository.findByAccountNumber(accountNumber).isEmpty()){
-            throw new RuntimeException("This account does not exists");
-        }
-    }
+
 
     public void enableOrDisableAccount(String accountNumber, boolean active){
         checkAccountNumber(accountNumber);
-        IcesiAccount icesiAccount = icesiAccountRepository.findByAccountNumber(accountNumber).get();
-        if(!icesiAccount.isActive()&& icesiAccount.getBalance() != 0){
+        Account account = accountRepository.findByAccountNumber(accountNumber).get();
+        if(!account.isActive()&& account.getBalance() != 0){
             throw new RuntimeException("For disable your account is necessary balance equals to zero");
         }
-        icesiAccount.setActive(active);
+        account.setActive(active);
     }
 
     public void withdrawalMoney(String accountNumber, long quantity){
         checkAccountNumber(accountNumber);
         checkQuantity(quantity);
-        IcesiAccount icesiAccount=icesiAccountRepository.findByAccountNumber(accountNumber).get();
-        checkAccountEnable(icesiAccount);
-        if(icesiAccount.getBalance()<quantity){
+        Account account = accountRepository.findByAccountNumber(accountNumber).get();
+        checkAccountEnable(account);
+        if(account.getBalance()<quantity){
             throw new RuntimeException("Insuficient balance, please deposit money and try again");
         }
-        icesiAccount.setBalance(icesiAccount.getBalance()-quantity);
+        account.setBalance(account.getBalance()-quantity);
     }
 
-    private void checkAccountEnable(IcesiAccount icesiAccount) {
-        if(!icesiAccount.isActive()){
+    private void checkAccountEnable(Account account) {
+        if(!account.isActive()){
             throw new RuntimeException("This account is disabled");
         }
     }
@@ -97,10 +95,10 @@ public class IcesiAccountService {
 
     public void depositMoney(String accountNumber, long quantity){
         checkAccountNumber(accountNumber);
-        IcesiAccount icesiAccount=icesiAccountRepository.findByAccountNumber(accountNumber).get();
-        checkAccountEnable(icesiAccount);
+        Account account = accountRepository.findByAccountNumber(accountNumber).get();
+        checkAccountEnable(account);
         if (quantity > 0){
-            icesiAccount.setBalance(icesiAccount.getBalance()+quantity);
+            account.setBalance(account.getBalance()+quantity);
         }
     }
 
@@ -108,8 +106,8 @@ public class IcesiAccountService {
         checkAccountNumber(senderAccount);
         checkAccountNumber(receiverAccount);
         checkQuantity(quantity);
-        IcesiAccount senderIcesiAccount=icesiAccountRepository.findByAccountNumber(senderAccount).get();
-        IcesiAccount receiverIcesiAccount=icesiAccountRepository.findByAccountNumber(receiverAccount).get();
+        Account senderIcesiAccount= accountRepository.findByAccountNumber(senderAccount).get();
+        Account receiverIcesiAccount= accountRepository.findByAccountNumber(receiverAccount).get();
         checkAvaliableForTransfer(senderIcesiAccount);
         checkAvaliableForTransfer(receiverIcesiAccount);
         checkAccountEnable(senderIcesiAccount);
@@ -122,8 +120,8 @@ public class IcesiAccountService {
         receiverIcesiAccount.setBalance(receiverIcesiAccount.getBalance()+quantity);
     }
 
-    private void checkAvaliableForTransfer(IcesiAccount icesiAccount) {
-           if(icesiAccount.getType().equals("deposit only")){
+    private void checkAvaliableForTransfer(Account account) {
+           if(account.getType().equals("deposit only")){
                 throw new RuntimeException("Your account is only for deposit money");
             }
     }
