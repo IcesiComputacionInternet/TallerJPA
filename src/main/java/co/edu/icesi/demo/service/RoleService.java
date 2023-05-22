@@ -24,7 +24,7 @@ public class RoleService {
 
     private RoleMapper roleMapper;
 
-    public RoleCreateDTO save(RoleCreateDTO role){
+    public RoleCreateDTO save(RoleCreateDTO role){ //Only admin
         if(roleRepository.findByName(role.getName()).isPresent()){
 
             throw createIcesiException(

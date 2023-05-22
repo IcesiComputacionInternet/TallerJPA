@@ -3,6 +3,7 @@ package co.edu.icesi.demo.error;
 import co.edu.icesi.demo.error.exception.*;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.access.AccessDeniedException;
 import org.springframework.security.authentication.BadCredentialsException;
 import org.springframework.security.core.AuthenticationException;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
@@ -27,8 +28,10 @@ public class GlobalExceptionHandler {
         var error = createIcesiError(runtimeException.getMessage(), HttpStatus.INTERNAL_SERVER_ERROR, new DetailBuilder(ErrorCode.ERR_500));
         return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(error);
     }
-
 */
+
+
+
     @ExceptionHandler(AuthenticationException.class)
     public ResponseEntity<IcesiError> handleAuthenticationException(AuthenticationException authenticationException){
         var error = createIcesiError(authenticationException.getMessage(), HttpStatus.UNAUTHORIZED, new DetailBuilder(ErrorCode.ERR_LOGIN,"Login unauthorized"));

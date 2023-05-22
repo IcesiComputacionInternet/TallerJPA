@@ -9,7 +9,6 @@ import org.springframework.security.authentication.UsernamePasswordAuthenticatio
 import org.springframework.security.core.Authentication;
 import org.springframework.web.bind.annotation.*;
 
-import static co.edu.icesi.demo.security.IcesiSecurityContext.getCurrentUserId;
 
 @RestController
 @AllArgsConstructor

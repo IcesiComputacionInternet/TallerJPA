@@ -8,8 +8,10 @@ import co.edu.icesi.demo.model.IcesiRole;
 import co.edu.icesi.demo.model.IcesiUser;
 import co.edu.icesi.demo.repository.RoleRepository;
 import co.edu.icesi.demo.repository.UserRepository;
+import co.edu.icesi.demo.security.IcesiSecurityContext;
 import lombok.AllArgsConstructor;
 import org.springframework.http.HttpStatus;
+import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
 import java.util.UUID;
@@ -26,8 +28,10 @@ public class UserService {
 
     private RoleRepository roleRepository;
 
-    public UserCreateDTO save(UserCreateDTO user){
+    private final PasswordEncoder passwordEncoder;
 
+    public UserCreateDTO save(UserCreateDTO user){
+        manageAuthorization(user);
         validateEmailAndPhoneNumber(user);
 
         IcesiRole icesiRole=roleRepository.findByName(user.getRoleName()).orElseThrow(createIcesiException(
@@ -37,9 +41,20 @@ public class UserService {
         ));
         IcesiUser icesiUser=userMapper.fromIcesiUserDTO(user);
         icesiUser.setRole(icesiRole);
+        icesiUser.setPassword(passwordEncoder.encode(user.getPassword()));
         icesiUser.setUserId(UUID.randomUUID());
         return userMapper.fromIcesiUser(userRepository.save(icesiUser));
 
+    }
+
+    public void manageAuthorization(UserCreateDTO user){
+        if(IcesiSecurityContext.getCurrentUserRole().equals("BANK") && user.getRoleName().equals("ADMIN")){
+            throw createIcesiException(
+                    "Bank user cannot create Admin users",
+                    HttpStatus.FORBIDDEN,
+                    new DetailBuilder(ErrorCode.ERR_403, "Unauthorized: Bank user cannot create Admin users")
+            ).get();
+        }
     }
 
     public void validateEmailAndPhoneNumber(UserCreateDTO user){

@@ -33,6 +33,10 @@ import javax.crypto.SecretKey;
 import javax.crypto.spec.SecretKeySpec;
 import javax.servlet.http.HttpServletRequest;
 
+import static co.edu.icesi.demo.api.AccountAPI.BASE_ACCOUNT_URL;
+import static co.edu.icesi.demo.api.RoleAPI.BASE_ROLE_URL;
+import static co.edu.icesi.demo.api.UserAPI.BASE_USER_URL;
+
 @Configuration
 @EnableWebSecurity
 @AllArgsConstructor
@@ -80,11 +84,14 @@ public class SecurityConfiguration {
                 =RequestMatcherDelegatingAuthorizationManager.builder()
                 .add(permitAll,(context,other)-> new AuthorizationDecision(true));
 
-        managerBuilder.add(new MvcRequestMatcher(introspector,"/admin/**"),
-                AuthorityAuthorizationManager.hasAnyAuthority("SCOPE_ADMIN"));
+        managerBuilder.add(new MvcRequestMatcher(introspector,BASE_ACCOUNT_URL+"/**"),
+                AuthorityAuthorizationManager.hasAnyAuthority("SCOPE_USER","SCOPE_ADMIN"));
 
-        managerBuilder.add(new MvcRequestMatcher(introspector,"/user"),
-                AuthorityAuthorizationManager.hasAnyAuthority("SCOPE_USER"));
+        managerBuilder.add(new MvcRequestMatcher(introspector,BASE_USER_URL+"/**"),
+                AuthorityAuthorizationManager.hasAnyAuthority("SCOPE_BANK","SCOPE_ADMIN"));
+
+        managerBuilder.add(new MvcRequestMatcher(introspector,BASE_ROLE_URL+"/**"),
+                AuthorityAuthorizationManager.hasAnyAuthority("SCOPE_ADMIN"));
 
         AuthorizationManager<HttpServletRequest> manager=managerBuilder.build();
         return ((authentication, object) -> manager.check(authentication, object.getRequest()));

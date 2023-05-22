@@ -2,6 +2,7 @@ package co.edu.icesi.demo;
 
 import co.edu.icesi.demo.dto.LoginDTO;
 import co.edu.icesi.demo.dto.TokenDTO;
+import co.edu.icesi.demo.security.IcesiSecurityContext;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import net.jcip.annotations.Immutable;
 import org.junit.jupiter.api.Test;
@@ -43,16 +44,17 @@ class DemoApplicationTests {
 
 		TokenDTO token =objectMapper.readValue(result.getResponse().getContentAsString(),TokenDTO.class);
 		assertNotNull(token);
+
 	}
 
 	@Test
 	public void testTokenEndpointWithInvalidEmail() throws Exception{
-		var result=mockMvc.perform(MockMvcRequestBuilders.get("/token").content(
+		var result=mockMvc.perform(MockMvcRequestBuilders.post("/token").content(
 								objectMapper.writeValueAsString(new LoginDTO("incorrect@email.com","password"))
 						)
 						.contentType(MediaType.APPLICATION_JSON)
 						.accept(MediaType.APPLICATION_JSON))
-				.andExpect(status().isOk())
+				.andExpect(status().isUnauthorized())
 				.andReturn();
 
 		//IcesiError token =objectMapper.readValue(result.getResponse().getContentAsString(),TokenDTO.class);
