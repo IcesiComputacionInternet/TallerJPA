@@ -75,7 +75,7 @@ public class UserService {
         Optional.ofNullable(roleName).orElseThrow(createIcesiException(
                 "User must have a role",
                 HttpStatus.BAD_REQUEST,
-                new DetailBuilder(ErrorCode.ERR_400, "Role", "Name", "null")
+                new DetailBuilder(ErrorCode.ERR_REQUIRED_FIELD, "Role", "Name")
         ));
 
 

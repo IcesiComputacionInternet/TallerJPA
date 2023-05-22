@@ -36,7 +36,7 @@ public class AccountService {
                 createIcesiException (
                         "User does not exist",
                         HttpStatus.BAD_REQUEST,
-                        new DetailBuilder(ErrorCode.ERR_400, "User", "Id", account.getUser().getUserId().toString())
+                        new DetailBuilder(ErrorCode.ERR_404, "User", "Id", account.getUser().getUserId().toString())
                 )
         );
         if(account.getBalance()<0){
