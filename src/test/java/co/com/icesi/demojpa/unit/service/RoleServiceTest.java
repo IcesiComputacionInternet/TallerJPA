@@ -28,6 +28,7 @@ public class RoleServiceTest {
 
     private UserRepository userRepository;
 
+
     @BeforeEach
     private void init(){
         userRepository = mock(UserRepository.class);
@@ -36,7 +37,7 @@ public class RoleServiceTest {
         roleService = new RoleService(roleRepository,roleMapper, userRepository);
     }
 
-    //Se crea rol sin problema :D
+
     @Test
     public void testCreateRole(){
         roleService.save(defaultRoleDTO());
@@ -99,7 +100,7 @@ public class RoleServiceTest {
         return IcesiUser.builder()
                 .email("5")
                 .firstName("John")
-                .lastname("Doe")
+                .lastName("Doe")
                 .phone("123")
                 .password("123")
                 .role(IcesiRole.builder()

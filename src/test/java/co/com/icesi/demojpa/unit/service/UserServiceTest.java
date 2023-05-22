@@ -3,6 +3,8 @@ package co.com.icesi.demojpa.unit.service;
 import co.com.icesi.demojpa.dto.UserCreateDTO;
 import co.com.icesi.demojpa.mapper.UserMapper;
 import co.com.icesi.demojpa.mapper.UserMapperImpl;
+import co.com.icesi.demojpa.mapper.response.UserResponseMapper;
+import co.com.icesi.demojpa.mapper.response.UserResponseMapperImpl;
 import co.com.icesi.demojpa.model.IcesiAccount;
 import co.com.icesi.demojpa.model.IcesiRole;
 import co.com.icesi.demojpa.model.IcesiUser;
@@ -34,14 +36,17 @@ public class UserServiceTest {
 
     private AccountRepository accountRepository;
 
+    private UserResponseMapper userResponseMapper;
+
     @BeforeEach
     private void init(){
         accountRepository=mock(AccountRepository.class);
         roleRepository = mock(RoleRepository.class);
         userRepository = mock(UserRepository.class);
+        userResponseMapper = spy(UserResponseMapperImpl.class);
         userMapper = spy(UserMapperImpl.class);
         roleService =mock(RoleService.class);
-        userService = new UserService(userRepository,userMapper, roleService, roleRepository, accountRepository);
+        userService = new UserService(userRepository,userMapper, roleService, roleRepository, accountRepository, userResponseMapper);
 
     }
 
@@ -71,10 +76,12 @@ public class UserServiceTest {
     @Test
     public void testCreateUserWhenPhoneAlreadyExists(){
         IcesiRole role = testRole();
+        UserCreateDTO user=defaultUserCreateDTO();
+        user.setEmail("noEmail@gmail.com");
         when(roleRepository.findByName(role.getName())).thenReturn(Optional.of((role)));
         when(userRepository.findByPhone(any())).thenReturn(Optional.of(defaultIcesiUser()));
         try{
-            userService.save(defaultUserCreateDTO());
+            userService.save(user);
             fail();
         }catch (RuntimeException exception){
             String message = exception.getMessage();
@@ -142,7 +149,7 @@ public class UserServiceTest {
      return UserCreateDTO.builder()
              .email("5")
              .firstName("John")
-             .lastname("Doe")
+             .lastName("Doe")
              .phone("123")
              .password("123")
              .roleName("rol de prueba")
@@ -164,7 +171,7 @@ public class UserServiceTest {
                 .userId(UUID.randomUUID())
                 .email("5")
                 .firstName("John")
-                .lastname("Doe")
+                .lastName("Doe")
                 .phone("123")
                 .password("123")
                 .accounts(new ArrayList<>())
@@ -183,7 +190,7 @@ public class UserServiceTest {
                 .account(IcesiUser.builder()
                         .email("5")
                         .firstName("John")
-                        .lastname("Doe")
+                        .lastName("Doe")
                         .phone("123")
                         .password("123")
                         .role(IcesiRole.builder()

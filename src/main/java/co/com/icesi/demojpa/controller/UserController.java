@@ -1,13 +1,17 @@
 package co.com.icesi.demojpa.controller;
+import co.com.icesi.demojpa.api.UserAPI;
 import co.com.icesi.demojpa.dto.UserCreateDTO;
+import co.com.icesi.demojpa.dto.response.ResponseUserDTO;
 import co.com.icesi.demojpa.model.IcesiUser;
 import co.com.icesi.demojpa.servicio.UserService;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.UUID;
 
+
+
 @RestController
-public class UserController {
+public class UserController implements UserAPI {
 
 
     private final UserService userService;
@@ -17,15 +21,11 @@ public class UserController {
     }
 
 
-    @PostMapping("/users")
-    public IcesiUser createIcesiUser(@RequestBody UserCreateDTO user){
+
+    @Override
+    public ResponseUserDTO createIcesiUser(@RequestBody UserCreateDTO user){
+        System.out.println("Creando usuario");
         return userService.save(user);
     }
-
-    @GetMapping("/users/{id}")
-    public IcesiUser returnUser(@PathVariable String id){
-        return userService.findById(UUID.fromString(id)).orElseThrow();
-    }
-
 
 }

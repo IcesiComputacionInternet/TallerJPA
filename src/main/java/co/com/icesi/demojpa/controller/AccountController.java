@@ -1,6 +1,9 @@
 package co.com.icesi.demojpa.controller;
 
+import co.com.icesi.demojpa.api.AccountAPI;
 import co.com.icesi.demojpa.dto.AccountCreateDTO;
+import co.com.icesi.demojpa.dto.TransactionDTO;
+import co.com.icesi.demojpa.dto.response.ResponseAccountDTO;
 import co.com.icesi.demojpa.model.IcesiAccount;
 import co.com.icesi.demojpa.repository.AccountRepository;
 import co.com.icesi.demojpa.servicio.AccountService;
@@ -11,7 +14,7 @@ import java.util.Optional;
 import java.util.UUID;
 
 @RestController
-public class AccountController {
+public class AccountController implements AccountAPI {
 
     private final AccountService accountService;
 
@@ -23,24 +26,35 @@ public class AccountController {
         this.accountRepository = accountRepository1;
     }
 
-    @PostMapping("/accounts")
-    public IcesiAccount createIcesiAccount(@RequestBody AccountCreateDTO accountCreateDTO){
+    @Override
+    public ResponseAccountDTO createIcesiAccount(AccountCreateDTO accountCreateDTO){
         return accountService.save(accountCreateDTO);
     }
 
-    @PostMapping("/disableAccount/{accountNumber}")
-    public void disableAccount(@PathVariable String accountNumber){
+    @Override
+    public void disableAccount(String accountNumber){
         accountService.disableAccount(accountNumber);
     }
 
-    @PostMapping ("/accounts/{id}")
-    public Optional<IcesiAccount> showAccountsById(@PathVariable String id){
-        return accountRepository.findById(UUID.fromString(id));
+
+    @Override
+    public void eneableAccount(String accountNumber){
+        accountService.enableAccount(accountNumber);
     }
 
-    @GetMapping ("/all")
-    public List<IcesiAccount> showAccounts(){
-        return accountRepository.findAll();
+    @Override
+    public void withdraw(String accountNumber, long amount){
+        accountService.withdrawal(accountNumber, amount);
     }
 
+    @Override
+    public void deposit(String accountNumber, long amount){
+        accountService.deposit(accountNumber, amount);
+    }
+
+
+    @Override
+    public TransactionDTO transfer(TransactionDTO transactionDTO){
+        return accountService.transfer(transactionDTO);
+    }
 }

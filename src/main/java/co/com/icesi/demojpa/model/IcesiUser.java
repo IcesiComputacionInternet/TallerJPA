@@ -21,7 +21,7 @@ public class IcesiUser {
 
     private String firstName;
 
-    private String lastname;
+    private String lastName;
 
     private String email;
 
@@ -42,11 +42,5 @@ public class IcesiUser {
     @OneToMany(mappedBy = "account")
     private List<IcesiAccount> accounts;
 
-
-/*
-    @OneToMany(mappedBy = "user")
-    private List<IcesiBlogPost> post;
-
-     */
 
 }
