@@ -16,6 +16,6 @@ public class CustomEmailValidator implements ConstraintValidator<CustomEmailCons
 
     @Override
     public boolean isValid(String email, ConstraintValidatorContext constraintValidatorContext) {
-        return email == null || email.isEmpty() || email.matches("[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\\\\.[a-zA-Z]{2,}") ;
+        return email == null || email.isEmpty() || email.matches("[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\\.[a-zA-Z]{2,}") ;
     }
 }

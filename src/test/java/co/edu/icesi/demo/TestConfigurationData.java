@@ -39,7 +39,7 @@ public class TestConfigurationData {
                 .firstName("Julieta")
                 .lastName("Venegas")
                 .email("julietav@example.com")
-                .phoneNumber("3184441232")
+                .phoneNumber("+573184441232")
                 .password(encoder.encode("julieta123"))
                 .role(admin)
                 .build();
@@ -48,7 +48,7 @@ public class TestConfigurationData {
                 .firstName("John")
                 .lastName("Doe")
                 .email("johndoe2@email.com")
-                .phoneNumber("+57123123123")
+                .phoneNumber("+573123123123")
                 .role(user)
                 .password(encoder.encode("password"))
                 .build();
@@ -57,7 +57,7 @@ public class TestConfigurationData {
                 .firstName("John")
                 .lastName("Doe")
                 .email("icesibank@email.com")
-                .phoneNumber("+57123123333")
+                .phoneNumber("+573123123333")
                 .role(bank)
                 .password(encoder.encode("password123"))
                 .build();

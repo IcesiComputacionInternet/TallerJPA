@@ -48,7 +48,7 @@ class DemoApplicationTests {
 	}
 
 	@Test
-	public void testTokenEndpointWithInvalidEmail() throws Exception{
+	public void testTokenEndpointWithInvalidCredentials() throws Exception{
 		var result=mockMvc.perform(MockMvcRequestBuilders.post("/token").content(
 								objectMapper.writeValueAsString(new LoginDTO("incorrect@email.com","password"))
 						)
@@ -56,9 +56,6 @@ class DemoApplicationTests {
 						.accept(MediaType.APPLICATION_JSON))
 				.andExpect(status().isUnauthorized())
 				.andReturn();
-
-		//IcesiError token =objectMapper.readValue(result.getResponse().getContentAsString(),TokenDTO.class);
-		//assertNotNull(token);
 	}
 
 }
