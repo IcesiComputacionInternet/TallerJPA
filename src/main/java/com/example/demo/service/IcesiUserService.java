@@ -87,7 +87,7 @@ public class IcesiUserService {
         return icesiUserMapper.fromIcesiUserToResponseIcesiUserDTO(icesiUserRepository.save(user));
     }
 
-    public IcesiUser findIcesiUserByEmail(String email) {
+    private IcesiUser findIcesiUserByEmail(String email) {
         return icesiUserRepository.findByEmail(email)
             .orElseThrow(() -> IcesiExceptionBuilder.createIcesiException(
                 "This email is not present in the database",
@@ -96,7 +96,7 @@ public class IcesiUserService {
             ).get());
     }
 
-    public IcesiRole findIcesiRoleByName(String name) {
+    private IcesiRole findIcesiRoleByName(String name) {
         return icesiRoleRepository.findByName(name)
             .orElseThrow(() -> IcesiExceptionBuilder.createIcesiException(
                 "This role is not present in the database",
@@ -109,8 +109,8 @@ public class IcesiUserService {
     /*This method receives two params:
     *the first one is the user who is modifying the role of another user
     *The second one is the role that the user is trying to assign to another user or add to the list of roles*/
-    public void validateAdminRole(String userModifier, String role) {
-        if (!userModifier.equals(TypeIcesiRole.ADMIN.name()) && role.equals(TypeIcesiRole.ADMIN.name())) {
+    private void validateAdminRole(String userModifier, String role) {
+        if (!userModifier.equals(TypeIcesiRole.admin.name()) && role.equals(TypeIcesiRole.admin.name())) {
             throw IcesiExceptionBuilder.createIcesiException(
                 "Forbidden",
                 HttpStatus.FORBIDDEN,

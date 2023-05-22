@@ -15,14 +15,18 @@ import java.util.Optional;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 
+import com.example.demo.DTO.IcesiRoleCreateDTO;
 import com.example.demo.DTO.IcesiUserCreateDTO;
 import com.example.demo.mapper.IcesiUserMapper;
 import com.example.demo.mapper.IcesiUserMapperImpl;
 import com.example.demo.model.IcesiRole;
 import com.example.demo.model.IcesiUser;
+import com.example.demo.model.enums.TypeIcesiRole;
 import com.example.demo.repository.IcesiRoleRepository;
 import com.example.demo.repository.IcesiUserRepository;
 import com.example.demo.service.IcesiUserService;
+
+import aj.org.objectweb.asm.Type;
 
 public class IcesiUserServiceTest {
     private IcesiUserService icesiUserService;
@@ -32,7 +36,6 @@ public class IcesiUserServiceTest {
     private IcesiUserMapper icesiUserMapper;
 
     private IcesiRoleRepository icesiRoleRepository;
-
 
     @BeforeEach
     private void init() {
@@ -60,7 +63,14 @@ public class IcesiUserServiceTest {
             .email("testEmail@example.com")
             .phoneNumber("999999")
             .password("1234")
-            .icesiRole(defaultIcesiRole())
+            .icesiRoleCreateDTO(defaultIcesiRoleDTO())
+            .build();
+    }
+
+    private IcesiRoleCreateDTO defaultIcesiRoleDTO() {
+        return IcesiRoleCreateDTO.builder()
+            .description("This role is for students")
+            .name("Student")
             .build();
     }
 
@@ -71,10 +81,41 @@ public class IcesiUserServiceTest {
             .build();
     }
 
+
     @Test
-    public void testCreateIcesiUserWithRegisteredRole() {
+    public void testCreateIcesiUserWithRegisteredRoleAsAdmin() {
         when(icesiRoleRepository.findByName(any())).thenReturn(Optional.of(defaultIcesiRole()));
-        icesiUserService.create(defaultIcesiUserCreateDTO());
+        icesiUserService.create(TypeIcesiRole.admin.name(),defaultIcesiUserCreateDTO());
+        IcesiUser icesiUser1 = IcesiUser.builder()
+            .firstName("John")
+            .lastName("Doe")
+            .email("testEmail@example.com")
+            .phoneNumber("999999")
+            .password("1234")
+            .icesiRole(defaultIcesiRole())
+            .build();
+        verify(icesiUserRepository, times(1)).save(argThat(new IcesiUserMatcher(icesiUser1)));
+    }
+
+    @Test
+    public void testCreateIcesiUserWithRegisteredRoleAsBank() {
+        when(icesiRoleRepository.findByName(any())).thenReturn(Optional.of(defaultIcesiRole()));
+        icesiUserService.create(TypeIcesiRole.bank.name(),defaultIcesiUserCreateDTO());
+        IcesiUser icesiUser1 = IcesiUser.builder()
+            .firstName("John")
+            .lastName("Doe")
+            .email("testEmail@example.com")
+            .phoneNumber("999999")
+            .password("1234")
+            .icesiRole(defaultIcesiRole())
+            .build();
+        verify(icesiUserRepository, times(1)).save(argThat(new IcesiUserMatcher(icesiUser1)));
+    }
+
+    @Test
+    public void testCreateIcesiUserWithRegisteredRoleAsUser() {
+        when(icesiRoleRepository.findByName(any())).thenReturn(Optional.of(defaultIcesiRole()));
+        icesiUserService.create(TypeIcesiRole.user.name(),defaultIcesiUserCreateDTO());
         IcesiUser icesiUser1 = IcesiUser.builder()
             .firstName("John")
             .lastName("Doe")
@@ -89,7 +130,7 @@ public class IcesiUserServiceTest {
     @Test
     public void testCreateIcesiUserWithANoRegisteredRole() {
         try {
-            icesiUserService.create(defaultIcesiUserCreateDTO());
+            icesiUserService.create(TypeIcesiRole.admin.name(),defaultIcesiUserCreateDTO());
             fail();
         } catch (Exception exception) {
             String message = exception.getMessage();
@@ -102,7 +143,7 @@ public class IcesiUserServiceTest {
     public void testCreateUserWhenEmailAlreadyExists() {
         when(icesiUserRepository.findByEmail(any())).thenReturn(Optional.of(defaultIcesiUser()));
         try {
-            icesiUserService.create(defaultIcesiUserCreateDTO());
+            icesiUserService.create(TypeIcesiRole.admin.name(),defaultIcesiUserCreateDTO());
             fail();
         } catch(RuntimeException exception) {
             String message = exception.getMessage();
@@ -111,12 +152,11 @@ public class IcesiUserServiceTest {
 
     }
 
-
     @Test
     public void testCreateUserWhenPhoneNumberAlreadyExists() {
         when(icesiUserRepository.findByPhoneNumber(any())).thenReturn(Optional.of(defaultIcesiUser()));
         try {
-            icesiUserService.create(defaultIcesiUserCreateDTO());
+            icesiUserService.create(TypeIcesiRole.admin.name(),defaultIcesiUserCreateDTO());
             fail();
         } catch(RuntimeException exception) {
             String message = exception.getMessage();
@@ -131,12 +171,36 @@ public class IcesiUserServiceTest {
         when(icesiUserRepository.findByPhoneNumber(any())).thenReturn(Optional.of(defaultIcesiUser()));
      
         try {
-            icesiUserService.create(defaultIcesiUserCreateDTO());
+            icesiUserService.create(TypeIcesiRole.admin.name(),defaultIcesiUserCreateDTO());
             fail();
         } catch(RuntimeException exception) {
             String message = exception.getMessage();
             assertEquals("These email and phone number are already in use", message);
         }
+
+    }
+
+    @Test
+    public void testUpdateIcesiRoleToAdminAsAdmin() {
+        
+    }
+
+    @Test
+    public void testUpdateIcesiRoleToAdminAsBank() {
+
+    }
+    @Test
+    public void testUpdateIcesiRoleToAdminAsUser() {
+
+    }
+
+    @Test
+    public void testUpdateIcesiRoleAsBank() {
+
+    }
+
+    @Test
+    public void testUpdateIcesiRoleAsUser() {
 
     }
 
