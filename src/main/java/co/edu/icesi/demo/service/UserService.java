@@ -63,7 +63,7 @@ public class UserService {
             throw createIcesiException(
                     "User email and phone number are in use",
                     HttpStatus.CONFLICT,
-                    new DetailBuilder(ErrorCode.ERR_DUPLICATED, "User email","Phone number" )
+                    new DetailBuilder(ErrorCode.ERR_DUPLICATED, "User Email and","Phone number" )
             ).get();
 
         }else if (userRepository.findByEmail(user.getEmail()).isPresent()){
