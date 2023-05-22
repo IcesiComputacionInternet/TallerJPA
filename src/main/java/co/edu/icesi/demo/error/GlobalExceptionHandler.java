@@ -47,10 +47,20 @@ public class GlobalExceptionHandler {
     }
 
     private IcesiErrorDetail mapBindingResultToError(ObjectError objectError){
-        var message = ErrorCode.ERR_400.getMessage().formatted(((FieldError) objectError).getField(), objectError.getDefaultMessage());
+        if (objectError instanceof FieldError) {
+            var fieldError = (FieldError) objectError;
+            var message = ErrorCode.ERR_400.getMessage().formatted(fieldError.getField(), fieldError.getDefaultMessage());
+            return IcesiErrorDetail.builder()
+                    .errorCode(ErrorCode.ERR_400.getCode())
+                    .errorMessage(message)
+                    .build();
+        }
+        var message = ErrorCode.ERR_400.getMessage().formatted("",objectError.getDefaultMessage());
         return IcesiErrorDetail.builder()
                 .errorCode(ErrorCode.ERR_400.getCode())
-                .errorMessage(message).build();
+                .errorMessage(message)
+                .build();
+
     }
 
 }

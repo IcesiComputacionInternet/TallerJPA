@@ -1,5 +1,6 @@
 package co.edu.icesi.demo.dto;
 
+import co.edu.icesi.demo.validation.constraint.CustomEmailConstraint;
 import co.edu.icesi.demo.validation.constraint.EmailOrPhoneNumberExistConstraint;
 import co.edu.icesi.demo.validation.constraint.PhoneNumberConstraint;
 import lombok.AllArgsConstructor;
@@ -7,7 +8,6 @@ import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
-import javax.validation.constraints.Email;
 import javax.validation.constraints.NotBlank;
 
 @Data
@@ -18,21 +18,22 @@ import javax.validation.constraints.NotBlank;
 public class UserCreateDTO {
 
 
-    @NotBlank
+    @NotBlank(message = "is missing")
     private String firstName;
 
-    @NotBlank
+    @NotBlank(message = "is missing")
     private String lastName;
 
 
+    @CustomEmailConstraint
     private String email;
 
     @PhoneNumberConstraint
     private String phoneNumber;
 
-    @NotBlank
+    @NotBlank(message = "is missing")
     private String password;
 
-    @NotBlank
+    @NotBlank(message = "is missing")
     private String roleName;
 }

@@ -13,6 +13,7 @@ public class PhoneNumberValidator implements ConstraintValidator<PhoneNumberCons
 
     @Override
     public boolean isValid(String phoneNumber, ConstraintValidatorContext constraintValidatorContext) {
-        return phoneNumber!=null && phoneNumber.matches("[+]573[0-5][0-9]{8}") && (phoneNumber.length()==13);
+
+        return phoneNumber == null || phoneNumber.isEmpty() || (phoneNumber.matches("[+]573[0-5][0-9]{8}") && phoneNumber.length() == 13);
     }
 }

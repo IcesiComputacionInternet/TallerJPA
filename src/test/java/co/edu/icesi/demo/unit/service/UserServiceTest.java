@@ -12,6 +12,8 @@ import co.edu.icesi.demo.service.UserService;
 import co.edu.icesi.demo.unit.matcher.IcesiUserMatcher;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.security.crypto.password.PasswordEncoder;
 
 import java.util.Optional;
 import java.util.UUID;
@@ -28,6 +30,9 @@ public class UserServiceTest {
     private UserRepository userRepository;
     private RoleRepository roleRepository;
 
+    @Autowired
+    private PasswordEncoder passwordEncoder;
+
 
     @BeforeEach
     private void init(){
@@ -35,7 +40,7 @@ public class UserServiceTest {
         userMapper=spy(UserMapperImpl.class);
         roleRepository=mock(RoleRepository.class);
 
-        userService=new UserService(userRepository, userMapper, roleRepository);
+        userService=new UserService(userRepository, userMapper, roleRepository,passwordEncoder);
     }
 
 

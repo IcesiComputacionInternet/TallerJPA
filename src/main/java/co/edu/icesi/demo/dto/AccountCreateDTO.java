@@ -18,14 +18,14 @@ public class AccountCreateDTO {
     private String accountNumber;
 
     @Min(value=0, message = "min value is 0")
-    @Max(value=1000000000000L)
+    @Max(value=1000000000000L, message = "max value is 1000000000000")
     private long balance;
 
-    @NotBlank
+    @NotBlank(message = "is missing")
     private String type;
 
     private boolean active;
 
-    @NotBlank
+    @NotBlank(message = "is missing")
     private String userEmail;
 }
