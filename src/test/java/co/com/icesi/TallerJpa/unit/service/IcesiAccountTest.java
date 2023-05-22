@@ -68,7 +68,7 @@ public class IcesiAccountTest {
 
         verify(icesiUserRepository,times(1)).findByEmail(any());
         verify(icesiAccountMapper,times(0)).fromAccountDto(any());
-        verify(icesiAccountMapper,times(0)).fromIcesiAccount(any());
+        verify(icesiAccountMapper,times(0)).fromIcesiAccountToResponse(any());
         verify(icesiAccountRepository,times(0)).save(argThat(new IcesiAccountMatcher(defaultIcesiAccount())));
     }
 
@@ -94,7 +94,7 @@ public class IcesiAccountTest {
 
         verify(icesiUserRepository,times(1)).findByEmail(any());
         verify(icesiAccountMapper,times(0)).fromAccountDto(any());
-        verify(icesiAccountMapper,times(0)).fromIcesiAccount(any());
+        verify(icesiAccountMapper,times(0)).fromIcesiAccountToResponse(any());
         verify(icesiAccountRepository,times(0)).save(argThat(new IcesiAccountMatcher(icesiAccount)));
     }
 
@@ -472,7 +472,7 @@ public class IcesiAccountTest {
         return IcesiAccountRequestDTO.builder()
                 .balance(20L)
                 .type(AccountType.NORMAL)
-                .user("jaime.enrique@hotmail.com").build();
+                .userEmail("jaime.enrique@hotmail.com").build();
     }
     private IcesiAccount defaultIcesiAccount(){
         return IcesiAccount.builder()
