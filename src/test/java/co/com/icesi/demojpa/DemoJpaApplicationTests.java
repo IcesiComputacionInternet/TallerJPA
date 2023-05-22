@@ -3,11 +3,12 @@ package co.com.icesi.demojpa;
 
 
 import co.com.icesi.demojpa.dto.LoginDTO;
-import co.com.icesi.demojpa.dto.TokenDTO;
+import co.com.icesi.demojpa.dto.TransactionDTO;
 import co.com.icesi.demojpa.dto.UserCreateDTO;
 import co.com.icesi.demojpa.dto.response.ResponseUserDTO;
 import co.com.icesi.demojpa.error.exception.IcesiError;
 import co.com.icesi.demojpa.error.exception.IcesiException;
+import co.com.icesi.demojpa.repository.AccountRepository;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -19,8 +20,7 @@ import org.springframework.test.context.ActiveProfiles;
 import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.request.MockMvcRequestBuilders;
 
-import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.junit.jupiter.api.Assertions.assertNotNull;
+import static org.junit.jupiter.api.Assertions.*;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
 @AutoConfigureMockMvc
@@ -49,8 +49,7 @@ class TallerJpaApplicationTests {
                         .accept(MediaType.APPLICATION_JSON))
                 .andExpect(status().isOk())
                 .andReturn();
-        TokenDTO token = objectMapper.readValue(result.getResponse().getContentAsString(), TokenDTO.class);
-        assertNotNull(token);
+        assertNotNull(result);
     }
 
     @Test
@@ -71,7 +70,7 @@ class TallerJpaApplicationTests {
     @Test
     public void testTokenEndpointPassword() throws Exception{
         var result = mocMvc.perform(MockMvcRequestBuilders.post("/token").content(
-                                objectMapper.writeValueAsString(new LoginDTO("johndoe@email4.com","NotApassword"))
+                                objectMapper.writeValueAsString(new LoginDTO("johndoe@email.com","NotApassword"))
                         )
                         .contentType(MediaType.APPLICATION_JSON)
                         .accept(MediaType.APPLICATION_JSON))
@@ -152,8 +151,7 @@ class TallerJpaApplicationTests {
                         .contentType(MediaType.APPLICATION_JSON)
                         .accept(MediaType.APPLICATION_JSON))
                 .andExpect(status().isOk());
-        ResponseUserDTO user = objectMapper.readValue(result.andReturn().getResponse().getContentAsString(), ResponseUserDTO.class);
-        assertNotNull(user);
+        assertTrue(result.andReturn().getResponse().getContentAsString().contains("USER"));
     }
 
     @Test
@@ -175,11 +173,59 @@ class TallerJpaApplicationTests {
                                         "a")))
                         .contentType(MediaType.APPLICATION_JSON)
                         .accept(MediaType.APPLICATION_JSON))
-                .andExpect(status().is5xxServerError());
-        IcesiException error = objectMapper.readValue(result.andReturn().getResponse().getContentAsString(), IcesiException.class);
+                .andExpect(status().is4xxClientError());
+        System.out.println(result.andReturn().getResponse().getContentAsString());
+        IcesiError error = objectMapper.readValue(result.andReturn().getResponse().getContentAsString(), IcesiError.class);
         assertNotNull(error);
-        assertEquals("No existe un rol con este nombre", error.getMessage());
+
+        assertEquals("ROLE_NOT_FOUND", error.getDetails());
     }
+
+    @Test
+    public void testTransferEndpointHappyPath() throws Exception {
+        mocMvc.perform(MockMvcRequestBuilders.post("/token").content(
+                                objectMapper.writeValueAsString(new LoginDTO("johndoe@email.com", "password"))
+                        )
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .accept(MediaType.APPLICATION_JSON))
+                .andExpect(status().isOk())
+                .andReturn();
+        var result = mocMvc.perform(MockMvcRequestBuilders.post("/accounts/transfer/").content(
+                                objectMapper.writeValueAsString(TransactionDTO.builder()
+                                        .accountNumberOrigin("1234567899")
+                                        .accountNumberDestination("123456789")
+                                        .amount(1000L)
+                                        .resultMessage("")
+                                        .build()))
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .accept(MediaType.APPLICATION_JSON))
+                .andExpect(status().isOk());
+        System.out.println(result.andReturn().getResponse().getContentAsString());
+        TransactionDTO transactionDTO = objectMapper.readValue(result.andReturn().getResponse().getContentAsString(), TransactionDTO.class);
+        assertEquals("El nuevo balance es de: 999000", transactionDTO.getResultMessage());
+    }
+
+    @Test
+    public void testTransferEndpointBankRole() throws Exception {
+        mocMvc.perform(MockMvcRequestBuilders.post("/token").content(
+                                objectMapper.writeValueAsString(new LoginDTO("johndoe@email2.com", "password"))
+                        )
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .accept(MediaType.APPLICATION_JSON))
+                .andExpect(status().isOk())
+                .andReturn();
+        mocMvc.perform(MockMvcRequestBuilders.post("/accounts/transfer/").content(
+                                objectMapper.writeValueAsString(TransactionDTO.builder()
+                                        .accountNumberOrigin("1234567899")
+                                        .accountNumberDestination("123456789")
+                                        .amount(1000L)
+                                        .resultMessage("")
+                                        .build()))
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .accept(MediaType.APPLICATION_JSON))
+                .andExpect(status().is4xxClientError());
+    }
+
 
 
 

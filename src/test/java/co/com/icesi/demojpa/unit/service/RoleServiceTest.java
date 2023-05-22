@@ -100,7 +100,7 @@ public class RoleServiceTest {
         return IcesiUser.builder()
                 .email("5")
                 .firstName("John")
-                .lastname("Doe")
+                .lastName("Doe")
                 .phone("123")
                 .password("123")
                 .role(IcesiRole.builder()

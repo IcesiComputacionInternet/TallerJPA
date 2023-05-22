@@ -2,6 +2,7 @@ package co.com.icesi.demojpa.controller;
 
 import co.com.icesi.demojpa.api.AccountAPI;
 import co.com.icesi.demojpa.dto.AccountCreateDTO;
+import co.com.icesi.demojpa.dto.TransactionDTO;
 import co.com.icesi.demojpa.dto.response.ResponseAccountDTO;
 import co.com.icesi.demojpa.model.IcesiAccount;
 import co.com.icesi.demojpa.repository.AccountRepository;
@@ -53,7 +54,7 @@ public class AccountController implements AccountAPI {
 
 
     @Override
-    public void transfer(String accountNumberOrigin, String accountNumberDestination, long amount){
-        accountService.transfer(accountNumberOrigin, accountNumberDestination, amount);
+    public TransactionDTO transfer(TransactionDTO transactionDTO){
+        return accountService.transfer(transactionDTO);
     }
 }

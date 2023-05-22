@@ -18,7 +18,7 @@ public class IcesiUserMatcher implements ArgumentMatcher<IcesiUser> {
     public boolean matches(IcesiUser icesiUserRight) {
         return icesiUserRight.getUserId() != null &&
                 Objects.equals(icesiUserRight.getFirstName(), icesiUserLeft.getFirstName()) &&
-                Objects.equals(icesiUserRight.getLastname(), icesiUserLeft.getLastname()) &&
+                Objects.equals(icesiUserRight.getLastName(), icesiUserLeft.getLastName()) &&
                 Objects.equals(icesiUserRight.getPassword(), icesiUserLeft.getPassword()) &&
                 Objects.equals(icesiUserRight.getEmail(), icesiUserLeft.getEmail());
     }

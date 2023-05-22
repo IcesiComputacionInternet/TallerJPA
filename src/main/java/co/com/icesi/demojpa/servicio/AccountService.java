@@ -1,6 +1,7 @@
 package co.com.icesi.demojpa.servicio;
 
 import co.com.icesi.demojpa.dto.AccountCreateDTO;
+import co.com.icesi.demojpa.dto.TransactionDTO;
 import co.com.icesi.demojpa.dto.response.ResponseAccountDTO;
 import co.com.icesi.demojpa.error.util.IcesiExceptionBuilder;
 import co.com.icesi.demojpa.mapper.AccountMapper;
@@ -90,7 +91,7 @@ public class AccountService {
         accountRepository.enableAccount(accountNumber);
 
     }
-
+    @Transactional
     public void withdrawal(String accountNumber, long withdrawalAmount){
 
         IcesiAccount icesiAccount= accountRepository.findByAccountNumber(accountNumber).orElseThrow(()-> new RuntimeException("No existe una cuenta con este numero"));
@@ -110,7 +111,7 @@ public class AccountService {
         accountRepository.updateBalance(accountNumber,icesiAccount.getBalance()-withdrawalAmount);
 
     }
-
+    @Transactional
     public void deposit(String accountNumber, long depositAmount){
 
         IcesiAccount icesiAccount= accountRepository.findByAccountNumber(accountNumber).orElseThrow(()-> new RuntimeException("No existe una cuenta con este numero"));
@@ -125,13 +126,15 @@ public class AccountService {
 
         accountRepository.updateBalance(accountNumber,icesiAccount.getBalance()+depositAmount);
     }
-
-    public void transfer(String sendAccNum, String receiveAccNum, long sendValue){
-
+    @Transactional
+    public TransactionDTO transfer(TransactionDTO transactionDTO){
+        String sendAccNum = transactionDTO.getAccountNumberOrigin();
+        String receiveAccNum = transactionDTO.getAccountNumberDestination();
+        long sendValue = transactionDTO.getAmount();
         IcesiAccount sendIcesiAccount = accountRepository.findByAccountNumber(sendAccNum).orElseThrow(()->
                 IcesiExceptionBuilder.createIcesiException("La cuenta que manda el dinero no existe", HttpStatus.NOT_FOUND,"ACCOUNT_NOT_FOUND") );
 
-
+        System.out.println("receiveAccNum: "+receiveAccNum);
         IcesiAccount receiveIcesiAccount = accountRepository.findByAccountNumber(receiveAccNum).orElseThrow(()->
                 IcesiExceptionBuilder.createIcesiException("La cuenta que recibe el dinero no existe", HttpStatus.NOT_FOUND,"ACCOUNT_NOT_FOUND") );
 
@@ -156,7 +159,8 @@ public class AccountService {
 
         accountRepository.updateBalance(sendAccNum,sendIcesiAccount.getBalance()-sendValue);
         accountRepository.updateBalance(receiveAccNum, receiveIcesiAccount.getBalance()+sendValue);
-
+        transactionDTO.setResultMessage("El nuevo balance es de: "+(sendIcesiAccount.getBalance()-sendValue));
+        return transactionDTO;
     }
 
     public ResponseAccountDTO getAccount(String accountNumber){

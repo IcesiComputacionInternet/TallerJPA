@@ -41,8 +41,9 @@ public class UserService {
             throw new RuntimeException("El usuario no tiene rol");
         }
 
+        System.out.println("El rol del usuario es: "+user.getRoleName());
         IcesiRole role = roleRepository.findByName(user.getRoleName()).orElseThrow(
-                ()->IcesiExceptionBuilder.createIcesiException("No existe un rol con este nombre", HttpStatus.NOT_FOUND,"ROLE_NOT_FOUND") );
+                ()-> IcesiExceptionBuilder.createIcesiException("No existe un rol con este nombre", HttpStatus.NOT_FOUND,"ROLE_NOT_FOUND") );
 
         if(userRepository.findByEmail(user.getEmail()).isPresent() && userRepository.findByPhone(user.getPhone()).isPresent()) {
             throw new RuntimeException("Ya hay un usuario con este email y celular");

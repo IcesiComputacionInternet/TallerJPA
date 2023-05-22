@@ -2,6 +2,7 @@ package co.com.icesi.demojpa.unit.service;
 
 
 import co.com.icesi.demojpa.dto.AccountCreateDTO;
+import co.com.icesi.demojpa.dto.TransactionDTO;
 import co.com.icesi.demojpa.mapper.AccountMapper;
 import co.com.icesi.demojpa.mapper.AccountMapperImpl;
 import co.com.icesi.demojpa.mapper.response.AccountResponseMapper;
@@ -315,7 +316,12 @@ public class AccountServiceTest {
         IcesiAccount icesiAccount2 = defaultIcesiAccountWithNumberAndID();
         when(accountRepository.findByAccountNumber(icesiAccount.getAccountNumber())).thenReturn(Optional.of(icesiAccount));
         when(accountRepository.findByAccountNumber(icesiAccount2.getAccountNumber())).thenReturn(Optional.of(icesiAccount2));
-        accountService.transfer(icesiAccount.getAccountNumber(),icesiAccount2.getAccountNumber(),100L);
+        accountService.transfer(TransactionDTO.builder()
+                .accountNumberOrigin("1234567899")
+                .accountNumberDestination("123456789")
+                .amount(1000L)
+                .resultMessage("")
+                .build());
         verify(accountRepository, times(1)).updateBalance(eq(icesiAccount.getAccountNumber()),eq(icesiAccount.getBalance()-100L));
         verify(accountRepository, times(1)).updateBalance(eq(icesiAccount2.getAccountNumber()),eq(icesiAccount.getBalance()+100L));
     }
@@ -330,7 +336,12 @@ public class AccountServiceTest {
         when(accountRepository.findByAccountNumber(icesiAccount2.getAccountNumber())).thenReturn(Optional.of(icesiAccount2));
 
         try{
-            accountService.transfer(icesiAccount.getAccountNumber(),icesiAccount2.getAccountNumber(),100L);
+            accountService.transfer(TransactionDTO.builder()
+                    .accountNumberOrigin("1234567899")
+                    .accountNumberDestination("123456789")
+                    .amount(1000L)
+                    .resultMessage("")
+                    .build());
             fail();
         }catch (RuntimeException exception){
             assertEquals("La cuenta que manda el dinero no existe",exception.getMessage());
@@ -347,7 +358,12 @@ public class AccountServiceTest {
         when(accountRepository.findByAccountNumber(icesiAccount2.getAccountNumber())).thenReturn(Optional.empty());
 
         try{
-            accountService.transfer(icesiAccount.getAccountNumber(),icesiAccount2.getAccountNumber(),100L);
+            accountService.transfer(TransactionDTO.builder()
+                    .accountNumberOrigin("1234567899")
+                    .accountNumberDestination("123456789")
+                    .amount(1000L)
+                    .resultMessage("")
+                    .build());
             fail();
         }catch (RuntimeException exception){
             assertEquals("La cuenta que recibe el dinero no existe",exception.getMessage());
@@ -364,7 +380,12 @@ public class AccountServiceTest {
         when(accountRepository.findByAccountNumber(icesiAccount2.getAccountNumber())).thenReturn(Optional.of(icesiAccount2));
 
         try{
-            accountService.transfer(icesiAccount.getAccountNumber(),icesiAccount2.getAccountNumber(),100L);
+            accountService.transfer(TransactionDTO.builder()
+                    .accountNumberOrigin("1234567899")
+                    .accountNumberDestination("123456789")
+                    .amount(1000L)
+                    .resultMessage("")
+                    .build());
             fail();
         }catch (RuntimeException exception){
             assertEquals("La cuenta que manda el dinero es de tipo 'deposit only' ",exception.getMessage());
@@ -381,7 +402,12 @@ public class AccountServiceTest {
         when(accountRepository.findByAccountNumber(icesiAccount2.getAccountNumber())).thenReturn(Optional.of(icesiAccount2));
 
         try{
-            accountService.transfer(icesiAccount.getAccountNumber(),icesiAccount2.getAccountNumber(),100L);
+            accountService.transfer(TransactionDTO.builder()
+                    .accountNumberOrigin("1234567899")
+                    .accountNumberDestination("123456789")
+                    .amount(1000L)
+                    .resultMessage("")
+                    .build());
             fail();
         }catch (RuntimeException exception){
             assertEquals("La cuenta que recibe el dinero es de tipo 'deposit only' ",exception.getMessage());
@@ -399,7 +425,12 @@ public class AccountServiceTest {
         when(accountRepository.findByAccountNumber(icesiAccount2.getAccountNumber())).thenReturn(Optional.of(icesiAccount2));
 
         try{
-            accountService.transfer(icesiAccount.getAccountNumber(),icesiAccount2.getAccountNumber(),100L);
+            accountService.transfer(TransactionDTO.builder()
+                    .accountNumberOrigin("1234567899")
+                    .accountNumberDestination("123456789")
+                    .amount(1000L)
+                    .resultMessage("")
+                    .build());
             fail();
         }catch (RuntimeException exception){
             assertEquals("La cuenta que manda el dinero no tiene balance suficiente ",exception.getMessage());
@@ -416,7 +447,12 @@ public class AccountServiceTest {
         when(accountRepository.findByAccountNumber(icesiAccount2.getAccountNumber())).thenReturn(Optional.of(icesiAccount2));
 
         try{
-            accountService.transfer(icesiAccount.getAccountNumber(),icesiAccount2.getAccountNumber(),100L);
+            accountService.transfer(TransactionDTO.builder()
+                    .accountNumberOrigin("1234567899")
+                    .accountNumberDestination("123456789")
+                    .amount(1000L)
+                    .resultMessage("")
+                    .build());
             fail();
         }catch (RuntimeException exception){
             assertEquals("La cuenta que manda el dinero no esta activa",exception.getMessage());
@@ -433,7 +469,12 @@ public class AccountServiceTest {
         when(accountRepository.findByAccountNumber(icesiAccount2.getAccountNumber())).thenReturn(Optional.of(icesiAccount2));
 
         try{
-            accountService.transfer(icesiAccount.getAccountNumber(),icesiAccount2.getAccountNumber(),100L);
+            accountService.transfer(TransactionDTO.builder()
+                    .accountNumberOrigin("1234567899")
+                    .accountNumberDestination("123456789")
+                    .amount(1000L)
+                    .resultMessage("")
+                    .build());
             fail();
         }catch (RuntimeException exception){
             assertEquals("La cuenta que recibe el dinero no esta activa",exception.getMessage());
@@ -449,7 +490,12 @@ public class AccountServiceTest {
         when(accountRepository.findByAccountNumber(icesiAccount2.getAccountNumber())).thenReturn(Optional.of(icesiAccount2));
 
         try{
-            accountService.transfer(icesiAccount.getAccountNumber(),icesiAccount2.getAccountNumber(),-100L);
+            accountService.transfer(TransactionDTO.builder()
+                    .accountNumberOrigin("1234567899")
+                    .accountNumberDestination("123456789")
+                    .amount(1000L)
+                    .resultMessage("")
+                    .build());
             fail();
         }catch (RuntimeException exception){
             assertEquals("La cantidad de dinero que se quiere enviar debe ser mayor que 0",exception.getMessage());
@@ -465,7 +511,12 @@ public class AccountServiceTest {
         when(accountRepository.findByAccountNumber(icesiAccount2.getAccountNumber())).thenReturn(Optional.of(icesiAccount2));
 
         try{
-            accountService.transfer(icesiAccount.getAccountNumber(),icesiAccount2.getAccountNumber(),0L);
+            accountService.transfer(TransactionDTO.builder()
+                    .accountNumberOrigin("1234567899")
+                    .accountNumberDestination("123456789")
+                    .amount(1000L)
+                    .resultMessage("")
+                    .build());
             fail();
         }catch (RuntimeException exception){
             assertEquals("La cantidad de dinero que se quiere enviar debe ser mayor que 0",exception.getMessage());
@@ -488,7 +539,7 @@ public class AccountServiceTest {
                 .userId(UUID.randomUUID())
                 .email("5")
                 .firstName("John")
-                .lastname("Doe")
+                .lastName("Doe")
                 .phone("123")
                 .password("123")
                 .accounts(new ArrayList<>())
@@ -507,7 +558,7 @@ public class AccountServiceTest {
                 .account(IcesiUser.builder()
                         .email("5")
                         .firstName("John")
-                        .lastname("Doe")
+                        .lastName("Doe")
                         .phone("123")
                         .password("123")
                         .role(IcesiRole.builder()
