@@ -1,6 +1,6 @@
 package co.com.icesi.demojpa.unit.service;
 
-import co.com.icesi.demojpa.dto.UserCreateDTO;
+import co.com.icesi.demojpa.dto.request.UserCreateDTO;
 import co.com.icesi.demojpa.mapper.UserMapper;
 import co.com.icesi.demojpa.mapper.UserMapperImpl;
 import co.com.icesi.demojpa.model.IcesiAccount;
@@ -9,8 +9,8 @@ import co.com.icesi.demojpa.model.IcesiUser;
 import co.com.icesi.demojpa.repository.AccountRepository;
 import co.com.icesi.demojpa.repository.RoleRepository;
 import co.com.icesi.demojpa.repository.UserRepository;
-import co.com.icesi.demojpa.service.RoleService;
 import co.com.icesi.demojpa.service.UserService;
+import co.com.icesi.demojpa.unit.matcher.IcesiUserMatcher;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 
@@ -27,7 +27,6 @@ public class UserServiceTest {
     private UserRepository userRepository;
     private UserMapper userMapper;
     private RoleRepository roleRepository;
-    private RoleService roleService;
     private AccountRepository accountRepository;
     private UserService userService;
 
@@ -38,8 +37,7 @@ public class UserServiceTest {
         roleRepository = mock(RoleRepository.class);
         accountRepository = mock(AccountRepository.class);
         userMapper = spy(UserMapperImpl.class);
-        roleService =mock(RoleService.class);
-        userService = new UserService(userRepository,userMapper,roleRepository, roleService, accountRepository);
+        userService = new UserService(userRepository,userMapper,roleRepository, accountRepository);
     }
 
     @Test
@@ -81,29 +79,7 @@ public class UserServiceTest {
         }
     }
 
-    @Test
-    public void testAddAccount(){
-        IcesiUser user = defaultIcesiUser();
-        IcesiAccount account =defaultIcesiAccount();
-        when(accountRepository.findByAccountNumber(account.getAccountNumber())).thenReturn(Optional.of(account));
-        when(userRepository.findById(user.getUserId())).thenReturn(Optional.of(user));
-        userService.addAccount(user,account.getAccountNumber());
-        assertEquals(user.getAccounts(),userRepository.findById(user.getUserId()).get().getAccounts());
-    }
 
-    @Test
-    public void testAddAccountEmptyAccount(){
-        IcesiUser user = defaultIcesiUser();
-        IcesiAccount account =defaultIcesiAccount();
-        when(accountRepository.findByAccountNumber(any())).thenReturn(Optional.empty());
-        when(userRepository.findById(user.getUserId())).thenReturn(Optional.of(user));
-        try{
-            userService.addAccount(user,account.getAccountNumber());
-            fail();
-        }catch (RuntimeException exception){
-            assertEquals("Account doesn't exists",exception.getMessage());
-        }
-    }
 
     private IcesiAccount defaultIcesiAccount(){
         return IcesiAccount.builder()

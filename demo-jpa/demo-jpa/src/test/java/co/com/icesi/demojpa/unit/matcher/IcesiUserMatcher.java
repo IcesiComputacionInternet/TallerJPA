@@ -1,17 +1,15 @@
-package co.com.icesi.demojpa.unit.service;
+package co.com.icesi.demojpa.unit.matcher;
 
 import co.com.icesi.demojpa.model.IcesiUser;
+import lombok.AllArgsConstructor;
 import org.mockito.ArgumentMatcher;
 
 import java.util.Objects;
 
+@AllArgsConstructor
 public class IcesiUserMatcher implements ArgumentMatcher<IcesiUser> {
 
     private final IcesiUser userLeft;
-
-    public IcesiUserMatcher(IcesiUser iu){
-        userLeft = iu;
-    }
 
     @Override
     public boolean matches(IcesiUser userRight) {

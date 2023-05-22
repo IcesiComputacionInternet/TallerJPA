@@ -1,150 +1,131 @@
 package co.com.icesi.demojpa.service;
-
-import co.com.icesi.demojpa.dto.AccountCreateDTO;
+import co.com.icesi.demojpa.dto.request.AccountCreateDTO;
+import co.com.icesi.demojpa.dto.response.AccountResponseDTO;
+import co.com.icesi.demojpa.enums.IcesiAccountType;
+import co.com.icesi.demojpa.error.util.IcesiExceptionBuilder;
 import co.com.icesi.demojpa.mapper.AccountMapper;
 import co.com.icesi.demojpa.model.IcesiAccount;
-import co.com.icesi.demojpa.model.IcesiUser;
 import co.com.icesi.demojpa.repository.AccountRepository;
 import co.com.icesi.demojpa.repository.UserRepository;
 import lombok.AllArgsConstructor;
+import org.springframework.dao.DataIntegrityViolationException;
+import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
-import java.util.Optional;
 import java.util.Random;
 import java.util.UUID;
+
 
 @Service
 @AllArgsConstructor
 public class AccountService {
 
-    private final AccountRepository accountRepository;
     private final AccountMapper accountMapper;
-    private final UserRepository userRepository;
-    private final UserService userService;
+    private final AccountRepository accountRepository;
+    private final UserRepository userRespository;
 
+    private final IcesiExceptionBuilder eb = new IcesiExceptionBuilder();
 
-    public IcesiAccount save(AccountCreateDTO account){
+    public AccountResponseDTO save(AccountCreateDTO icesiAccountDTO) {
+        if(icesiAccountDTO.getBalance() <= 0 ){throw eb.exceptionDontValue("Balance can't be below 0", "Balance");}
+        return createAccount(icesiAccountDTO);
+    }
 
-        if(account.getBalance() < 0) {
-            throw new RuntimeException("The balance cannot be less than 0");
-        }else if(userRepository.findById(UUID.fromString(account.getUserId())).isEmpty()){
-                throw new RuntimeException("Account user not found");
-        }
+    public AccountResponseDTO createAccount(AccountCreateDTO icesiAccountDTO){
 
-        String num = generateRandomCode();
-        while(accountRepository.findByAccountNumber(num).isPresent()){
-            num = generateRandomCode();
-        }
-
-        IcesiAccount icesiAccount = accountMapper.fromIcesiAccountDTO(account);
+        IcesiAccount icesiAccount = accountMapper.fromAccountCreateDTO(icesiAccountDTO);
+        icesiAccount.setUser(userRespository.findByEmail(icesiAccountDTO.getEmail())
+                .orElseThrow(()->{throw eb.exceptionNotFound("User not found", "email");}));
         icesiAccount.setAccountId(UUID.randomUUID());
-        icesiAccount.setAccountNumber(num);
-        icesiAccount.setUser(userRepository.findById(UUID.fromString(account.getUserId())).get());
-        userService.addAccount(icesiAccount.getUser(), icesiAccount.getAccountNumber());
+        icesiAccount.setAccountNumber(setAccountNumberGenerate(generateAccountNumber()));
+        setTypeAccount(icesiAccountDTO.getType().getValue(), icesiAccount);
 
-
-        return accountRepository.save(icesiAccount);
+        return accountMapper.toResponse(accountRepository.save(icesiAccount));
     }
 
-    public String generateRandomCode(){
-        Random rand = new Random();
-        String code = "";
-
-        for(int i = 0; i < 14; i++){
-            if(i == 3 || i == 10){
-                code = code+"-";
-            }else{
-                code = code + String.valueOf(rand.nextInt(10));
-            }
-        }
-
-        return code;
+    public String generateAccountNumber(){
+        Random random = new Random();
+        return String.format("%03d-%06d-%02d", random.nextInt(1000),
+                random.nextInt(1000000), random.nextInt(100));
     }
 
-    public Optional<IcesiAccount> findById(UUID fromString){
-        return accountRepository.findById(fromString);
-    }
-
-    public void disableAccount(String aNumber){
-
-        if(accountRepository.findByAccountNumber(aNumber).isEmpty()){
-            throw new RuntimeException("The account doesn't exists");
-        }else if(accountRepository.findByAccountNumber(aNumber).get().getBalance() > 0){
-            throw new RuntimeException("The account balance must be in 0 to disable");
-        }else{
-            accountRepository.disable(aNumber);
+    public String setAccountNumberGenerate(String number){
+        if(accountRepository.existsByAccountNumber(generateAccountNumber())){
+            return setAccountNumberGenerate(number);
+        } else {
+            return number;
         }
     }
 
-    public void enableAccount(String aNumber){
-
-        if(accountRepository.findByAccountNumber(aNumber).isEmpty()){
-            throw new RuntimeException("The account doesn't exists");
-        }else if(accountRepository.findByAccountNumber(aNumber).get().getUser().isActive()){
-            accountRepository.enable(aNumber);
-        }else{
-            throw new RuntimeException("The account is already enable");
+    public void setTypeAccount(String type, IcesiAccount icesiAccount){
+        try {
+            icesiAccount.setType(IcesiAccountType.valueOf(type.toUpperCase()));
+        } catch (IllegalArgumentException e){
+            throw new IllegalArgumentException("Account type does not exist");
         }
     }
 
-    public void transfer(long amount, String accFrom, String accTo){
-        if(accountRepository.findByAccountNumber(accFrom).isEmpty()){
-            throw new RuntimeException("The account sending the money doesn't exists");
-        }else if(accountRepository.findByAccountNumber(accTo).isEmpty()){
-            throw new RuntimeException("The account taking the money doesn't exists");
-        }else if(amount <= 0){
-            throw new RuntimeException("The amount must be grater than 0");
-        }else{
-            IcesiAccount fromAcc = accountRepository.findByAccountNumber(accFrom).get();
-            IcesiAccount toAcc = accountRepository.findByAccountNumber(accFrom).get();
+    @Transactional
+    public String activeAccount(String accountNumber){
+        getUserLogged(accountNumber);
+        accountRepository.activeAccount(accountNumber);
+        return "The account " + accountNumber + " was active";
+    }
 
-            if(!fromAcc.isActive()){
-                throw new RuntimeException("The account sending the money is disabled");
-            }else if(!toAcc.isActive()) {
-                throw new RuntimeException("The account taking the money is disabled");
-            }else if(depositsOnlyFilter(fromAcc.getAccountNumber())){
-                throw new RuntimeException("The account sending the money is deposits only");
-            }else if(depositsOnlyFilter(toAcc.getAccountNumber())){
-                throw new RuntimeException("The account taking the money is deposits only");
-            }else if(fromAcc.getBalance()<amount){
-                throw new RuntimeException("The account sending doesn't have enough money");
-            }else{
-                accountRepository.updateBalance(accFrom,fromAcc.getBalance()-amount);
-                accountRepository.updateBalance(accTo,toAcc.getBalance()+amount);
-            }
+    @Transactional
+    public String disableAccount(String accountNumber){
+        getUserLogged(accountNumber);
+        accountRepository.inactiveAccount(accountNumber);
+        if(!accountRepository.IcesiAccountByActive(accountNumber)){
+            return "The account " + accountNumber + " was inactive";
+        } else {
+            throw eb.exceptionDontDisable("The account " + accountNumber + " can't be disabled", "accountNumber");
         }
     }
 
-    public boolean depositsOnlyFilter(String number){
-        return accountRepository.findByAccountNumber(number).get().getType().equalsIgnoreCase("deposits only");
-    }
-
-    public void withdrawal(String acc, long amount){
-        if(accountRepository.findByAccountNumber(acc).isEmpty()){
-            throw new RuntimeException("The account doesn't exists");
-        }else if(amount <= 0){
-            throw new RuntimeException("The amount must be grater than 0");
-        }else if(accountRepository.findByAccountNumber(acc).get().isActive()){
-            throw new RuntimeException("The account is disabled");
-        }else if(accountRepository.findByAccountNumber(acc).get().getBalance() < amount){
-            throw new RuntimeException("The account doesn't have enough money");
-        }else{
-            accountRepository.updateBalance(acc, accountRepository.findByAccountNumber(acc).get().getBalance()-amount);
+    @Transactional
+    public String withdrawal(String accountNumber, Long value){
+        try{
+            accountRepository.withdrawalAccount(accountNumber, value);
+            return "The withdrawal was successful";
+        } catch (DataIntegrityViolationException e){
+            throw eb.exceptionDontValue("The withdrawal can't be done", "Money");
         }
     }
 
-    public void deposit(String acc, long amount){
-        if(accountRepository.findByAccountNumber(acc).isEmpty()){
-            throw new RuntimeException("The account doesn't exists");
-        }else if(amount <= 0){
-            throw new RuntimeException("The amount must be grater than 0");
-        }else if(accountRepository.findByAccountNumber(acc).get().isActive()){
-            throw new RuntimeException("The account is disabled");
-        }else if(accountRepository.findByAccountNumber(acc).get().getBalance() < amount){
-            throw new RuntimeException("The account doesn't have enough money");
-        }else{
-            accountRepository.updateBalance(acc, accountRepository.findByAccountNumber(acc).get().getBalance()+amount);
+    @Transactional
+    public String deposit(String accountNumber, Long value){
+        if(value>0){
+            accountRepository.depositAccount(accountNumber, value);
+            return "Deposit was successful";
+        } else {
+            throw eb.exceptionDontValue("The value don't be negative", "Balance");
         }
     }
 
+    @Transactional
+    public String transfer(String accountNumberOrigin, String accountNumberDestination, Long value){
+
+        accountRepository.getTypeofAccount(
+                accountNumberOrigin).orElseThrow(()-> {throw eb.exceptionAccountInactive("Deposit Origin Account inactive", accountNumberDestination);});
+        accountRepository.getTypeofAccount(
+                accountNumberDestination).orElseThrow(()->{throw eb.exceptionAccountInactive("Deposit Destination Account inactive", accountNumberDestination);});
+
+        withdrawal(accountNumberOrigin, value);
+        deposit(accountNumberDestination, value);
+
+        return "The transaction was successful";
+    }
+
+    public void getUserLogged(String accountNumber){
+        var username = SecurityContextHolder.getContext().getAuthentication().getName();
+        var user = userRespository.findByEmail(username).orElseThrow(()->{throw eb.exceptionNotFound("User not found", "email");});
+
+        System.out.println(user.getUserId());
+
+        if(!accountRepository.accountOwner(accountNumber, user.getUserId())){
+            throw eb.exceptionNotFound("This account is not yours", "account Number in your accounts");
+        }
+    }
 }

@@ -18,13 +18,12 @@ public class IcesiUser {
 
     @Id
     private UUID userId;
-
     private String firstName;
     private String lastName;
     private String email;
-    private String phoneNumber;
-    private boolean isActive;
     private String password;
+    private String phoneNumber;
+
 
     @ManyToOne
     @JoinColumn(name="icesi_role_role_id", nullable = false)
@@ -32,8 +31,5 @@ public class IcesiUser {
 
     @OneToMany(mappedBy = "user")
     private List<IcesiAccount> accounts;
-
-    @OneToMany(mappedBy = "icesiUser")
-    private List<IcesiBlogPost> blogPosts;
 
 }

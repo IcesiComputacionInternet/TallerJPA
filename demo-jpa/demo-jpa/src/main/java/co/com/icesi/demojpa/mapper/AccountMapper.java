@@ -1,13 +1,14 @@
 package co.com.icesi.demojpa.mapper;
 
-import co.com.icesi.demojpa.dto.AccountCreateDTO;
+import co.com.icesi.demojpa.dto.request.AccountCreateDTO;
+import co.com.icesi.demojpa.dto.response.AccountResponseDTO;
 import co.com.icesi.demojpa.model.IcesiAccount;
 import org.mapstruct.Mapper;
 
 @Mapper(componentModel = "spring")
 public interface AccountMapper {
+    IcesiAccount fromAccountCreateDTO(AccountCreateDTO createdAccountDTO);
+    AccountCreateDTO fromIcesiAccount(IcesiAccount account);
 
-    IcesiAccount fromIcesiAccountDTO(AccountCreateDTO accountCreateDTO);
-
-    AccountCreateDTO fromIcesiAccount(IcesiAccount icesiAccount);
+    AccountResponseDTO toResponse(IcesiAccount icesiAccount);
 }

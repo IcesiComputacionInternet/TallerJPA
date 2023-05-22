@@ -1,14 +1,14 @@
 package co.com.icesi.demojpa.unit.service;
 
-import co.com.icesi.demojpa.dto.RoleCreateDTO;
+import co.com.icesi.demojpa.dto.request.RoleCreateDTO;
 import co.com.icesi.demojpa.mapper.RoleMapper;
 import co.com.icesi.demojpa.mapper.RoleMapperImpl;
-import co.com.icesi.demojpa.model.IcesiAccount;
 import co.com.icesi.demojpa.model.IcesiRole;
 import co.com.icesi.demojpa.model.IcesiUser;
 import co.com.icesi.demojpa.repository.RoleRepository;
 import co.com.icesi.demojpa.repository.UserRepository;
 import co.com.icesi.demojpa.service.RoleService;
+import co.com.icesi.demojpa.unit.matcher.IcesiRoleMatcher;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 
@@ -64,7 +64,6 @@ public class RoleServiceTest {
         IcesiRole role =defaultRole();
         when(userRepository.findById(any())).thenReturn(Optional.empty());
         try{
-            roleService.addUserToRole(role,user.getUserId());
             fail();
         }catch (RuntimeException exception){
             String exceptionMessage = exception.getMessage();

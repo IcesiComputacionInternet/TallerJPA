@@ -1,14 +1,12 @@
 package co.com.icesi.demojpa.model;
 
+import co.com.icesi.demojpa.enums.IcesiAccountType;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
-import javax.persistence.Entity;
-import javax.persistence.Id;
-import javax.persistence.JoinColumn;
-import javax.persistence.ManyToOne;
+import javax.persistence.*;
 import java.util.UUID;
 
 @Data
@@ -22,12 +20,14 @@ public class IcesiAccount {
     private UUID accountId;
 
     private String accountNumber;
-    private long balance;
-    private String type;
+
+    @Column(name = "balance", nullable = false, columnDefinition = "BIGINT CHECK (balance >= 0)")
+    private Long balance;
+    private IcesiAccountType type;
     private boolean isActive;
 
     @ManyToOne
-    @JoinColumn(name="icesi_user_user_id", nullable = false)
+    @JoinColumn(name="icesi_user_user_id")
     private IcesiUser user;
 
 }

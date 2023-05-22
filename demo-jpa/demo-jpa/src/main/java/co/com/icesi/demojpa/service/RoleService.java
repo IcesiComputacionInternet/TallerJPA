@@ -1,14 +1,13 @@
 package co.com.icesi.demojpa.service;
 
-import co.com.icesi.demojpa.dto.RoleCreateDTO;
+import co.com.icesi.demojpa.dto.request.RoleCreateDTO;
 import co.com.icesi.demojpa.mapper.RoleMapper;
 import co.com.icesi.demojpa.model.IcesiRole;
 import co.com.icesi.demojpa.repository.RoleRepository;
-import co.com.icesi.demojpa.repository.UserRepository;
 import lombok.AllArgsConstructor;
+import lombok.SneakyThrows;
 import org.springframework.stereotype.Service;
 
-import java.util.Optional;
 import java.util.UUID;
 
 @Service
@@ -17,29 +16,16 @@ public class RoleService {
 
     private final RoleRepository roleRepository;
     private final RoleMapper roleMapper;
-    private final UserRepository userRepository;
 
-    public IcesiRole save(RoleCreateDTO role){
-        if(roleRepository.findByName(role.getName()).isPresent()){
+    @SneakyThrows
+    public RoleCreateDTO save(RoleCreateDTO role){
+        if(roleRepository.existsByName(role.getName())){
             throw new RuntimeException("Role already exists");
         }
 
-        IcesiRole icesiRole = roleMapper.fromIcesiRoleDTO(role);
+        IcesiRole icesiRole = roleMapper.fromRoleCreateDTO(role);
         icesiRole.setRoleId(UUID.randomUUID());
-        return roleRepository.save(icesiRole);
-    }
-
-    public void addUserToRole(IcesiRole role, UUID userId){
-        if(userRepository.findById(userId).isPresent()){
-            role.getIcesiUsers().add(userRepository.findById(userId).get());
-        }else{
-            throw new RuntimeException("User doesn't exists");
-        }
-    }
-
-    public Optional<IcesiRole> fingById(UUID fromString) {
-
-        return roleRepository.findById(fromString);
+        return roleMapper.fromIcesiRole(roleRepository.save(icesiRole));
     }
 
 }

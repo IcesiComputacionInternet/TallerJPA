@@ -14,7 +14,10 @@ public interface UserRepository extends JpaRepository<IcesiUser, UUID> {
     @Query("SELECT u FROM IcesiUser u WHERE u.email = :email")
     Optional<IcesiUser> findByEmail(String email);
 
-    @Query("SELECT u FROM IcesiUser u WHERE u.phoneNumber = :phone")
-    Optional<IcesiUser> findByPhone(String phone);
+    @Query("SELECT CASE WHEN (COUNT(u) > 0) THEN true ELSE false END FROM IcesiUser u WHERE u.email = :email")
+    boolean existsByEmail(String email);
+
+    @Query("SELECT CASE WHEN (COUNT(u) > 0) THEN true ELSE false END FROM IcesiUser u WHERE u.phoneNumber = :phoneNumber")
+    boolean existsByPhone(String phoneNumber);
 
 }

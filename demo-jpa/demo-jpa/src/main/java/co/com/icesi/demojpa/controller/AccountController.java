@@ -1,22 +1,46 @@
 package co.com.icesi.demojpa.controller;
 
-import co.com.icesi.demojpa.dto.AccountCreateDTO;
-import co.com.icesi.demojpa.model.IcesiAccount;
+
+import co.com.icesi.demojpa.api.AccountAPI;
+import co.com.icesi.demojpa.dto.request.AccountCreateDTO;
+import co.com.icesi.demojpa.dto.response.AccountResponseDTO;
 import co.com.icesi.demojpa.service.AccountService;
 import lombok.AllArgsConstructor;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 
 @RestController
 @AllArgsConstructor
-public class AccountController {
+public class AccountController implements AccountAPI {
 
     private final AccountService accountService;
 
-    @PostMapping("/accounts/add")
-    public IcesiAccount createIcesiAccount(@RequestBody AccountCreateDTO account){
-        return accountService.save(account);
+    @Override
+    public AccountResponseDTO createIcesiAccount(@RequestBody AccountCreateDTO icesiAccountDTO){
+        return  accountService.save(icesiAccountDTO);
     }
 
+    @Override
+    public  String activeAccount(@PathVariable String accountNumber){
+        return accountService.activeAccount(accountNumber);
+    }
+
+    @Override
+    public String inactiveAccount(@PathVariable String accountNumber){
+        return accountService.disableAccount(accountNumber);
+    }
+
+    @Override
+    public String withdrawalAccount(@PathVariable String accountNumber, @RequestBody Long value){
+        return accountService.withdrawal(accountNumber, value);
+    }
+
+    @Override
+    public String depositAccount(@PathVariable String accountNumber, @RequestBody Long value){
+        return accountService.deposit(accountNumber, value);
+    }
+
+    @Override
+    public String transferAccount(@PathVariable String accountNumberOrigin, @PathVariable String accountNumberDestination, @RequestBody Long value){
+        return accountService.transfer(accountNumberOrigin, accountNumberDestination, value);
+    }
 }
