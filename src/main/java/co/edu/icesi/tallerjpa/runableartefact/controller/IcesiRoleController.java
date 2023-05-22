@@ -2,6 +2,7 @@ package co.edu.icesi.tallerjpa.runableartefact.controller;
 
 import co.edu.icesi.tallerjpa.runableartefact.api.IcesiRoleAPI;
 import co.edu.icesi.tallerjpa.runableartefact.dto.request.IcesiRoleDTO;
+import co.edu.icesi.tallerjpa.runableartefact.dto.request.RoleToAssignDTO;
 import co.edu.icesi.tallerjpa.runableartefact.exception.implementation.DataAlreadyExist;
 import co.edu.icesi.tallerjpa.runableartefact.mapper.IcesiRoleMapper;
 import co.edu.icesi.tallerjpa.runableartefact.service.IcesiRoleService;
@@ -20,5 +21,10 @@ public class IcesiRoleController implements IcesiRoleAPI {
     @Override
     public String createNewRole(@RequestBody IcesiRoleDTO icesiRole) throws DataAlreadyExist {
         return icesiRoleService.saveNewRole(icesiRole);
+    }
+
+    @Override
+    public IcesiRoleDTO assignRole(RoleToAssignDTO roleToAssignDTO) {
+        return icesiRoleService.assignRoleToIcesiUser(roleToAssignDTO);
     }
 }

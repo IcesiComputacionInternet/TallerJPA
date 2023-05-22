@@ -10,6 +10,7 @@ import co.edu.icesi.tallerjpa.runableartefact.model.IcesiRole;
 import co.edu.icesi.tallerjpa.runableartefact.model.IcesiUser;
 import co.edu.icesi.tallerjpa.runableartefact.repository.IcesiRoleRepository;
 import co.edu.icesi.tallerjpa.runableartefact.repository.IcesiUserRepository;
+import co.edu.icesi.tallerjpa.runableartefact.service.AuthoritiesService;
 import co.edu.icesi.tallerjpa.runableartefact.service.IcesiUserService;
 import co.edu.icesi.tallerjpa.runableartefact.unit.service.matcher.IcesiUserMatcher;
 import org.junit.jupiter.api.BeforeEach;
@@ -29,14 +30,17 @@ public class IcesiUserServiceTest {
 
     private IcesiRoleRepository icesiRoleRepository;
 
+    private AuthoritiesService authoritiesService;
+
     private IcesiUserMapper icesiUserMapper;
 
     @BeforeEach
     public void init(){
         icesiUserRepository = mock(IcesiUserRepository.class);
         icesiRoleRepository = mock(IcesiRoleRepository.class);
+        authoritiesService = mock(AuthoritiesService.class);
         icesiUserMapper = spy(IcesiUserMapperImpl.class);
-        icesiUserService = new IcesiUserService(icesiUserRepository, icesiRoleRepository, icesiUserMapper);
+        icesiUserService = new IcesiUserService(icesiUserRepository, icesiRoleRepository,authoritiesService, icesiUserMapper);
     }
 
     @Test

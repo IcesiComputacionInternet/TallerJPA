@@ -16,6 +16,9 @@ public interface IcesiUserAPI {
     @PostMapping("/save")
     String createNewUser(IcesiUserDTO userDTO);
 
+    @PostMapping("/update")
+    IcesiUserDTO updateUser(IcesiUserDTO userDTO);
+
     @GetMapping("/all")
     List<IcesiUser> getAllUsers();
 }

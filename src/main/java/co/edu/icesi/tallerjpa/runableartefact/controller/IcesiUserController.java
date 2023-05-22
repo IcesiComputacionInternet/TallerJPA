@@ -21,6 +21,11 @@ public class IcesiUserController implements IcesiUserAPI {
     }
 
     @Override
+    public IcesiUserDTO updateUser(@RequestBody IcesiUserDTO userDTO) {
+        return icesiUserService.updateIcesiUser(userDTO);
+    }
+
+    @Override
     public List<IcesiUser> getAllUsers() {
         return icesiUserService.getAllUsers();
     }

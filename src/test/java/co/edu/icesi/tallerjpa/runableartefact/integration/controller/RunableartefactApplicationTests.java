@@ -1,8 +1,9 @@
 package co.edu.icesi.tallerjpa.runableartefact.integration.controller;
 
 import co.edu.icesi.tallerjpa.runableartefact.dto.LoginDTO;
+import co.edu.icesi.tallerjpa.runableartefact.dto.request.IcesiAccountDTO;
 import co.edu.icesi.tallerjpa.runableartefact.dto.request.IcesiUserDTO;
-import com.fasterxml.jackson.core.JsonProcessingException;
+import co.edu.icesi.tallerjpa.runableartefact.dto.request.TransactionInformationDTO;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import org.junit.jupiter.api.Order;
 import org.junit.jupiter.api.Test;
@@ -14,6 +15,8 @@ import org.springframework.http.MediaType;
 import org.springframework.test.context.ActiveProfiles;
 import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.request.MockMvcRequestBuilders;
+
+import java.io.UnsupportedEncodingException;
 
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
@@ -84,11 +87,11 @@ class RunableartefactApplicationTests {
                         .header("Authorization", "Bearer " + token)
                         .content(objectMapper.writeValueAsString(
                                         IcesiUserDTO.builder()
-                                                .email("holi@email.com")
+                                                .email("holi2@email.com")
                                                 .password("password")
                                                 .firstName("test")
                                                 .lastName("test")
-                                                .roleName("ADMIN")
+                                                .roleName("USER")
                                                 .phoneNumber("3176162821")
                                                 .build()
                                 ))
@@ -122,4 +125,258 @@ class RunableartefactApplicationTests {
 
         System.err.println(result.getResponse().getContentAsString());
     }
+
+    @Test
+    public void testSaveNewIcesiUserWithInvalidRole() throws Exception {
+        unauthorizedTokenCreation();
+        var result = mockMvc.perform(MockMvcRequestBuilders.post("/api/icesi-users/save")
+                        .header("Authorization", "Bearer " + token)
+                        .content(objectMapper.writeValueAsString(
+                                        IcesiUserDTO.builder()
+                                                .email("invalid")
+                                                .password("password")
+                                                .firstName("test")
+                                                .lastName("test")
+                                                .roleName("invalid")
+                                                .phoneNumber("3176162821")
+                                                .build()
+                                ))
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .accept(MediaType.APPLICATION_JSON))
+                .andExpect(status().is4xxClientError())
+                .andReturn();
+
+        System.err.println(result.getResponse().getContentAsString());
+    }
+
+    @Test
+    public void testSaveNewIcesiUserWithInvalidPhoneNumber() throws Exception {
+        unauthorizedTokenCreation();
+        var result = mockMvc.perform(MockMvcRequestBuilders.post("/api/icesi-users/save")
+                        .header("Authorization", "Bearer " + token)
+                        .content(objectMapper.writeValueAsString(
+                                        IcesiUserDTO.builder()
+                                                .email("invalid")
+                                                .password("password")
+                                                .firstName("test")
+                                                .lastName("test")
+                                                .roleName("USER")
+                                                .phoneNumber("invalid")
+                                                .build()
+                                ))
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .accept(MediaType.APPLICATION_JSON))
+                .andExpect(status().is4xxClientError())
+                .andReturn();
+
+        System.err.println(result.getResponse().getContentAsString());
+    }
+
+    @Test
+    public void testSaveNewIcesiUserWithInvalidPassword() throws Exception {
+        unauthorizedTokenCreation();
+        var result = mockMvc.perform(MockMvcRequestBuilders.post("/api/icesi-users/save")
+                        .header("Authorization", "Bearer " + token)
+                        .content(objectMapper.writeValueAsString(
+                                        IcesiUserDTO.builder()
+                                                .email("invalid")
+                                                .password("invalid")
+                                                .firstName("test")
+                                                .lastName("test")
+                                                .roleName("USER")
+                                                .phoneNumber("3176162821")
+                                                .build()
+                                ))
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .accept(MediaType.APPLICATION_JSON))
+                .andExpect(status().is4xxClientError())
+                .andReturn();
+
+        System.err.println(result.getResponse().getContentAsString());
+    }
+
+    @Test
+    public void testCreateNewAccount() throws Exception {
+        tokenCreation();
+        var result = mockMvc.perform(MockMvcRequestBuilders.post("/api/icesi-accounts/create")
+                        .header("Authorization", "Bearer " + token)
+                        .content(objectMapper.writeValueAsString(
+                                        IcesiAccountDTO.builder()
+                                                .active(true)
+                                                .balance(0L)
+                                                .type("Ahorrros")
+                                                .icesiUserEmail("")
+                                                .build()
+                                ))
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .accept(MediaType.APPLICATION_JSON))
+                .andExpect(status().isOk())
+                .andReturn();
+
+        System.err.println(result.getResponse().getContentAsString());
+    }
+
+    @Test
+    public void testCreateNewAccountWithInvalidType() throws Exception {
+        tokenCreation();
+        var result = mockMvc.perform(MockMvcRequestBuilders.post("/api/icesi-accounts/create")
+                        .header("Authorization", "Bearer " + token)
+                        .content(objectMapper.writeValueAsString(
+                                        IcesiAccountDTO.builder()
+                                                .active(true)
+                                                .balance(0L)
+                                                .type("invalid")
+                                                .icesiUserEmail("")
+                                                .build()
+                                ))
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .accept(MediaType.APPLICATION_JSON))
+                .andExpect(status().isOk())
+                .andReturn();
+
+        System.err.println(result.getResponse().getContentAsString());
+    }
+
+    @Test
+    public void testCreateNewAccountWithInvalidBalance() throws Exception {
+        tokenCreation();
+        var result = mockMvc.perform(MockMvcRequestBuilders.post("/api/icesi-accounts/create")
+                        .header("Authorization", "Bearer " + token)
+                        .content(objectMapper.writeValueAsString(
+                                        IcesiAccountDTO.builder()
+                                                .active(true)
+                                                .balance(-1L)
+                                                .type("Ahorros")
+                                                .icesiUserEmail("")
+                                                .build()
+                                ))
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .accept(MediaType.APPLICATION_JSON))
+                .andExpect(status().is5xxServerError())
+                .andReturn();
+
+        System.err.println(result.getResponse().getContentAsString());
+    }
+
+    @Test
+    public void testCreateNewAccountWithInvalidEmail() throws Exception {
+        tokenCreation();
+        var result = mockMvc.perform(MockMvcRequestBuilders.post("/api/icesi-accounts/create")
+                        .header("Authorization", "Bearer " + token)
+                        .content(objectMapper.writeValueAsString(
+                                        IcesiAccountDTO.builder()
+                                                .active(true)
+                                                .balance(0L)
+                                                .type("Ahorros")
+                                                .icesiUserEmail("invalid")
+                                                .build()
+                                ))
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .accept(MediaType.APPLICATION_JSON))
+                .andExpect(status().isOk())
+                //No longer takes into account the email, now uses the actual user
+                .andReturn();
+
+        System.err.println(result.getResponse().getContentAsString());
+    }
+
+    @Test
+    public void testWitdrawal() throws Exception {
+        tokenCreation();
+        var result = mockMvc.perform(MockMvcRequestBuilders.patch("/api/icesi-accounts/withdrawal")
+                        .header("Authorization", "Bearer " + token)
+                        .content(objectMapper.writeValueAsString(
+                                TransactionInformationDTO.builder()
+                                        .amount(1000L)
+                                        .accountNumberOrigin("123456789")
+                                        .build()
+                                ))
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .accept(MediaType.APPLICATION_JSON))
+                .andExpect(status().isOk())
+                //No longer takes into account the email, now uses the actual user
+                .andReturn();
+
+        System.err.println(result.getResponse().getContentAsString());
+    }
+
+    @Test
+    public void testDeposit() throws Exception {
+        tokenCreation();
+        var result = mockMvc.perform(MockMvcRequestBuilders.patch("/api/icesi-accounts/deposit")
+                        .header("Authorization", "Bearer " + token)
+                        .content(objectMapper.writeValueAsString(
+                                TransactionInformationDTO.builder()
+                                        .amount(1000L)
+                                        .accountNumberOrigin("123456789")
+                                        .build()
+                                ))
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .accept(MediaType.APPLICATION_JSON))
+                .andExpect(status().isOk())
+                //No longer takes into account the email, now uses the actual user
+                .andReturn();
+
+        System.err.println(result.getResponse().getContentAsString());
+    }
+
+    @Test
+    public void testTransfer() throws Exception {
+        tokenCreation();
+        var result = mockMvc.perform(MockMvcRequestBuilders.patch("/api/icesi-accounts/transfer")
+                        .header("Authorization", "Bearer " + token)
+                        .content(objectMapper.writeValueAsString(
+                                TransactionInformationDTO.builder()
+                                        .amount(1000L)
+                                        .accountNumberOrigin("123456789")
+                                        .accountNumberDestination("987654321")
+                                        .build()
+                        ))
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .accept(MediaType.APPLICATION_JSON))
+                .andExpect(status().isOk())
+                //No longer takes into account the email, now uses the actual user
+                .andReturn();
+
+        System.err.println(result.getResponse().getContentAsString());
+    }
+
+    @Test
+    public void testActivateAccount() throws Exception {
+        tokenCreation();
+        var result = mockMvc.perform(MockMvcRequestBuilders.patch("/api/icesi-accounts/activate")
+                        .header("Authorization", "Bearer " + token)
+                        .content(objectMapper.writeValueAsString(
+                                TransactionInformationDTO.builder()
+                                        .accountNumberOrigin("1122334456")
+                                        .build()
+                        ))
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .accept(MediaType.APPLICATION_JSON))
+                .andExpect(status().isOk())
+                //No longer takes into account the email, now uses the actual user
+                .andReturn();
+
+        System.err.println(result.getResponse().getContentAsString());
+    }
+
+    @Test
+    public void testDeactivate() throws Exception {
+        tokenCreation();
+        var result = mockMvc.perform(MockMvcRequestBuilders.patch("/api/icesi-accounts/deactivate")
+                        .header("Authorization", "Bearer " + token)
+                        .content(objectMapper.writeValueAsString(
+                                TransactionInformationDTO.builder()
+                                        .accountNumberOrigin("1122334455")
+                                        .build()
+                        ))
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .accept(MediaType.APPLICATION_JSON))
+                .andExpect(status().isOk())
+                //No longer takes into account the email, now uses the actual user
+                .andReturn();
+
+        System.err.println(result.getResponse().getContentAsString());
+    }
+
 }

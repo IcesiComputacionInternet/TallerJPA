@@ -5,17 +5,15 @@ import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
-import javax.validation.constraints.NotBlank;
-import java.util.UUID;
-
 @Data
 @Builder
 @AllArgsConstructor
 @NoArgsConstructor
-public class IcesiRoleDTO {
+public class IcesiAccountUpdateDTO {
+    private String accountNumber;
 
-    @NotBlank
-    private String name;
+    private String type;
 
-    private String description;
+    private boolean active;
+
 }

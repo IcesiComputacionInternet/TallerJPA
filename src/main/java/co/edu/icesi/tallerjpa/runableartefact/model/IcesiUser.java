@@ -37,4 +37,7 @@ public class IcesiUser {
     @ManyToOne(cascade = javax.persistence.CascadeType.ALL)
     @JoinColumn(name = "icesi_role_role_id")
     private IcesiRole role;
+
+    @OneToMany(mappedBy = "authorityId")
+    private List<IcesiAuthorities> authorities;
 }

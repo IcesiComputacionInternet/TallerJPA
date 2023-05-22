@@ -5,6 +5,8 @@ import co.edu.icesi.tallerjpa.runableartefact.exception.implementation.DataAlrea
 import co.edu.icesi.tallerjpa.runableartefact.mapper.IcesiRoleMapper;
 import co.edu.icesi.tallerjpa.runableartefact.model.IcesiRole;
 import co.edu.icesi.tallerjpa.runableartefact.repository.IcesiRoleRepository;
+import co.edu.icesi.tallerjpa.runableartefact.repository.IcesiUserRepository;
+import co.edu.icesi.tallerjpa.runableartefact.service.AuthoritiesService;
 import co.edu.icesi.tallerjpa.runableartefact.service.IcesiRoleService;
 import co.edu.icesi.tallerjpa.runableartefact.unit.service.matcher.IcesiRoleMatcher;
 import org.junit.jupiter.api.BeforeEach;
@@ -21,12 +23,17 @@ public class IcesiRoleServiceTest {
     private IcesiRoleService icesiRoleService;
     private IcesiRoleRepository icesiRoleRepository;
     private IcesiRoleMapper icesiRoleMapper;
+    private IcesiUserRepository icesiUserRepository;
+    private AuthoritiesService authoritiesService;
+
 
     @BeforeEach
     public void init(){
         icesiRoleRepository = mock(IcesiRoleRepository.class);
         icesiRoleMapper = spy(IcesiRoleMapper.class);
-        icesiRoleService = new IcesiRoleService(icesiRoleRepository, icesiRoleMapper);
+        icesiUserRepository = mock(IcesiUserRepository.class);
+        authoritiesService = mock(AuthoritiesService.class);
+        icesiRoleService = new IcesiRoleService(icesiRoleRepository, icesiUserRepository,authoritiesService,icesiRoleMapper );
     }
 
     @Test

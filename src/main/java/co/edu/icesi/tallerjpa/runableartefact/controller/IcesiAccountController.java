@@ -2,6 +2,7 @@ package co.edu.icesi.tallerjpa.runableartefact.controller;
 
 import co.edu.icesi.tallerjpa.runableartefact.api.IcesiAccountAPI;
 import co.edu.icesi.tallerjpa.runableartefact.dto.request.IcesiAccountDTO;
+import co.edu.icesi.tallerjpa.runableartefact.dto.request.IcesiAccountUpdateDTO;
 import co.edu.icesi.tallerjpa.runableartefact.dto.request.TransactionInformationDTO;
 import co.edu.icesi.tallerjpa.runableartefact.dto.response.TransactionInformationResponseDTO;
 import co.edu.icesi.tallerjpa.runableartefact.service.IcesiAccountService;
@@ -20,13 +21,16 @@ public class IcesiAccountController implements IcesiAccountAPI {
     public String createAccount(@RequestBody IcesiAccountDTO icesiAccountDTO) {
         return icesiAccountService.saveNewAccount(icesiAccountDTO);
     }
-
-    public String activateAccount(@RequestBody String accountNumber) {
-        return icesiAccountService.activateAccount(accountNumber);
+    @Override
+    public IcesiAccountDTO updateAccount(IcesiAccountUpdateDTO icesiAccountUpdateDTO) {
+        return icesiAccountService.updateAccount(icesiAccountUpdateDTO);
+    }
+    public String activateAccount(@RequestBody TransactionInformationDTO transactionInformationDTO) {
+        return icesiAccountService.activateAccount(transactionInformationDTO);
     }
 
-    public String deactivateAccount(@RequestBody String accountNumber) {
-        return icesiAccountService.deactivateAccount(accountNumber);
+    public String deactivateAccount(@RequestBody TransactionInformationDTO transactionInformationDTO) {
+        return icesiAccountService.deactivateAccount(transactionInformationDTO);
     }
 
     @Override

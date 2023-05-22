@@ -16,4 +16,5 @@ public interface IcesiUserRepository extends JpaRepository<IcesiUser, UUID> {
 
     Optional<IcesiUser> findByEmail(String email);
 
+
 }

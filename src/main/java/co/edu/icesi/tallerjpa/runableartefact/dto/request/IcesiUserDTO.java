@@ -2,8 +2,6 @@ package co.edu.icesi.tallerjpa.runableartefact.dto.request;
 
 import co.edu.icesi.tallerjpa.runableartefact.validations.emailAndPhoneExist.interfaces.emailAndPhone;
 import co.edu.icesi.tallerjpa.runableartefact.validations.phoneValidation.interfaces.ColombianNumber;
-import com.fasterxml.jackson.annotation.JsonCreator;
-import com.fasterxml.jackson.annotation.JsonProperty;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
@@ -37,5 +35,5 @@ public class IcesiUserDTO {
 
     @NotEmpty
     private String roleName;
-    
+
 }
