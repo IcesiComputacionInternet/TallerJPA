@@ -4,9 +4,9 @@ import co.com.icesi.tallerjpa.controller.api.AccountApi;
 import co.com.icesi.tallerjpa.dto.RequestAccountDTO;
 import co.com.icesi.tallerjpa.dto.ResponseAccountDTO;
 import co.com.icesi.tallerjpa.dto.TransactionDTO;
+import co.com.icesi.tallerjpa.security.SecurityContext;
 import co.com.icesi.tallerjpa.service.AccountService;
 import lombok.AllArgsConstructor;
-import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.UUID;
@@ -39,13 +39,13 @@ public class AccountController implements AccountApi {
 
     @Override
     public TransactionDTO enableAccount(String accountNumber){
-        var userId = SecurityContextHolder.getContext().getAuthentication().getName();
+        var userId = SecurityContext.getCurrentUserId();
         return accountService.enableAccount(accountNumber, UUID.fromString(userId));
     }
 
     @Override
     public TransactionDTO disableAccount(String accountNumber){
-        var userId = SecurityContextHolder.getContext().getAuthentication().getName();
+        var userId = SecurityContext.getCurrentUserId();
         return accountService.disableAccount(accountNumber, UUID.fromString(userId));
     }
 }

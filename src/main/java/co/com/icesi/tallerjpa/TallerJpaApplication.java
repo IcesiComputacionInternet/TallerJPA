@@ -10,6 +10,7 @@ import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.ComponentScan;
+import org.springframework.context.annotation.Profile;
 import org.springframework.core.annotation.Order;
 import org.springframework.security.crypto.password.PasswordEncoder;
 
@@ -23,7 +24,8 @@ public class TallerJpaApplication {
 		SpringApplication.run(TallerJpaApplication.class, args);
 	}
 
-	//@Bean
+	@Bean
+	@Profile("!test")
 	public CommandLineRunner commandLineRunner(UserRepository users,
 											   PermissionRepository permissions,
 											   PasswordEncoder encoder) {
@@ -90,14 +92,14 @@ public class TallerJpaApplication {
 				.password(encoder.encode("password"))
 				.build();
 
-		return args -> {
-			users.save(admin);
-			users.save(user);
-			users.save(backUser);
+		users.save(admin);
+		users.save(user);
+		users.save(backUser);
 
-			permissions.save(rolePermission);
-			permissions.save(accountPermission);
-			permissions.save(addUserPermission);
-		};
+		permissions.save(rolePermission);
+		permissions.save(accountPermission);
+		permissions.save(addUserPermission);
+
+		return args -> {};
 	}
 }

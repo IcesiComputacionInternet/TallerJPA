@@ -12,15 +12,19 @@ import org.springframework.boot.CommandLineRunner;
 import org.springframework.boot.test.context.TestConfiguration;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.ComponentScan;
+import org.springframework.context.annotation.Primary;
+import org.springframework.core.annotation.Order;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.test.annotation.Commit;
+import org.springframework.test.context.ActiveProfiles;
 
 import java.util.List;
 import java.util.UUID;
 
 @TestConfiguration
 public class TestConfigurationData {
-    @Bean("commandLineRunner")
+
+    @Bean
     public CommandLineRunner commandLineRunner(UserRepository users,
                                                PermissionRepository permissions,
                                                AccountRepository accounts,
@@ -106,15 +110,15 @@ public class TestConfigurationData {
                 .active(true)
                 .build();
 
+        users.save(admin);
+        users.save(user);
+        users.save(backUser);
+
+        permissions.save(rolePermission);
+        permissions.save(accountPermission);
+        permissions.save(addUserPermission);
+
         return args -> {
-            users.save(admin);
-            users.save(user);
-            users.save(backUser);
-
-            permissions.save(rolePermission);
-            permissions.save(accountPermission);
-            permissions.save(addUserPermission);
-
             accounts.save(account);
             accounts.save(account2);
         };

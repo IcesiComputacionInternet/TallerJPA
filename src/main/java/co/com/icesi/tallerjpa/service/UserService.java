@@ -22,7 +22,11 @@ public class UserService {
     private final RoleRepository roleRepository;
 
     @SneakyThrows
-    public ResponseUserDTO save(RequestUserDTO userDTO){
+    public ResponseUserDTO save(RequestUserDTO userDTO, String role){
+        if (role.equalsIgnoreCase("BANK_USER")
+                && !userDTO.getRole().equalsIgnoreCase("user")){
+            throw new CustomException("Bank users can only create users");
+        }
 
         boolean emailExists = userRepository.existsByEmail(userDTO.getEmail());
         boolean phoneExists = userRepository.existsByPhoneNumber(userDTO.getPhoneNumber());

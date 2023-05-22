@@ -41,9 +41,10 @@ import java.util.List;
 import java.util.Map;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
-import java.util.stream.StreamSupport;
 
 @Configuration
+@DependsOn("commandLineRunner")
+@ComponentScan(basePackages = "co.com.icesi.tallerjpa")
 @EnableWebSecurity
 @AllArgsConstructor
 public class SecurityConfiguration {

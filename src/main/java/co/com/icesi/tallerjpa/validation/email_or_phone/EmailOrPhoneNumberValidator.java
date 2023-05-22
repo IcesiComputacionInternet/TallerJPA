@@ -13,6 +13,7 @@ public class EmailOrPhoneNumberValidator implements ConstraintValidator<EmailOrP
 
     @Override
     public boolean isValid(RequestUserDTO value, ConstraintValidatorContext constraintValidatorContext) {
+        if(value.getEmail() == null || value.getPhoneNumber() == null) {return false;}
         return !value.getEmail().isBlank() || !value.getPhoneNumber().isBlank();
     }
 }

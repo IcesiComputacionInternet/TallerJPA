@@ -40,7 +40,7 @@ public class UserServiceTest {
     public void testCreateUser(){
         when(roleRepository.findByName(any())).thenReturn(Optional.of(defaultRole()));
 
-        userService.save(defaultUserDTO());
+        userService.save(defaultUserDTO(), "ADMIN");
         verify(roleRepository, times(1)).findByName(any());
         verify(userMapper, times(1)).fromUserDTO(any());
         verify(userRepository, times(1)).save(argThat(new UserMatcher(defaultIcesiUser())));
@@ -52,7 +52,7 @@ public class UserServiceTest {
         userDTO.setRole(null);
 
         try{
-            userService.save(userDTO);
+            userService.save(userDTO, "ADMIN");
         }catch (Exception e){
             assertEquals("Role not found", e.getMessage());
         }
@@ -63,7 +63,7 @@ public class UserServiceTest {
         when(roleRepository.findByName(any())).thenReturn(Optional.empty());
 
         try{
-            userService.save(defaultUserDTO());
+            userService.save(defaultUserDTO(), "ADMIN");
         }catch (Exception e){
             assertEquals("Role not found", e.getMessage());
         }
@@ -74,7 +74,7 @@ public class UserServiceTest {
         when(userRepository.existsByEmail(any())).thenReturn(true);
 
         try{
-            userService.save(defaultUserDTO());
+            userService.save(defaultUserDTO(), "ADMIN");
         }catch (CustomException e){
             assertEquals("Email already exists", e.getMessage());
         }
@@ -86,7 +86,7 @@ public class UserServiceTest {
         when(userRepository.existsByPhoneNumber(any())).thenReturn(true);
 
         try{
-            userService.save(defaultUserDTO());
+            userService.save(defaultUserDTO(), "ADMIN");
         }catch (CustomException e){
             assertEquals("Phone number already exists", e.getMessage());
         }
@@ -99,12 +99,39 @@ public class UserServiceTest {
         when(userRepository.existsByEmail(any())).thenReturn(true);
 
         try{
-            userService.save(defaultUserDTO());
+            userService.save(defaultUserDTO(), "ADMIN");
         }catch (CustomException e){
             assertEquals("Email and Phone is already used", e.getMessage());
         }
 
     }
+
+    //Bank users can only create users
+    @Test
+    public void testCreateUserWhenRoleIsBank(){
+        when(roleRepository.findByName(any())).thenReturn(Optional.of(defaultRole()));
+
+        userService.save(defaultUserDTO(), "BANK");
+        verify(roleRepository, times(1)).findByName(any());
+        verify(userMapper, times(1)).fromUserDTO(any());
+        verify(userRepository, times(1)).save(argThat(new UserMatcher(defaultIcesiUser())));
+    }
+
+    @Test
+    public void testCreateUserWhenRoleIsBankAndUserRolNotIsUser(){
+        when(roleRepository.findByName(any())).thenReturn(Optional.of(defaultRole()));
+
+        var user = defaultUserDTO();
+        user.setRole("ADMIN");
+
+        try{
+            userService.save(user, "BANK_USER");
+        }catch (CustomException e){
+            assertEquals("Bank users can only create users", e.getMessage());
+        }
+
+    }
+
 
     private RequestUserDTO defaultUserDTO(){
         return RequestUserDTO.builder()
@@ -113,7 +140,7 @@ public class UserServiceTest {
                 .email("prueba@gmail.com")
                 .phoneNumber("12345")
                 .password("12345")
-                .role("Ingeniero")
+                .role("USER")
                 .build();
     }
 
@@ -131,7 +158,7 @@ public class UserServiceTest {
     private Role defaultRole(){
         return Role.builder()
                 .roleId(UUID.randomUUID())
-                .name("Ingeniero")
+                .name("USER")
                 .description("Ingeniero de sistemas")
                 .build();
     }

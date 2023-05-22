@@ -30,18 +30,11 @@ public class UserControllerTest {
     private String key;
 
     @Test
-    public void testCreateUserEndPointWhenUserIsNotAuth() throws Exception {
-        var result = mvc.perform(post("/users").content(
-                        mapper.writeValueAsString(
-                                RequestUserDTO.builder()
-                                        .email("123456789@gmail.com")
-                                        .phoneNumber("+573197419033")
-                                        .firstName("John")
-                                        .lastName("Doe")
-                                        .password("password")
-                                        .role("ADMIN")
-                                        .build()
-                        )).contentType(MediaType.APPLICATION_JSON).accept(MediaType.APPLICATION_JSON))
+    public void testCreateUserWhenUserIsNotAuth() throws Exception {
+        var result = mvc.perform(post("/users")
+                        .content(mapper.writeValueAsString(defaultUser()))
+                        .contentType(MediaType.APPLICATION_JSON).accept(MediaType.APPLICATION_JSON)
+                )
                 .andExpect(status().isUnauthorized())
                 .andReturn();
 
@@ -49,18 +42,9 @@ public class UserControllerTest {
     }
 
     @Test
-    public void testCreateUserEndPointWhenUserIsAuth() throws Exception {
+    public void testCreateUserWhenUserIsAuth() throws Exception {
         var result = mvc.perform(post("/users")
-                        .content(mapper.writeValueAsString(
-                                RequestUserDTO.builder()
-                                        .email("12345678910@gmail.com")
-                                        .phoneNumber("+573197419034")
-                                        .firstName("John")
-                                        .lastName("Doe")
-                                        .password("password")
-                                        .role("ADMIN")
-                                        .build()
-                        ))
+                        .content(mapper.writeValueAsString(defaultUser()))
                         .header("Authorization", "Bearer " + key)
                         .contentType(MediaType.APPLICATION_JSON)
                         .accept(MediaType.APPLICATION_JSON)
@@ -69,5 +53,170 @@ public class UserControllerTest {
                 .andReturn();
 
         System.out.println(result.getResponse().getContentAsString());
+    }
+
+    @Test
+    public void testCreateUserWhenEmailIsInvalid() throws Exception {
+        RequestUserDTO user = defaultUser();
+        user.setEmail("12345678910gmail.com");
+
+        var result = mvc.perform(post("/users")
+                        .content(mapper.writeValueAsString(user))
+                        .header("Authorization", "Bearer " + key)
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .accept(MediaType.APPLICATION_JSON)
+                )
+                .andExpect(status().isBadRequest())
+                .andReturn();
+
+        System.out.println(result.getResponse().getContentAsString());
+    }
+
+    @Test
+    public void testCreateUserWhenPhoneNumberIsNotColombian() throws Exception {
+        RequestUserDTO user = defaultUser();
+        user.setPhoneNumber("12345678910");
+
+        var result = mvc.perform(post("/users")
+                        .content(mapper.writeValueAsString(user))
+                        .header("Authorization", "Bearer " + key)
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .accept(MediaType.APPLICATION_JSON)
+                )
+                .andExpect(status().isBadRequest())
+                .andReturn();
+
+        System.out.println(result.getResponse().getContentAsString());
+    }
+
+    @Test
+    public void testCreateUserWhenRoleIsNull() throws Exception {
+        RequestUserDTO user = defaultUser();
+        user.setRole(null);
+
+        var result = mvc.perform(post("/users")
+                        .content(mapper.writeValueAsString(user))
+                        .header("Authorization", "Bearer " + key)
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .accept(MediaType.APPLICATION_JSON)
+                )
+                .andExpect(status().isBadRequest())
+                .andReturn();
+
+        System.out.println(result.getResponse().getContentAsString());
+    }
+
+    @Test
+    public void testCreateUserWhenFirstNameIsBlank() throws Exception {
+        RequestUserDTO user = defaultUser();
+        user.setFirstName("");
+
+        var result = mvc.perform(post("/users")
+                        .content(mapper.writeValueAsString(user))
+                        .header("Authorization", "Bearer " + key)
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .accept(MediaType.APPLICATION_JSON)
+                )
+                .andExpect(status().isBadRequest())
+                .andReturn();
+
+        System.out.println(result.getResponse().getContentAsString());
+    }
+
+    @Test
+    public void testCreateUserWhenLastNameIsBlank() throws Exception {
+        RequestUserDTO user = defaultUser();
+        user.setLastName("");
+
+        var result = mvc.perform(post("/users")
+                        .content(mapper.writeValueAsString(user))
+                        .header("Authorization", "Bearer " + key)
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .accept(MediaType.APPLICATION_JSON)
+                )
+                .andExpect(status().isBadRequest())
+                .andReturn();
+
+        System.out.println(result.getResponse().getContentAsString());
+    }
+
+    @Test
+    public void testCreateUserWhenPasswordIsBlank() throws Exception {
+        RequestUserDTO user = defaultUser();
+        user.setPassword("");
+
+        var result = mvc.perform(post("/users")
+                        .content(mapper.writeValueAsString(user))
+                        .header("Authorization", "Bearer " + key)
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .accept(MediaType.APPLICATION_JSON)
+                )
+                .andExpect(status().isBadRequest())
+                .andReturn();
+
+        System.out.println(result.getResponse().getContentAsString());
+    }
+
+    @Test
+    public void testCreateUserWhenEmailAndPhoneNumberAreBlank() throws Exception {
+        RequestUserDTO user = defaultUser();
+        user.setEmail("");
+        user.setPhoneNumber("");
+
+        var result = mvc.perform(post("/users")
+                        .content(mapper.writeValueAsString(user))
+                        .header("Authorization", "Bearer " + key)
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .accept(MediaType.APPLICATION_JSON)
+                )
+                .andExpect(status().isBadRequest())
+                .andReturn();
+
+        System.out.println(result.getResponse().getContentAsString());
+    }
+
+    @Test
+    public void testCreateUserWhenEmailIsNull() throws Exception {
+        RequestUserDTO user = defaultUser();
+        user.setEmail(null);
+
+        var result = mvc.perform(post("/users")
+                        .content(mapper.writeValueAsString(user))
+                        .header("Authorization", "Bearer " + key)
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .accept(MediaType.APPLICATION_JSON)
+                )
+                .andExpect(status().isBadRequest())
+                .andReturn();
+
+        System.out.println(result.getResponse().getContentAsString());
+    }
+
+    @Test
+    public void testCreateUserWhenPhoneNumberIsNull() throws Exception {
+        RequestUserDTO user = defaultUser();
+        user.setPhoneNumber(null);
+
+        var result = mvc.perform(post("/users")
+                        .content(mapper.writeValueAsString(user))
+                        .header("Authorization", "Bearer " + key)
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .accept(MediaType.APPLICATION_JSON)
+                )
+                .andExpect(status().isBadRequest())
+                .andReturn();
+
+        System.out.println(result.getResponse().getContentAsString());
+    }
+
+    private RequestUserDTO defaultUser() {
+        return RequestUserDTO.builder()
+                .email("12345678910@gmail.com")
+                .phoneNumber("+573197419034")
+                .firstName("John")
+                .lastName("Doe")
+                .password("password")
+                .role("ADMIN")
+                .build();
     }
 }

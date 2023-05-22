@@ -17,14 +17,21 @@ import javax.validation.constraints.NotNull;
 public class RequestUserDTO {
     @NotBlank
     private String firstName;
+
     @NotBlank
     private String lastName;
+
     @Email
+    @NotNull
     private String email;
+
     @NotBlank
     private String password;
+
+    @NotNull
     @ColombianNumber
     private String phoneNumber;
+
     @NotNull
     private String role;
 }
