@@ -2,8 +2,10 @@ package com.example.demo.service;
 
 import com.example.demo.DTO.IcesiAccountDTO;
 import com.example.demo.Mapper.IcesiAccountMapper;
+import com.example.demo.model.IcesiUser;
 import com.example.demo.repository.IcesiAccountRepository;
 import com.example.demo.model.IcesiAccount;
+import com.example.demo.repository.IcesiUserRepository;
 import lombok.AllArgsConstructor;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.dao.DuplicateKeyException;
@@ -124,4 +126,16 @@ public class IcesiAccountService {
         account.setBalance(account.getBalance() + amount);
         accountRepository.save(account);
     }
+    public IcesiAccountDTO save(IcesiAccountDTO accountDTO) {
+        IcesiUser userFound = IcesiUserRepository.findByEmail(accountDTO.getUserEmail()).orElseThrow(() -> new RuntimeException("User not found"));
+        String uuid = generateAccountNumber();
+        IcesiAccount icesiAccount = accountMapper.fromIcesiAccountDTO(accountDTO);
+        icesiAccount.setAccountNumber(uuid);
+        icesiAccount.setAccountId(UUID.randomUUID());
+        icesiAccount.setIcesiUser(userFound);
+        icesiAccount.setBalance(0L);
+        icesiAccount.setActive(true);
+        return accountMapper.fromIcesiAccount(accountRepository.save(icesiAccount));
+    }
+
 }
