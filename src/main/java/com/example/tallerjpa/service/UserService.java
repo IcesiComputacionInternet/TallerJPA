@@ -41,9 +41,6 @@ public class UserService {
             throw new CustomException("This phone number already exists");
         }
         icesiUser.setUserId(UUID.randomUUID());
-        if(userDTO.getRole()==null){
-            throw new CustomException("The role can't be null");
-        }
         icesiUser.setIcesiRole(roleRepository.searchByName(userDTO.getRole().getName().toUpperCase()).orElseThrow(()-> new CustomException("Role doesn't exists")));
         return icesiUser;
 

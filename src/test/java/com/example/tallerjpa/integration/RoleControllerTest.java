@@ -40,8 +40,8 @@ class RoleControllerTest {
     @Test
     public void createRole() throws Exception{
         var  result = mockMvc.perform(MockMvcRequestBuilders.post(URL).content(
-                                objectMapper.writeValueAsString(RoleDTO.builder().
-                                        name("ANOTHER:ROLE")
+                                objectMapper.writeValueAsString(RoleDTO.builder()
+                                        .name("ANOTHER:ROLE")
                                         .description("AnotherRole")
                                         .build()))
                         .header("Authorization", "Bearer " + token)
