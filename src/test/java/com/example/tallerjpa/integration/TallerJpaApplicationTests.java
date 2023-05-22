@@ -29,8 +29,6 @@ class TallerJpaApplicationTests {
 	@Autowired
 	ObjectMapper objectMapper;
 
-	private String token = "";
-
 	@Test
 	void contextLoads() {
 	}

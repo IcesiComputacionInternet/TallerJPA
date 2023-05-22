@@ -1,9 +1,9 @@
 package com.example.tallerjpa.integration;
 
-
+import com.example.tallerjpa.dto.AccountDTO;
 import com.example.tallerjpa.dto.LoginDTO;
-import com.example.tallerjpa.dto.RoleDTO;
-import com.example.tallerjpa.dto.UserDTO;
+import com.example.tallerjpa.dto.TransactionRequestDTO;
+import com.example.tallerjpa.enums.AccountType;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -21,36 +21,41 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 @Import(TestConfigurationData.class )
 @ActiveProfiles(profiles = "test")
 @SpringBootTest
-public class UserControllerTest {
-
+public class AccountControllerTest {
     @Autowired
     private MockMvc mockMvc;
-
 
     @Autowired
     private ObjectMapper objectMapper;
 
     private String token = "";
 
-    private static final String URL= "/users";
+    private static final String URL = "/accounts";
 
     @Test
-    public void testCreateUserNoAuth() throws Exception {
-        var  result = mockMvc.perform(MockMvcRequestBuilders.post(URL).content(
-                                objectMapper.writeValueAsString(defaultUser()))
+    public void createAccount() throws Exception {
+        setToken();
+        var result = mockMvc.perform(MockMvcRequestBuilders.post(URL).content(
+                                objectMapper.writeValueAsString(AccountDTO.builder()
+                                        .balance(100L)
+                                        .type(AccountType.DEFAULT)
+                                        .emailUser("juan@hotmail.com")
+                                        .build()))
+                        .header("Authorization", "Bearer " + token)
                         .contentType(MediaType.APPLICATION_JSON)
                         .accept(MediaType.APPLICATION_JSON))
-                .andExpect(status().isUnauthorized())
+                .andExpect(status().isOk())
                 .andReturn();
 
         System.out.println(result.getResponse().getContentAsString());
+
     }
 
     @Test
-    public void testCreateUserWithAuth() throws Exception {
+    public void transferMoneyWhenUserIsAuth() throws Exception {
         setToken();
-        var  result = mockMvc.perform(MockMvcRequestBuilders.post(URL).content(
-                                objectMapper.writeValueAsString(defaultUser()))
+        var  result = mockMvc.perform(MockMvcRequestBuilders.patch(URL+"/transfer/").content(
+                                objectMapper.writeValueAsString(defaultTransaction()))
                         .header("Authorization", "Bearer " + token)
                         .contentType(MediaType.APPLICATION_JSON)
                         .accept(MediaType.APPLICATION_JSON))
@@ -61,12 +66,12 @@ public class UserControllerTest {
     }
 
     @Test
-    public void testCreateUserWithInvalidNumber() throws Exception {
+    public void transferMoneyWhenTheAccountIsOnlyDeposits() throws Exception {
         setToken();
-        UserDTO user = defaultUser();
-        user.setPhoneNumber("+1342993845");
-        var  result = mockMvc.perform(MockMvcRequestBuilders.post(URL).content(
-                                objectMapper.writeValueAsString(user))
+        TransactionRequestDTO transaction = defaultTransaction();
+        transaction.setOriginAccountNumber("111-567788-33");
+        var  result = mockMvc.perform(MockMvcRequestBuilders.patch(URL+"/transfer/").content(
+                                objectMapper.writeValueAsString(transaction))
                         .header("Authorization", "Bearer " + token)
                         .contentType(MediaType.APPLICATION_JSON)
                         .accept(MediaType.APPLICATION_JSON))
@@ -77,12 +82,12 @@ public class UserControllerTest {
     }
 
     @Test
-    public void testCreateUserWithInvalidEmail() throws Exception {
+    public void transferMoneyWithLowBalance() throws Exception {
         setToken();
-        UserDTO user = defaultUser();
-        user.setEmail("test.com");
-        var  result = mockMvc.perform(MockMvcRequestBuilders.post(URL).content(
-                                objectMapper.writeValueAsString(user))
+        TransactionRequestDTO transaction = defaultTransaction();
+        transaction.setAmount(20000L);
+        var  result = mockMvc.perform(MockMvcRequestBuilders.patch(URL+"/transfer/").content(
+                                objectMapper.writeValueAsString(transaction))
                         .header("Authorization", "Bearer " + token)
                         .contentType(MediaType.APPLICATION_JSON)
                         .accept(MediaType.APPLICATION_JSON))
@@ -92,33 +97,22 @@ public class UserControllerTest {
         System.out.println(result.getResponse().getContentAsString());
     }
 
-
-
-
-
     public void  setToken() throws Exception {
         var login =   mockMvc.perform(MockMvcRequestBuilders.post("/login").content(
-                                objectMapper.writeValueAsString(LoginDTO.builder().username("juan@hotmail.com").password("password").build())
+                                objectMapper.writeValueAsString(LoginDTO.builder().username("bank@email.com").password("password").build())
                         )
                         .contentType(MediaType.APPLICATION_JSON)
                         .accept(MediaType.APPLICATION_JSON))
                 .andExpect(status().isOk())
                 .andReturn();
         token = login.getResponse().getContentAsString();
-
     }
 
-    private UserDTO defaultUser(){
-        return UserDTO.builder()
-                .firstName("Juan")
-                .lastName("Osorio")
-                .email("juanosorio@hotmail.com")
-                .phoneNumber("+573007896543")
-                .password("password")
-                .role(RoleDTO.builder()
-                        .name("ADMIN")
-                        .description("Role for admin's")
-                        .build())
+    private TransactionRequestDTO defaultTransaction(){
+        return TransactionRequestDTO.builder()
+                .originAccountNumber("098-765432-11")
+                .destinationAccountNumber("123-456789-00")
+                .amount(100L)
                 .build();
     }
 }
