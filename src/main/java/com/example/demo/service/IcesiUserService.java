@@ -91,7 +91,7 @@ public class IcesiUserService {
             .orElseThrow(() -> IcesiExceptionBuilder.createIcesiException(
                 "This email is not present in the database",
                 HttpStatus.NOT_FOUND,
-                new DetailBuilder(ErrorCode.ERR_404, "email", email)
+                new DetailBuilder(ErrorCode.ERR_404, "email", "not present", email)
             ).get());
     }
 

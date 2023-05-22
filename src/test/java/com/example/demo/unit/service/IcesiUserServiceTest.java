@@ -12,7 +12,6 @@ import static org.mockito.Mockito.when;
 
 import java.util.Optional;
 
-import org.apache.catalina.connector.Response;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 
@@ -29,8 +28,6 @@ import com.example.demo.model.enums.TypeIcesiRole;
 import com.example.demo.repository.IcesiRoleRepository;
 import com.example.demo.repository.IcesiUserRepository;
 import com.example.demo.service.IcesiUserService;
-
-import aj.org.objectweb.asm.Type;
 
 public class IcesiUserServiceTest {
     private IcesiUserService icesiUserService;
@@ -99,7 +96,7 @@ public class IcesiUserServiceTest {
     private IcesiRole defaultIcesiRole() {
         return IcesiRole.builder()
             .description("This role is for students")
-            .name("Student")
+            .name("student")
             .build();
     }
 
@@ -154,7 +151,7 @@ public class IcesiUserServiceTest {
         try {
             icesiUserService.create(TypeIcesiRole.admin.name(),defaultIcesiUserCreateDTO());
             fail();
-        } catch (Exception exception) {
+        } catch (IcesiException exception) {
             String message = exception.getMessage();
             assertEquals("This role is not present in the database", message);
         }
@@ -167,7 +164,7 @@ public class IcesiUserServiceTest {
         try {
             icesiUserService.create(TypeIcesiRole.admin.name(),defaultIcesiUserCreateDTO());
             fail();
-        } catch(RuntimeException exception) {
+        } catch(IcesiException exception) {
             String message = exception.getMessage();
             assertEquals("This email is already in use", message);
         }
@@ -180,7 +177,7 @@ public class IcesiUserServiceTest {
         try {
             icesiUserService.create(TypeIcesiRole.admin.name(),defaultIcesiUserCreateDTO());
             fail();
-        } catch(RuntimeException exception) {
+        } catch(IcesiException exception) {
             String message = exception.getMessage();
             assertEquals("This phone number is already in use", message);
         }
@@ -195,7 +192,7 @@ public class IcesiUserServiceTest {
         try {
             icesiUserService.create(TypeIcesiRole.admin.name(),defaultIcesiUserCreateDTO());
             fail();
-        } catch(RuntimeException exception) {
+        } catch(IcesiException exception) {
             String message = exception.getMessage();
             assertEquals("These email and phone number are already in use", message);
         }
@@ -215,13 +212,30 @@ public class IcesiUserServiceTest {
         try {
             icesiUserService.findIcesiUserByEmail(defaultIcesiUser().getEmail());
             fail();
-        } catch (IcesiException exception) {
+        } catch(IcesiException exception) {
             String message = exception.getMessage();
             assertEquals("This email is not present in the database", message);
         }
     }
 
+    @Test
+    public void testFindIcesiRoleByNameWhenIsPresent() {
+        when(icesiRoleRepository.findByName(any())).thenReturn(Optional.of(defaultIcesiRole()));
+        IcesiRole result = icesiUserService.findIcesiRoleByName(defaultIcesiRole().getName());
+        verify(icesiRoleRepository, times(1)).findByName(any());
+        assertEquals(defaultResponseIcesiRoleDTO().getName(), result.getName());
+    }
 
+    @Test
+    public void testFindIcesiRoleByNameWhenIsNotPresent() {
+        try {
+            icesiUserService.findIcesiRoleByName(defaultIcesiRole().getName());
+            fail();
+        } catch(IcesiException exception) {
+            String message = exception.getMessage();
+            assertEquals("This role is not present in the database", message);
+        }
+    }
 
     @Test
     public void testUpdateIcesiRoleToAdminAsAdmin() {
