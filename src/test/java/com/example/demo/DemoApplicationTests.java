@@ -36,19 +36,18 @@ class DemoApplicationTests {
 	void contextLoads() {
 	}
 
-    @Test
-    public void testTokenEndpoint() throws Exception {
-        var result = mockMvc.perform(MockMvcRequestBuilders.post("/token").content(
-                                objectMapper.writeValueAsString(new LoginDTO("johndoe@email.com", "password"))
-                        )
-                        .contentType(MediaType.APPLICATION_JSON)
-                        .accept(MediaType.APPLICATION_JSON))
-                .andExpect(status().isOk())
-                .andReturn();
-
-        TokenDTO token = objectMapper.readValue(result.getResponse().getContentAsString(), TokenDTO.class);
-        assertNotNull(token);
-    }
+	@Test
+	public void testTokenEndpoint() throws Exception {
+		var result = mockMvc.perform(MockMvcRequestBuilders.post("/token").content(
+				objectMapper.writeValueAsString(new LoginDTO("johndoe@email.com","password"))
+				)
+						.contentType(MediaType.APPLICATION_JSON)
+						.accept(MediaType.APPLICATION_JSON))
+				.andExpect(status().isOk())
+				.andReturn();
+		String token = result.getResponse().getContentAsString();
+		assertNotNull(token);
+	}
 
     @Test
     public void testTokenEndpointWithInvalidEmail() throws Exception {
@@ -61,6 +60,4 @@ class DemoApplicationTests {
                 .andExpect(status().isUnauthorized())
                 .andReturn();
     }
-
-
 }
