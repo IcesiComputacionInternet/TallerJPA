@@ -1,6 +1,5 @@
 package icesi.university.accountSystem.services;
 
-import icesi.university.accountSystem.dto.AssignRoleDTO;
 import icesi.university.accountSystem.dto.RequestUserDTO;
 import icesi.university.accountSystem.dto.ResponseUserDTO;
 import icesi.university.accountSystem.exception.ExistsException;
@@ -41,9 +40,12 @@ public class UserService {
             errors.add("Phone number already exists");
         }
 
+       checkCreateUserADMIN(userDTO.getRole());
+
         if(!errors.isEmpty()){
             throw new ExistsException(String.join(" ", errors));
         }
+
         IcesiUser user = icesiUserMapper.fromIcesiUserDTO(userDTO);
         user.setPassword(new BCryptPasswordEncoder().encode(userDTO.getPassword()));
         user.setUserId(UUID.randomUUID());
@@ -64,22 +66,31 @@ public class UserService {
 
     public List<ResponseUserDTO> getAllUsers() {
         List<IcesiUser> users = icesiUserRepository.findAll();
-        System.out.println(getRole());
         return icesiUserMapper.fromUsersToSendUsersDTO(users);
     }
 
-    private String getRole(){
+    private String currentRole(){
        return IcesiSecurityContext.getCurrentUserRole();
     }
 
-    public ResponseUserDTO assignRole(AssignRoleDTO assignRoleDTO) {
-        Optional<IcesiUser> user = icesiUserRepository.findByEmail(assignRoleDTO.getEmail());
+    private void checkCreateUserADMIN(String roleOfUserToCreate) {
+        String role = currentRole();
+        if (role.equals("BANK") && roleOfUserToCreate.equals("ADMIN")) {
+            throw new RuntimeException("You can't create an admin");
+
+        }
+    }
+
+    public ResponseUserDTO assignRole(String userMail,String roleName) {
+        Optional<IcesiUser> user = icesiUserRepository.findByEmail(userMail);
         if(user.isPresent()){
-            var role = roleRepository.findByName(assignRoleDTO.getName()).orElseThrow(() -> new ExistsException("Role doesn't exists"));
-            user.get().setRole(role);
-            return icesiUserMapper.fromUserToSendUserDTO(icesiUserRepository.save(user.get()));
+            var role = roleRepository.findByName(roleName).orElseThrow(() -> new ExistsException("Role doesn't exists"));
+            IcesiUser newRole = user.get();
+            newRole.setRole(role);
+            return icesiUserMapper.fromUserToSendUserDTO(icesiUserRepository.save(newRole));
         }else{
             throw new RuntimeException("User doesn't exists");
         }
     }
+
 }

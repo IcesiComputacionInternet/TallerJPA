@@ -1,5 +1,6 @@
 package icesi.university.accountSystem.model;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import lombok.*;
 
 import javax.persistence.*;
@@ -27,6 +28,7 @@ public class IcesiUser {
     private String password;
 
     @OneToMany(mappedBy = "user")
+    @JsonIgnore
     List<IcesiAccount> accounts;
 
     @ManyToOne(optional = false)

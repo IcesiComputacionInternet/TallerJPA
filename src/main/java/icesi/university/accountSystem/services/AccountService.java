@@ -6,9 +6,12 @@ import icesi.university.accountSystem.dto.TransactionOperationDTO;
 import icesi.university.accountSystem.dto.TransactionResultDTO;
 import icesi.university.accountSystem.enums.TypeAccount;
 import icesi.university.accountSystem.mapper.IcesiAccountMapper;
+import icesi.university.accountSystem.mapper.IcesiUserMapper;
 import icesi.university.accountSystem.model.IcesiAccount;
+import icesi.university.accountSystem.model.IcesiUser;
 import icesi.university.accountSystem.repository.IcesiAccountRepository;
 import icesi.university.accountSystem.repository.IcesiUserRepository;
+import icesi.university.accountSystem.security.IcesiSecurityContext;
 import lombok.AllArgsConstructor;
 import org.springframework.stereotype.Service;
 
@@ -24,8 +27,11 @@ public class AccountService {
 
     private IcesiUserRepository icesiUserRepository;
 
+    private IcesiUserMapper icesiUserMapper;
+
     public ResponseAccountDTO save(RequestAccountDTO accountDTO){
         var user = icesiUserRepository.findByEmail(accountDTO.getUser()).orElseThrow(()-> new RuntimeException("User doesn't exists"));
+        validateAccountHimself(user.getUserId().toString());
         IcesiAccount account = icesiAccountMapper.fromIcesiAccountDTO(accountDTO);
         account.setAccountId(UUID.randomUUID());
         account.setAccountNumber(validateAccountNumber(getRandomAccountNumber()));
@@ -37,6 +43,7 @@ public class AccountService {
     public String activateAccount(String accountNumber){
         var account = icesiAccountRepository.findByAccountNumber(accountNumber, false)
                 .orElseThrow(() -> new RuntimeException("The account: " + accountNumber + " can't be enabled"));
+        validateAccountUser(account.getUser().getUserId().toString());
         account.setActive(true);
         icesiAccountRepository.save(account);
         return "The account is enabled";
@@ -46,6 +53,7 @@ public class AccountService {
     public String deactivateAccount(String accountNumber){
         var account = icesiAccountRepository.findByAccountNumber(accountNumber, true)
                 .orElseThrow(() -> new RuntimeException("The account: " + accountNumber + " can't be disabled"));
+        validateAccountUser(account.getUser().getUserId().toString());
         account.setActive(false);
         icesiAccountRepository.save(account);
         return "The account was disabled";
@@ -53,6 +61,7 @@ public class AccountService {
     @Transactional
     public TransactionResultDTO withdrawal(TransactionOperationDTO transaction){
         IcesiAccount account = getAccountByAccountNumber(transaction.getAccountFrom());
+        validateAccountUser(account.getUser().getUserId().toString());
         validateAccountBalance(account, transaction.getAmount());
         account.setBalance( account.getBalance() - transaction.getAmount() );
         icesiAccountRepository.save(account);
@@ -61,6 +70,7 @@ public class AccountService {
 @Transactional
     public TransactionResultDTO deposit(TransactionOperationDTO transaction){
         IcesiAccount account = getAccountByAccountNumber(transaction.getAccountTo());
+        validateAccountUser(account.getUser().getUserId().toString());
         account.setBalance(account.getBalance() + transaction.getAmount());
         icesiAccountRepository.save(account);
         return icesiAccountMapper.fromTransactionOperation(transaction, "The deposit was successful");
@@ -69,6 +79,7 @@ public class AccountService {
     public TransactionResultDTO transfer(TransactionOperationDTO transaction){
     IcesiAccount accountOrigin = getAccountByAccountNumber(transaction.getAccountFrom());
     IcesiAccount accountDestination = getAccountByAccountNumber(transaction.getAccountTo());
+    validateAccountUser(accountOrigin.getUser().getUserId().toString());
     validateAccountType(accountOrigin);
     validateAccountType(accountDestination);
     validateAccountBalance(accountOrigin, transaction.getAmount());
@@ -119,6 +130,26 @@ public class AccountService {
             return accountNumber;
         }else{
             return getRandomAccountNumber();
+        }
+    }
+
+    private void validateAccountHimself(String icesiUserId){
+        boolean creatingAccountToAnotherUser = !IcesiSecurityContext.getCurrentUserId().equals(icesiUserId);
+        IcesiUser loggedIcesiUser = icesiUserRepository.findById(UUID.fromString(IcesiSecurityContext.getCurrentUserId()))
+                .orElseThrow(() -> new RuntimeException("User not found"));
+        boolean isNotAnAdminRole = !IcesiSecurityContext.getCurrentUserRole().equals("ADMIN");
+        if(isNotAnAdminRole && creatingAccountToAnotherUser){
+            throw new RuntimeException("You can't create an account to another user");
+        }
+    }
+
+    private void validateAccountUser(String icesiUserId){
+        IcesiUser icesiUser = icesiUserRepository.findById(UUID.fromString(icesiUserId))
+                .orElseThrow(() -> new RuntimeException("User not found"));
+        boolean isNotAnAdminRole = !IcesiSecurityContext.getCurrentUserRole().equals("ADMIN");
+        boolean theAccountDoesNotBelongToTheUser = !IcesiSecurityContext.getCurrentUserId().equals(icesiUserId);
+        if (isNotAnAdminRole && theAccountDoesNotBelongToTheUser){
+            throw new RuntimeException("You can't see the account of another user");
         }
     }
 }

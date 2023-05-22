@@ -1,11 +1,9 @@
 package icesi.university.accountSystem.api;
 
-import icesi.university.accountSystem.dto.AssignRoleDTO;
+
 import icesi.university.accountSystem.dto.RequestUserDTO;
 import icesi.university.accountSystem.dto.ResponseUserDTO;
-import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
-import org.springframework.web.bind.annotation.PostMapping;
 
 import java.util.List;
 
@@ -22,7 +20,7 @@ public interface UserAPI {
 
     ResponseUserDTO addUser(RequestUserDTO requestUserDTO);
 
-    ResponseUserDTO assignRole(AssignRoleDTO assignRoleDTO);
+    ResponseUserDTO assignRole(String userEmail,String roleName);
 
 
 

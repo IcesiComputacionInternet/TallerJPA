@@ -1,15 +1,11 @@
 package icesi.university.accountSystem.controller;
 
 import icesi.university.accountSystem.api.UserAPI;
-import icesi.university.accountSystem.dto.AssignRoleDTO;
 import icesi.university.accountSystem.dto.RequestUserDTO;
 import icesi.university.accountSystem.dto.ResponseUserDTO;
 import icesi.university.accountSystem.services.UserService;
 import lombok.AllArgsConstructor;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
 @RestController
@@ -18,7 +14,7 @@ public class UserController implements UserAPI {
     private final UserService userService;
     @GetMapping(BASE_USER_URL+"/{userEmail}")
     @Override
-    public ResponseUserDTO getUser(String userEmail) {
+    public ResponseUserDTO getUser(@PathVariable String userEmail) {
         return userService.getUser(userEmail);
     }
 
@@ -33,9 +29,9 @@ public class UserController implements UserAPI {
     public ResponseUserDTO addUser(@RequestBody RequestUserDTO requestUserDTO) {
         return userService.save(requestUserDTO);
     }
-
+    @PutMapping(BASE_USER_URL+"/assignRole/{userEmail}/{roleName}")
     @Override
-    public ResponseUserDTO assignRole(AssignRoleDTO assignRoleDTO) {
-        return userService.assignRole(assignRoleDTO);
+    public ResponseUserDTO assignRole(@PathVariable String userEmail, @PathVariable String roleName) {
+        return userService.assignRole(userEmail,roleName);
     }
 }
