@@ -33,8 +33,6 @@ class UserControllerTests {
     @Autowired
     ObjectMapper objectMapper;
 
-    PasswordEncoder encoder;
-
     public TokenDTO generateAdminToken() throws Exception{
         var result = mockMvc.perform(MockMvcRequestBuilders.post("/token").content(
                                 objectMapper.writeValueAsString(new LoginDTO("johndoe@email.com", "password"))
@@ -198,10 +196,10 @@ class UserControllerTests {
                             .header("Authorization","Bearer "+generateUserToken().getToken())
                             .contentType(MediaType.APPLICATION_JSON)
                             .accept(MediaType.APPLICATION_JSON))
-                    .andExpect(status().isBadRequest())
+                    .andExpect(status().isConflict())
                     .andReturn();
 
-            assertEquals(400, newResult.getResponse().getStatus());
+            assertEquals(409, newResult.getResponse().getStatus());
         }
 
         @Test
@@ -228,6 +226,7 @@ class UserControllerTests {
 
             UserCreateDTO user = defaultUser1();
             user.setEmail("pepitope@email.com");
+            user.setPhoneNumber("+57123123123");
 
             var newResult = mockMvc.perform(MockMvcRequestBuilders.post("/users/create/").content(
                                     objectMapper.writeValueAsString(user)
@@ -235,10 +234,10 @@ class UserControllerTests {
                             .header("Authorization","Bearer "+generateUserToken().getToken())
                             .contentType(MediaType.APPLICATION_JSON)
                             .accept(MediaType.APPLICATION_JSON))
-                    .andExpect(status().isConflict())
+                    .andExpect(status().isBadRequest())
                     .andReturn();
 
-            assertEquals(409, newResult.getResponse().getStatus());
+            assertEquals(400, newResult.getResponse().getStatus());
         }
     }
 
@@ -259,7 +258,7 @@ class UserControllerTests {
                 .lastName("Perez")
                 .email("pepito2@email.com")
                 .phoneNumber("+573174545942")
-                .password(encoder.encode("password"))
+                .password("password")
                 .icesiRole("USER")
                 .build();
     }
@@ -270,7 +269,7 @@ class UserControllerTests {
                 .lastName("Perez")
                 .email("pepito3@email.com")
                 .phoneNumber("+573274545942")
-                .password(encoder.encode("password"))
+                .password("password")
                 .icesiRole("USER")
                 .build();
     }
@@ -281,7 +280,7 @@ class UserControllerTests {
                 .lastName("Perez")
                 .email("pepito3@email.com")
                 .phoneNumber("+573274545942")
-                .password(encoder.encode("password"))
+                .password("password")
                 .icesiRole("BANK")
                 .build();
     }
