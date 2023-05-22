@@ -4,6 +4,7 @@ import co.com.icesi.TallerJpa.error.exception.*;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.http.converter.HttpMessageNotReadableException;
+import org.springframework.security.access.AccessDeniedException;
 import org.springframework.security.authentication.BadCredentialsException;
 import org.springframework.validation.BindException;
 import org.springframework.validation.FieldError;
@@ -55,6 +56,14 @@ public class GlobalExceptionHandler {
     public ResponseEntity<IcesiError> handleLoginException(BadCredentialsException ex){
         var errorBuilder = IcesiError.builder().status(HttpStatus.UNAUTHORIZED);
         var details = new IcesiErrorDetail(ErrorCode.ERR_401.getCode(), ex.getMessage());
+        var error = errorBuilder.details(List.of(details)).build();
+        return ResponseEntity.status(error.getStatus()).body(error);
+    }
+
+    @ExceptionHandler(AccessDeniedException.class)
+    public ResponseEntity<IcesiError> handleAccessDeniedException(AccessDeniedException ex){
+        var errorBuilder = IcesiError.builder().status(HttpStatus.FORBIDDEN);
+        var details = new IcesiErrorDetail(ErrorCode.ERR_403.getCode(), ex.getMessage());
         var error = errorBuilder.details(List.of(details)).build();
         return ResponseEntity.status(error.getStatus()).body(error);
     }

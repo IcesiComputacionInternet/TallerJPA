@@ -5,6 +5,7 @@ import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
 
 import javax.validation.Valid;
+import javax.validation.constraints.NotBlank;
 import java.util.List;
 
 @RequestMapping(value = IcesiRoleApi.ROLE_BASE_URL)
@@ -16,12 +17,12 @@ public interface IcesiRoleApi {
     @PostMapping
     IcesiRoleDTO addIcesiRole(@Valid @RequestBody IcesiRoleDTO icesiRoleDTO);
 
-    @PostMapping("/roles")
+    @PostMapping(params = "list=true")
     List<IcesiRoleDTO> addListIcesiRole(@Valid @RequestBody List<IcesiRoleDTO> icesiRoleDTOS);
 
-    @GetMapping("/roles")
+    @GetMapping(params = "all=true")
     List<IcesiRoleDTO> getAllIcesiRoles();
 
     @GetMapping("/{name}")
-    IcesiRoleDTO getIcesiRole(@PathVariable String name);
+    IcesiRoleDTO getIcesiRole(@NotBlank @Valid @PathVariable String name);
 }

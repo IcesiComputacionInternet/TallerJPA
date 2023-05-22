@@ -25,6 +25,7 @@ public class IcesiAuthenticatorManager extends DaoAuthenticationProvider {
                 (UsernamePasswordAuthenticationToken) super.createSuccessAuthentication(principal,
                         authentication, userDetails);
         SecurityUser securityUser = (SecurityUser) userDetails;
-        return new CustomAuthentication(successAuthentication, securityUser.icesiUser().getUserId().toString());
+        return new CustomAuthentication(successAuthentication,
+                securityUser.icesiUser().getUserId().toString());
     }
 }

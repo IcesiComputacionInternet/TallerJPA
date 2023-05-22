@@ -41,12 +41,17 @@ public class IcesiRoleService {
         return icesiRoleDTOS.stream().map(this::saveRole).collect(Collectors.toList());
     }
 
-    public IcesiRoleDTO getRoleByName(String roleName){
-        return icesiRoleMapper.fromIcesiRole(icesiRoleRepository.findByName(roleName).orElse(null));
-    }
-
     public List<IcesiRoleDTO> getAllRoles(){
         return icesiRoleRepository.findAll().stream()
                 .map(icesiRoleMapper::fromIcesiRole).collect(Collectors.toList());
+    }
+
+    public IcesiRoleDTO getRoleByName(String roleName){
+        return icesiRoleMapper.fromIcesiRole(icesiRoleRepository.findByName(roleName)
+                .orElseThrow(createIcesiException(
+                        "Role: "+roleName+" not found",
+                        HttpStatus.NOT_FOUND,
+                        new DetailBuilder(ErrorCode.ERR_404,"IcesiRole","name",roleName)
+                )));
     }
 }

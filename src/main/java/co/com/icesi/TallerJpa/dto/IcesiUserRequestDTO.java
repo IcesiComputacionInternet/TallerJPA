@@ -8,6 +8,7 @@ import lombok.NoArgsConstructor;
 
 import javax.validation.constraints.Email;
 import javax.validation.constraints.NotBlank;
+import javax.validation.constraints.NotEmpty;
 import javax.validation.constraints.NotNull;
 
 @Data
@@ -15,16 +16,30 @@ import javax.validation.constraints.NotNull;
 @AllArgsConstructor
 @NoArgsConstructor
 public class IcesiUserRequestDTO {
-    @NotBlank
+    @NotNull(message = "can't be null.")
+    @NotBlank(message = "can't be blank.")
+    @NotEmpty(message = "can't be empty.")
     private String firstName;
-    @NotBlank
+    @NotNull(message = "can't be null.")
+    @NotBlank(message = "can't be blank.")
+    @NotEmpty(message = "can't be empty.")
     private String lastName;
+    @NotNull(message = "can't be null.")
+    @NotBlank(message = "can't be blank.")
+    @NotEmpty(message = "can't be empty.")
     @Email
     private String email;
+    @NotNull(message = "can't be null.")
+    @NotBlank(message = "can't be blank.")
+    @NotEmpty(message = "can't be empty.")
     @ColombianPhoneNumber
     private String phoneNumber;
-    @NotBlank
+    @NotNull(message = "can't be null.")
+    @NotBlank(message = "can't be blank.")
+    @NotEmpty(message = "can't be empty.")
     private String password;
-    @NotNull
+    @NotNull(message = "can't be null.")
+    @NotBlank(message = "can't be blank.")
+    @NotEmpty(message = "can't be empty.")
     private String role;
 }

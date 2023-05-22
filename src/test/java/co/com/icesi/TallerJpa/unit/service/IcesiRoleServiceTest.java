@@ -12,8 +12,10 @@ import co.com.icesi.TallerJpa.unit.service.matcher.IcesiRoleMatcher;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
+import org.springframework.http.HttpStatus;
 
 import java.util.List;
+import java.util.Optional;
 
 import static org.junit.jupiter.api.Assertions.*;
 import static org.mockito.Mockito.*;
@@ -73,6 +75,36 @@ public class IcesiRoleServiceTest {
         defaultIcesiRoleList().stream()
                 .map(IcesiRoleMatcher::new)
                 .forEach(role -> verify(icesiRoleRepository, times(1)).save(argThat(role)));
+    }
+
+    @Test
+    @DisplayName("Get an icesi role Happy Path")
+    public void testGetIcesiRoleHappyPath(){
+        when(icesiRoleRepository.findByName(any())).thenReturn(Optional.of(defaultIcesiRole()));
+        icesiRoleService.getRoleByName(defaultIcesiRole().getName());
+        verify(icesiRoleRepository,times(1)).findByName(any());
+        verify(icesiRoleMapper,times(1)).fromIcesiRole(any());
+    }
+
+    @Test
+    @DisplayName("Get an icesi role when not exists")
+    public void testGetIcesiRoleNotExists(){
+        when(icesiRoleRepository.findByName(any())).thenReturn(Optional.empty());
+        IcesiException icesiException = assertThrows(IcesiException.class,
+                () -> icesiRoleService.getRoleByName(defaultIcesiRole().getName()));
+        IcesiError icesiError = icesiException.getError();
+
+        assertEquals(1,icesiError.getDetails().size());
+        assertEquals(HttpStatus.NOT_FOUND.value(), icesiError.getStatus().value());
+        assertEquals("Role: "+defaultIcesiRole().getName()+" not found"
+                , icesiException.getMessage());
+        assertEquals("ERR_404", icesiError.getDetails().get(0).getErrorCode());
+        assertEquals("IcesiRole with name: "+ defaultIcesiRoleDTO().getName() +" not found"
+                , icesiError.getDetails().get(0).getErrorMessage());
+
+        verify(icesiRoleRepository,times(1)).findByName(any());
+        verify(icesiRoleMapper,times(0)).fromIcesiRole(any());
+
     }
 
     private IcesiRoleDTO defaultIcesiRoleDTO(){

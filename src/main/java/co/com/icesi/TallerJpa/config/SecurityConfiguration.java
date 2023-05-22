@@ -7,6 +7,7 @@ import com.nimbusds.jose.jwk.source.ImmutableSecret;
 import lombok.AllArgsConstructor;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
+import org.springframework.http.HttpMethod;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.ProviderManager;
 import org.springframework.security.authorization.AuthorityAuthorizationManager;
@@ -60,7 +61,7 @@ public class SecurityConfiguration {
     public JwtDecoder jwtDecoder(){
         byte[] bytes = secret.getBytes();
         SecretKeySpec key = new SecretKeySpec(bytes,0,bytes.length,"RSA");
-        return NimbusJwtDecoder.withSecretKey(key).macAlgorithm(MacAlgorithm.HS512).build();
+        return NimbusJwtDecoder.withSecretKey(key).macAlgorithm(MacAlgorithm.HS256).build();
     }
 
     @Bean
@@ -71,12 +72,27 @@ public class SecurityConfiguration {
     @Bean
     public AuthorizationManager<RequestAuthorizationContext> requestMatcherAuthorizationManager
             (HandlerMappingIntrospector introspector) {
+        MvcRequestMatcher tempMvcRequestMatcher;
         RequestMatcher permitAll = new AndRequestMatcher(new MvcRequestMatcher(introspector, "/token"));
+        RequestMatcherDelegatingAuthorizationManager.Builder managerBuilder
+                = RequestMatcherDelegatingAuthorizationManager.builder()
+                .add(permitAll, (context, other) -> new AuthorizationDecision(true));
 
-        RequestMatcherDelegatingAuthorizationManager.Builder managerBuilder =
-                RequestMatcherDelegatingAuthorizationManager.builder()
-                        .add(permitAll, (context , other) -> new AuthorizationDecision(true));
+        //ASIGNANDO LOS PERMISOS DEL API DE ROLES.
+        //solo admin users puede añadir roles.
+        tempMvcRequestMatcher = new MvcRequestMatcher(introspector, IcesiRoleApi.ROLE_BASE_URL);
+        tempMvcRequestMatcher.setMethod(HttpMethod.POST);
+        managerBuilder.add(tempMvcRequestMatcher,
+                AuthorityAuthorizationManager.hasAnyAuthority("SCOPE_ADMIN"));
+        //admin y bank users pueden consultar los roles.
+        tempMvcRequestMatcher = new MvcRequestMatcher(introspector, IcesiRoleApi.ROLE_BASE_URL+"/**");
+        tempMvcRequestMatcher.setMethod(HttpMethod.GET);
+        managerBuilder.add(tempMvcRequestMatcher,
+                AuthorityAuthorizationManager.hasAnyAuthority("SCOPE_ADMIN","SCOPE_BANK"));
 
+        //ASIGNANDO LOS PERMISOS DEL API DE USUARIOS.
+        tempMvcRequestMatcher = new MvcRequestMatcher(introspector, IcesiUserApi.USER_BASE_URL);
+        tempMvcRequestMatcher.setMethod(HttpMethod.POST);
         managerBuilder.add(new MvcRequestMatcher(introspector, IcesiAccountApi.ACCOUNT_BASE_URL+"/**"),
                 AuthorityAuthorizationManager.hasAnyAuthority("SCOPE_USER"));
         managerBuilder.add(new MvcRequestMatcher(introspector, IcesiAccountApi.ACCOUNT_BASE_URL),
@@ -85,11 +101,9 @@ public class SecurityConfiguration {
         managerBuilder.add(new MvcRequestMatcher(introspector, IcesiUserApi.USER_BASE_URL+"/**"),
                 AuthorityAuthorizationManager.hasAnyAuthority("SCOPE_USER","SCOPE_BANK"));
 
-        managerBuilder.add(new MvcRequestMatcher(introspector, IcesiRoleApi.ROLE_BASE_URL+"/**"),
-                AuthorityAuthorizationManager.hasAnyAuthority("SCOPE_ADMIN"));
 
         AuthorizationManager<HttpServletRequest> manager = managerBuilder.build();
-        return ((authentication, object) -> manager.check(authentication, object.getRequest()));
+        return (authentication, object) -> manager.check(authentication, object.getRequest());
     }
 }
 

@@ -7,6 +7,7 @@ import lombok.Getter;
 @AllArgsConstructor
 public enum ErrorCode {
     ERR_404("ERR_404", "%s with %s: %s not found"),
+    ERR_403("ERR_403", "%s"),
     ERR_500("ERR_500", "Oops, we ran into an error"),
     ERR_400("ERR_400", "field %s %s"),
     ERR_401("ERR_401", "Unauthorized"),
