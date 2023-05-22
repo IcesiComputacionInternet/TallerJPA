@@ -6,6 +6,7 @@ import com.example.TallerJPA.model.IcesiRole;
 import com.example.TallerJPA.model.IcesiUser;
 import com.example.TallerJPA.repository.RoleRepository;
 import com.example.TallerJPA.repository.UserRepository;
+import com.example.TallerJPA.security.IcesiSecurityContext;
 import lombok.AllArgsConstructor;
 import org.springframework.stereotype.Service;
 
@@ -35,9 +36,21 @@ public class UserService {
         if(roleFound.isEmpty()){
             throw new RuntimeException("Role not found");
         }
+        if(user.getRoleName().equals("ADMIN") && !checkAdminPermissions()){
+            throw new RuntimeException("You don't have permissions to create an admin user");
+        }
         IcesiUser icesiUser = userMapper.fromIcesiUserDTO(user);
         icesiUser.setUserId(UUID.randomUUID());
         icesiUser.setRole(roleFound.get());
         return userMapper.fromIcesiUser(userRepository.save(icesiUser));
+    }
+
+    private boolean checkAdminPermissions(){
+        Optional<IcesiUser> userFound = userRepository.findById(UUID.fromString(IcesiSecurityContext.getCurrentUserId()));
+        IcesiUser user = userFound.orElseThrow(RuntimeException::new);
+        if(user.getRole().getName().equals("ADMIN")){
+            return true;
+        }
+        return false;
     }
 }

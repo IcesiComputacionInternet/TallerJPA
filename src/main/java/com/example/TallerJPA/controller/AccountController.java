@@ -2,7 +2,6 @@ package com.example.TallerJPA.controller;
 
 import com.example.TallerJPA.api.AccountAPI;
 import com.example.TallerJPA.dto.*;
-import com.example.TallerJPA.security.IcesiSecurityContext;
 import com.example.TallerJPA.service.AccountService;
 import lombok.AllArgsConstructor;
 import org.springframework.validation.annotation.Validated;
@@ -10,7 +9,6 @@ import org.springframework.web.bind.annotation.*;
 
 import javax.validation.Valid;
 
-import static com.example.TallerJPA.api.AccountAPI.BASE_ACCOUNT_URL;
 
 @AllArgsConstructor
 @RestController
