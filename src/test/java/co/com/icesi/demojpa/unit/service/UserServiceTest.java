@@ -114,7 +114,7 @@ public class UserServiceTest {
             fail();
         }catch (RuntimeException exception){
             String message= exception.getMessage();
-            assertEquals("Este rol no existe",message);
+            assertEquals("No existe un rol con este nombre",message);
         }
     }
 

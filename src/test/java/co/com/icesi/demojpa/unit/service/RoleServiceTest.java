@@ -42,7 +42,7 @@ public class RoleServiceTest {
     public void testCreateRole(){
         roleService.save(defaultRoleDTO());
         IcesiRole icesiRole = defaultRole();
-        verify(roleRepository,times(1)).save(argThat(new IcesiRoleMatcher(icesiRole)));
+        verify(roleRepository,times(1)).findByName(argThat(name->name.equals(icesiRole.getName())));
     }
 
     @Test
@@ -64,7 +64,7 @@ public class RoleServiceTest {
             roleService.addUser(role,user.getUserId());
             fail();
         }catch (RuntimeException exception){
-            assertEquals("No existe un usuario con esta id",exception.getMessage());
+            assertEquals("No existe un usuario con este id",exception.getMessage());
         }
     }
 

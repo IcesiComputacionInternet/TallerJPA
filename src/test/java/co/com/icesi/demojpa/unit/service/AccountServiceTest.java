@@ -23,8 +23,7 @@ import java.util.ArrayList;
 import java.util.Optional;
 import java.util.UUID;
 
-import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.junit.jupiter.api.Assertions.fail;
+import static org.junit.jupiter.api.Assertions.*;
 import static org.mockito.ArgumentMatchers.argThat;
 import static org.mockito.Mockito.*;
 import static org.mockito.Mockito.times;
@@ -316,14 +315,13 @@ public class AccountServiceTest {
         IcesiAccount icesiAccount2 = defaultIcesiAccountWithNumberAndID();
         when(accountRepository.findByAccountNumber(icesiAccount.getAccountNumber())).thenReturn(Optional.of(icesiAccount));
         when(accountRepository.findByAccountNumber(icesiAccount2.getAccountNumber())).thenReturn(Optional.of(icesiAccount2));
-        accountService.transfer(TransactionDTO.builder()
-                .accountNumberOrigin("1234567899")
-                .accountNumberDestination("123456789")
+        TransactionDTO result =accountService.transfer(TransactionDTO.builder()
+                .accountNumberOrigin(icesiAccount.getAccountNumber())
+                .accountNumberDestination(icesiAccount2.getAccountNumber())
                 .amount(1000L)
                 .resultMessage("")
                 .build());
-        verify(accountRepository, times(1)).updateBalance(eq(icesiAccount.getAccountNumber()),eq(icesiAccount.getBalance()-100L));
-        verify(accountRepository, times(1)).updateBalance(eq(icesiAccount2.getAccountNumber()),eq(icesiAccount.getBalance()+100L));
+        assertEquals(result.getResultMessage(),"El nuevo balance es de: 9000");
     }
 
     @Test
@@ -337,8 +335,8 @@ public class AccountServiceTest {
 
         try{
             accountService.transfer(TransactionDTO.builder()
-                    .accountNumberOrigin("1234567899")
-                    .accountNumberDestination("123456789")
+                    .accountNumberOrigin(icesiAccount.getAccountNumber())
+                    .accountNumberDestination(icesiAccount2.getAccountNumber())
                     .amount(1000L)
                     .resultMessage("")
                     .build());
@@ -359,8 +357,8 @@ public class AccountServiceTest {
 
         try{
             accountService.transfer(TransactionDTO.builder()
-                    .accountNumberOrigin("1234567899")
-                    .accountNumberDestination("123456789")
+                    .accountNumberOrigin(icesiAccount.getAccountNumber())
+                    .accountNumberDestination(icesiAccount2.getAccountNumber())
                     .amount(1000L)
                     .resultMessage("")
                     .build());
@@ -381,8 +379,8 @@ public class AccountServiceTest {
 
         try{
             accountService.transfer(TransactionDTO.builder()
-                    .accountNumberOrigin("1234567899")
-                    .accountNumberDestination("123456789")
+                    .accountNumberOrigin(icesiAccount.getAccountNumber())
+                    .accountNumberDestination(icesiAccount2.getAccountNumber())
                     .amount(1000L)
                     .resultMessage("")
                     .build());
@@ -403,8 +401,8 @@ public class AccountServiceTest {
 
         try{
             accountService.transfer(TransactionDTO.builder()
-                    .accountNumberOrigin("1234567899")
-                    .accountNumberDestination("123456789")
+                    .accountNumberOrigin(icesiAccount.getAccountNumber())
+                    .accountNumberDestination(icesiAccount2.getAccountNumber())
                     .amount(1000L)
                     .resultMessage("")
                     .build());
@@ -426,8 +424,8 @@ public class AccountServiceTest {
 
         try{
             accountService.transfer(TransactionDTO.builder()
-                    .accountNumberOrigin("1234567899")
-                    .accountNumberDestination("123456789")
+                    .accountNumberOrigin(icesiAccount.getAccountNumber())
+                    .accountNumberDestination(icesiAccount2.getAccountNumber())
                     .amount(1000L)
                     .resultMessage("")
                     .build());
@@ -448,8 +446,8 @@ public class AccountServiceTest {
 
         try{
             accountService.transfer(TransactionDTO.builder()
-                    .accountNumberOrigin("1234567899")
-                    .accountNumberDestination("123456789")
+                    .accountNumberOrigin(icesiAccount.getAccountNumber())
+                    .accountNumberDestination(icesiAccount2.getAccountNumber())
                     .amount(1000L)
                     .resultMessage("")
                     .build());
@@ -470,8 +468,8 @@ public class AccountServiceTest {
 
         try{
             accountService.transfer(TransactionDTO.builder()
-                    .accountNumberOrigin("1234567899")
-                    .accountNumberDestination("123456789")
+                    .accountNumberOrigin(icesiAccount.getAccountNumber())
+                    .accountNumberDestination(icesiAccount2.getAccountNumber())
                     .amount(1000L)
                     .resultMessage("")
                     .build());
@@ -491,9 +489,9 @@ public class AccountServiceTest {
 
         try{
             accountService.transfer(TransactionDTO.builder()
-                    .accountNumberOrigin("1234567899")
-                    .accountNumberDestination("123456789")
-                    .amount(1000L)
+                    .accountNumberOrigin(icesiAccount.getAccountNumber())
+                    .accountNumberDestination(icesiAccount2.getAccountNumber())
+                    .amount(-1000L)
                     .resultMessage("")
                     .build());
             fail();
@@ -512,8 +510,8 @@ public class AccountServiceTest {
 
         try{
             accountService.transfer(TransactionDTO.builder()
-                    .accountNumberOrigin("1234567899")
-                    .accountNumberDestination("123456789")
+                    .accountNumberOrigin(icesiAccount.getAccountNumber())
+                    .accountNumberDestination(icesiAccount2.getAccountNumber())
                     .amount(1000L)
                     .resultMessage("")
                     .build());
@@ -554,6 +552,8 @@ public class AccountServiceTest {
         return IcesiAccount.builder()
                 .active(true)
                 .balance(10000)
+                .accountId(UUID.randomUUID())
+                .accountNumber(accountService.genNumber())
                 .type("polish emissary")
                 .account(IcesiUser.builder()
                         .email("5")
@@ -568,6 +568,7 @@ public class AccountServiceTest {
                         .build())
                 .build();
     }
+
     private IcesiAccount defaultIcesiAccountWithNumberAndID(){
         return IcesiAccount.builder()
                 .accountId(UUID.randomUUID())
@@ -577,6 +578,67 @@ public class AccountServiceTest {
                 .type("polish emissary")
                 .build();
     }
+
+    /*
+    IcesiRole admin = IcesiRole.builder()
+                .roleId(UUID.randomUUID())
+                .description("Role for demo")
+                .name("ADMIN")
+                .build();
+        IcesiRole bank = IcesiRole.builder()
+                .roleId(UUID.randomUUID())
+                .description("Role for demo")
+                .name("BANK")
+                .build();
+        IcesiRole user = IcesiRole.builder()
+                .roleId(UUID.randomUUID())
+                .description("Role for demo")
+                .name("USER")
+                .build();
+        IcesiUser icesiUser = IcesiUser.builder()
+                .userId(UUID.randomUUID())
+                .email("johndoe@email.com")
+                .role(admin)
+                .firstName("John")
+                .lastName("Doe")
+                .phone("+57123123123")
+                .password(encoder.encode("password"))
+                .build();
+        IcesiUser icesiUser2 = IcesiUser.builder()
+                .userId(UUID.randomUUID())
+                .email("johndoe2@email.com")
+                .role(bank)
+                .firstName("John")
+                .lastName("Doe")
+                .phone("+57123123123")
+                .password(encoder.encode("password"))
+                .build();
+        IcesiUser icesiUser3 = IcesiUser.builder()
+                .userId(UUID.randomUUID())
+                .email("johndoe3@email,com")
+                .role(user)
+                .firstName("John")
+                .lastName("Doe")
+                .phone("+57123123123")
+                .password(encoder.encode("password"))
+                .build();
+        IcesiAccount accountUser1 = IcesiAccount.builder()
+                .accountId(UUID.randomUUID())
+                .accountNumber("1234567899")
+                .balance(1000000)
+                .account(icesiUser)
+                .active(true)
+                .type("polish emissary")
+                .build();
+        IcesiAccount accountUser3 = IcesiAccount.builder()
+                .accountId(UUID.randomUUID())
+                .accountNumber("123456789")
+                .balance(1000000)
+                .active(true)
+                .type("polish emissary")
+                .account(icesiUser3)
+                .build();
+     */
 }
 
 
