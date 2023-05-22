@@ -312,6 +312,137 @@ class UserControllerTests {
                 .andReturn();
     }
 
+    @Order(11)
+    @Test
+    public void testCreateUserRequestMissingFiled() throws Exception{
+
+        TokenDTO tokenDTO=tokenAdmin();
+        UserCreateDTO defaultUser=defaultUserCreateDTO();
+        defaultUser.setPassword("");
+
+        var result=mockMvc.perform(MockMvcRequestBuilders.post(BASE_USER_URL).content(
+                                objectMapper.writeValueAsString(defaultUser)
+                        )
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .accept(MediaType.APPLICATION_JSON)
+                        .header(HttpHeaders.AUTHORIZATION, "Bearer "+tokenDTO.getToken()))
+                .andExpect(status().isBadRequest())
+                .andReturn();
+        IcesiError icesiError =objectMapper.readValue(result.getResponse().getContentAsString(),IcesiError.class);
+        assertNotNull(icesiError);
+        var details = icesiError.getDetails();
+        assertEquals(1, details.size());
+        var detail = details.get(0);
+        assertEquals("password is missing",detail.getErrorMessage());
+
+
+    }
+    @Order(12)
+    @Test
+    public void testCreateUserRequestInvalidEmail1() throws Exception{
+
+        TokenDTO tokenDTO=tokenAdmin();
+        UserCreateDTO defaultUser=defaultUserCreateDTO();
+        defaultUser.setEmail("@u.com");
+
+        var result=mockMvc.perform(MockMvcRequestBuilders.post(BASE_USER_URL).content(
+                                objectMapper.writeValueAsString(defaultUser)
+                        )
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .accept(MediaType.APPLICATION_JSON)
+                        .header(HttpHeaders.AUTHORIZATION, "Bearer "+tokenDTO.getToken()))
+                .andExpect(status().isBadRequest())
+                .andReturn();
+        IcesiError icesiError =objectMapper.readValue(result.getResponse().getContentAsString(),IcesiError.class);
+        assertNotNull(icesiError);
+        var details = icesiError.getDetails();
+        assertEquals(1, details.size());
+        var detail = details.get(0);
+        assertEquals("email Invalid email",detail.getErrorMessage());
+
+
+    }
+
+    @Order(13)
+    @Test
+    public void testCreateUserRequestInvalidEmail2() throws Exception{
+
+        TokenDTO tokenDTO=tokenAdmin();
+        UserCreateDTO defaultUser=defaultUserCreateDTO();
+        defaultUser.setEmail("u.com");
+        defaultUser.setPhoneNumber("");
+
+        var result=mockMvc.perform(MockMvcRequestBuilders.post(BASE_USER_URL).content(
+                                objectMapper.writeValueAsString(defaultUser)
+                        )
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .accept(MediaType.APPLICATION_JSON)
+                        .header(HttpHeaders.AUTHORIZATION, "Bearer "+tokenDTO.getToken()))
+                .andExpect(status().isBadRequest())
+                .andReturn();
+        IcesiError icesiError =objectMapper.readValue(result.getResponse().getContentAsString(),IcesiError.class);
+        assertNotNull(icesiError);
+        var details = icesiError.getDetails();
+        assertEquals(1, details.size());
+        var detail = details.get(0);
+        assertEquals("email Invalid email",detail.getErrorMessage());
+
+    }
+
+    @Order(14)
+    @Test
+    public void testCreateUserRequestInvalidPhoneNumber() throws Exception{
+
+        TokenDTO tokenDTO=tokenAdmin();
+        UserCreateDTO defaultUser=defaultUserCreateDTO();
+        defaultUser.setEmail("");
+        defaultUser.setPhoneNumber("1234567890123");
+
+        var result=mockMvc.perform(MockMvcRequestBuilders.post(BASE_USER_URL).content(
+                                objectMapper.writeValueAsString(defaultUser)
+                        )
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .accept(MediaType.APPLICATION_JSON)
+                        .header(HttpHeaders.AUTHORIZATION, "Bearer "+tokenDTO.getToken()))
+                .andExpect(status().isBadRequest())
+                .andReturn();
+        IcesiError icesiError =objectMapper.readValue(result.getResponse().getContentAsString(),IcesiError.class);
+        assertNotNull(icesiError);
+        var details = icesiError.getDetails();
+        assertEquals(1, details.size());
+        var detail = details.get(0);
+        assertEquals("phoneNumber Invalid phone number. Should be a Colombian phone number",detail.getErrorMessage());
+
+
+    }
+
+    @Order(15)
+    @Test
+    public void testCreateUserRequestMissingEmailAndPhoneNumber() throws Exception{
+
+        TokenDTO tokenDTO=tokenAdmin();
+        UserCreateDTO defaultUser=defaultUserCreateDTO();
+        defaultUser.setEmail("");
+        defaultUser.setPhoneNumber("");
+
+        var result=mockMvc.perform(MockMvcRequestBuilders.post(BASE_USER_URL).content(
+                                objectMapper.writeValueAsString(defaultUser)
+                        )
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .accept(MediaType.APPLICATION_JSON)
+                        .header(HttpHeaders.AUTHORIZATION, "Bearer "+tokenDTO.getToken()))
+                .andExpect(status().isBadRequest())
+                .andReturn();
+        IcesiError icesiError =objectMapper.readValue(result.getResponse().getContentAsString(),IcesiError.class);
+        assertNotNull(icesiError);
+        var details = icesiError.getDetails();
+        assertEquals(1, details.size());
+        var detail = details.get(0);
+        assertEquals(" Email or phone number are needed!",detail.getErrorMessage());
+
+
+    }
+
     private UserCreateDTO defaultUserCreateDTO(){
 
         return UserCreateDTO.builder()

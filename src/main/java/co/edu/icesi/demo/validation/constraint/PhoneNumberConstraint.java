@@ -13,7 +13,7 @@ import java.lang.annotation.*;
 @Retention(RetentionPolicy.RUNTIME)
 public @interface PhoneNumberConstraint {
 
-    String message() default "Invalid phone number";
+    String message() default "Invalid phone number. Should be a Colombian phone number";
     Class<?>[] groups() default {};
     Class<? extends Payload>[] payload() default {};
 
