@@ -17,23 +17,14 @@ public class UserController implements UserAPI {
 
     private UserService userService ;
 
-    @PostMapping("add/user")
-    public UserCreateDTO createUser(@Valid @RequestBody UserCreateDTO requestUserDTO) {
+    @Override
+    public UserCreateDTO addUser(@Valid @RequestBody UserCreateDTO requestUserDTO) {
         return userService.save(requestUserDTO);
     }
 
     @Override
-    public ResponseUserDTO getUser(String userEmail) {
-        return null;
+    public UserCreateDTO getUser(String userEmail) {
+        return userService.getByEmail(userEmail);
     }
 
-    @GetMapping
-    public List<ResponseUserDTO> getAllUsers() {
-        return null;
-    }
-
-    @Override
-    public ResponseUserDTO addUser(UserCreateDTO requestUserDTO) {
-        return null;
-    }
 }

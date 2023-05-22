@@ -17,6 +17,8 @@ import org.springframework.test.web.servlet.result.MockMvcResultMatchers;
 
 import static org.junit.jupiter.api.Assertions.assertNotNull;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
+import org.json.JSONObject;
+
 
 @AutoConfigureMockMvc
 @SpringBootTest
@@ -45,5 +47,6 @@ class DemoJpaApplicationTests {
 		TokenDTO token = objectMapper.readValue(result.getResponse().getContentAsString(), TokenDTO.class);
 		assertNotNull(token);
 	}
+
 
 }

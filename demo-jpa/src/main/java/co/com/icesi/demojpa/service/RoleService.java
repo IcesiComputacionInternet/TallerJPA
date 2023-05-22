@@ -6,6 +6,7 @@ import co.com.icesi.demojpa.error.exception.ErrorCode;
 import co.com.icesi.demojpa.mapper.RoleMapper;
 import co.com.icesi.demojpa.model.IcesiRole;
 import co.com.icesi.demojpa.repository.RoleRepository;
+import co.com.icesi.demojpa.security.IcesiSecurityContext;
 import lombok.AllArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
@@ -33,6 +34,7 @@ public class RoleService {
                         new DetailBuilder(ErrorCode.ERR_DUPLICATED, "Role", "Name", role.getName())
                 ));
 
+        getAdminAuthorization();
 
         IcesiRole icesiRole= roleMapper.fromIcesiRoleDTO(role);
         icesiRole.setRoleId(UUID.randomUUID());
@@ -48,5 +50,15 @@ public class RoleService {
                         HttpStatus.BAD_REQUEST,
                         new DetailBuilder(ErrorCode.ERR_404, "Role", "Id", roleId)
                 )));
+    }
+
+    public void getAdminAuthorization() {
+        if (!IcesiSecurityContext.getCurrentUserRole().equals("ADMIN")) {
+            throw createIcesiException(
+                    "Unauthorized: Admin only",
+                    HttpStatus.FORBIDDEN,
+                    new DetailBuilder(ErrorCode.ERR_403, "Unauthorized: Admin only")
+            ).get();
+        }
     }
 }

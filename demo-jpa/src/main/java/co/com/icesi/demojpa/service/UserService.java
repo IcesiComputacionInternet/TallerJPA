@@ -97,5 +97,14 @@ public class UserService {
         }
     }
 
+    public UserCreateDTO getByEmail(String email){
+        return userMapper.fromIcesiUser(userRepository.findByEmail(email).orElseThrow(createIcesiException(
+                "User with this e-mail does not exist",
+                HttpStatus.NOT_FOUND,
+                new DetailBuilder(ErrorCode.ERR_404, "User", "E-mail", email)
+        )));
+    }
+
+
 
 }

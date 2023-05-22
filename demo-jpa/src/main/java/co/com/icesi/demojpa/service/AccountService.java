@@ -3,6 +3,7 @@ package co.com.icesi.demojpa.service;
 import co.com.icesi.demojpa.dto.AccountCreateDTO;
 import co.com.icesi.demojpa.dto.TransactionOperationDTO;
 import co.com.icesi.demojpa.dto.TransactionResultDTO;
+import co.com.icesi.demojpa.dto.UserCreateDTO;
 import co.com.icesi.demojpa.error.exception.DetailBuilder;
 import co.com.icesi.demojpa.error.exception.ErrorCode;
 import co.com.icesi.demojpa.mapper.AccountMapper;
@@ -192,15 +193,6 @@ public class AccountService {
         return accountNumber;
     }
 
-    public void getAdminAuthorization() {
-        if (!IcesiSecurityContext.getCurrentUserRole().equals("ADMIN")) {
-            throw createIcesiException(
-                    "Unauthorized: Admin only",
-                    HttpStatus.FORBIDDEN,
-                    new DetailBuilder(ErrorCode.ERR_403, "Unauthorized: Admin only")
-            ).get();
-        }
-    }
 
     public void getNormalAuthorization(IcesiUser user) {
         if(IcesiSecurityContext.getCurrentUserRole().equals("USER") && !IcesiSecurityContext.getCurrentUserId().equals(user.getUserId().toString()) ){
