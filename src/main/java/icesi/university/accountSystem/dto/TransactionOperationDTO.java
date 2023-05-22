@@ -1,5 +1,6 @@
 package icesi.university.accountSystem.dto;
 
+import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
 
@@ -7,6 +8,7 @@ import javax.validation.constraints.Min;
 
 @Data
 @Builder
+@AllArgsConstructor
 public class TransactionOperationDTO {
 
     private String accountFrom;

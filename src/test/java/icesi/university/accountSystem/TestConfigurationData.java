@@ -1,7 +1,10 @@
 package icesi.university.accountSystem;
 
+import icesi.university.accountSystem.enums.TypeAccount;
+import icesi.university.accountSystem.model.IcesiAccount;
 import icesi.university.accountSystem.model.IcesiRole;
 import icesi.university.accountSystem.model.IcesiUser;
+import icesi.university.accountSystem.repository.IcesiAccountRepository;
 import icesi.university.accountSystem.repository.IcesiRoleRepository;
 import icesi.university.accountSystem.repository.IcesiUserRepository;
 import org.springframework.boot.CommandLineRunner;
@@ -16,6 +19,7 @@ public class TestConfigurationData {
     @Bean
     CommandLineRunner commandLineRunner(IcesiUserRepository users,
                                         IcesiRoleRepository roleRepository,
+                                        IcesiAccountRepository icesiAccountRepository,
                                         PasswordEncoder encoder) {
         IcesiRole icesiRole = IcesiRole.builder()
                 .roleId(UUID.randomUUID())
@@ -48,7 +52,7 @@ public class TestConfigurationData {
                 .firstName("John")
                 .lastName("Doe")
                 .password(encoder.encode("password"))
-                .phoneNumber("+57323121235")
+                .phoneNumber("+57323121233")
                 .build();
         IcesiUser icesiUser3 = IcesiUser.builder()
                 .userId(UUID.randomUUID())
@@ -59,7 +63,31 @@ public class TestConfigurationData {
                 .password(encoder.encode("password"))
                 .phoneNumber("+57323121235")
                 .build();
-
+        IcesiUser icesiUser4 = IcesiUser.builder()
+                .userId(UUID.randomUUID())
+                .email("johndoe4@email.com")
+                .role(icesiRole2)
+                .firstName("John")
+                .lastName("Doe")
+                .password(encoder.encode("password"))
+                .phoneNumber("+57323121236")
+                .build();
+        IcesiAccount icesiAccount1 = IcesiAccount.builder()
+                .accountId(UUID.randomUUID())
+                .accountNumber("123-456789-90")
+                .balance(1000000)
+                .user(icesiUser2)
+                .active(true)
+                .type(TypeAccount.ACCOUNT_NORMAL)
+                .build();
+        IcesiAccount icesiAccount2 = IcesiAccount.builder()
+                .accountId(UUID.randomUUID())
+                .accountNumber("123-456789-99")
+                .balance(1000000)
+                .user(icesiUser2)
+                .active(true)
+                .type(TypeAccount.ACCOUNT_NORMAL)
+                .build();
         return args -> {
             roleRepository.save(icesiRole);
             roleRepository.save(icesiRole2);
@@ -67,6 +95,10 @@ public class TestConfigurationData {
             users.save(icesiUser);
             users.save(icesiUser2);
             users.save(icesiUser3);
+            users.save(icesiUser4);
+            icesiAccountRepository.save(icesiAccount1);
+            icesiAccountRepository.save(icesiAccount2);
+
         };
     }
 }

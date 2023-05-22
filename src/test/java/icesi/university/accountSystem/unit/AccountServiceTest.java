@@ -16,6 +16,8 @@ import icesi.university.accountSystem.services.UserService;
 import icesi.university.accountSystem.unit.matcher.AccountMatcher;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
+import org.springframework.security.core.context.SecurityContextHolder;
+import org.springframework.security.oauth2.server.resource.authentication.JwtAuthenticationToken;
 
 import java.util.UUID;
 
@@ -57,7 +59,7 @@ public class AccountServiceTest {
         }
 
         verify(userRepository, times(1)).findByEmail(any());
-        verify(accountMapper, times(2)).fromIcesiAccountDTO(any());
+        verify(accountMapper, times(0)).fromIcesiAccountDTO(any());
         verify(accountRepository, times(0)).save(argThat(new AccountMatcher(defaultAccount())));
     }
 
@@ -117,6 +119,7 @@ public class AccountServiceTest {
         IcesiUser user = defaultUser();
         when(accountRepository.findByAccountNumber(any())).thenReturn(java.util.Optional.of(account));
         when(userRepository.findById(any())).thenReturn(java.util.Optional.of(user));
+        when(accountRepository.findById(any())).thenReturn(java.util.Optional.of(account));
         try {
             accountService.withdrawal(transactionOperationDTO());
         } catch (RuntimeException e) {
@@ -313,7 +316,10 @@ public class AccountServiceTest {
 
     @Test
     public void testEnableAccountCantBeEnabled() {
+        IcesiUser user = defaultUser();
         when(accountRepository.isActive(any())).thenReturn(false);
+        when(userRepository.findById(any())).thenReturn(java.util.Optional.of(user));
+        when(accountRepository.findByAccountNumber(any())).thenReturn(java.util.Optional.of(defaultAccount()));
         String msg = accountService.activateAccount(any());
 
         assertEquals("The account can't be enabled", msg);
