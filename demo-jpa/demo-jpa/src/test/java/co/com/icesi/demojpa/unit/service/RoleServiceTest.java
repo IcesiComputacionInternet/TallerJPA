@@ -35,7 +35,7 @@ public class RoleServiceTest {
         userRepository = mock(UserRepository.class);
         roleRepository = mock(RoleRepository.class);
         roleMapper = spy(RoleMapperImpl.class);
-        roleService = new RoleService(roleRepository,roleMapper, userRepository);
+        roleService = new RoleService(roleRepository,roleMapper);
     }
 
     @Test
@@ -83,7 +83,6 @@ public class RoleServiceTest {
                 .roleId(UUID.randomUUID())
                 .name("investor")
                 .description("test role")
-                .icesiUsers(new ArrayList<>())
                 .build();
     }
 

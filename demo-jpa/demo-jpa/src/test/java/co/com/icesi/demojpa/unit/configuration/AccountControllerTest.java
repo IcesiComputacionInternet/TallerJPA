@@ -1,11 +1,11 @@
 package co.com.icesi.demojpa.unit.configuration;
 
 
+import co.com.icesi.demojpa.dto.request.AccountCreateDTO;
+import co.com.icesi.demojpa.dto.request.LoginDTO;
+import co.com.icesi.demojpa.enums.IcesiAccountType;
+import co.com.icesi.demojpa.repository.UserRepository;
 import com.fasterxml.jackson.databind.ObjectMapper;
-import com.icesi.TallerJPA.dto.request.IcesiAccountDTO;
-import com.icesi.TallerJPA.dto.request.IcesiLoginDTO;
-import com.icesi.TallerJPA.enums.IcesiAccountType;
-import com.icesi.TallerJPA.repository.UserRespository;
 import org.junit.jupiter.api.*;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;
@@ -34,7 +34,7 @@ class AccountControllerTest {
     ObjectMapper objectMapper;
 
     @Autowired
-    UserRespository userRespository;
+    UserRepository userRespository;
 
     private static String token = "";
 
@@ -58,7 +58,7 @@ class AccountControllerTest {
     @Test
     public void testTransferMoneyEndPointWhenAuthUser() throws Exception {
         var resultToken = mockMvc.perform(post("/login").content(
-                                objectMapper.writeValueAsString(new IcesiLoginDTO("user@email.com", "password"))
+                                objectMapper.writeValueAsString(new LoginDTO("user@email.com", "password"))
                         )
                         .contentType(MediaType.APPLICATION_JSON)
                         .accept(MediaType.APPLICATION_JSON))
@@ -79,7 +79,7 @@ class AccountControllerTest {
     @Test
     public void testTransferMoneyEndPointWhenAuthAdmin() throws Exception {
         var resultToken = mockMvc.perform(post("/login").content(
-                                objectMapper.writeValueAsString(new IcesiLoginDTO("admin@email.com", "password"))
+                                objectMapper.writeValueAsString(new LoginDTO("admin@email.com", "password"))
                         )
                         .contentType(MediaType.APPLICATION_JSON)
                         .accept(MediaType.APPLICATION_JSON))
@@ -99,7 +99,7 @@ class AccountControllerTest {
     @Test
     public void testTransferMoneyEndPointWhenAuthBank() throws Exception {
         var resultToken = mockMvc.perform(post("/login").content(
-                                objectMapper.writeValueAsString(new IcesiLoginDTO("bank@email.com", "password"))
+                                objectMapper.writeValueAsString(new LoginDTO("bank@email.com", "password"))
                         )
                         .contentType(MediaType.APPLICATION_JSON)
                         .accept(MediaType.APPLICATION_JSON))
@@ -120,10 +120,9 @@ class AccountControllerTest {
     public void testCreateUserWhenIsNotAuth() throws Exception {
         var result = mockMvc.perform(post("/account").content(
                                 objectMapper.writeValueAsString(
-                                        IcesiAccountDTO.builder()
-                                                .emailUser("user@email.com")
-                                                .active(true)
-                                                .balance(50)
+                                        AccountCreateDTO.builder()
+                                                .email("user@email.com")
+                                                .balance(50L)
                                                 .type(IcesiAccountType.DEFAULT)
                                                 .build()))
                         .contentType(MediaType.APPLICATION_JSON)
@@ -136,7 +135,7 @@ class AccountControllerTest {
     @Test
     public void testCreateUserWhenAuthUser() throws Exception {
         var resultToken = mockMvc.perform(post("/login").content(
-                                objectMapper.writeValueAsString(new IcesiLoginDTO("user@email.com", "password"))
+                                objectMapper.writeValueAsString(new LoginDTO("user@email.com", "password"))
                         )
                         .contentType(MediaType.APPLICATION_JSON)
                         .accept(MediaType.APPLICATION_JSON))
@@ -146,10 +145,9 @@ class AccountControllerTest {
 
         var result = mockMvc.perform(post("/account").content(
                                 objectMapper.writeValueAsString(
-                                        IcesiAccountDTO.builder()
-                                                .emailUser("user@email.com")
-                                                .active(true)
-                                                .balance(50)
+                                        AccountCreateDTO.builder()
+                                                .email("user@email.com")
+                                                .balance(50L)
                                                 .type(IcesiAccountType.DEFAULT)
                                                 .build()))
                         .contentType(MediaType.APPLICATION_JSON)
@@ -163,7 +161,7 @@ class AccountControllerTest {
     @Test
     public void testCreateUserWhenAuthAdmin() throws Exception {
         var resultToken = mockMvc.perform(post("/login").content(
-                                objectMapper.writeValueAsString(new IcesiLoginDTO("admin@email.com", "password"))
+                                objectMapper.writeValueAsString(new LoginDTO("admin@email.com", "password"))
                         )
                         .contentType(MediaType.APPLICATION_JSON)
                         .accept(MediaType.APPLICATION_JSON))
@@ -173,10 +171,9 @@ class AccountControllerTest {
 
         var result = mockMvc.perform(post("/account").content(
                                 objectMapper.writeValueAsString(
-                                        IcesiAccountDTO.builder()
-                                                .emailUser("user@email.com")
-                                                .active(true)
-                                                .balance(50)
+                                        AccountCreateDTO.builder()
+                                                .email("user@email.com")
+                                                .balance(50L)
                                                 .type(IcesiAccountType.DEFAULT)
                                                 .build()))
                         .contentType(MediaType.APPLICATION_JSON)
@@ -190,7 +187,7 @@ class AccountControllerTest {
     @Test
     public void testCreateUserWhenAuthBank() throws Exception {
         var resultToken = mockMvc.perform(post("/login").content(
-                                objectMapper.writeValueAsString(new IcesiLoginDTO("bank@email.com", "password"))
+                                objectMapper.writeValueAsString(new LoginDTO("bank@email.com", "password"))
                         )
                         .contentType(MediaType.APPLICATION_JSON)
                         .accept(MediaType.APPLICATION_JSON))
@@ -200,10 +197,9 @@ class AccountControllerTest {
 
         var result = mockMvc.perform(post("/account").content(
                                 objectMapper.writeValueAsString(
-                                        IcesiAccountDTO.builder()
-                                                .emailUser("user@email.com")
-                                                .active(true)
-                                                .balance(50)
+                                        AccountCreateDTO.builder()
+                                                .email("user@email.com")
+                                                .balance(50L)
                                                 .type(IcesiAccountType.DEFAULT)
                                                 .build()))
                         .contentType(MediaType.APPLICATION_JSON)

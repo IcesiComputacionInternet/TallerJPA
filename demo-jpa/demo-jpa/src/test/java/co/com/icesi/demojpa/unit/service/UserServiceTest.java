@@ -1,6 +1,7 @@
 package co.com.icesi.demojpa.unit.service;
 
 import co.com.icesi.demojpa.dto.request.UserCreateDTO;
+import co.com.icesi.demojpa.enums.IcesiAccountType;
 import co.com.icesi.demojpa.mapper.UserMapper;
 import co.com.icesi.demojpa.mapper.UserMapperImpl;
 import co.com.icesi.demojpa.model.IcesiAccount;
@@ -84,8 +85,8 @@ public class UserServiceTest {
     private IcesiAccount defaultIcesiAccount(){
         return IcesiAccount.builder()
                 .isActive(true)
-                .balance(5000)
-                .type("polish emissary")
+                .balance(5000L)
+                .type(IcesiAccountType.DEFAULT)
                 .user(IcesiUser.builder()
                         .email("5")
                         .firstName("John")
@@ -105,7 +106,6 @@ public class UserServiceTest {
                 .roleId(UUID.randomUUID())
                 .name("investor")
                 .description("test role")
-                .icesiUsers(new ArrayList<>())
                 .build();
     }
 
@@ -114,7 +114,6 @@ public class UserServiceTest {
                 .email("5")
                 .firstName("John")
                 .lastName("Doe")
-                .isActive(true)
                 .password("123")
                 .roleName("investor")
                 .build();
