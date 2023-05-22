@@ -8,7 +8,7 @@ import co.com.icesi.TallerJpa.mapper.IcesiRoleMapperImpl;
 import co.com.icesi.TallerJpa.model.IcesiRole;
 import co.com.icesi.TallerJpa.repository.IcesiRoleRepository;
 import co.com.icesi.TallerJpa.service.IcesiRoleService;
-import co.com.icesi.TallerJpa.unit.service.matcher.IcesiRoleMatcher;
+import co.com.icesi.TallerJpa.unit.matcher.IcesiRoleMatcher;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;

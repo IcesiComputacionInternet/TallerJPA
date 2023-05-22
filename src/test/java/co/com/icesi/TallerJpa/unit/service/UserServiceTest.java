@@ -11,7 +11,7 @@ import co.com.icesi.TallerJpa.model.IcesiUser;
 import co.com.icesi.TallerJpa.repository.IcesiRoleRepository;
 import co.com.icesi.TallerJpa.repository.IcesiUserRepository;
 import co.com.icesi.TallerJpa.service.IcesiUserService;
-import co.com.icesi.TallerJpa.unit.service.matcher.IcesiUserMatcher;
+import co.com.icesi.TallerJpa.unit.matcher.IcesiUserMatcher;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;

@@ -1,4 +1,4 @@
-package co.com.icesi.TallerJpa.unit.service.matcher;
+package co.com.icesi.TallerJpa.unit.matcher;
 
 import co.com.icesi.TallerJpa.model.IcesiUser;
 import lombok.AllArgsConstructor;

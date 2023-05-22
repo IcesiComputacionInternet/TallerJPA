@@ -1,6 +1,7 @@
 package co.com.icesi.TallerJpa.controller.api;
 
 import co.com.icesi.TallerJpa.dto.IcesiAccountRequestDTO;
+import co.com.icesi.TallerJpa.dto.IcesiAccountRequestUserDTO;
 import co.com.icesi.TallerJpa.dto.IcesiAccountResponseDTO;
 import co.com.icesi.TallerJpa.dto.TransactionDTO;
 import org.springframework.web.bind.annotation.*;
@@ -15,7 +16,10 @@ public interface IcesiAccountApi {
     String ACCOUNT_BASE_URL = "/api/accounts";
 
     @PostMapping
-    IcesiAccountResponseDTO addIcesiAccount(@Valid @RequestBody IcesiAccountRequestDTO icesiAccountRequestDTO);
+    IcesiAccountResponseDTO addIcesiAccount(@Valid @RequestBody IcesiAccountRequestUserDTO icesiAccountRequestUserDTO);
+
+    @PostMapping("/any")
+    IcesiAccountResponseDTO addAnyIcesiAccount(@Valid @RequestBody IcesiAccountRequestDTO icesiAccountRequestDTO);
 
     @GetMapping
     List<IcesiAccountResponseDTO> getAllAccounts();

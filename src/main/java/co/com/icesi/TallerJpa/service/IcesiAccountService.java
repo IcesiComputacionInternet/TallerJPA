@@ -1,6 +1,7 @@
 package co.com.icesi.TallerJpa.service;
 
 import co.com.icesi.TallerJpa.dto.IcesiAccountRequestDTO;
+import co.com.icesi.TallerJpa.dto.IcesiAccountRequestUserDTO;
 import co.com.icesi.TallerJpa.dto.IcesiAccountResponseDTO;
 import co.com.icesi.TallerJpa.dto.TransactionDTO;
 import co.com.icesi.TallerJpa.enums.AccountType;
@@ -43,6 +44,29 @@ public class IcesiAccountService {
             ).get();
         }
         IcesiAccount icesiAccount = icesiAccountMapper.fromAccountDto(accountDTO);
+        icesiAccount.setIcesiUser(icesiUser);
+        icesiAccount.setActive(true);
+        icesiAccount.setAccountId(UUID.randomUUID());
+        icesiAccount.setAccountNumber(generateAccountNumber());
+
+        return icesiAccountMapper.fromIcesiAccountToResponse(icesiAccountRepository.save(icesiAccount));
+    }
+
+    public IcesiAccountResponseDTO saveAccountUser(IcesiAccountRequestUserDTO accountDTO, UUID actualUser){
+        IcesiUser icesiUser = icesiUserRepository.findById(actualUser)
+                .orElseThrow(createIcesiException(
+                        "User: "+actualUser+" not found",
+                        HttpStatus.NOT_FOUND,
+                        new DetailBuilder(ErrorCode.ERR_404,"IcesiUser","Email",actualUser)
+                ));
+        if(accountDTO.getBalance() < 0){
+            throw createIcesiException(
+                    "The balance can't be lower than 0",
+                    HttpStatus.BAD_REQUEST,
+                    new DetailBuilder(ErrorCode.ERR_400, "Balance","lower than 0")
+            ).get();
+        }
+        IcesiAccount icesiAccount = icesiAccountMapper.fromAccountDtoUser(accountDTO);
         icesiAccount.setIcesiUser(icesiUser);
         icesiAccount.setActive(true);
         icesiAccount.setAccountId(UUID.randomUUID());

@@ -2,6 +2,7 @@ package co.com.icesi.TallerJpa.controller;
 
 import co.com.icesi.TallerJpa.controller.api.IcesiAccountApi;
 import co.com.icesi.TallerJpa.dto.IcesiAccountRequestDTO;
+import co.com.icesi.TallerJpa.dto.IcesiAccountRequestUserDTO;
 import co.com.icesi.TallerJpa.dto.IcesiAccountResponseDTO;
 import co.com.icesi.TallerJpa.dto.TransactionDTO;
 import co.com.icesi.TallerJpa.security.IcesiSecurityContext;
@@ -20,7 +21,13 @@ public class IcesiAccountController implements IcesiAccountApi {
     private IcesiAccountService icesiAccountService;
 
     @Override
-    public IcesiAccountResponseDTO addIcesiAccount(IcesiAccountRequestDTO icesiAccountRequestDTO) {
+    public IcesiAccountResponseDTO addIcesiAccount(IcesiAccountRequestUserDTO icesiAccountRequestUserDTO) {
+        String actualUser = IcesiSecurityContext.getCurrentUserId();
+        return icesiAccountService.saveAccountUser(icesiAccountRequestUserDTO, UUID.fromString(actualUser));
+    }
+
+    @Override
+    public IcesiAccountResponseDTO addAnyIcesiAccount(IcesiAccountRequestDTO icesiAccountRequestDTO) {
         return icesiAccountService.saveAccount(icesiAccountRequestDTO);
     }
 
