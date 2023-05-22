@@ -2,6 +2,7 @@ package icesi.university.accountSystem.services;
 
 import icesi.university.accountSystem.dto.RequestUserDTO;
 import icesi.university.accountSystem.dto.ResponseUserDTO;
+import icesi.university.accountSystem.exception.CustomException;
 import icesi.university.accountSystem.exception.ExistsException;
 import icesi.university.accountSystem.mapper.IcesiUserMapper;
 import icesi.university.accountSystem.model.IcesiUser;
@@ -76,7 +77,7 @@ public class UserService {
     private void checkCreateUserADMIN(String roleOfUserToCreate) {
         String role = currentRole();
         if (role.equals("BANK") && roleOfUserToCreate.equals("ADMIN")) {
-            throw new RuntimeException("You can't create an admin");
+            throw new CustomException("You cant create a admin", "ERR-404");
 
         }
     }

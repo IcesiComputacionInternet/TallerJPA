@@ -94,9 +94,9 @@ public class UserServiceTest {
 
         private IcesiUser defaultIcesiUser(){
                 return IcesiUser.builder()
-                        .firstName("Arturo")
-                        .lastName("Diaz")
-                        .email("prueba@gmail.com")
+                        .firstName("juan")
+                        .lastName("palta")
+                        .email("juanpalta24@hotmail.com")
                         .phoneNumber("12345")
                         .password("12345")
                         .role(defaultRole())
@@ -107,7 +107,7 @@ public class UserServiceTest {
                 return IcesiRole.builder()
                         .roleId(UUID.randomUUID())
                         .name("ADMIN")
-                        .description("Addmin")
+                        .description("Admin")
                         .build();
         }
 
