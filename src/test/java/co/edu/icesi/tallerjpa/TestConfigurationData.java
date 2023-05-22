@@ -80,6 +80,22 @@ public class TestConfigurationData {
                 .active(true)
                 .icesiUser(icesiUser2)
                 .build();
+        IcesiAccount icesiAccount3 = IcesiAccount.builder()
+                .accountId(UUID.fromString("0b4251be-3aed-46fb-82cc-49d1f8991f6c"))
+                .accountNumber("333-123456-33")
+                .balance(1500)
+                .type(TypeIcesiAccount.REGULAR_ACCOUNT.toString())
+                .active(false)
+                .icesiUser(icesiUser)
+                .build();
+        IcesiAccount icesiAccount4 = IcesiAccount.builder()
+                .accountId(UUID.fromString("a80da076-8195-4ff1-acb5-3ba2d5dd44dc"))
+                .accountNumber("444-123456-44")
+                .balance(650)
+                .type(TypeIcesiAccount.DEPOSIT_ONLY.toString())
+                .active(true)
+                .icesiUser(icesiUser2)
+                .build();
 
         return args -> {
             icesiroleRepository.save(icesiRole);
@@ -90,6 +106,8 @@ public class TestConfigurationData {
             users.save(icesiUser3);
             icesiAccountRepository.save(icesiAccount);
             icesiAccountRepository.save(icesiAccount2);
+            icesiAccountRepository.save(icesiAccount3);
+            icesiAccountRepository.save(icesiAccount4);
         };
     }
 }

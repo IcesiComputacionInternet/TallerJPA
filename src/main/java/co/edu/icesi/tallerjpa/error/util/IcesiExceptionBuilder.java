@@ -29,5 +29,4 @@ public class IcesiExceptionBuilder {
     public static Supplier<IcesiException> createIcesiException(String message, HttpStatus httpStatus, DetailBuilder... details) {
         return () -> new IcesiException(message, createIcesiError(message, httpStatus, details));
     }
-
 }

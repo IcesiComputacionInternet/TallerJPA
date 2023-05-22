@@ -244,7 +244,7 @@ public class IcesiAccountServiceTest {
         long newBalance = icesiAccount.getBalance() - transactionWithOneAccountCreateDTO.getAmount();
 
         verify(icesiAccountRepository, times(1))
-                .updateBalance(longThat(x -> x == newBalance), argThat(x -> x.equals(icesiAccount.getAccountId().toString())));
+                .updateBalance(longThat(x -> x == newBalance), argThat(x -> x.equals(icesiAccount.getAccountId())));
 
         assertEquals(newBalance, transactionResultDTO.getAmount());
         assertEquals(transactionWithOneAccountCreateDTO.getAccountNumber(), transactionResultDTO.getAccountNumber());
@@ -319,7 +319,7 @@ public class IcesiAccountServiceTest {
         long newBalance = icesiAccount.getBalance() + transactionCreateDTO.getAmount();
 
         verify(icesiAccountRepository, times(1))
-                .updateBalance(longThat(x -> x == newBalance), argThat(x -> x.equals(icesiAccount.getAccountId().toString())));
+                .updateBalance(longThat(x -> x == newBalance), argThat(x -> x.equals(icesiAccount.getAccountId())));
 
         assertEquals(newBalance, transactionResultDTO.getAmount());
         assertEquals(transactionCreateDTO.getAccountNumber(), transactionResultDTO.getAccountNumber());
@@ -377,9 +377,28 @@ public class IcesiAccountServiceTest {
         assertEquals(transactionCreateDTO.getSenderAccountNumber(), transactionResultDTO.getSenderAccountNumber());
         assertEquals(transactionCreateDTO.getReceiverAccountNumber(), transactionResultDTO.getReceiverAccountNumber());
         assertEquals("The transfer was successful", transactionResultDTO.getResult());
-        verify(icesiAccountRepository, times(1)).updateBalance(longThat((x -> x == 500)), argThat(x -> x.equals(icesiAccount.getAccountId().toString())));
-        verify(icesiAccountRepository, times(1)).updateBalance(longThat((x -> x == 1500)), argThat(x -> x.equals(icesiAccount.getAccountId().toString())));
+        verify(icesiAccountRepository, times(1)).updateBalance(longThat((x -> x == 500)), argThat(x -> x.equals(icesiAccount.getAccountId())));
+        verify(icesiAccountRepository, times(1)).updateBalance(longThat((x -> x == 1500)), argThat(x -> x.equals(icesiAccount.getAccountId())));
         verify(icesiAccountRepository, times(2)).findByAccountNumber(any());
+    }
+
+    @Test
+    public void testTransferMoneyWhenSenderAndReceiverAccountNumbersAreTheSame(){
+        IcesiUser icesiUser = adminIcesiUser();
+        TransactionCreateDTO transactionCreateDTO = TransactionCreateDTO.builder()
+                .senderAccountNumber("111-123456-11")
+                .receiverAccountNumber("111-123456-11")
+                .amount(100)
+                .build();
+
+        IcesiException exception = assertThrows(IcesiException.class, () -> icesiAccountService.transferMoney(transactionCreateDTO, icesiUser.getUserId().toString()));
+        IcesiError icesiError = exception.getError();
+        assertEquals(1, icesiError.getDetails().size());
+        assertEquals(400, icesiError.getStatus().value());
+        assertEquals("field senderAccountNumber and receiverAccountNumber: The sender account number and receiver account number must be different", icesiError.getDetails().get(0).getErrorMessage());
+        assertEquals("The sender account number and receiver account number must be different", exception.getMessage());
+        verify(icesiAccountRepository, times(0)).updateBalance(anyLong(), any());
+        verify(icesiAccountRepository, times(0)).findByAccountNumber(any());
     }
 
     @Test
@@ -456,7 +475,7 @@ public class IcesiAccountServiceTest {
         IcesiError icesiError = exception.getError();
         assertEquals(1, icesiError.getDetails().size());
         assertEquals(400, icesiError.getStatus().value());
-        assertEquals("field type: "+"The account with number " + transactionCreateDTO.getSenderAccountNumber() + " is marked as deposit only so it can't transfers money", icesiError.getDetails().get(0).getErrorMessage());
+        assertEquals("field type: "+"The account with number " + transactionCreateDTO.getSenderAccountNumber() + " is marked as deposit only so no money can be transferred", icesiError.getDetails().get(0).getErrorMessage());
         assertEquals("The account with number " + transactionCreateDTO.getSenderAccountNumber() + " is marked as deposit only so it can't transfers money", exception.getMessage());
         verify(icesiAccountRepository, times(2)).findByAccountNumber(any());
     }

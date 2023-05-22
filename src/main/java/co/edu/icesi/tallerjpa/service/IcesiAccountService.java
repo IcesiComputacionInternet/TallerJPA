@@ -182,6 +182,7 @@ public class IcesiAccountService {
 
     @Transactional
     public TransactionResultDTO transferMoney(TransactionCreateDTO transactionCreateDTO, String icesiUserId){
+        checkThatTheAccountNumbersAreDifferent(transactionCreateDTO);
         IcesiAccount senderIcesiAccount = getAccountByAccountNumber(transactionCreateDTO.getSenderAccountNumber());
         IcesiAccount receiverIcesiAccount = getAccountByAccountNumber(transactionCreateDTO.getReceiverAccountNumber());
         checkIfTheAccountBelongsToTheIcesiUser(senderIcesiAccount, icesiUserId);
@@ -196,13 +197,23 @@ public class IcesiAccountService {
         return transactionResultDTO;
     }
 
+    private void checkThatTheAccountNumbersAreDifferent(TransactionCreateDTO transactionCreateDTO){
+        if(transactionCreateDTO.getSenderAccountNumber().equals(transactionCreateDTO.getReceiverAccountNumber())){
+            throw createIcesiException(
+                    "The sender account number and receiver account number must be different",
+                    HttpStatus.BAD_REQUEST,
+                    new DetailBuilder(ErrorCode.ERR_400, "senderAccountNumber and receiverAccountNumber", "The sender account number and receiver account number must be different")
+            ).get();
+        }
+    }
+
     private void checkConditionsToTransfer(IcesiAccount senderIcesiAccount, IcesiAccount receiverIcesiAccount, long moneyToTransfer){
         checkIfTheAccountIsDisabled(senderIcesiAccount);
         if(senderIcesiAccount.isMarkedAsDepositOnly()){
             throw createIcesiException(
                     "The account with number " + senderIcesiAccount.getAccountNumber() + " is marked as deposit only so it can't transfers money",
                     HttpStatus.BAD_REQUEST,
-                    new DetailBuilder(ErrorCode.ERR_400, "type", "The account with number " + senderIcesiAccount.getAccountNumber() + " is marked as deposit only so it can't transfers money")
+                    new DetailBuilder(ErrorCode.ERR_400, "type", "The account with number " + senderIcesiAccount.getAccountNumber() + " is marked as deposit only so no money can be transferred")
             ).get();
         }
         if(!senderIcesiAccount.isThereEnoughMoneyToWithdraw(moneyToTransfer)){
@@ -260,7 +271,7 @@ public class IcesiAccountService {
             throw createIcesiException(
                     "The account does not belong to" + icesiUser.getEmail(),
                     HttpStatus.FORBIDDEN,
-                    new DetailBuilder(ErrorCode.ERR_400, "The account does not belong to" + icesiUser.getEmail())
+                    new DetailBuilder(ErrorCode.ERR_403, "The account does not belong to " + icesiUser.getEmail())
             ).get();
         }
     }
