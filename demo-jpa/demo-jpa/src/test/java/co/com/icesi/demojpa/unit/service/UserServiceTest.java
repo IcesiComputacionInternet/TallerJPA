@@ -1,137 +1,138 @@
 package co.com.icesi.demojpa.unit.service;
 
 import co.com.icesi.demojpa.dto.request.UserCreateDTO;
-import co.com.icesi.demojpa.enums.IcesiAccountType;
 import co.com.icesi.demojpa.mapper.UserMapper;
 import co.com.icesi.demojpa.mapper.UserMapperImpl;
-import co.com.icesi.demojpa.model.IcesiAccount;
 import co.com.icesi.demojpa.model.IcesiRole;
 import co.com.icesi.demojpa.model.IcesiUser;
-import co.com.icesi.demojpa.repository.AccountRepository;
 import co.com.icesi.demojpa.repository.RoleRepository;
 import co.com.icesi.demojpa.repository.UserRepository;
 import co.com.icesi.demojpa.service.UserService;
-import co.com.icesi.demojpa.unit.matcher.IcesiUserMatcher;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 
-import java.util.ArrayList;
 import java.util.Optional;
-import java.util.UUID;
 
-import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.junit.jupiter.api.Assertions.fail;
+import static org.junit.jupiter.api.Assertions.*;
 import static org.mockito.Mockito.*;
 
 public class UserServiceTest {
 
-    private UserRepository userRepository;
     private UserMapper userMapper;
+
+    private UserRepository userRespository;
+
     private RoleRepository roleRepository;
-    private AccountRepository accountRepository;
+
     private UserService userService;
 
     @BeforeEach
-    private void init(){
-        userRepository = mock(UserRepository.class);
+    public void setup() {
         userMapper = spy(UserMapperImpl.class);
+        userRespository = mock(UserRepository.class);
         roleRepository = mock(RoleRepository.class);
-        accountRepository = mock(AccountRepository.class);
-        userMapper = spy(UserMapperImpl.class);
-        userService = new UserService(userMapper,userRepository,roleRepository);
+
+        userService = new UserService(userMapper, userRespository, roleRepository);
     }
 
-    @Test
-    public void testSave() {
-        IcesiRole role = defaultRole();
-        when(roleRepository.findByName(role.getName())).thenReturn(Optional.of((role)));
-        userService.save(defaultUserCreateDTO());
-        IcesiUser user = defaultIcesiUser();
-        verify(userRepository,times(1)).save(argThat(new IcesiUserMatcher(user)));
-    }
-
-    @Test
-    public void testSaveWhenEmailAlreadyExists(){
-        IcesiRole role = defaultRole();
-        when(roleRepository.findByName(role.getName())).thenReturn(Optional.of((role)));
-        when(userRepository.findByEmail(any())).thenReturn(Optional.of(defaultIcesiUser()));
-        try{
-            userService.save(defaultUserCreateDTO());
-            fail();
-        }catch (RuntimeException exception){
-            String message = exception.getMessage();
-            assertEquals("User email is already in use",message);
-        }
-    }
-
-    @Test
-    public void testCreateUserWithNonExistingRole(){
-        IcesiRole role = defaultRole();
-        UserCreateDTO userCreateDTO =defaultUserCreateDTO();
-        userCreateDTO.setRoleName("owner");
-        when(roleRepository.findByName(role.getName())).thenReturn(Optional.of((role)));
-
-        try{
-            userService.save(userCreateDTO);
-            fail();
-        }catch (RuntimeException exception){
-            String message= exception.getMessage();
-            assertEquals("Role doesn't exists",message);
-        }
-    }
-
-
-
-    private IcesiAccount defaultIcesiAccount(){
-        return IcesiAccount.builder()
-                .isActive(true)
-                .balance(5000L)
-                .type(IcesiAccountType.DEFAULT)
-                .user(IcesiUser.builder()
-                        .email("5")
-                        .firstName("John")
-                        .lastName("Doe")
-                        .phoneNumber("123")
-                        .password("123")
-                        .role(IcesiRole.builder()
-                                .name("rol de prueba")
-                                .description("rol de prueba")
-                                .build())
-                        .build())
-                .build();
-    }
-
-    private IcesiRole defaultRole(){
-        return IcesiRole.builder()
-                .roleId(UUID.randomUUID())
-                .name("investor")
-                .description("test role")
-                .build();
-    }
-
-    private UserCreateDTO defaultUserCreateDTO(){
+    private UserCreateDTO defaultUserDTO() {
         return UserCreateDTO.builder()
-                .email("5")
-                .firstName("John")
-                .lastName("Doe")
-                .password("123")
-                .roleName("investor")
+                .firstName("Juan")
+                .lastName("Perez")
+                .email("test@example.com")
+                .phone("123456789")
+                .password("123456")
+                .roleName("USER")
                 .build();
     }
 
-    private IcesiUser defaultIcesiUser(){
+    private IcesiUser defaultUser() {
         return IcesiUser.builder()
-                .userId(UUID.randomUUID())
-                .email("5")
-                .firstName("John")
-                .lastName("Doe")
-                .phoneNumber("123")
-                .password("123")
-                .accounts(new ArrayList<>())
-                .role(IcesiRole.builder()
-                        .name("rol de prueba")
-                        .description("rol de prueba")
-                        .build())
+                .firstName("Juan")
+                .lastName("Perez")
+                .email("test@example.com")
+                .phoneNumber("123456789")
+                .password("123456")
+                .role(defaultRole())
+                .build();
+
+    }
+
+    private IcesiRole defaultRole() {
+        return IcesiRole.builder()
+                .name("USER")
+                .description("User")
                 .build();
     }
+
+
+    @Test
+    public void testSaveUser() {
+
+        when(roleRepository.findByName(any())).thenReturn(Optional.of(defaultRole()));
+        when(userRespository.existsByEmail(anyString())).thenReturn(false);
+        when(userRespository.existsByPhone(anyString())).thenReturn(false);
+        when(userMapper.fromIcesiUser(any(UserCreateDTO.class))).thenReturn(defaultUser());
+
+        userService.save(defaultUserDTO());
+
+        verify(roleRepository, times(1)).findByName(anyString());
+        verify(userRespository, times(1)).existsByEmail(anyString());
+        verify(userRespository, times(1)).existsByPhone(anyString());
+        verify(userMapper, times(1)).fromIcesiUser(any(UserCreateDTO.class));
+        verify(userRespository, times(1)).save(any(IcesiUser.class));
+
+
+    }
+
+    @Test
+    public void testSaveUserWhenEmailAlreadyExists() {
+        when(userRespository.existsByEmail(any())).thenReturn(true);
+        try {
+            userService.save(defaultUserDTO());
+            fail();
+        } catch (RuntimeException exception) {
+            String message = exception.getMessage();
+            assertEquals("Email is repeated", message);
+        }
+    }
+
+    @Test
+    public void testSaveUserWhenPhoneNumberAlreadyExists() {
+        when(userRespository.existsByPhone(any())).thenReturn(true);
+        try {
+            userService.save(defaultUserDTO());
+            fail();
+        } catch (RuntimeException exception) {
+            String message = exception.getMessage();
+            assertEquals("Phone is repeated", message);
+        }
+    }
+
+    @Test
+    public void testSaveUserWhenEmailAndPhoneNumberAlreadyExists() {
+        when(userRespository.existsByEmail(any())).thenReturn(true);
+        when(userRespository.existsByPhone(any())).thenReturn(true);
+        try {
+            userService.save(defaultUserDTO());
+            fail();
+        } catch (RuntimeException exception) {
+            String message = exception.getMessage();
+            assertEquals("Email and phone are repeated", message);
+        }
+    }
+
+    @Test
+    public void testSaveUserWhenRoleDoesNotExist() {
+        when(roleRepository.findByName(any())).thenReturn(Optional.empty());
+        try {
+            userService.save(defaultUserDTO());
+            fail();
+        } catch (RuntimeException exception) {
+            String message = exception.getMessage();
+            assertEquals("Role not found", message);
+        }
+    }
+
+
 }
