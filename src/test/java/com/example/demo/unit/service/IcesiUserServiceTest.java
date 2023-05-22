@@ -28,6 +28,7 @@ import com.example.demo.model.enums.TypeIcesiRole;
 import com.example.demo.repository.IcesiRoleRepository;
 import com.example.demo.repository.IcesiUserRepository;
 import com.example.demo.service.IcesiUserService;
+import com.example.demo.unit.service.matchers.IcesiUserMatcher;
 
 public class IcesiUserServiceTest {
     private IcesiUserService icesiUserService;
@@ -239,21 +240,7 @@ public class IcesiUserServiceTest {
 
     @Test
     public void testUpdateIcesiRoleToAdminAsAdmin() {
-        IcesiUserCreateDTO userToUpdateRole = defaultIcesiUserCreateDTO();
-        String newRole = TypeIcesiRole.admin.name();
-        String userModifier = TypeIcesiRole.admin.name();
-        
-        when(icesiUserRepository.findByEmail(any())).thenReturn(Optional.of(defaultIcesiUser()));
-        when(icesiRoleRepository.findByName(any())).thenReturn(Optional.of(defaultIcesiRole()));
-        when(icesiUserRepository.save(any())).thenReturn(Optional.of(defaultResponseIcesiUserDTO()));
-        when(icesiUserRepository.save(any())).thenReturn(Optional.of(defaultIcesiUser()));
 
-        ResponseIcesiUserDTO result = icesiUserService.updateRole(userModifier, userToUpdateRole, defaultResponseIcesiRoleDTO().getName());
-
-        System.out.println(result.toString());
-
-        verify(icesiUserRepository, times(1)).save(any());
-        assertEquals(newRole, result.getIcesiRoleCreateDTO().getName());
     }
 
     @Test

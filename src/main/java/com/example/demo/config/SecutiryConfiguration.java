@@ -61,7 +61,7 @@ public class SecutiryConfiguration {
     public JwtDecoder jwtDecoder() {
         byte[] bytes = secret.getBytes();
         SecretKeySpec key = new SecretKeySpec(bytes, 0, bytes.length, "RSA");
-        return NimbusJwtDecoder.withSecretKey(key).macAlgorithm(MacAlgorithm.HS512).build();
+        return NimbusJwtDecoder.withSecretKey(key).macAlgorithm(MacAlgorithm.HS256).build();
     }
 
     @Bean

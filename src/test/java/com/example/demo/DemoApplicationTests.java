@@ -36,28 +36,31 @@ class DemoApplicationTests {
 	void contextLoads() {
 	}
 
-	@Test
-	public void testTokenEndpoint() throws Exception {
-		var result = mockMvc.perform(MockMvcRequestBuilders.get("/token").content(
-				objectMapper.writeValueAsString(new LoginDTO("johndoe@email.com","password"))
-				)
-						.contentType(MediaType.APPLICATION_JSON)
-						.accept(MediaType.APPLICATION_JSON))
-				.andExpect(status().isOk())
-				.andReturn();
-		System.out.println(result.getResponse().getContentAsString());
-	}
+    @Test
+    public void testTokenEndpoint() throws Exception {
 
-	/*@Test
-	public void testTokenEndpointWithINvalidEmail() throws Exception {
-		var result = mockMvc.perform(MockMvcRequestBuilders.get("/token").content(
-			objectMapper.writeValueAsString(new LoginDTO("incorrect@email.com", "password"))
-		)
-		.contentType(MediaType.APPLICATION_JSON)
-		.accept(MediaType.APPLICATION_JSON)
-		.andExpect(status().isOk())
-		.andReturn();
-		IcesiError token = objectMapper.readValue(result.getResponse().getContentAsString(),TokenDTO.class);
-		assertNotNull(token); 
-	}*/
+        var result = mockMvc.perform(MockMvcRequestBuilders.post("/token").content(
+                                objectMapper.writeValueAsString(new LoginDTO("johndoe@email.com", "password"))
+                        )
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .accept(MediaType.APPLICATION_JSON))
+                .andExpect(status().isOk())
+                .andReturn();
+
+        TokenDTO token = objectMapper.readValue(result.getResponse().getContentAsString(), TokenDTO.class);
+        assertNotNull(token);
+    }
+
+    @Test
+    public void testTokenEndpointWithInvalidEmail() throws Exception {
+
+        var result = mockMvc.perform(MockMvcRequestBuilders.("/token").content(
+                                objectMapper.writeValueAsString(new LoginDTO("incorrect@email.com", "password"))
+                        )
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .accept(MediaType.APPLICATION_JSON))
+                .andExpect(status().isOk())
+                .andReturn();
+
+    }
 }
