@@ -27,15 +27,20 @@ public class DemoApplication {
 										IcesiRoleRepository roleRepository,
 										PasswordEncoder encoder) {
 		IcesiPermission adminPermission = IcesiPermission.builder()
-				.key("home")
-				.path("/home")
-				.build();
-		IcesiPermission icesiPermission2 = IcesiPermission.builder()
 				.key("admin")
 				.path("/admin")
 				.build();
+		IcesiPermission bankPermission = IcesiPermission.builder()
+				.key("user")
+				.path("/user")
+				.build();
+		IcesiPermission normalPermission = IcesiPermission.builder()
+				.key("account")
+				.path("/account")
+				.build();
 		adminPermission = permissionRepository.save(adminPermission);
-		icesiPermission2 = permissionRepository.save(icesiPermission2);
+		bankPermission = permissionRepository.save(bankPermission);
+		normalPermission = permissionRepository.save(normalPermission);
 
 
 		IcesiRole icesiRole = IcesiRole.builder()

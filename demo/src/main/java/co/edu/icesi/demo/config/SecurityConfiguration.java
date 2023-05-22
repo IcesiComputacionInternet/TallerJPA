@@ -83,6 +83,8 @@ public class SecurityConfiguration {
                 AuthorityAuthorizationManager.hasAnyAuthority("SCOPE_ADMIN"));
         managerBuilder.add(new MvcRequestMatcher(introspector, "/user"),
                 AuthorityAuthorizationManager.hasAnyAuthority("SCOPE_USER"));
+        managerBuilder.add(new MvcRequestMatcher(introspector, "/role"),
+                AuthorityAuthorizationManager.hasAnyAuthority("SCOPE_BANK"));
 
 
         AuthorizationManager<HttpServletRequest> manager = managerBuilder.build();
