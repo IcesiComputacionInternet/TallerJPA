@@ -6,8 +6,7 @@ import com.edu.icesi.TallerJPA.dto.RoleCreateDTO;
 import com.edu.icesi.TallerJPA.dto.TokenDTO;
 import com.edu.icesi.TallerJPA.dto.UserCreateDTO;
 import com.fasterxml.jackson.databind.ObjectMapper;
-import org.junit.jupiter.api.Nested;
-import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.*;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;
 import org.springframework.boot.test.context.SpringBootTest;
@@ -24,6 +23,7 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 @AutoConfigureMockMvc
 @Import(TestConfigurationData.class)
 @ActiveProfiles(profiles = "test")
+@TestMethodOrder(MethodOrderer.OrderAnnotation.class)
 class RoleControllerTests {
 
     @Autowired
@@ -32,28 +32,49 @@ class RoleControllerTests {
     @Autowired
     ObjectMapper objectMapper;
 
+    public TokenDTO generateAdminToken() throws Exception{
+        var result = mockMvc.perform(MockMvcRequestBuilders.post("/token").content(
+                                objectMapper.writeValueAsString(new LoginDTO("johndoe@email.com", "password"))
+                        )
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .accept(MediaType.APPLICATION_JSON))
+                .andExpect(status().isOk())
+                .andReturn();
+        return objectMapper.readValue(result.getResponse().getContentAsString(), TokenDTO.class);
+    }
+
+    public TokenDTO generateUserToken() throws Exception{
+        var result = mockMvc.perform(MockMvcRequestBuilders.post("/token").content(
+                                objectMapper.writeValueAsString(new LoginDTO("johndoe2@email.com", "password"))
+                        )
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .accept(MediaType.APPLICATION_JSON))
+                .andExpect(status().isOk())
+                .andReturn();
+        return objectMapper.readValue(result.getResponse().getContentAsString(), TokenDTO.class);
+    }
+
+    public TokenDTO generateBankToken() throws Exception{
+        var result = mockMvc.perform(MockMvcRequestBuilders.post("/token").content(
+                                objectMapper.writeValueAsString(new LoginDTO("johndoe3@email.com", "password"))
+                        )
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .accept(MediaType.APPLICATION_JSON))
+                .andExpect(status().isOk())
+                .andReturn();
+        return objectMapper.readValue(result.getResponse().getContentAsString(), TokenDTO.class);
+    }
+
     @Nested
     public class testsForCreateUserHappyPath{
 
         @Test
         public void testCreateRoleFromAdmin() throws Exception{
-            var result = mockMvc.perform(MockMvcRequestBuilders.post("/token").content(
-                                    objectMapper.writeValueAsString(new LoginDTO("johndoe@email.com", "password"))
-                            )
-                            .contentType(MediaType.APPLICATION_JSON)
-                            .accept(MediaType.APPLICATION_JSON))
-                    .andExpect(status().isOk())
-                    .andReturn();
-            TokenDTO token = objectMapper.readValue(result.getResponse().getContentAsString(), TokenDTO.class);
 
             var newResult = mockMvc.perform(MockMvcRequestBuilders.post("/roles/create/").content(
-                                    objectMapper.writeValueAsString(RoleCreateDTO.builder()
-                                            .name("Example")
-                                            .description("Role for demo")
-                                            .icesiUsers(null)
-                                            .build())
+                                    objectMapper.writeValueAsString(defaultRole())
                             )
-                            .header("Authorization","Bearer "+token.getToken())
+                            .header("Authorization","Bearer "+generateAdminToken().getToken())
                             .contentType(MediaType.APPLICATION_JSON)
                             .accept(MediaType.APPLICATION_JSON))
                     .andExpect(status().isOk())
@@ -68,24 +89,29 @@ class RoleControllerTests {
     public class testForCreateUserNotHappyPath{
 
         @Test
-        public void testCreateRoleFromUser() throws Exception{
-            var result = mockMvc.perform(MockMvcRequestBuilders.post("/token").content(
-                                    objectMapper.writeValueAsString(new LoginDTO("johndoe2@email.com", "password"))
-                            )
-                            .contentType(MediaType.APPLICATION_JSON)
-                            .accept(MediaType.APPLICATION_JSON))
-                    .andExpect(status().isOk())
-                    .andReturn();
-            TokenDTO token = objectMapper.readValue(result.getResponse().getContentAsString(), TokenDTO.class);
+        public void testCreateRoleThatAlreadyExists() throws Exception{
+
+            RoleCreateDTO role = defaultRole();
+            role.setName("ADMIN");
 
             var newResult = mockMvc.perform(MockMvcRequestBuilders.post("/roles/create/").content(
-                                    objectMapper.writeValueAsString(RoleCreateDTO.builder()
-                                            .name("Example")
-                                            .description("Role for demo")
-                                            .icesiUsers(null)
-                                            .build())
+                                    objectMapper.writeValueAsString(role)
                             )
-                            .header("Authorization","Bearer "+token.getToken())
+                            .header("Authorization","Bearer "+generateAdminToken().getToken())
+                            .contentType(MediaType.APPLICATION_JSON)
+                            .accept(MediaType.APPLICATION_JSON))
+                    .andExpect(status().isConflict())
+                    .andReturn();
+
+            assertEquals(409, newResult.getResponse().getStatus());
+        }
+
+        @Test
+        public void testCreateRoleFromUser() throws Exception{
+            var newResult = mockMvc.perform(MockMvcRequestBuilders.post("/roles/create/").content(
+                                    objectMapper.writeValueAsString(defaultRole())
+                            )
+                            .header("Authorization","Bearer "+generateUserToken().getToken())
                             .contentType(MediaType.APPLICATION_JSON)
                             .accept(MediaType.APPLICATION_JSON))
                     .andExpect(status().isForbidden())
@@ -96,23 +122,11 @@ class RoleControllerTests {
 
         @Test
         public void testCreateRoleFromBank() throws Exception{
-            var result = mockMvc.perform(MockMvcRequestBuilders.post("/token").content(
-                                    objectMapper.writeValueAsString(new LoginDTO("johndoe3@email.com", "password"))
-                            )
-                            .contentType(MediaType.APPLICATION_JSON)
-                            .accept(MediaType.APPLICATION_JSON))
-                    .andExpect(status().isOk())
-                    .andReturn();
-            TokenDTO token = objectMapper.readValue(result.getResponse().getContentAsString(), TokenDTO.class);
 
             var newResult = mockMvc.perform(MockMvcRequestBuilders.post("/roles/create/").content(
-                                    objectMapper.writeValueAsString(RoleCreateDTO.builder()
-                                            .name("Example")
-                                            .description("Role for demo")
-                                            .icesiUsers(null)
-                                            .build())
+                                    objectMapper.writeValueAsString(defaultRole())
                             )
-                            .header("Authorization","Bearer "+token.getToken())
+                            .header("Authorization","Bearer "+generateBankToken().getToken())
                             .contentType(MediaType.APPLICATION_JSON)
                             .accept(MediaType.APPLICATION_JSON))
                     .andExpect(status().isForbidden())
@@ -120,6 +134,14 @@ class RoleControllerTests {
 
             assertEquals(403, newResult.getResponse().getStatus());
         }
+    }
+
+    public RoleCreateDTO defaultRole(){
+        return RoleCreateDTO.builder()
+                .name("Example")
+                .description("Role for demo")
+                .icesiUsers(null)
+                .build();
     }
 
 }

@@ -1,5 +1,6 @@
 package com.edu.icesi.TallerJPA.Constraint;
 
+import com.edu.icesi.TallerJPA.dto.UserCreateDTO;
 import com.edu.icesi.TallerJPA.validator.PhoneAndEmailValidation;
 
 import javax.validation.Constraint;
@@ -12,10 +13,6 @@ import java.lang.annotation.*;
 public @interface PhoneAndEmailConstraint {
 
     String message() default "User need a email and phone number";
-
-    String email();
-
-    String phoneNumber();
 
     Class<?>[] groups() default{};
 

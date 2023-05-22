@@ -1,5 +1,6 @@
 package com.edu.icesi.TallerJPA.model;
 
+import com.edu.icesi.TallerJPA.Constraint.PhoneAndEmailConstraint;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;

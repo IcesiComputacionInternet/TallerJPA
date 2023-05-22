@@ -19,10 +19,9 @@ public class ContactNumberValidator implements ConstraintValidator<ContactNumber
     public boolean isValid(String phone, ConstraintValidatorContext constraintValidatorContext) {
         boolean verify = false;
 
-        if (verifyDigits(phone) && validateLength(phone)){
+        if (validateLength(phone)){
             verify = verifyFormatPhoneNumber(phone);
         }
-
         return verify;
     }
 
@@ -30,11 +29,8 @@ public class ContactNumberValidator implements ConstraintValidator<ContactNumber
         return phoneNumber != null && phoneNumber.length() == 13;
     }
 
-    private boolean verifyDigits(String phoneNumber){
-        return phoneNumber.matches("[0-9]+");
-    }
 
     private boolean verifyFormatPhoneNumber(String phoneNumber){
-        return phoneNumber.matches("^(/+57 3)/d{9}$");
+        return phoneNumber.matches("[+]573[0-5][0-9]{8}");
     }
 }

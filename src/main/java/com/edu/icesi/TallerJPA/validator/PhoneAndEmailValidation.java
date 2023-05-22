@@ -1,15 +1,12 @@
 package com.edu.icesi.TallerJPA.validator;
 
 import com.edu.icesi.TallerJPA.Constraint.PhoneAndEmailConstraint;
+import com.edu.icesi.TallerJPA.dto.UserCreateDTO;
 
 import javax.validation.ConstraintValidator;
 import javax.validation.ConstraintValidatorContext;
 
-public class PhoneAndEmailValidation implements ConstraintValidator<PhoneAndEmailConstraint, String> {
-
-    private String email;
-
-    private String phoneNumber;
+public class PhoneAndEmailValidation implements ConstraintValidator<PhoneAndEmailConstraint, UserCreateDTO> {
 
     @Override
     public void initialize(PhoneAndEmailConstraint constraintAnnotation) {
@@ -17,7 +14,7 @@ public class PhoneAndEmailValidation implements ConstraintValidator<PhoneAndEmai
     }
 
     @Override
-    public boolean isValid(String s, ConstraintValidatorContext constraintValidatorContext) {
-        return false;
+    public boolean isValid(UserCreateDTO user, ConstraintValidatorContext constraintValidatorContext) {
+        return user.getEmail() != null && user.getPhoneNumber() != null;
     }
 }

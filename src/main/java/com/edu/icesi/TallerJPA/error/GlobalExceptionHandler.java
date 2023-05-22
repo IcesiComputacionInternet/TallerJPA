@@ -21,12 +21,11 @@ public class GlobalExceptionHandler {
         return ResponseEntity.status(icesiException.getError().getStatus()).body(icesiException.getError());
     }
 
-    /*@ExceptionHandler(RuntimeException.class)
+    @ExceptionHandler(RuntimeException.class)
     public ResponseEntity<IcesiError> handleRuntimeException(RuntimeException runtimeException){
         var error = createIcesiError(runtimeException.getMessage(), HttpStatus.INTERNAL_SERVER_ERROR, new DetailBuilder(ErrorCode.ERR_500));
         return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(error);
     }
-     */
 
     @ExceptionHandler(AuthenticationException.class)
     public ResponseEntity<IcesiError> handleAuthenticationException(AuthenticationException authenticationException){
@@ -43,10 +42,18 @@ public class GlobalExceptionHandler {
     }
 
     private IcesiErrorDetail mapBindingResultToError(ObjectError objectError){
-        var message = ErrorCode.ERR_400.getMessage().formatted(((FieldError) objectError).getField(), objectError.getDefaultMessage());
+
+        if (objectError instanceof FieldError) {
+            var message = ErrorCode.ERR_400.getMessage().formatted(((FieldError) objectError).getField(), objectError.getDefaultMessage());
+            return IcesiErrorDetail.builder()
+                    .errorCode(ErrorCode.ERR_400.getCode())
+                    .errorMessage(message).build();
+        }
+
+        var messageFromError = ErrorCode.ERR_400.getMessage().formatted("", objectError.getDefaultMessage());
         return IcesiErrorDetail.builder()
                 .errorCode(ErrorCode.ERR_400.getCode())
-                .errorMessage(message).build();
+                .errorMessage(messageFromError).build();
     }
 
 }

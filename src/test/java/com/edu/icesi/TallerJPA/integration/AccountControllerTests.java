@@ -2,7 +2,6 @@ package com.edu.icesi.TallerJPA.integration;
 
 import com.edu.icesi.TallerJPA.TestConfigurationData;
 import com.edu.icesi.TallerJPA.dto.*;
-import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
@@ -30,31 +29,48 @@ class AccountControllerTests {
     @Autowired
     ObjectMapper objectMapper;
 
+    public TokenDTO generateAdminToken() throws Exception{
+        var result = mockMvc.perform(MockMvcRequestBuilders.post("/token").content(
+                                objectMapper.writeValueAsString(new LoginDTO("johndoe@email.com", "password"))
+                        )
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .accept(MediaType.APPLICATION_JSON))
+                .andExpect(status().isOk())
+                .andReturn();
+        return objectMapper.readValue(result.getResponse().getContentAsString(), TokenDTO.class);
+    }
+
+    public TokenDTO generateUserToken() throws Exception{
+        var result = mockMvc.perform(MockMvcRequestBuilders.post("/token").content(
+                                objectMapper.writeValueAsString(new LoginDTO("johndoe2@email.com", "password"))
+                        )
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .accept(MediaType.APPLICATION_JSON))
+                .andExpect(status().isOk())
+                .andReturn();
+        return objectMapper.readValue(result.getResponse().getContentAsString(), TokenDTO.class);
+    }
+
+    public TokenDTO generateBankToken() throws Exception{
+        var result = mockMvc.perform(MockMvcRequestBuilders.post("/token").content(
+                                objectMapper.writeValueAsString(new LoginDTO("johndoe3@email.com", "password"))
+                        )
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .accept(MediaType.APPLICATION_JSON))
+                .andExpect(status().isOk())
+                .andReturn();
+        return objectMapper.readValue(result.getResponse().getContentAsString(), TokenDTO.class);
+    }
+
     @Nested
     public class testsTransferMoneyHappyPath{
 
         @Test
         public void testTransferMoneyWithUser() throws Exception{
-            var result = mockMvc.perform(MockMvcRequestBuilders.post("/token").content(
-                                    objectMapper.writeValueAsString(new LoginDTO("johndoe2@email.com", "password"))
-                            )
-                            .contentType(MediaType.APPLICATION_JSON)
-                            .accept(MediaType.APPLICATION_JSON))
-                    .andExpect(status().isOk())
-                    .andReturn();
-            TokenDTO token = objectMapper.readValue(result.getResponse().getContentAsString(), TokenDTO.class);
-
             var newResult = mockMvc.perform(MockMvcRequestBuilders.patch("/accounts/transfer/").content(
-                                    objectMapper.writeValueAsString(TransactionDTO.builder()
-                                            .sourceAccount("000000000")
-                                            .destinationAccount("1234567")
-                                            .amountMoney(2000L)
-                                            .result("")
-                                            .finalBalanceDestinationAccount(0L)
-                                            .finalBalanceSourceAccount(0L)
-                                            .build())
+                                    objectMapper.writeValueAsString(defaultTransaction())
                             )
-                            .header("Authorization","Bearer "+token.getToken())
+                            .header("Authorization","Bearer "+generateUserToken().getToken())
                             .contentType(MediaType.APPLICATION_JSON)
                             .accept(MediaType.APPLICATION_JSON))
                     .andExpect(status().isOk())
@@ -67,26 +83,11 @@ class AccountControllerTests {
 
         @Test
         public void testTransferMoneyWithAdmin() throws Exception{
-            var result = mockMvc.perform(MockMvcRequestBuilders.post("/token").content(
-                                    objectMapper.writeValueAsString(new LoginDTO("johndoe@email.com", "password"))
-                            )
-                            .contentType(MediaType.APPLICATION_JSON)
-                            .accept(MediaType.APPLICATION_JSON))
-                    .andExpect(status().isOk())
-                    .andReturn();
-            TokenDTO token = objectMapper.readValue(result.getResponse().getContentAsString(), TokenDTO.class);
 
             var newResult = mockMvc.perform(MockMvcRequestBuilders.patch("/accounts/transfer/").content(
-                                    objectMapper.writeValueAsString(TransactionDTO.builder()
-                                            .sourceAccount("000000000")
-                                            .destinationAccount("1234567")
-                                            .amountMoney(2000L)
-                                            .result("")
-                                            .finalBalanceDestinationAccount(0L)
-                                            .finalBalanceSourceAccount(0L)
-                                            .build())
+                                    objectMapper.writeValueAsString(defaultTransaction())
                             )
-                            .header("Authorization","Bearer "+token.getToken())
+                            .header("Authorization","Bearer "+generateAdminToken().getToken())
                             .contentType(MediaType.APPLICATION_JSON)
                             .accept(MediaType.APPLICATION_JSON))
                     .andExpect(status().isOk())
@@ -96,8 +97,6 @@ class AccountControllerTests {
             assertEquals(transaction.getFinalBalanceSourceAccount(),8000L);
             assertEquals(transaction.getFinalBalanceDestinationAccount(),17000L);
         }
-
-
     }
 
     @Nested
@@ -105,26 +104,11 @@ class AccountControllerTests {
 
         @Test
         public void testTransferMoneyWithBankUser() throws Exception{
-            var result = mockMvc.perform(MockMvcRequestBuilders.post("/token").content(
-                                    objectMapper.writeValueAsString(new LoginDTO("johndoe3@email.com", "password"))
-                            )
-                            .contentType(MediaType.APPLICATION_JSON)
-                            .accept(MediaType.APPLICATION_JSON))
-                    .andExpect(status().isOk())
-                    .andReturn();
-            TokenDTO token = objectMapper.readValue(result.getResponse().getContentAsString(), TokenDTO.class);
 
             var newResult = mockMvc.perform(MockMvcRequestBuilders.patch("/accounts/transfer/").content(
-                                    objectMapper.writeValueAsString(TransactionDTO.builder()
-                                            .sourceAccount("000000000")
-                                            .destinationAccount("1234567")
-                                            .amountMoney(2000L)
-                                            .result("")
-                                            .finalBalanceDestinationAccount(0L)
-                                            .finalBalanceSourceAccount(0L)
-                                            .build())
+                                    objectMapper.writeValueAsString(defaultTransaction())
                             )
-                            .header("Authorization","Bearer "+token.getToken())
+                            .header("Authorization","Bearer "+generateBankToken().getToken())
                             .contentType(MediaType.APPLICATION_JSON)
                             .accept(MediaType.APPLICATION_JSON))
                     .andExpect(status().isUnauthorized())
@@ -135,26 +119,10 @@ class AccountControllerTests {
 
         @Test
         public void testTransferMoneyToNoOwnAccount() throws Exception{
-            var result = mockMvc.perform(MockMvcRequestBuilders.post("/token").content(
-                                    objectMapper.writeValueAsString(new LoginDTO("johndoe2@email.com", "password"))
-                            )
-                            .contentType(MediaType.APPLICATION_JSON)
-                            .accept(MediaType.APPLICATION_JSON))
-                    .andExpect(status().isOk())
-                    .andReturn();
-            TokenDTO token = objectMapper.readValue(result.getResponse().getContentAsString(), TokenDTO.class);
-
             var newResult = mockMvc.perform(MockMvcRequestBuilders.patch("/accounts/transfer/").content(
-                                    objectMapper.writeValueAsString(TransactionDTO.builder()
-                                            .sourceAccount("000000000")
-                                            .destinationAccount("1357911")
-                                            .amountMoney(2000L)
-                                            .result("")
-                                            .finalBalanceDestinationAccount(0L)
-                                            .finalBalanceSourceAccount(0L)
-                                            .build())
+                                    objectMapper.writeValueAsString(defaultNotOwnTransaction())
                             )
-                            .header("Authorization","Bearer "+token.getToken())
+                            .header("Authorization","Bearer "+generateUserToken().getToken())
                             .contentType(MediaType.APPLICATION_JSON)
                             .accept(MediaType.APPLICATION_JSON))
                     .andExpect(status().isUnauthorized())
@@ -165,26 +133,11 @@ class AccountControllerTests {
 
         @Test
         public void testTransferMoneyToDepositOnlyAccount() throws Exception{
-            var result = mockMvc.perform(MockMvcRequestBuilders.post("/token").content(
-                                    objectMapper.writeValueAsString(new LoginDTO("johndoe2@email.com", "password"))
-                            )
-                            .contentType(MediaType.APPLICATION_JSON)
-                            .accept(MediaType.APPLICATION_JSON))
-                    .andExpect(status().isOk())
-                    .andReturn();
-            TokenDTO token = objectMapper.readValue(result.getResponse().getContentAsString(), TokenDTO.class);
 
             var newResult = mockMvc.perform(MockMvcRequestBuilders.patch("/accounts/transfer/").content(
-                                    objectMapper.writeValueAsString(TransactionDTO.builder()
-                                            .sourceAccount("000000000")
-                                            .destinationAccount("0246810")
-                                            .amountMoney(2000L)
-                                            .result("")
-                                            .finalBalanceDestinationAccount(0L)
-                                            .finalBalanceSourceAccount(0L)
-                                            .build())
+                                    objectMapper.writeValueAsString(defaultTransactionDepositOnlyAccount())
                             )
-                            .header("Authorization","Bearer "+token.getToken())
+                            .header("Authorization","Bearer "+generateUserToken().getToken())
                             .contentType(MediaType.APPLICATION_JSON)
                             .accept(MediaType.APPLICATION_JSON))
                     .andExpect(status().isBadRequest())
@@ -195,26 +148,14 @@ class AccountControllerTests {
 
         @Test
         public void testTransferMoneyWithInsufficientMoney() throws Exception{
-            var result = mockMvc.perform(MockMvcRequestBuilders.post("/token").content(
-                                    objectMapper.writeValueAsString(new LoginDTO("johndoe2@email.com", "password"))
-                            )
-                            .contentType(MediaType.APPLICATION_JSON)
-                            .accept(MediaType.APPLICATION_JSON))
-                    .andExpect(status().isOk())
-                    .andReturn();
-            TokenDTO token = objectMapper.readValue(result.getResponse().getContentAsString(), TokenDTO.class);
+
+            TransactionDTO transaction = defaultTransaction();
+            transaction.setAmountMoney(12000L);
 
             var newResult = mockMvc.perform(MockMvcRequestBuilders.patch("/accounts/transfer/").content(
-                                    objectMapper.writeValueAsString(TransactionDTO.builder()
-                                            .sourceAccount("000000000")
-                                            .destinationAccount("1234567")
-                                            .amountMoney(12000L)
-                                            .result("")
-                                            .finalBalanceDestinationAccount(0L)
-                                            .finalBalanceSourceAccount(0L)
-                                            .build())
+                                    objectMapper.writeValueAsString(transaction)
                             )
-                            .header("Authorization","Bearer "+token.getToken())
+                            .header("Authorization","Bearer "+generateUserToken().getToken())
                             .contentType(MediaType.APPLICATION_JSON)
                             .accept(MediaType.APPLICATION_JSON))
                     .andExpect(status().isBadRequest())
@@ -222,5 +163,38 @@ class AccountControllerTests {
 
             assertEquals(newResult.getResponse().getStatus(), 400);
         }
+    }
+
+    public TransactionDTO defaultTransaction(){
+        return TransactionDTO.builder()
+                .sourceAccount("000000000")
+                .destinationAccount("1234567")
+                .amountMoney(2000L)
+                .result("")
+                .finalBalanceDestinationAccount(0L)
+                .finalBalanceSourceAccount(0L)
+                .build();
+    }
+
+    public TransactionDTO defaultNotOwnTransaction(){
+        return TransactionDTO.builder()
+                .sourceAccount("000000000")
+                .destinationAccount("1357911")
+                .amountMoney(2000L)
+                .result("")
+                .finalBalanceDestinationAccount(0L)
+                .finalBalanceSourceAccount(0L)
+                .build();
+    }
+
+    public TransactionDTO defaultTransactionDepositOnlyAccount(){
+        return TransactionDTO.builder()
+                .sourceAccount("000000000")
+                .destinationAccount("0246810")
+                .amountMoney(2000L)
+                .result("")
+                .finalBalanceDestinationAccount(0L)
+                .finalBalanceSourceAccount(0L)
+                .build();
     }
 }
