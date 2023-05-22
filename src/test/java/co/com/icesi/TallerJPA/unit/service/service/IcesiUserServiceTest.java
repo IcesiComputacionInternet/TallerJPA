@@ -1,5 +1,6 @@
 package co.com.icesi.TallerJPA.unit.service.service;
 
+import co.com.icesi.TallerJPA.config.PasswordEncoderConfiguration;
 import co.com.icesi.TallerJPA.dto.requestDTO.IcesiRoleCreateDTO;
 import co.com.icesi.TallerJPA.dto.requestDTO.IcesiUserCreateDTO;
 import co.com.icesi.TallerJPA.mapper.IcesiUserMapper;
@@ -12,6 +13,7 @@ import co.com.icesi.TallerJPA.service.IcesiUserService;
 import co.com.icesi.TallerJPA.unit.service.matcher.IcesiUserMatcher;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
+import org.springframework.beans.factory.annotation.Autowired;
 
 import java.util.Optional;
 
@@ -25,12 +27,15 @@ public class IcesiUserServiceTest {
     private IcesiUserMapper userMapper;
     private IcesiRoleRepository roleRepository;
 
+    @Autowired
+    private PasswordEncoderConfiguration passwordEncoderConfiguration;
+
     @BeforeEach
     public void init(){
         userRepository = mock(IcesiUserRepository.class);
         roleRepository = mock(IcesiRoleRepository.class);
         userMapper = spy(IcesiUserMapperImpl.class);
-        userService = new IcesiUserService(userRepository,roleRepository, userMapper);
+        userService = new IcesiUserService(userRepository,roleRepository, userMapper,passwordEncoderConfiguration);
     }
 
     @Test

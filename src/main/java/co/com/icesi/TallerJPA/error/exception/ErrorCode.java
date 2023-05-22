@@ -7,6 +7,7 @@ import lombok.Getter;
 @AllArgsConstructor
 public enum ErrorCode {
     ERR_404("ERR_404", "%s with %s: %s not found"),
+    ERR_401("ERR_401", "You do not have permission to see this feature"),
     ERR_500("ERR_500", "Oops, we ran into an error"),
     ERR_400("ERR_400", "field %s %s"),
     ERR_REQUIRED_FIELD("ERR_REQUIRED_FIELD", "field %s is required"),
