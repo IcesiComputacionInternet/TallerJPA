@@ -187,7 +187,7 @@ public class IcesiAccountServiceTest {
 
 
     @Test
-    public void tesTransferInvalidTypeAccount() {
+    public void tesTransferInvalid() {
 
         IcesiAccountDTO sourceAccount = createicesiAccountDTONTypeInvalid();
         IcesiAccountDTO destinationAccount = createicesiAccountDTONormal1();

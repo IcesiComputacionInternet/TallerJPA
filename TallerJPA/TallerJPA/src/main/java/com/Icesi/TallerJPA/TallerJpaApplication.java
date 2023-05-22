@@ -20,7 +20,7 @@ public class TallerJpaApplication {
 		SpringApplication.run(TallerJpaApplication.class, args);
 	}
 
-	@Bean
+	//@Bean
 	CommandLineRunner commandLineRunner(IcesiUserRepository users, IcesiRoleRepository roleRepository, IcesiAccountRepository icesiAccountRepository, PasswordEncoder encoder)
 	{
 		IcesiRole icesiRole = IcesiRole.builder()

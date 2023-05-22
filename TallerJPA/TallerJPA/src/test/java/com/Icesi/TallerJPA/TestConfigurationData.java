@@ -15,7 +15,7 @@ import java.util.Collections;
 import java.util.UUID;
 @TestConfiguration
 public class TestConfigurationData {
-    //@Bean
+    @Bean
     CommandLineRunner commandLineRunner(IcesiUserRepository users, IcesiRoleRepository roleRepository, IcesiAccountRepository icesiAccountRepository, PasswordEncoder encoder)
     {
         IcesiRole icesiRole = IcesiRole.builder()
