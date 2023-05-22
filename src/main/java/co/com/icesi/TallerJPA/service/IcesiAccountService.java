@@ -83,6 +83,7 @@ public class IcesiAccountService {
     @Transactional
     public TransactionResponseDTO  withdrawalMoney (TransactionRequestDTO transactionRequestDTO ){
        IcesiAccount account = getIcesiAccount(transactionRequestDTO.getAccountNumberFrom());
+       verifyActionForItSelf(account.getUser().getUserID());
         validateAmount(transactionRequestDTO.getAmount(), account);
         Long prevBalance = account.getBalance();
         account.setBalance(account.getBalance()- transactionRequestDTO.getAmount());
@@ -101,6 +102,7 @@ public class IcesiAccountService {
     @Transactional
     public TransactionResponseDTO  depositMoney (TransactionRequestDTO transactionRequestDTO ){
         IcesiAccount account = getIcesiAccount(transactionRequestDTO.getAccountNumberFrom());
+        verifyActionForItSelf(account.getUser().getUserID());
         Long prevBalance = account.getBalance();
         account.setBalance(account.getBalance() + transactionRequestDTO.getAmount());
         accountRespository.save(account);
@@ -117,7 +119,7 @@ public class IcesiAccountService {
     public TransactionResponseDTO transferMoney(TransactionRequestDTO transactionRequestDTO){
         IcesiAccount accountSource = getIcesiAccount(transactionRequestDTO.getAccountNumberFrom());
         IcesiAccount accountDestination = getIcesiAccount(transactionRequestDTO.getAccountNumberTo());
-
+        verifyActionForItSelf(accountSource.getUser().getUserID());
 
         isDeposit(accountSource);
         isDeposit(accountDestination);

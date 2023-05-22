@@ -1,18 +1,12 @@
 package co.com.icesi.TallerJPA.integration;
 
 
-import co.com.icesi.TallerJPA.config.IcesiAuthenticationManager;
-import co.com.icesi.TallerJPA.config.PasswordEncoderConfiguration;
-import co.com.icesi.TallerJPA.config.SecurityConfiguration;
-import co.com.icesi.TallerJPA.controller.IcesiUserController;
-import co.com.icesi.TallerJPA.dto.IcesiRoleDTO;
+import co.com.icesi.TallerJPA.dto.IcesiAccountDTO;
 import co.com.icesi.TallerJPA.dto.IcesiUserDTO;
 import co.com.icesi.TallerJPA.dto.LoginDto;
-import com.fasterxml.jackson.core.JsonProcessingException;
+import co.com.icesi.TallerJPA.dto.TransactionRequestDTO;
 import com.fasterxml.jackson.databind.ObjectMapper;
-import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
-import org.junit.jupiter.api.extension.ExtendWith;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;
 import org.springframework.boot.test.context.SpringBootTest;
@@ -24,14 +18,11 @@ import org.springframework.test.web.servlet.request.MockMvcRequestBuilders;
 
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
-
-
 @AutoConfigureMockMvc
 @Import(TestConfigurationData.class )
 @ActiveProfiles(profiles = "test")
 @SpringBootTest
-public class IcesiUserControllerTest {
-
+public class IcesiAccountControllerTest {
     @Autowired
     private MockMvc mockMvc;
 
@@ -41,14 +32,12 @@ public class IcesiUserControllerTest {
 
     private String token = "";
 
-    private static final String URL= "/user";
-
-
+    private static final String URL= "/account/transferMoney";
 
     @Test
-    public void testCreateUserNoAuth() throws Exception {
-        var  result = mockMvc.perform(MockMvcRequestBuilders.post(URL).content(
-                                objectMapper.writeValueAsString(defaultUser()))
+    public void transferMoneyWhenNoUserAuth() throws Exception {
+        var  result = mockMvc.perform(MockMvcRequestBuilders.patch(URL).content(
+                                objectMapper.writeValueAsString(defaultTransaction()))
                         .contentType(MediaType.APPLICATION_JSON)
                         .accept(MediaType.APPLICATION_JSON))
                 .andExpect(status().isUnauthorized())
@@ -56,48 +45,40 @@ public class IcesiUserControllerTest {
 
         System.out.println(result.getResponse().getContentAsString());
     }
-    @Test
-    public void testCreateUserAdmin() throws Exception {
-        setToken("admin@email.com");
-        var  result = mockMvc.perform(MockMvcRequestBuilders.post(URL).content(
-                                objectMapper.writeValueAsString(defaultUser()))
-                        .header("Authorization", "Bearer " + token)
-                        .contentType(MediaType.APPLICATION_JSON)
-                        .accept(MediaType.APPLICATION_JSON))
-                .andExpect(status().isOk())
-                .andReturn();
-
-        System.out.println(result.getResponse().getContentAsString());
-    }
 
     @Test
-    public void testCreateUserBank() throws Exception {
-        setToken("bank@email.com");
-        var  result = mockMvc.perform(MockMvcRequestBuilders.post(URL).content(
-                                objectMapper.writeValueAsString(IcesiUserDTO.builder()
-                                        .firstName("Jhon")
-                                        .lastName("Doe")
-                                        .phoneNumber("+573377456789")
-                                        .password("12456789")
-                                        .email("Bonioe@gmailTest2.com")
-                                        .role(IcesiRoleDTO.builder()
-                                                .name("NORMAL")
-                                                .build())
-                                        .build()))
-                        .header("Authorization", "Bearer " + token)
-                        .contentType(MediaType.APPLICATION_JSON)
-                        .accept(MediaType.APPLICATION_JSON))
-                .andExpect(status().isOk())
-                .andReturn();
-
-        System.out.println(result.getResponse().getContentAsString());
-    }
-
-    @Test
-    public void testCreateUserNormal() throws Exception {
+    public void transferMoneyWhenUserAuth() throws Exception {
         setToken("user@email.com");
-        var  result = mockMvc.perform(MockMvcRequestBuilders.post(URL).content(
-                                objectMapper.writeValueAsString(defaultUser()))
+        var  result = mockMvc.perform(MockMvcRequestBuilders.patch(URL).content(
+                                objectMapper.writeValueAsString(defaultTransaction()))
+                        .header("Authorization", "Bearer " + token)
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .accept(MediaType.APPLICATION_JSON))
+                .andExpect(status().isOk())
+                .andReturn();
+
+        System.out.println(result.getResponse().getContentAsString());
+    }
+
+    @Test
+    public void transferMoneyWhenAdminAuth() throws Exception {
+        setToken("admin@email.com");
+        var  result = mockMvc.perform(MockMvcRequestBuilders.patch(URL).content(
+                                objectMapper.writeValueAsString(defaultTransaction()))
+                        .header("Authorization", "Bearer " + token)
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .accept(MediaType.APPLICATION_JSON))
+                .andExpect(status().isOk())
+                .andReturn();
+
+        System.out.println(result.getResponse().getContentAsString());
+    }
+
+    @Test
+    public void transferMoneyWhenBankAuth() throws Exception {
+        setToken("bank@email.com");
+        var  result = mockMvc.perform(MockMvcRequestBuilders.patch(URL).content(
+                                objectMapper.writeValueAsString(defaultTransaction()))
                         .header("Authorization", "Bearer " + token)
                         .contentType(MediaType.APPLICATION_JSON)
                         .accept(MediaType.APPLICATION_JSON))
@@ -106,6 +87,23 @@ public class IcesiUserControllerTest {
 
         System.out.println(result.getResponse().getContentAsString());
     }
+
+    @Test
+    public void transferMoneyWhenTheAccountIsDeposit() throws Exception {
+        setToken("admin@email.com");
+        var  result = mockMvc.perform(MockMvcRequestBuilders.patch(URL).content(
+                                objectMapper.writeValueAsString(defaultTransactionDesposit()))
+                        .header("Authorization", "Bearer " + token)
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .accept(MediaType.APPLICATION_JSON))
+                .andExpect(status().isBadRequest())
+                .andReturn();
+
+        System.out.println(result.getResponse().getContentAsString());
+    }
+
+
+
 
     public void  setToken(String email) throws Exception {
         var login =   mockMvc.perform(MockMvcRequestBuilders.post("/auth/login").content(
@@ -120,16 +118,21 @@ public class IcesiUserControllerTest {
         System.out.println("Actual token: "+ token);
     }
 
-    public IcesiUserDTO defaultUser(){
-        return  IcesiUserDTO.builder()
-                .firstName("Jhon")
-                .lastName("Doe")
-                .phoneNumber("+573322456789")
-                .password("12456789")
-                .email("Alex.doe@gmailTest2.com")
-                .role(IcesiRoleDTO.builder()
-                        .name("NORMAL")
-                        .build())
+    private TransactionRequestDTO defaultTransaction(){
+        return TransactionRequestDTO.builder()
+                .accountNumberFrom("956-648065-61")
+                .accountNumberTo("903-178442-08")
+                .amount(100L)
                 .build();
     }
+
+    private TransactionRequestDTO defaultTransactionDesposit() {
+        return TransactionRequestDTO.builder()
+                .accountNumberFrom("903-178442-08")
+                .accountNumberTo("903-178442-62")
+                .amount(100L)
+                .build();
+    }
+
+
 }

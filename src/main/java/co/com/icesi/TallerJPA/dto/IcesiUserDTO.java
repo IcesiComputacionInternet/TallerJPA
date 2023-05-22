@@ -15,16 +15,18 @@ import javax.validation.constraints.NotBlank;
 @AllArgsConstructor
 @NoArgsConstructor
 public class IcesiUserDTO {
-    @NotBlank
+
     private String firstName;
-    @NotBlank
+
     private String lastName;
 
     @ColombianNumber
     private String phoneNumber;
+
     @NotBlank
     private String password;
 
+    @NotBlank
     @Email
     private String email;
     private IcesiRoleDTO role;
