@@ -27,7 +27,7 @@ public class IcesiUserService {
     private final IcesiRoleRepository icesiRoleRepository;
     private final IcesiUserMapper icesiUserMapper;
 
-    public IcesiUserResponseDTO saveUser(IcesiUserRequestDTO icesiUserRequestDTO){
+    public IcesiUserResponseDTO saveUser(IcesiUserRequestDTO icesiUserRequestDTO, String actualUserRole){
         List<String> errors = new ArrayList<>();
         if(icesiUserRepository.findByEmail(icesiUserRequestDTO.getEmail()).isPresent()){
             errors.add("email");
@@ -45,6 +45,8 @@ public class IcesiUserService {
             ).get();
         }
         IcesiRole icesiRole = privateGetRoleByName(icesiUserRequestDTO.getRole());
+        checkPermissionsToCreateUser(actualUserRole, icesiRole.getName());
+
         IcesiUser icesiUser = icesiUserMapper.fromUserDto(icesiUserRequestDTO);
         icesiUser.setUserId(UUID.randomUUID());
         icesiUser.setIcesiRole(icesiRole);
@@ -64,6 +66,18 @@ public class IcesiUserService {
 
     public IcesiUserResponseDTO getUserByEmail(String email){
         return icesiUserMapper.fromIcesiUserToResponse(privateGetUserByEmail(email));
+    }
+
+    private void checkPermissionsToCreateUser(String actualUserRole, String role){
+        boolean userIsNotAdmin = !actualUserRole.equals("ADMIN");
+        boolean roleAssignIsAdmin = role.equals("ADMIN");
+        if(userIsNotAdmin && roleAssignIsAdmin){
+            throw createIcesiException(
+                    "Forbidden",
+                    HttpStatus.FORBIDDEN,
+                    new DetailBuilder(ErrorCode.ERR_403,"Forbidden. Only ADMINs can create ADMIN users")
+            ).get();
+        }
     }
 
     private IcesiUser privateGetUserById(UUID idString){

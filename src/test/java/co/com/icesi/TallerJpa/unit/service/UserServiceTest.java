@@ -39,10 +39,11 @@ public class UserServiceTest {
     @Test
     @DisplayName("Create an icesi user Happy Path")
     public void testCreateUserHappyPath(){
+        var actualUser = adminIcesiUser();
         when(icesiUserRepository.findByEmail(any())).thenReturn(Optional.empty());
         when(icesiUserRepository.findByPhoneNumber(any())).thenReturn(Optional.empty());
         when(icesiRoleRepository.findByName(any())).thenReturn(Optional.of(defaultIcesiRole()));
-        icesiUserService.saveUser(defaultIcesiUserDTO());
+        icesiUserService.saveUser(defaultIcesiUserDTO(), actualUser.getIcesiRole().getName());
         verify(icesiUserRepository,times(1)).findByEmail(any());
         verify(icesiUserRepository,times(1)).findByPhoneNumber(any());
         verify(icesiRoleRepository,times(1)).findByName(any());
@@ -54,10 +55,11 @@ public class UserServiceTest {
     @Test
     @DisplayName("Create an icesi user with email duplicated")
     public void testCreateIcesiUserWithEmailExists(){
+        var actualUser = adminIcesiUser();
         when(icesiUserRepository.findByEmail(any())).thenReturn(Optional.of(defaultIcesiUser()));
 
         IcesiException icesiException = assertThrows(IcesiException.class,
-                () -> icesiUserService.saveUser(defaultIcesiUserDTO()));
+                () -> icesiUserService.saveUser(defaultIcesiUserDTO(),actualUser.getIcesiRole().getName()));
         IcesiError icesiError = icesiException.getError();
 
         assertEquals(1,icesiError.getDetails().size());
@@ -78,11 +80,12 @@ public class UserServiceTest {
     @Test
     @DisplayName("Create an icesi user with phoneNumber duplicated")
     public void testCreateIcesiUserWithPhoneNumberExists(){
+        var actualUser = adminIcesiUser();
         when(icesiUserRepository.findByEmail(any())).thenReturn(Optional.empty());
         when(icesiUserRepository.findByPhoneNumber(any())).thenReturn(Optional.of(defaultIcesiUser()));
 
         IcesiException icesiException = assertThrows(IcesiException.class,
-                () -> icesiUserService.saveUser(defaultIcesiUserDTO()));
+                () -> icesiUserService.saveUser(defaultIcesiUserDTO(),actualUser.getIcesiRole().getName()));
         IcesiError icesiError = icesiException.getError();
 
         assertEquals(1,icesiError.getDetails().size());
@@ -103,11 +106,12 @@ public class UserServiceTest {
     @Test
     @DisplayName("Create an icesi user with email and phoneNumber duplicated")
     public void testCreateIcesiUserWithEmailAndPhoneNumberExists(){
+        var actualUser = adminIcesiUser();
         when(icesiUserRepository.findByEmail(any())).thenReturn(Optional.of(defaultIcesiUser()));
         when(icesiUserRepository.findByPhoneNumber(any())).thenReturn(Optional.of(defaultIcesiUser()));
 
         IcesiException icesiException = assertThrows(IcesiException.class,
-                () -> icesiUserService.saveUser(defaultIcesiUserDTO()));
+                () -> icesiUserService.saveUser(defaultIcesiUserDTO(),actualUser.getIcesiRole().getName()));
         IcesiError icesiError = icesiException.getError();
 
         assertEquals(2,icesiError.getDetails().size());
@@ -129,12 +133,13 @@ public class UserServiceTest {
     @Test
     @DisplayName("Create an icesi user when icesi role doesn't exists")
     public void testCreateIcesiUserWithIcesiRoleNotExists(){
+        var actualUser = adminIcesiUser();
         when(icesiUserRepository.findByEmail(any())).thenReturn(Optional.empty());
         when(icesiUserRepository.findByPhoneNumber(any())).thenReturn(Optional.empty());
         when(icesiRoleRepository.findByName(any())).thenReturn(Optional.empty());
 
         IcesiException icesiException = assertThrows(IcesiException.class,
-                () -> icesiUserService.saveUser(defaultIcesiUserDTO()));
+                () -> icesiUserService.saveUser(defaultIcesiUserDTO(),actualUser.getIcesiRole().getName()));
         IcesiError icesiError = icesiException.getError();
 
         assertEquals(1,icesiError.getDetails().size());
@@ -266,6 +271,22 @@ public class UserServiceTest {
         verify(icesiUserRepository,times(1)).findByEmail(defaultIcesiUser().getEmail());
     }
 
+    private IcesiUser adminIcesiUser(){
+        return IcesiUser.builder()
+                .userId(defaultUUID())
+                .firstName("John")
+                .lastName("Doe")
+                .email("jd.trujillo@hotmail.com")
+                .phoneNumber("3147778899")
+                .password("password")
+                .icesiRole(adminIcesiRole())
+                .build();
+    }
+    private IcesiRole adminIcesiRole(){
+        return IcesiRole.builder()
+                .name("ADMIN")
+                .description("Administrador").build();
+    }
     private IcesiUserRequestDTO defaultIcesiUserDTO(){
         return IcesiUserRequestDTO.builder()
                 .firstName("Mariana")

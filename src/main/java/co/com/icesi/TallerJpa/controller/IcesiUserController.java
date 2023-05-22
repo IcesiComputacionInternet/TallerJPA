@@ -4,6 +4,7 @@ import co.com.icesi.TallerJpa.controller.api.IcesiUserApi;
 import co.com.icesi.TallerJpa.dto.IcesiUserRequestDTO;
 import co.com.icesi.TallerJpa.dto.IcesiUserResponseDTO;
 import co.com.icesi.TallerJpa.dto.RoleChangeDTO;
+import co.com.icesi.TallerJpa.security.IcesiSecurityContext;
 import co.com.icesi.TallerJpa.service.IcesiUserService;
 import lombok.AllArgsConstructor;
 import org.springframework.web.bind.annotation.RestController;
@@ -18,7 +19,8 @@ public class IcesiUserController implements IcesiUserApi {
 
     @Override
     public IcesiUserResponseDTO addIcesiUser(IcesiUserRequestDTO icesiUserRequestDTO) {
-        return icesiUserService.saveUser(icesiUserRequestDTO);
+        String actualUserRole = IcesiSecurityContext.getCurrentUserRole();
+        return icesiUserService.saveUser(icesiUserRequestDTO, actualUserRole);
     }
 
     @Override

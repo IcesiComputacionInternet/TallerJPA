@@ -91,26 +91,28 @@ public class SecurityConfiguration {
                 AuthorityAuthorizationManager.hasAnyAuthority("SCOPE_ADMIN","SCOPE_BANK"));
 
         //ASIGNANDO LOS PERMISOS DEL API DE USUARIOS.
-        //admin users pueden añadir usuarios.
+        //admin y bank users pueden añadir usuarios.
         tempMvcRequestMatcher = new MvcRequestMatcher(introspector, IcesiUserApi.USER_BASE_URL);
         tempMvcRequestMatcher.setMethod(HttpMethod.POST);
         managerBuilder.add(tempMvcRequestMatcher,
-                AuthorityAuthorizationManager.hasAnyAuthority("SCOPE_ADMIN"));
+                AuthorityAuthorizationManager.hasAnyAuthority("SCOPE_ADMIN","SCOPE_BANK"));
         //admin users pueden modificar rol de usuarios.
         tempMvcRequestMatcher = new MvcRequestMatcher(introspector, IcesiUserApi.USER_BASE_URL);
         tempMvcRequestMatcher.setMethod(HttpMethod.PATCH);
         managerBuilder.add(tempMvcRequestMatcher,
                 AuthorityAuthorizationManager.hasAnyAuthority("SCOPE_ADMIN"));
 
-
-        managerBuilder.add(new MvcRequestMatcher(introspector, IcesiAccountApi.ACCOUNT_BASE_URL+"/**"),
+        //ASIGNANDO LOS PERMISOS DEL API DE CUENTAS.
+        //user can create account
+        tempMvcRequestMatcher = new MvcRequestMatcher(introspector, IcesiAccountApi.ACCOUNT_BASE_URL);
+        tempMvcRequestMatcher.setMethod(HttpMethod.POST);
+        managerBuilder.add(tempMvcRequestMatcher,
                 AuthorityAuthorizationManager.hasAnyAuthority("SCOPE_USER"));
-        managerBuilder.add(new MvcRequestMatcher(introspector, IcesiAccountApi.ACCOUNT_BASE_URL),
-                AuthorityAuthorizationManager.hasAnyAuthority("SCOPE_BANK"));
-
-        managerBuilder.add(new MvcRequestMatcher(introspector, IcesiUserApi.USER_BASE_URL+"/**"),
-                AuthorityAuthorizationManager.hasAnyAuthority("SCOPE_USER","SCOPE_BANK"));
-
+        //user can update account
+        tempMvcRequestMatcher = new MvcRequestMatcher(introspector, IcesiAccountApi.ACCOUNT_BASE_URL);
+        tempMvcRequestMatcher.setMethod(HttpMethod.PATCH);
+        managerBuilder.add(tempMvcRequestMatcher,
+                AuthorityAuthorizationManager.hasAnyAuthority("SCOPE_USER"));
 
         AuthorizationManager<HttpServletRequest> manager = managerBuilder.build();
         return (authentication, object) -> manager.check(authentication, object.getRequest());
