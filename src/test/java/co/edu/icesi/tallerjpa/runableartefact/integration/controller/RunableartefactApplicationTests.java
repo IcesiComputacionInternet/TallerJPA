@@ -361,6 +361,24 @@ class RunableartefactApplicationTests {
     }
 
     @Test
+    public void testActivateAccountWithInvalidAccountNumber() throws Exception {
+        tokenCreation();
+        var result = mockMvc.perform(MockMvcRequestBuilders.patch("/api/icesi-accounts/activate")
+                        .header("Authorization", "Bearer " + token)
+                        .content(objectMapper.writeValueAsString(
+                                TransactionInformationDTO.builder()
+                                        .accountNumberOrigin("987654321")
+                                        .build()
+                        ))
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .accept(MediaType.APPLICATION_JSON))
+                .andExpect(status().is4xxClientError())
+                .andReturn();
+
+        System.err.println(result.getResponse().getContentAsString());
+    }
+
+    @Test
     public void testDeactivate() throws Exception {
         tokenCreation();
         var result = mockMvc.perform(MockMvcRequestBuilders.patch("/api/icesi-accounts/deactivate")
@@ -374,6 +392,24 @@ class RunableartefactApplicationTests {
                         .accept(MediaType.APPLICATION_JSON))
                 .andExpect(status().isOk())
                 //No longer takes into account the email, now uses the actual user
+                .andReturn();
+
+        System.err.println(result.getResponse().getContentAsString());
+    }
+
+    @Test
+    public void testDeactivateAccountWithInvalidAccountNumber() throws Exception {
+        tokenCreation();
+        var result = mockMvc.perform(MockMvcRequestBuilders.patch("/api/icesi-accounts/deactivate")
+                        .header("Authorization", "Bearer " + token)
+                        .content(objectMapper.writeValueAsString(
+                                TransactionInformationDTO.builder()
+                                        .accountNumberOrigin("987654321")
+                                        .build()
+                        ))
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .accept(MediaType.APPLICATION_JSON))
+                .andExpect(status().is4xxClientError())
                 .andReturn();
 
         System.err.println(result.getResponse().getContentAsString());
