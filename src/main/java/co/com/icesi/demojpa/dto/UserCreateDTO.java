@@ -3,11 +3,11 @@ package co.com.icesi.demojpa.dto;
 
 import co.com.icesi.demojpa.validate.email.EmailConstraint;
 import co.com.icesi.demojpa.validate.phone.PhoneConstraint;
-import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
 
 import javax.validation.constraints.NotBlank;
+
 
 @Data
 @Builder

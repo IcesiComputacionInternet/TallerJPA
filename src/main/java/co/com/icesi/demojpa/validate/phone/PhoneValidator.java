@@ -8,7 +8,6 @@ import javax.validation.ConstraintValidatorContext;
 public class PhoneValidator implements ConstraintValidator<PhoneConstraint, UserCreateDTO> {
     @Override
     public void initialize(PhoneConstraint constraintAnnotation) {
-        ConstraintValidator.super.initialize(constraintAnnotation);
     }
 
     @Override
