@@ -164,6 +164,80 @@ class AccountControllerTests {
         assertEquals("Transfer successfully completed",transactionDTO.getResult());
     }
 
+    @Order(6)
+    @Test
+    public void testTransferMoneyRequestMissingAccountNumber() throws Exception{
+
+        TokenDTO tokenDTO=tokenUser1();
+        TransactionDTO transactionDTO=defaultTransactionDTO();
+        transactionDTO.setAccountNumberFrom("");
+        transactionDTO.setAccountNumberTo("");
+
+        var result=mockMvc.perform(MockMvcRequestBuilders.put(BASE_ACCOUNT_URL+"/transfer").content(
+                                objectMapper.writeValueAsString(transactionDTO)
+                        )
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .accept(MediaType.APPLICATION_JSON)
+                        .header(HttpHeaders.AUTHORIZATION, "Bearer "+tokenDTO.getToken()))
+                .andExpect(status().isBadRequest())
+                .andReturn();
+        IcesiError icesiError =objectMapper.readValue(result.getResponse().getContentAsString(),IcesiError.class);
+        assertNotNull(icesiError);
+        var details = icesiError.getDetails();
+        assertEquals(1, details.size());
+        var detail = details.get(0);
+        assertEquals(" An account number is needed",detail.getErrorMessage());
+    }
+
+    @Order(7)
+    @Test
+    public void testTransferMoneyInvalidAmountMin() throws Exception{
+
+        TokenDTO tokenDTO=tokenUser1();
+        TransactionDTO transactionDTO=defaultTransactionDTO();
+        transactionDTO.setMoney(-1);
+
+
+        var result=mockMvc.perform(MockMvcRequestBuilders.put(BASE_ACCOUNT_URL+"/transfer").content(
+                                objectMapper.writeValueAsString(transactionDTO)
+                        )
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .accept(MediaType.APPLICATION_JSON)
+                        .header(HttpHeaders.AUTHORIZATION, "Bearer "+tokenDTO.getToken()))
+                .andExpect(status().isBadRequest())
+                .andReturn();
+        IcesiError icesiError =objectMapper.readValue(result.getResponse().getContentAsString(),IcesiError.class);
+        assertNotNull(icesiError);
+        var details = icesiError.getDetails();
+        assertEquals(1, details.size());
+        var detail = details.get(0);
+        assertEquals("money min value is 0",detail.getErrorMessage());
+    }
+    @Order(7)
+    @Test
+    public void testTransferMoneyInvalidAmountMax() throws Exception{
+
+        TokenDTO tokenDTO=tokenUser1();
+        TransactionDTO transactionDTO=defaultTransactionDTO();
+        transactionDTO.setMoney(1000000001L);
+
+
+        var result=mockMvc.perform(MockMvcRequestBuilders.put(BASE_ACCOUNT_URL+"/transfer").content(
+                                objectMapper.writeValueAsString(transactionDTO)
+                        )
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .accept(MediaType.APPLICATION_JSON)
+                        .header(HttpHeaders.AUTHORIZATION, "Bearer "+tokenDTO.getToken()))
+                .andExpect(status().isBadRequest())
+                .andReturn();
+        IcesiError icesiError =objectMapper.readValue(result.getResponse().getContentAsString(),IcesiError.class);
+        assertNotNull(icesiError);
+        var details = icesiError.getDetails();
+        assertEquals(1, details.size());
+        var detail = details.get(0);
+        assertEquals("money max value is 1000000000",detail.getErrorMessage());
+    }
+
     private TransactionDTO defaultTransactionDTO(){
         return TransactionDTO.builder()
                 .accountNumberFrom("123-123456-23")

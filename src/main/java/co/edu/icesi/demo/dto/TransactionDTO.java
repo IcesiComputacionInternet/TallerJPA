@@ -21,7 +21,7 @@ public class TransactionDTO {
     private String accountNumberTo;
 
     @Min(value=0, message = "min value is 0")
-    @Max(value=1000000000L)
+    @Max(value=1000000000L, message = "max value is 1000000000")
     private long money;
 
     private String result;

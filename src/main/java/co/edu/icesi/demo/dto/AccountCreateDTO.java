@@ -1,5 +1,6 @@
 package co.edu.icesi.demo.dto;
 
+import co.edu.icesi.demo.validation.constraint.CustomEmailConstraint;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
@@ -27,5 +28,6 @@ public class AccountCreateDTO {
     private boolean active;
 
     @NotBlank(message = "is missing")
+    @CustomEmailConstraint
     private String userEmail;
 }
