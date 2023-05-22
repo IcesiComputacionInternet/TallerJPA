@@ -18,6 +18,7 @@ public class IcesiAuthenticatorManager extends DaoAuthenticationProvider {
         this.setPasswordEncoder(passwordEncoder);
     }
 
+    @Override
     public Authentication createSuccessAuthentication(Object principal, Authentication authentication,
                                                       UserDetails userDetails){
         UsernamePasswordAuthenticationToken successAuthentication =

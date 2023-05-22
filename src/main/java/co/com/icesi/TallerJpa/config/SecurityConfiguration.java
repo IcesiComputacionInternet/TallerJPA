@@ -1,5 +1,8 @@
 package co.com.icesi.TallerJpa.config;
 
+import co.com.icesi.TallerJpa.controller.api.IcesiAccountApi;
+import co.com.icesi.TallerJpa.controller.api.IcesiRoleApi;
+import co.com.icesi.TallerJpa.controller.api.IcesiUserApi;
 import com.nimbusds.jose.jwk.source.ImmutableSecret;
 import lombok.AllArgsConstructor;
 import org.springframework.context.annotation.Bean;
@@ -10,6 +13,7 @@ import org.springframework.security.authorization.AuthorityAuthorizationManager;
 import org.springframework.security.authorization.AuthorizationDecision;
 import org.springframework.security.authorization.AuthorizationManager;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
+import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
 import org.springframework.security.config.annotation.web.configurers.AbstractHttpConfigurer;
 import org.springframework.security.config.annotation.web.configurers.oauth2.server.resource.OAuth2ResourceServerConfigurer;
 import org.springframework.security.config.http.SessionCreationPolicy;
@@ -31,6 +35,7 @@ import javax.servlet.http.HttpServletRequest;
 
 @AllArgsConstructor
 @Configuration
+@EnableWebSecurity
 public class SecurityConfiguration {
     private final IcesiAuthenticatorManager icesiAuthenticatorManager;
     private final String secret = "longenoughsecrettotestjwtencrypt";
@@ -39,25 +44,30 @@ public class SecurityConfiguration {
     public AuthenticationManager authenticationManager(){
         return new ProviderManager(icesiAuthenticatorManager);
     }
+
     @Bean
     public SecurityFilterChain securityFilterChain(HttpSecurity http, AuthorizationManager<RequestAuthorizationContext> access) throws Exception{
         return http
+                .cors(AbstractHttpConfigurer::disable)
                 .csrf(AbstractHttpConfigurer::disable)
                 .authorizeHttpRequests(auth -> auth.anyRequest().access(access))
                 .oauth2ResourceServer(OAuth2ResourceServerConfigurer::jwt)
                 .sessionManagement(session -> session.sessionCreationPolicy(SessionCreationPolicy.STATELESS))
                 .build();
     }
+
     @Bean
     public JwtDecoder jwtDecoder(){
         byte[] bytes = secret.getBytes();
         SecretKeySpec key = new SecretKeySpec(bytes,0,bytes.length,"RSA");
         return NimbusJwtDecoder.withSecretKey(key).macAlgorithm(MacAlgorithm.HS512).build();
     }
+
     @Bean
     public JwtEncoder jwtEncoder(){
         return new NimbusJwtEncoder(new ImmutableSecret<>(secret.getBytes()));
     }
+
     @Bean
     public AuthorizationManager<RequestAuthorizationContext> requestMatcherAuthorizationManager
             (HandlerMappingIntrospector introspector) {
@@ -65,11 +75,22 @@ public class SecurityConfiguration {
 
         RequestMatcherDelegatingAuthorizationManager.Builder managerBuilder =
                 RequestMatcherDelegatingAuthorizationManager.builder()
-                .add(permitAll, (context , other) -> new AuthorizationDecision(true));
-        managerBuilder.add(new MvcRequestMatcher(introspector, "/admin/**"),
+                        .add(permitAll, (context , other) -> new AuthorizationDecision(true));
+
+        managerBuilder.add(new MvcRequestMatcher(introspector, IcesiAccountApi.ACCOUNT_BASE_URL+"/**"),
+                AuthorityAuthorizationManager.hasAnyAuthority("SCOPE_USER"));
+        managerBuilder.add(new MvcRequestMatcher(introspector, IcesiAccountApi.ACCOUNT_BASE_URL),
+                AuthorityAuthorizationManager.hasAnyAuthority("SCOPE_BANK"));
+
+        managerBuilder.add(new MvcRequestMatcher(introspector, IcesiUserApi.USER_BASE_URL+"/**"),
+                AuthorityAuthorizationManager.hasAnyAuthority("SCOPE_USER","SCOPE_BANK"));
+
+        managerBuilder.add(new MvcRequestMatcher(introspector, IcesiRoleApi.ROLE_BASE_URL+"/**"),
                 AuthorityAuthorizationManager.hasAnyAuthority("SCOPE_ADMIN"));
 
         AuthorizationManager<HttpServletRequest> manager = managerBuilder.build();
         return ((authentication, object) -> manager.check(authentication, object.getRequest()));
     }
 }
+
+

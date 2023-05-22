@@ -51,12 +51,18 @@ public class GlobalExceptionHandler {
         return ResponseEntity.status(error.getStatus()).body(error);
     }
 
+    @ExceptionHandler(BadCredentialsException.class)
+    public ResponseEntity<IcesiError> handleLoginException(BadCredentialsException ex){
+        var errorBuilder = IcesiError.builder().status(HttpStatus.UNAUTHORIZED);
+        var details = new IcesiErrorDetail(ErrorCode.ERR_401.getCode(), ex.getMessage());
+        var error = errorBuilder.details(List.of(details)).build();
+        return ResponseEntity.status(error.getStatus()).body(error);
+    }
+
     @ExceptionHandler(IcesiException.class)
     public ResponseEntity<IcesiError> handleIcesiException(IcesiException icesiException){
         return ResponseEntity.status(icesiException.getError().getStatus()).body(icesiException.getError());
     }
-
-    //BadCredentialsException
 
     private IcesiErrorDetail mapBindingResultToError(ObjectError objectError){
         var message = ErrorCode.ERR_400.getMessage().formatted(((FieldError) objectError).getField(), objectError.getDefaultMessage());
