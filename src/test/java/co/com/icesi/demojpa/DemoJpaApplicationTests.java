@@ -79,7 +79,7 @@ class TallerJpaApplicationTests {
 		IcesiError error = objectMapper.readValue(result.getResponse().getContentAsString(), IcesiError.class);
 		System.out.println(error.getDetails());
 		assertNotNull(error);
-		assertEquals("Usuario o contraseÃ±a incorrectos", error.getDetails());
+		assertEquals("Bad credentials", error.getDetails());
 	}
 
 	@Test
