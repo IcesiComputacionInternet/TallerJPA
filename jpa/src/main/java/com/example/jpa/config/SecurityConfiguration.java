@@ -6,7 +6,6 @@ import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.ProviderManager;
-import org.springframework.security.authentication.dao.DaoAuthenticationProvider;
 import org.springframework.security.authorization.AuthorityAuthorizationManager;
 import org.springframework.security.authorization.AuthorizationDecision;
 import org.springframework.security.authorization.AuthorizationManager;
@@ -61,7 +60,7 @@ public class SecurityConfiguration {
     public JwtDecoder jwtDecoder() {
         byte[] secretBytes = secret.getBytes();
         SecretKeySpec key = new SecretKeySpec(secretBytes, 0, secretBytes.length, "RSA");
-        return NimbusJwtDecoder.withSecretKey(key).macAlgorithm(MacAlgorithm.HS512).build();
+        return NimbusJwtDecoder.withSecretKey(key).macAlgorithm(MacAlgorithm.HS256).build();
     }
 
     @Bean
@@ -75,18 +74,18 @@ public class SecurityConfiguration {
 
         RequestMatcherDelegatingAuthorizationManager.Builder managerBuilder = RequestMatcherDelegatingAuthorizationManager.builder()
                 .add(permitAll, (context, other) -> new AuthorizationDecision(true));
-        //These lines give access to the /admin/** path only to users with the SCOPE_ADMIN authority
-        managerBuilder.add(new MvcRequestMatcher(introspector, "/admin/**"),
+        //These lines give access to all paths to users with the SCOPE_ADMIN authority
+        managerBuilder.add(new MvcRequestMatcher(introspector, "/**"),
                 AuthorityAuthorizationManager.hasAnyAuthority("SCOPE_ADMIN"));
-        //These lines give acces to the /roles/** path only to users with the SCOPE_ADMIN authority
-        managerBuilder.add(new MvcRequestMatcher(introspector, "/roles/**"),
-                AuthorityAuthorizationManager.hasAnyAuthority("SCOPE_ADMIN"));
-        //These lines give acces to the /user/** path only to users with the SCOPE_USER authority
-        managerBuilder.add(new MvcRequestMatcher(introspector, "/users/**"),
-                AuthorityAuthorizationManager.hasAnyAuthority("SCOPE_USER"));
-        //These lines give acces to the /accounts/** path only to users with the SCOPE_USER authority
+        //These lines give acces to the /accounts/** path  to users with the SCOPE_USER authority
         managerBuilder.add(new MvcRequestMatcher(introspector, "/accounts/**"),
                 AuthorityAuthorizationManager.hasAnyAuthority("SCOPE_USER"));
+        //These lines give acces to the /accounts/createAccount path only to users with the SCOPE_BANK_USER authority
+        managerBuilder.add(new MvcRequestMatcher(introspector, "/accounts/createAcoount"),
+                AuthorityAuthorizationManager.hasAnyAuthority("SCOPE_BANK_USER"));
+        //These lines give acces to the /users/** path to users with the SCOPE_BANK_USER authority. This is created and get users.
+        managerBuilder.add(new MvcRequestMatcher(introspector, "/users/**"),
+                AuthorityAuthorizationManager.hasAnyAuthority("SCOPE_BANK_USER"));
 
         AuthorizationManager<HttpServletRequest> manager = managerBuilder.build();
         return (authentication, object) -> manager.check(authentication, object.getRequest());

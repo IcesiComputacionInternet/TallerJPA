@@ -11,7 +11,10 @@ import com.example.jpa.model.IcesiAccount;
 import com.example.jpa.model.IcesiUser;
 import com.example.jpa.repository.AccountRepository;
 import com.example.jpa.repository.UserRepository;
+import com.example.jpa.security.IcesiSecurityContext;
 import lombok.AllArgsConstructor;
+import org.springframework.security.core.Authentication;
+import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -95,6 +98,7 @@ public class AccountService {
     public boolean enableAccount(String accountNumber){
         IcesiAccount account = validateAccountExists(accountNumber);
         validateAccountBalance(account, 0);
+        validateAccountOwner(account.getAccountNumber());
         account.setActive(true);
         accountRepository.save(account);
         return true;
@@ -103,6 +107,7 @@ public class AccountService {
     //Disable account if balance is 0
     public boolean disableAccount(String accountNumber){
         IcesiAccount account = validateAccountExists(accountNumber);
+        validateAccountOwner(account.getAccountNumber());
         if(account.getBalance() == 0){
             account.setActive(false);
             accountRepository.save(account);
@@ -155,6 +160,14 @@ public class AccountService {
         if((accountFrom.getType().equalsIgnoreCase("deposit") ||
                 accountTo.getType().equalsIgnoreCase("deposit"))) {
             throw new AccountException("One or both accounts are of type deposit");
+        }
+    }
+
+    //Validate if the logged user is the owner of the account
+    public void validateAccountOwner(String accountNumber){
+        var userId = IcesiSecurityContext.getCurrentUserId();
+        if(!accountRepository.isAccountOwner(userId, accountNumber)) {
+            throw new AccountException("You are not the owner of this account");
         }
     }
 

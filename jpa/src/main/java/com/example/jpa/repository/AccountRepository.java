@@ -3,6 +3,7 @@ package com.example.jpa.repository;
 import com.example.jpa.model.IcesiAccount;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
+import org.springframework.data.repository.query.Param;
 import org.springframework.stereotype.Repository;
 
 import java.util.List;
@@ -20,5 +21,8 @@ public interface AccountRepository extends JpaRepository<IcesiAccount, UUID> {
 
     @Query(value = "SELECT a FROM IcesiAccount  a where a.active = true")
     List<IcesiAccount> getAllAccounts();
+
+    @Query("SELECT CASE WHEN COUNT(a)>0 THEN true ELSE false END FROM IcesiAccount a WHERE a.user.userId = :userId AND a.accountNumber = :accountNumber")
+    Boolean isAccountOwner(@Param("userId") String userId, @Param("accountNumber") String accountNumber);
 
 }
