@@ -34,6 +34,48 @@ public class IcesiAccountControllerTest {
 
     private static final String URL= "/account/transferMoney";
 
+
+
+     @Test
+     public void createAccount() throws Exception{
+         setToken("admin@email.com");
+         var  result = mockMvc.perform(MockMvcRequestBuilders.post("/account").content(
+                                 objectMapper.writeValueAsString(IcesiAccountDTO.builder()
+                                         .balance(100L)
+                                         .type("AHORROS")
+                                         .user(IcesiUserDTO.builder()
+                                                 .email("admin@email.com").build()).build())
+                                          )
+                         .header("Authorization", "Bearer " + token)
+                         .contentType(MediaType.APPLICATION_JSON)
+                         .accept(MediaType.APPLICATION_JSON))
+                 .andExpect(status().isOk())
+                 .andReturn();
+
+         System.out.println(result.getResponse().getContentAsString());
+
+     }
+
+    @Test
+    public void createAccountWithBlankType() throws Exception{
+        setToken("admin@email.com");
+        var  result = mockMvc.perform(MockMvcRequestBuilders.post("/account").content(
+                                objectMapper.writeValueAsString(IcesiAccountDTO.builder()
+                                        .balance(100L)
+                                        .type("")
+                                        .user(IcesiUserDTO.builder()
+                                                .email("admin@email.com").build()).build())
+                        )
+                        .header("Authorization", "Bearer " + token)
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .accept(MediaType.APPLICATION_JSON))
+                .andExpect(status().isBadRequest())
+                .andReturn();
+
+        System.out.println(result.getResponse().getContentAsString());
+
+    }
+
     @Test
     public void transferMoneyWhenNoUserAuth() throws Exception {
         var  result = mockMvc.perform(MockMvcRequestBuilders.patch(URL).content(
@@ -93,6 +135,25 @@ public class IcesiAccountControllerTest {
         setToken("admin@email.com");
         var  result = mockMvc.perform(MockMvcRequestBuilders.patch(URL).content(
                                 objectMapper.writeValueAsString(defaultTransactionDesposit()))
+                        .header("Authorization", "Bearer " + token)
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .accept(MediaType.APPLICATION_JSON))
+                .andExpect(status().isBadRequest())
+                .andReturn();
+
+        System.out.println(result.getResponse().getContentAsString());
+    }
+
+
+    @Test
+    public void transferMoneyWhenTheBalanceToTransferIsLessThanZero() throws Exception {
+        setToken("admin@email.com");
+        var  result = mockMvc.perform(MockMvcRequestBuilders.patch(URL).content(
+                                objectMapper.writeValueAsString(TransactionRequestDTO.builder()
+                                        .accountNumberFrom("956-648065-61")
+                                        .accountNumberTo("903-178442-08")
+                                        .amount(-1L)
+                                        .build()))
                         .header("Authorization", "Bearer " + token)
                         .contentType(MediaType.APPLICATION_JSON)
                         .accept(MediaType.APPLICATION_JSON))

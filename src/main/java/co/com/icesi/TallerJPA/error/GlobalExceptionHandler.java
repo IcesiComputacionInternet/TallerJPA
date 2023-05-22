@@ -25,7 +25,7 @@ public class GlobalExceptionHandler {
 
     @ExceptionHandler(MethodArgumentNotValidException.class)
     public ResponseEntity<ApplicationError> handleMissArgumentException(MethodArgumentNotValidException exception){
-        ApplicationError error = ApplicationError.builder().status(HttpStatus.BAD_REQUEST).details(List.of(sendDetails(createDetail("Check your field's", ErrorCode.ERROR_MISSING_ARGUMENT)))).build();
+        ApplicationError error = ApplicationError.builder().status(HttpStatus.BAD_REQUEST).details(List.of(sendDetails(createDetail("Check your field's: "+exception.getMessage(), ErrorCode.ERROR_MISSING_ARGUMENT)))).build();
         return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(error);
     }
 

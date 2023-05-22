@@ -1,18 +1,10 @@
 package co.com.icesi.TallerJPA.integration;
 
-
-import co.com.icesi.TallerJPA.config.IcesiAuthenticationManager;
-import co.com.icesi.TallerJPA.config.PasswordEncoderConfiguration;
-import co.com.icesi.TallerJPA.config.SecurityConfiguration;
-import co.com.icesi.TallerJPA.controller.IcesiUserController;
 import co.com.icesi.TallerJPA.dto.IcesiRoleDTO;
 import co.com.icesi.TallerJPA.dto.IcesiUserDTO;
 import co.com.icesi.TallerJPA.dto.LoginDto;
-import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
-import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
-import org.junit.jupiter.api.extension.ExtendWith;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;
 import org.springframework.boot.test.context.SpringBootTest;
@@ -43,8 +35,6 @@ public class IcesiUserControllerTest {
 
     private static final String URL= "/user";
 
-
-
     @Test
     public void testCreateUserNoAuth() throws Exception {
         var  result = mockMvc.perform(MockMvcRequestBuilders.post(URL).content(
@@ -65,6 +55,98 @@ public class IcesiUserControllerTest {
                         .contentType(MediaType.APPLICATION_JSON)
                         .accept(MediaType.APPLICATION_JSON))
                 .andExpect(status().isOk())
+                .andReturn();
+
+        System.out.println(result.getResponse().getContentAsString());
+    }
+
+    @Test
+    public void testCreateUserAdminNonColombianNumber() throws Exception {
+        setToken("admin@email.com");
+        var  result = mockMvc.perform(MockMvcRequestBuilders.post(URL).content(
+                                objectMapper.writeValueAsString(IcesiUserDTO.builder()
+                                        .firstName("Jhon")
+                                        .lastName("Doe")
+                                        .phoneNumber("+973322356789")
+                                        .password("1234567")
+                                        .email("Richie.doe@gmailTest9.com")
+                                        .role(IcesiRoleDTO.builder()
+                                                .name("NORMAL")
+                                                .build())
+                                        .build()))
+                        .header("Authorization", "Bearer " + token)
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .accept(MediaType.APPLICATION_JSON))
+                .andExpect(status().isBadRequest())
+                .andReturn();
+
+        System.out.println(result.getResponse().getContentAsString());
+    }
+
+    @Test
+    public void testCreateUserAdminBlankPassword() throws Exception {
+        setToken("admin@email.com");
+        var  result = mockMvc.perform(MockMvcRequestBuilders.post(URL).content(
+                                objectMapper.writeValueAsString(IcesiUserDTO.builder()
+                                        .firstName("Jhon")
+                                        .lastName("Doe")
+                                        .phoneNumber("+573322356789")
+                                        .password("")
+                                        .email("Richie.doe@gmailTest9.com")
+                                        .role(IcesiRoleDTO.builder()
+                                                .name("NORMAL")
+                                                .build())
+                                        .build()))
+                        .header("Authorization", "Bearer " + token)
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .accept(MediaType.APPLICATION_JSON))
+                .andExpect(status().isBadRequest())
+                .andReturn();
+
+        System.out.println(result.getResponse().getContentAsString());
+    }
+
+    @Test
+    public void testCreateUserAdminBlankEmail() throws Exception {
+        setToken("admin@email.com");
+        var  result = mockMvc.perform(MockMvcRequestBuilders.post(URL).content(
+                                objectMapper.writeValueAsString(IcesiUserDTO.builder()
+                                        .firstName("Jhon")
+                                        .lastName("Doe")
+                                        .phoneNumber("+573322356789")
+                                        .password("")
+                                        .email("")
+                                        .role(IcesiRoleDTO.builder()
+                                                .name("NORMAL")
+                                                .build())
+                                        .build()))
+                        .header("Authorization", "Bearer " + token)
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .accept(MediaType.APPLICATION_JSON))
+                .andExpect(status().isBadRequest())
+                .andReturn();
+
+        System.out.println(result.getResponse().getContentAsString());
+    }
+
+    @Test
+    public void testCreateUserAdminNotFormatEmail() throws Exception {
+        setToken("admin@email.com");
+        var  result = mockMvc.perform(MockMvcRequestBuilders.post(URL).content(
+                                objectMapper.writeValueAsString(IcesiUserDTO.builder()
+                                        .firstName("Jhon")
+                                        .lastName("Doe")
+                                        .phoneNumber("+573322356789")
+                                        .password("12121212")
+                                        .email("Richi.com")
+                                        .role(IcesiRoleDTO.builder()
+                                                .name("NORMAL")
+                                                .build())
+                                        .build()))
+                        .header("Authorization", "Bearer " + token)
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .accept(MediaType.APPLICATION_JSON))
+                .andExpect(status().isBadRequest())
                 .andReturn();
 
         System.out.println(result.getResponse().getContentAsString());
