@@ -6,7 +6,7 @@ import com.example.tallerjpa.dto.TransactionResponseDTO;
 import com.example.tallerjpa.dto.UserDTO;
 import com.example.tallerjpa.mapper.AccountMapper;
 import com.example.tallerjpa.mapper.AccountMapperImpl;
-import com.example.tallerjpa.model.AccountType;
+import com.example.tallerjpa.enums.AccountType;
 import com.example.tallerjpa.model.IcesiAccount;
 import com.example.tallerjpa.model.IcesiRole;
 import com.example.tallerjpa.model.IcesiUser;

@@ -5,7 +5,7 @@ import com.example.tallerjpa.dto.TransactionRequestDTO;
 import com.example.tallerjpa.dto.TransactionResponseDTO;
 import com.example.tallerjpa.error.exception.CustomException;
 import com.example.tallerjpa.mapper.AccountMapper;
-import com.example.tallerjpa.model.AccountType;
+import com.example.tallerjpa.enums.AccountType;
 import com.example.tallerjpa.model.IcesiAccount;
 import com.example.tallerjpa.repository.AccountRepository;
 import com.example.tallerjpa.repository.UserRepository;

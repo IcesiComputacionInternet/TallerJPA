@@ -10,6 +10,7 @@ import org.springframework.security.authentication.ProviderManager;
 import org.springframework.security.authorization.AuthorityAuthorizationManager;
 import org.springframework.security.authorization.AuthorizationDecision;
 import org.springframework.security.authorization.AuthorizationManager;
+import org.springframework.security.config.annotation.authentication.builders.AuthenticationManagerBuilder;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
 import org.springframework.security.config.annotation.web.configurers.AbstractHttpConfigurer;
@@ -40,11 +41,11 @@ public class SecurityConfiguration {
     private final IcesiAuthenticationManager icesiAuthenticationManager;
 
 
-    private final String secret = "longenoughtsecretkeytotestasdfghjkl";
+    private final String secret = "longenoughsecrettotestjwtencrypt";
     @Bean
-    public AuthenticationManager authenticationManager(){
-        return new ProviderManager(icesiAuthenticationManager);
+    public AuthenticationManager authenticationManager(){return new ProviderManager(icesiAuthenticationManager);
     }
+
 
     @Bean
     public SecurityFilterChain securityFilterChain(HttpSecurity http, AuthorizationManager<RequestAuthorizationContext> access) throws Exception{
@@ -70,11 +71,13 @@ public class SecurityConfiguration {
 
     @Bean
     public AuthorizationManager<RequestAuthorizationContext> requestAuthorizationContextAuthenticationManager(HandlerMappingIntrospector introspector){
-        RequestMatcher permitAll = new AndRequestMatcher(new MvcRequestMatcher(introspector, "/token"));
+        RequestMatcher permitAll = new AndRequestMatcher(new MvcRequestMatcher(introspector, "/login"));
         RequestMatcherDelegatingAuthorizationManager.Builder managerBuilder = RequestMatcherDelegatingAuthorizationManager.builder()
                 .add(permitAll, (context, other)-> new AuthorizationDecision(true));
-        managerBuilder.add(new MvcRequestMatcher(introspector, "/admin/**"),
-                AuthorityAuthorizationManager.hasAnyAuthority("SCOPE_ADMIN"));
+        managerBuilder.add(new MvcRequestMatcher(introspector,"/users"), AuthorityAuthorizationManager.hasAnyAuthority("SCOPE_ADMIN"));
+        managerBuilder.add(new MvcRequestMatcher(introspector,"/roles"), AuthorityAuthorizationManager.hasAnyAuthority("SCOPE_ADMIN"));
+        managerBuilder.add(new MvcRequestMatcher(introspector,"/accounts"), AuthorityAuthorizationManager.hasAnyAuthority("SCOPE_NORMAL","SCOPE_BANK"));
+        managerBuilder.add(new MvcRequestMatcher(introspector,"/accounts/**"), AuthorityAuthorizationManager.hasAnyAuthority("SCOPE_NORMAL","SCOPE_ADMIN"));
         AuthorizationManager<HttpServletRequest> manager = managerBuilder.build();
         return (authentication, object) -> manager.check(authentication, object.getRequest());
     }

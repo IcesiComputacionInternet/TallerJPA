@@ -7,6 +7,7 @@ import com.example.tallerjpa.model.IcesiUser;
 import com.example.tallerjpa.repository.RoleRepository;
 import com.example.tallerjpa.repository.UserRepository;
 import lombok.AllArgsConstructor;
+import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
 import java.util.UUID;
@@ -18,6 +19,7 @@ public class UserService {
     private final UserRepository userRepository;
     private final RoleRepository roleRepository;
     private final UserMapper userMapper;
+    private final PasswordEncoder passwordEncoder;
 
     public IcesiUser saveIcesiUser(UserDTO userDTO){
         IcesiUser icesiUser = createIcesiUser(userDTO);
@@ -26,6 +28,7 @@ public class UserService {
 
     public IcesiUser createIcesiUser(UserDTO userDTO){
         IcesiUser icesiUser = userMapper.fromUserDTO(userDTO);
+        icesiUser.setPassword(passwordEncoder.encode(userDTO.getPassword()));
         boolean existsByEmail = userRepository.existsByEmail(userDTO.getEmail());
         boolean existsByPhoneNumber = userRepository.existsByPhoneNumber(userDTO.getPhoneNumber());
         if (existsByEmail&&existsByPhoneNumber){
@@ -41,7 +44,7 @@ public class UserService {
         if(userDTO.getRole().isEmpty()){
             throw new CustomException("The role can't be null");
         }
-        icesiUser.setIcesiRole(roleRepository.searchByName(userDTO.getRole()).orElseThrow(()-> new CustomException("Role doesn't exists")));
+        icesiUser.setIcesiRole(roleRepository.searchByName(userDTO.getRole().toUpperCase()).orElseThrow(()-> new CustomException("Role doesn't exists")));
         return icesiUser;
 
     }

@@ -1,5 +1,6 @@
 package com.example.tallerjpa.model;
 
+import com.example.tallerjpa.enums.AccountType;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;

@@ -14,6 +14,7 @@ import org.springframework.stereotype.Component;
 public class IcesiAuthenticationManager extends DaoAuthenticationProvider {
 
     public IcesiAuthenticationManager(UserManagementService userManagementService, PasswordEncoder passwordEncoder){
+        super();
         this.setUserDetailsService(userManagementService);
         this.setPasswordEncoder(passwordEncoder);
     }

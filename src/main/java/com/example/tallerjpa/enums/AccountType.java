@@ -1,4 +1,4 @@
-package com.example.tallerjpa.model;
+package com.example.tallerjpa.enums;
 
 public enum AccountType {
     DEPOSIT("Deposit"),

@@ -24,6 +24,7 @@ public class RoleService {
 
     public IcesiRole createRole(RoleDTO roleDTO){
         IcesiRole icesiRole = roleMapper.fromRoleDTO(roleDTO);
+        icesiRole.setName(icesiRole.getName().toUpperCase());
         if(roleRepository.existsByName(roleDTO.getName())){throw new CustomException("Role's name must be unique");}
         icesiRole.setRoleId(UUID.randomUUID());
         return icesiRole;

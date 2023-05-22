@@ -11,6 +11,7 @@ import com.example.tallerjpa.service.UserService;
 import com.example.tallerjpa.unit.service.matcher.UserMatcher;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
+import org.springframework.security.crypto.password.PasswordEncoder;
 
 import java.util.Optional;
 import java.util.UUID;
@@ -25,6 +26,7 @@ public class UserServiceTest {
     private UserRepository userRepository;
     private UserMapper userMapper;
     private RoleRepository roleRepository;
+    private PasswordEncoder passwordEncoder;
 
 
     @BeforeEach
@@ -32,7 +34,8 @@ public class UserServiceTest {
         userRepository = mock(UserRepository.class);
         roleRepository = mock(RoleRepository.class);
         userMapper = spy(UserMapperImpl.class);
-        userService = new UserService(userRepository, roleRepository, userMapper);
+        passwordEncoder = mock(PasswordEncoder.class);
+        userService = new UserService(userRepository, roleRepository, userMapper, passwordEncoder);
     }
 
     @Test
@@ -99,7 +102,7 @@ public class UserServiceTest {
                 .lastName("Osorio")
                 .email("juanosorio@hotmail.com")
                 .phoneNumber("12345678")
-                .password("password")
+                .password(passwordEncoder.encode("password"))
                 .icesiRole(defaultRole())
                 .build();
     }
@@ -110,7 +113,7 @@ public class UserServiceTest {
                 .lastName("Osorio")
                 .email("juanosorio@hotmail.com")
                 .phoneNumber("12345678")
-                .password("password")
+                .password(passwordEncoder.encode("password"))
                 .role("Student")
                 .build();
     }
