@@ -91,8 +91,18 @@ public class SecurityConfiguration {
                 AuthorityAuthorizationManager.hasAnyAuthority("SCOPE_ADMIN","SCOPE_BANK"));
 
         //ASIGNANDO LOS PERMISOS DEL API DE USUARIOS.
+        //admin users pueden añadir usuarios.
         tempMvcRequestMatcher = new MvcRequestMatcher(introspector, IcesiUserApi.USER_BASE_URL);
         tempMvcRequestMatcher.setMethod(HttpMethod.POST);
+        managerBuilder.add(tempMvcRequestMatcher,
+                AuthorityAuthorizationManager.hasAnyAuthority("SCOPE_ADMIN"));
+        //admin users pueden modificar rol de usuarios.
+        tempMvcRequestMatcher = new MvcRequestMatcher(introspector, IcesiUserApi.USER_BASE_URL);
+        tempMvcRequestMatcher.setMethod(HttpMethod.PATCH);
+        managerBuilder.add(tempMvcRequestMatcher,
+                AuthorityAuthorizationManager.hasAnyAuthority("SCOPE_ADMIN"));
+
+
         managerBuilder.add(new MvcRequestMatcher(introspector, IcesiAccountApi.ACCOUNT_BASE_URL+"/**"),
                 AuthorityAuthorizationManager.hasAnyAuthority("SCOPE_USER"));
         managerBuilder.add(new MvcRequestMatcher(introspector, IcesiAccountApi.ACCOUNT_BASE_URL),

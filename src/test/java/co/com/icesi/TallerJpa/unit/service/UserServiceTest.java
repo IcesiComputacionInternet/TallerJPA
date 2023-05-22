@@ -1,6 +1,7 @@
 package co.com.icesi.TallerJpa.unit.service;
 
 import co.com.icesi.TallerJpa.dto.IcesiUserRequestDTO;
+import co.com.icesi.TallerJpa.dto.RoleChangeDTO;
 import co.com.icesi.TallerJpa.error.exception.IcesiError;
 import co.com.icesi.TallerJpa.error.exception.IcesiException;
 import co.com.icesi.TallerJpa.mapper.IcesiUserMapper;
@@ -138,7 +139,7 @@ public class UserServiceTest {
 
         assertEquals(1,icesiError.getDetails().size());
         assertEquals(HttpStatus.NOT_FOUND.value(), icesiError.getStatus().value());
-        assertEquals("Role doesn't exists", icesiException.getMessage());
+        assertEquals("Role: "+defaultIcesiUserDTO().getRole()+" not found", icesiException.getMessage());
         assertEquals("ERR_404", icesiError.getDetails().get(0).getErrorCode());
         assertEquals("IcesiRole with name: "+defaultIcesiUserDTO().getRole()+" not found",
                 icesiError.getDetails().get(0).getErrorMessage());
@@ -152,8 +153,64 @@ public class UserServiceTest {
     }
 
     @Test
+    @DisplayName("Assign new role to icesi user Happy Path")
+    public void testAssignRoleHappyPath(){
+        when(icesiUserRepository.findByEmail(any())).thenReturn(Optional.of(defaultIcesiUser()));
+        when(icesiRoleRepository.findByName(any())).thenReturn(Optional.of(changeIcesiRole()));
+        icesiUserService.assignRole(defaultRoleChangeDTO());
+        verify(icesiUserRepository,times(1)).findByEmail(defaultIcesiUser().getEmail());
+        verify(icesiRoleRepository,times(1)).findByName(changeIcesiRole().getName());
+        verify(icesiUserMapper,times(1)).fromIcesiUserToResponse(any());
+        verify(icesiUserRepository,times(1)).save(argThat(new IcesiUserMatcher(resultChangeRole())));
+    }
+
+    @Test
+    @DisplayName("Assign new role to icesi user that not exists")
+    public void testAssignRoleWhenUserNotExists(){
+        when(icesiUserRepository.findByEmail(any())).thenReturn(Optional.empty());
+        IcesiException icesiException = assertThrows(IcesiException.class,
+                () -> icesiUserService.assignRole(defaultRoleChangeDTO()));
+        IcesiError icesiError = icesiException.getError();
+
+        assertEquals(1,icesiError.getDetails().size());
+        assertEquals(HttpStatus.NOT_FOUND.value(), icesiError.getStatus().value());
+        assertEquals("User not found", icesiException.getMessage());
+        assertEquals("ERR_404", icesiError.getDetails().get(0).getErrorCode());
+        assertEquals("IcesiUser with email: "+defaultIcesiUserDTO().getEmail()+" not found",
+                icesiError.getDetails().get(0).getErrorMessage());
+
+        verify(icesiUserRepository,times(1)).findByEmail(defaultIcesiUser().getEmail());
+        verify(icesiRoleRepository,times(0)).findByName(changeIcesiRole().getName());
+        verify(icesiUserMapper,times(0)).fromIcesiUserToResponse(any());
+        verify(icesiUserRepository,times(0)).save(argThat(new IcesiUserMatcher(resultChangeRole())));
+
+    }
+
+    @Test
+    @DisplayName("Assign new role to icesi user when role not exists")
+    public void testAssignRoleThatNotExists(){
+        when(icesiUserRepository.findByEmail(any())).thenReturn(Optional.of(defaultIcesiUser()));
+        when(icesiRoleRepository.findByName(any())).thenReturn(Optional.empty());
+        IcesiException icesiException = assertThrows(IcesiException.class,
+                () -> icesiUserService.assignRole(defaultRoleChangeDTO()));
+        IcesiError icesiError = icesiException.getError();
+
+        assertEquals(1,icesiError.getDetails().size());
+        assertEquals(HttpStatus.NOT_FOUND.value(), icesiError.getStatus().value());
+        assertEquals("Role: "+defaultRoleChangeDTO().getRole()+" not found", icesiException.getMessage());
+        assertEquals("ERR_404", icesiError.getDetails().get(0).getErrorCode());
+        assertEquals("IcesiRole with name: "+defaultRoleChangeDTO().getRole()+" not found",
+                icesiError.getDetails().get(0).getErrorMessage());
+
+        verify(icesiUserRepository,times(1)).findByEmail(defaultIcesiUser().getEmail());
+        verify(icesiRoleRepository,times(1)).findByName(changeIcesiRole().getName());
+        verify(icesiUserMapper,times(0)).fromIcesiUserToResponse(any());
+        verify(icesiUserRepository,times(0)).save(argThat(new IcesiUserMatcher(resultChangeRole())));
+    }
+
+    @Test
     @DisplayName("Get an icesi user by userId Happy Path")
-    public void testGetIcesiUserHappyPath(){
+    public void testGetIcesiUserByUserIdHappyPath(){
         when(icesiUserRepository.findById(any())).thenReturn(Optional.of(defaultIcesiUser()));
         icesiUserService.getUserById(defaultUUID());
         verify(icesiUserMapper,times(1)).fromIcesiUserToResponse(any());
@@ -234,6 +291,29 @@ public class UserServiceTest {
         return IcesiRole.builder()
                 .name("ICESI_STUDENT")
                 .description("Icesi student")
+                .build();
+    }
+    private IcesiUser resultChangeRole(){
+        return IcesiUser.builder()
+                .userId(defaultUUID())
+                .firstName("Mariana")
+                .lastName("Trujillo")
+                .email("mariana.trujillo@hotmail.com")
+                .phoneNumber("3147778888")
+                .password("password")
+                .icesiRole(changeIcesiRole())
+                .build();
+    }
+    private IcesiRole changeIcesiRole(){
+        return IcesiRole.builder()
+                .name("ICESI_PROFESSOR")
+                .description("Icesi professor")
+                .build();
+    }
+    private RoleChangeDTO defaultRoleChangeDTO(){
+        return RoleChangeDTO.builder()
+                .email("mariana.trujillo@hotmail.com")
+                .role("ICESI_PROFESSOR")
                 .build();
     }
     private UUID defaultUUID(){

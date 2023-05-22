@@ -2,6 +2,7 @@ package co.com.icesi.TallerJpa.controller.api;
 
 import co.com.icesi.TallerJpa.dto.IcesiUserRequestDTO;
 import co.com.icesi.TallerJpa.dto.IcesiUserResponseDTO;
+import co.com.icesi.TallerJpa.dto.RoleChangeDTO;
 import org.springframework.web.bind.annotation.*;
 
 import javax.validation.Valid;
@@ -14,6 +15,9 @@ public interface IcesiUserApi {
 
     @PostMapping
     IcesiUserResponseDTO addIcesiUser(@Valid @RequestBody IcesiUserRequestDTO icesiUserRequestDTO);
+
+    @PatchMapping
+    IcesiUserResponseDTO assignRole(@Valid @RequestBody RoleChangeDTO roleChangeDTO);
 
     @GetMapping("/userId/{userId}")
     IcesiUserResponseDTO getIcesiUserById(@PathVariable String userId);

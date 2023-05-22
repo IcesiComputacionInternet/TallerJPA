@@ -2,6 +2,7 @@ package co.com.icesi.TallerJpa.service;
 
 import co.com.icesi.TallerJpa.dto.IcesiUserRequestDTO;
 import co.com.icesi.TallerJpa.dto.IcesiUserResponseDTO;
+import co.com.icesi.TallerJpa.dto.RoleChangeDTO;
 import co.com.icesi.TallerJpa.error.exception.DetailBuilder;
 import co.com.icesi.TallerJpa.error.exception.ErrorCode;
 import co.com.icesi.TallerJpa.mapper.IcesiUserMapper;
@@ -43,37 +44,50 @@ public class IcesiUserService {
                             .toArray(DetailBuilder[]::new)
             ).get();
         }
-        IcesiRole icesiRole = icesiRoleRepository.findByName(icesiUserRequestDTO.getRole())
-                .orElseThrow(createIcesiException(
-                        "Role doesn't exists",
-                        HttpStatus.NOT_FOUND,
-                        new DetailBuilder(ErrorCode.ERR_404,"IcesiRole","name",icesiUserRequestDTO.getRole())
-                ));
+        IcesiRole icesiRole = privateGetRoleByName(icesiUserRequestDTO.getRole());
         IcesiUser icesiUser = icesiUserMapper.fromUserDto(icesiUserRequestDTO);
         icesiUser.setUserId(UUID.randomUUID());
         icesiUser.setIcesiRole(icesiRole);
         return icesiUserMapper.fromIcesiUserToResponse(icesiUserRepository.save(icesiUser));
     }
 
+    public IcesiUserResponseDTO assignRole(RoleChangeDTO roleChangeDTO){
+        IcesiUser icesiUser = privateGetUserByEmail(roleChangeDTO.getEmail());
+        IcesiRole icesiRole = privateGetRoleByName(roleChangeDTO.getRole());
+        icesiUser.setIcesiRole(icesiRole);
+        return icesiUserMapper.fromIcesiUserToResponse(icesiUserRepository.save(icesiUser));
+    }
+
     public IcesiUserResponseDTO getUserById(UUID idString){
-        return icesiUserMapper.fromIcesiUserToResponse(
-                icesiUserRepository.findById(idString)
-                        .orElseThrow(createIcesiException(
-                                "User not found",
-                                HttpStatus.NOT_FOUND,
-                                new DetailBuilder(ErrorCode.ERR_404,"IcesiUser","userId",idString)
-                        ))
-        );
+        return icesiUserMapper.fromIcesiUserToResponse(privateGetUserById(idString));
     }
 
     public IcesiUserResponseDTO getUserByEmail(String email){
-        return icesiUserMapper.fromIcesiUserToResponse(
-                icesiUserRepository.findByEmail(email)
-                        .orElseThrow(createIcesiException(
-                                "User not found",
-                                HttpStatus.NOT_FOUND,
-                                new DetailBuilder(ErrorCode.ERR_404,"IcesiUser","email",email)
-                        ))
-        );
+        return icesiUserMapper.fromIcesiUserToResponse(privateGetUserByEmail(email));
+    }
+
+    private IcesiUser privateGetUserById(UUID idString){
+        return icesiUserRepository.findById(idString)
+                .orElseThrow(createIcesiException(
+                        "User not found",
+                        HttpStatus.NOT_FOUND,
+                        new DetailBuilder(ErrorCode.ERR_404,"IcesiUser","userId",idString)
+                ));
+    }
+    private IcesiUser privateGetUserByEmail(String email){
+        return icesiUserRepository.findByEmail(email)
+                .orElseThrow(createIcesiException(
+                        "User not found",
+                        HttpStatus.NOT_FOUND,
+                        new DetailBuilder(ErrorCode.ERR_404,"IcesiUser","email",email)
+                ));
+    }
+    private IcesiRole privateGetRoleByName(String name){
+        return icesiRoleRepository.findByName(name)
+                .orElseThrow(createIcesiException(
+                        "Role: "+name+" not found",
+                        HttpStatus.NOT_FOUND,
+                        new DetailBuilder(ErrorCode.ERR_404,"IcesiRole","name",name)
+                ));
     }
 }
