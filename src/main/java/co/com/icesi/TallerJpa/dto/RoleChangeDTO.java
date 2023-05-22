@@ -1,22 +1,27 @@
 package co.com.icesi.TallerJpa.dto;
 
+import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
+import lombok.NoArgsConstructor;
 
-import javax.validation.constraints.Min;
+import javax.validation.constraints.Email;
 import javax.validation.constraints.NotBlank;
 import javax.validation.constraints.NotEmpty;
 import javax.validation.constraints.NotNull;
 
 @Data
 @Builder
-public class TransactionDTO {
+@AllArgsConstructor
+@NoArgsConstructor
+public class RoleChangeDTO {
     @NotNull(message = "can't be null.")
     @NotBlank(message = "can't be blank.")
     @NotEmpty(message = "can't be empty.")
-    private String accountNumberOrigin;
-    private String accountNumberDestiny;
-    @Min(value = 0, message = "El monto de una transacción no puede ser menor a 0.")
-    private Long amount;
-    private String message;
+    @Email
+    String email;
+    @NotNull(message = "can't be null.")
+    @NotBlank(message = "can't be blank.")
+    @NotEmpty(message = "can't be empty.")
+    String role;
 }

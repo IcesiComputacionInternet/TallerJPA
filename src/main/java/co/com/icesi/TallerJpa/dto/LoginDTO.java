@@ -4,10 +4,10 @@ import javax.validation.constraints.NotBlank;
 import javax.validation.constraints.NotNull;
 
 public record LoginDTO (
-        @NotNull
-        @NotBlank
+        @NotNull(message = "can't be null.")
+        @NotBlank(message = "can't be blank.")
         String username,
-        @NotNull
-        @NotBlank
+        @NotNull(message = "can't be null.")
+        @NotBlank(message = "can't be blank.")
         String password) {
 }
