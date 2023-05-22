@@ -7,8 +7,10 @@ import co.com.icesi.demojpa.error.exception.DetailBuilder;
 import co.com.icesi.demojpa.error.exception.ErrorCode;
 import co.com.icesi.demojpa.mapper.AccountMapper;
 import co.com.icesi.demojpa.model.IcesiAccount;
+import co.com.icesi.demojpa.model.IcesiUser;
 import co.com.icesi.demojpa.repository.AccountRepository;
 import co.com.icesi.demojpa.repository.UserRepository;
+import co.com.icesi.demojpa.security.IcesiSecurityContext;
 import lombok.AllArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
@@ -28,35 +30,37 @@ public class AccountService {
     private final AccountRepository accountRepository;
     private final AccountMapper accountMapper;
 
-
     //@Transaccional asegura que las consultas se realicen una sola vez
-    public AccountCreateDTO save(AccountCreateDTO account){
+    public AccountCreateDTO save(AccountCreateDTO account) {
 
         userRepository.findById(account.getUser().getUserId()).orElseThrow(
-                createIcesiException (
+                createIcesiException(
                         "User does not exist",
                         HttpStatus.BAD_REQUEST,
                         new DetailBuilder(ErrorCode.ERR_404, "User", "Id", account.getUser().getUserId().toString())
                 )
         );
-        if(account.getBalance()<0){
+        if (account.getBalance() < 0) {
             throw createIcesiException(
                     "Balance must be greater than 0",
                     HttpStatus.BAD_REQUEST,
                     new DetailBuilder(ErrorCode.ERR_400, "Account", "Balance")
-            ).get();}
+            ).get();
+        }
+
 
         IcesiAccount icesiAccount = accountMapper.fromIcesiAccountDTO(account);
+        getCreationAuthorization(icesiAccount);
         account.setAccountId(UUID.randomUUID());
         account.setAccountNumber(generateAccountNumber());
         account.setActive(true);
         return accountMapper.fromIcesiAccount(accountRepository.save(icesiAccount));
     }
 
-    public void disableAccount(String accountNumber){
+    public AccountCreateDTO disableAccount(String accountNumber) {
         IcesiAccount account = getAccount(accountNumber);
-
-        if(account.getBalance()>0){
+        getNormalAuthorization(account.getUser());
+        if (account.getBalance() > 0) {
             throw createIcesiException(
                     "Account must have 0 balance to be disabled",
                     HttpStatus.BAD_REQUEST,
@@ -65,28 +69,31 @@ public class AccountService {
         }
 
         account.setActive(false);
-        accountRepository.save(account);
+        return accountMapper.fromIcesiAccount(accountRepository.save(account));
 
     }
 
-    public void enableAccount(String accountNumber){
+    public AccountCreateDTO enableAccount(String accountNumber) {
         IcesiAccount account = getAccount(accountNumber);
+        getNormalAuthorization(account.getUser());
         account.setActive(true);
-        accountRepository.save(account);
+        return accountMapper.fromIcesiAccount(accountRepository.save(account));
     }
 
-    public TransactionResultDTO transferMoney(TransactionOperationDTO transaction){
+    public TransactionResultDTO transferMoney(TransactionOperationDTO transaction) {
 
         IcesiAccount sourceAccount = getAccount(transaction.getAccountFrom());
         IcesiAccount targetAccount = getAccount(transaction.getAccountTo());
+        getTransactionAuthorization(sourceAccount.getUser());
+
         long amount = transaction.getAmount();
 
         validateAccountType(sourceAccount);
         validateAccountType(targetAccount);
         validateBalance(amount, sourceAccount.getBalance());
 
-        sourceAccount.setBalance(sourceAccount.getBalance()-amount);
-        targetAccount.setBalance(targetAccount.getBalance()+amount);
+        sourceAccount.setBalance(sourceAccount.getBalance() - amount);
+        targetAccount.setBalance(targetAccount.getBalance() + amount);
         accountRepository.save(sourceAccount);
         accountRepository.save(targetAccount);
 
@@ -95,15 +102,15 @@ public class AccountService {
 
     public IcesiAccount getAccount(String accountNumber) {
         return accountRepository.findByNumber(accountNumber).orElseThrow(
-                        createIcesiException(
-                                "Account does not exist",
-                                HttpStatus.BAD_REQUEST,
-                                new DetailBuilder(ErrorCode.ERR_400, "Account", "Number", accountNumber)
-                        ));
+                createIcesiException(
+                        "Account does not exist",
+                        HttpStatus.BAD_REQUEST,
+                        new DetailBuilder(ErrorCode.ERR_400, "Account", "Number", accountNumber)
+                ));
     }
 
-    public void validateAccountType(IcesiAccount account){
-        if(account.getType().equals("Deposit")){
+    public void validateAccountType(IcesiAccount account) {
+        if (account.getType().equals("Deposit")) {
             throw createIcesiException(
                     "You can't transfer money to this type of accounts",
                     HttpStatus.BAD_REQUEST,
@@ -112,8 +119,8 @@ public class AccountService {
         }
     }
 
-    public void validateBalance(long amount, long balance){
-        if(amount>balance){
+    public void validateBalance(long amount, long balance) {
+        if (amount > balance) {
             throw createIcesiException(
                     "Account must have balance greater than the amount to transfer",
                     HttpStatus.BAD_REQUEST,
@@ -122,8 +129,8 @@ public class AccountService {
         }
     }
 
-    public void validateStatus(IcesiAccount account){
-        if(!account.isActive()){
+    public void validateStatus(IcesiAccount account) {
+        if (!account.isActive()) {
             throw createIcesiException(
                     "Account is disabled",
                     HttpStatus.BAD_REQUEST,
@@ -132,8 +139,9 @@ public class AccountService {
         }
     }
 
-    public TransactionResultDTO withdraw(TransactionOperationDTO transaction){
+    public TransactionResultDTO withdraw(TransactionOperationDTO transaction) {
         IcesiAccount account = getAccount(transaction.getAccountFrom());
+        getTransactionAuthorization(account.getUser());
         long amount = transaction.getAmount();
 
         validateStatus(account);
@@ -152,8 +160,9 @@ public class AccountService {
         return accountMapper.fromTransactionOperation(transaction, "Success");
     }
 
-    public TransactionResultDTO deposit(TransactionOperationDTO transaction){
+    public TransactionResultDTO deposit(TransactionOperationDTO transaction) {
         IcesiAccount account = getAccount(transaction.getAccountFrom());
+        getTransactionAuthorization(account.getUser());
         long amount = transaction.getAmount();
         validateStatus(account);
 
@@ -177,11 +186,50 @@ public class AccountService {
                 .mapToObj(Integer::toString)
                 .collect(Collectors.joining(""));
         accountNumber = accountNumber.replaceFirst("(\\d{3})(\\d{6})(\\d{2})", "$1-$2-$3");
-        if(accountRepository.findByNumber(accountNumber).isPresent()){
+        if (accountRepository.findByNumber(accountNumber).isPresent()) {
             generateAccountNumber();
         }
         return accountNumber;
     }
 
+    public void getAdminAuthorization() {
+        if (!IcesiSecurityContext.getCurrentUserRole().equals("ADMIN")) {
+            throw createIcesiException(
+                    "Unauthorized: Admin only",
+                    HttpStatus.FORBIDDEN,
+                    new DetailBuilder(ErrorCode.ERR_403, "Unauthorized: Admin only")
+            ).get();
+        }
+    }
+
+    public void getNormalAuthorization(IcesiUser user) {
+        if(IcesiSecurityContext.getCurrentUserRole().equals("USER") && !IcesiSecurityContext.getCurrentUserId().equals(user.getUserId().toString()) ){
+            throw createIcesiException(
+                    "Unauthorized: User cannot perform this action",
+                    HttpStatus.FORBIDDEN,
+                    new DetailBuilder(ErrorCode.ERR_403, "Unauthorized: User cannot perform this action")
+            ).get();
+        }
+    }
+
+    public void getTransactionAuthorization(IcesiUser user) {
+        if(!IcesiSecurityContext.getCurrentUserId().equals(user.getUserId().toString()) ){
+            throw createIcesiException(
+                    "Unauthorized: User cannot perform this action",
+                    HttpStatus.FORBIDDEN,
+                    new DetailBuilder(ErrorCode.ERR_403, "Unauthorized: User cannot perform this action")
+            ).get();
+        }
+    }
+
+    public void getCreationAuthorization(IcesiAccount account) {
+        if(!IcesiSecurityContext.getCurrentUserId().equals(account.getUser().getUserId().toString())){
+            throw createIcesiException(
+                    "Unauthorized: User cannot create this account",
+                    HttpStatus.FORBIDDEN,
+                    new DetailBuilder(ErrorCode.ERR_403, "Unauthorized: just the owner can create this account")
+            ).get();
+        }
+    }
 
 }

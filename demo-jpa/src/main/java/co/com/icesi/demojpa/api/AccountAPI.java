@@ -25,9 +25,9 @@ public interface AccountAPI {
     TransactionResultDTO transfer(@Valid @RequestBody TransactionOperationDTO transactionDTO);
 
     @PatchMapping("/enable/{accountNumber}")
-    String enableAccount(@PathVariable String accountNumber);
+    AccountCreateDTO enableAccount(@PathVariable String accountNumber);
 
     @PatchMapping("/disable/{accountNumber}")
-    String disableAccount(@PathVariable String accountNumber);
+    AccountCreateDTO disableAccount(@PathVariable String accountNumber);
 
 }

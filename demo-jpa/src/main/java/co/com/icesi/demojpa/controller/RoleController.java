@@ -25,6 +25,6 @@ public class RoleController implements RoleAPI {
 
     @Override
     public RoleCreateDTO getRoleById(String roleId){
-        return null;
+        return roleService.getRoleById(roleId);
     }
 }

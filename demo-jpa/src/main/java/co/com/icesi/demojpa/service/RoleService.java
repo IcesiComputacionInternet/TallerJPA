@@ -41,4 +41,12 @@ public class RoleService {
     }
 
 
+    public RoleCreateDTO getRoleById(String roleId) {
+        return roleMapper.fromIcesiRole(roleRepository.findById(UUID.fromString(roleId)).orElseThrow(
+                createIcesiException(
+                        "Role does not exist",
+                        HttpStatus.BAD_REQUEST,
+                        new DetailBuilder(ErrorCode.ERR_404, "Role", "Id", roleId)
+                )));
+    }
 }

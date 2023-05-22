@@ -8,6 +8,7 @@ import co.com.icesi.demojpa.mapper.UserMapper;
 import co.com.icesi.demojpa.model.IcesiUser;
 import co.com.icesi.demojpa.repository.RoleRepository;
 import co.com.icesi.demojpa.repository.UserRepository;
+import co.com.icesi.demojpa.security.IcesiSecurityContext;
 import lombok.AllArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
@@ -27,9 +28,9 @@ public class UserService {
 
     public UserCreateDTO save(UserCreateDTO user){
 
-
         validatePhoneAndPhone(user.getPhoneNumber(), user.getEmail());
         validateRole(user.getRole());
+        validateAuthentication(userMapper.fromIcesiUserDTO(user));
 
         IcesiUser icesiUser = userMapper.fromIcesiUserDTO(user);
         icesiUser.setUserId(UUID.randomUUID());
@@ -84,6 +85,16 @@ public class UserService {
                 HttpStatus.BAD_REQUEST,
                 new DetailBuilder(ErrorCode.ERR_404, "Role", "Name", roleName.getName())
         ));
+    }
+
+    public void validateAuthentication(IcesiUser user){
+        if (IcesiSecurityContext.getCurrentUserRole().equals("BANK") && user.getRole().getName().equals("ADMIN")) {
+            throw createIcesiException(
+                    "Unauthorized: You can't create an admin user",
+                    HttpStatus.FORBIDDEN,
+                    new DetailBuilder(ErrorCode.ERR_403, "Unauthorized: Admin only")
+            ).get();
+        }
     }
 
 

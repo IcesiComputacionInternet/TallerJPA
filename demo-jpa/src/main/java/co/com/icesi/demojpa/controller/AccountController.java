@@ -36,12 +36,12 @@ public class AccountController implements AccountAPI {
     }
 
     @Override
-    public String enableAccount(String accountNumber) {
-        return null;
+    public AccountCreateDTO enableAccount(String accountNumber) {
+        return accountService.enableAccount(accountNumber);
     }
 
     @Override
-    public String disableAccount(String accountNumber) {
-        return null;
+    public AccountCreateDTO disableAccount(String accountNumber) {
+        return accountService.disableAccount(accountNumber);
     }
 }
