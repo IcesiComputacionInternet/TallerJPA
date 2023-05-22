@@ -12,7 +12,7 @@ import java.util.List;
 @RequestMapping(value =IcesiAccountApi.ACCOUNT_BASE_URL)
 public interface IcesiAccountApi {
 
-    String ACCOUNT_BASE_URL = "/api/account";
+    String ACCOUNT_BASE_URL = "/api/accounts";
 
     @PostMapping
     IcesiAccountResponseDTO addIcesiAccount(@Valid @RequestBody IcesiAccountRequestDTO icesiAccountRequestDTO);
@@ -23,10 +23,10 @@ public interface IcesiAccountApi {
     @GetMapping("/{accountNumber}")
     IcesiAccountResponseDTO getIcesiAccount(@PathVariable String accountNumber);
 
-    @GetMapping("/user/{userId}/accounts")
+    @GetMapping("/userId/{userId}/accounts")
     List<IcesiAccountResponseDTO> getAllAccountsByUserId(@PathVariable String userId);
 
-    @GetMapping("/user/{email}/accounts")
+    @GetMapping("/email/{email}/accounts")
     List<IcesiAccountResponseDTO> getAllAccountsByEmail(@PathVariable @Valid @Email String email);
 
     @PatchMapping("/enable/{accountNumber}")

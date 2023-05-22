@@ -11,7 +11,7 @@ import java.util.List;
 @Validated
 public interface IcesiRoleApi {
 
-    String ROLE_BASE_URL = "/api/role";
+    String ROLE_BASE_URL = "/api/roles";
 
     @PostMapping
     IcesiRoleDTO addIcesiRole(@Valid @RequestBody IcesiRoleDTO icesiRoleDTO);

@@ -8,6 +8,5 @@ import org.mapstruct.Mapper;
 @Mapper(componentModel = "spring")
 public interface IcesiAccountMapper {
     IcesiAccount fromAccountDto(IcesiAccountRequestDTO icesiAccountRequestDTO);
-    IcesiAccountRequestDTO fromIcesiAccount(IcesiAccount icesiAccount);
     IcesiAccountResponseDTO fromIcesiAccountToResponse(IcesiAccount icesiAccount);
 }

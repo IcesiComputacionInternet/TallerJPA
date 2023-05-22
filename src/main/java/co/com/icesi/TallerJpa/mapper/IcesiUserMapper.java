@@ -8,6 +8,5 @@ import org.mapstruct.Mapper;
 @Mapper(componentModel = "spring")
 public interface IcesiUserMapper {
     IcesiUser fromUserDto(IcesiUserRequestDTO icesiUserRequestDTO);
-    IcesiUserRequestDTO fromIcesiUser(IcesiUser icesiUser);
-    IcesiUserResponseDTO fromIcesiUserResponse(IcesiUser icesiUser);
+    IcesiUserResponseDTO fromIcesiUserToResponse(IcesiUser icesiUser);
 }
