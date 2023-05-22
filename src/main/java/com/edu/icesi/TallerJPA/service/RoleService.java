@@ -6,6 +6,7 @@ import com.edu.icesi.TallerJPA.error.exception.DetailBuilder;
 import com.edu.icesi.TallerJPA.error.exception.ErrorCode;
 import com.edu.icesi.TallerJPA.mapper.RoleMapper;
 import com.edu.icesi.TallerJPA.model.IcesiRole;
+import com.edu.icesi.TallerJPA.model.IcesiUser;
 import com.edu.icesi.TallerJPA.repository.RoleRepository;
 import com.edu.icesi.TallerJPA.security.IcesiSecurityContext;
 import lombok.AllArgsConstructor;
@@ -28,6 +29,7 @@ public class RoleService {
     public RoleCreateDTO save(RoleCreateDTO roleCreateDTO){
 
         verifyUserRole(IcesiSecurityContext.getCurrentRol());
+        verifyRoleName(roleCreateDTO.getName());
         IcesiRole icesiRole = roleMapper.fromIcesiRoleDTO(roleCreateDTO);
         icesiRole.setRoleId(UUID.randomUUID());
 
@@ -41,6 +43,17 @@ public class RoleService {
                     "User unauthorized",
                     HttpStatus.UNAUTHORIZED,
                     new DetailBuilder(ErrorCode.ERR_401)
+            ).get();
+        }
+    }
+
+    public void verifyRoleName(String roleName){
+
+        if (roleRepository.findByName(roleName).isPresent()){
+            throw createIcesiException(
+                    "Role name already exists",
+                    HttpStatus.CONFLICT,
+                    new DetailBuilder(ErrorCode.ERR_DUPLICATED, "Role", "role name", roleName)
             ).get();
         }
     }
@@ -59,5 +72,10 @@ public class RoleService {
             ).get();
         }
         return roleMapper.fromIcesiRole(role.get());
+    }
+
+    public RoleCreateDTO addUserToRole(RoleCreateDTO roleCreateDTO, IcesiUser user){
+        roleCreateDTO.getIcesiUsers().add(user);
+        return roleCreateDTO;
     }
 }

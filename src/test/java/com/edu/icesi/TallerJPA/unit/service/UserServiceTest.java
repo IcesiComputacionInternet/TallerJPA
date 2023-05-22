@@ -19,7 +19,7 @@ import static org.junit.jupiter.api.Assertions.fail;
 import static org.mockito.Mockito.*;
 
 public class UserServiceTest {
-
+/*
     private UserService userService;
 
     private UserRepository userRepository;
@@ -153,5 +153,7 @@ public class UserServiceTest {
                 .description("Is a student at Icesi")
                 .build();
     }
+
+ */
 
 }

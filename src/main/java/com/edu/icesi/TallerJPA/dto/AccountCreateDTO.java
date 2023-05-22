@@ -1,6 +1,7 @@
 package com.edu.icesi.TallerJPA.dto;
 
 import com.edu.icesi.TallerJPA.model.IcesiUser;
+import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
 
@@ -11,6 +12,7 @@ import javax.validation.constraints.NotNull;
 
 @Data
 @Builder
+@AllArgsConstructor
 public class AccountCreateDTO {
 
     @NotNull(message = "Account must have an account number")

@@ -10,7 +10,6 @@ import org.springframework.web.bind.MethodArgumentNotValidException;
 import org.springframework.web.bind.annotation.ControllerAdvice;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 
-import java.util.List;
 
 import static com.edu.icesi.TallerJPA.error.util.IcesiExceptionBuilder.createIcesiError;
 
@@ -22,11 +21,12 @@ public class GlobalExceptionHandler {
         return ResponseEntity.status(icesiException.getError().getStatus()).body(icesiException.getError());
     }
 
-    @ExceptionHandler(RuntimeException.class)
+    /*@ExceptionHandler(RuntimeException.class)
     public ResponseEntity<IcesiError> handleRuntimeException(RuntimeException runtimeException){
         var error = createIcesiError(runtimeException.getMessage(), HttpStatus.INTERNAL_SERVER_ERROR, new DetailBuilder(ErrorCode.ERR_500));
         return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(error);
     }
+     */
 
     @ExceptionHandler(AuthenticationException.class)
     public ResponseEntity<IcesiError> handleAuthenticationException(AuthenticationException authenticationException){

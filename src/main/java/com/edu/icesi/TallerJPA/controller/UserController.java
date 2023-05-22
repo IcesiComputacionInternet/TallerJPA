@@ -4,13 +4,15 @@ import com.edu.icesi.TallerJPA.api.UserAPI;
 import com.edu.icesi.TallerJPA.dto.UserCreateDTO;
 import com.edu.icesi.TallerJPA.service.UserService;
 import lombok.AllArgsConstructor;
+import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
 import java.util.List;
 
 import static com.edu.icesi.TallerJPA.api.UserAPI.BASE_USER_URL;
 
-@RestController(BASE_USER_URL)
+@RestController
+@RequestMapping(BASE_USER_URL)
 @AllArgsConstructor
 public class UserController implements UserAPI {
 
@@ -26,7 +28,7 @@ public class UserController implements UserAPI {
     }
 
     @Override
-    public UserCreateDTO addUser(UserCreateDTO userCreateDTO) {
+    public UserCreateDTO createUser(UserCreateDTO userCreateDTO) {
         return userService.save(userCreateDTO);
     }
 

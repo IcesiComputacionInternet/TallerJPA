@@ -154,6 +154,8 @@ public class AccountService {
 
         AccountCreateDTO destinationAccountToTransfer = findByAccountNumber(transactionDTO.getDestinationAccount());
 
+        verifyUserRole(IcesiSecurityContext.getCurrentUserId(), IcesiSecurityContext.getCurrentRol(), destinationAccountToTransfer.getIcesiUser().getUserId());
+
         validateAccountType(sourceAccountToTransfer, destinationAccountToTransfer);
 
         long moneyToTransfer = transactionDTO.getAmountMoney();
@@ -164,8 +166,8 @@ public class AccountService {
 
         destinationAccountToTransfer.setBalance(destinationAccountToTransfer.getBalance() + moneyToTransfer);
 
-        accountRepository.save(accountMapper.fromIcesiAccountDTO(sourceAccountToTransfer));
-        accountRepository.save(accountMapper.fromIcesiAccountDTO(destinationAccountToTransfer));
+        transactionDTO.setFinalBalanceSourceAccount(sourceAccountToTransfer.getBalance());
+        transactionDTO.setFinalBalanceDestinationAccount(destinationAccountToTransfer.getBalance());
 
         transactionDTO.setResult("Successful transfer");
 
@@ -231,6 +233,19 @@ public class AccountService {
         searchUserById(idActualUser);
 
         if (roleActualUser.equalsIgnoreCase(String.valueOf(Scopes.USER)) && !idActualUser.equalsIgnoreCase(String.valueOf(idUserOfAccount))){
+            throw createIcesiException(
+                    "User unauthorized",
+                    HttpStatus.UNAUTHORIZED,
+                    new DetailBuilder(ErrorCode.ERR_401)
+            ).get();
+        }
+
+        verifyUserRole(roleActualUser);
+    }
+
+    private void verifyUserRole(String roleActualUser){
+
+        if (roleActualUser.equalsIgnoreCase(String.valueOf(Scopes.BANK))){
             throw createIcesiException(
                     "User unauthorized",
                     HttpStatus.UNAUTHORIZED,

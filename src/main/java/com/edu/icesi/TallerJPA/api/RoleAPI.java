@@ -3,6 +3,7 @@ package com.edu.icesi.TallerJPA.api;
 import com.edu.icesi.TallerJPA.dto.RoleCreateDTO;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
+import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 
 import javax.validation.Valid;
@@ -17,5 +18,6 @@ public interface RoleAPI {
 
     List<RoleCreateDTO> getAllRoles();
 
+    @PostMapping("/create/")
     RoleCreateDTO addRole(@Valid @RequestBody RoleCreateDTO roleCreateDTO);
 }

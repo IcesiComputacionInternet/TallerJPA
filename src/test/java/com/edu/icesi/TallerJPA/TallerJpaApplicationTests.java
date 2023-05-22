@@ -13,7 +13,8 @@ import org.springframework.test.context.ActiveProfiles;
 import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.request.MockMvcRequestBuilders;
 
-import static org.junit.jupiter.api.Assertions.assertNotNull;
+import static org.junit.jupiter.api.Assertions.*;
+import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
 @SpringBootTest
@@ -48,14 +49,14 @@ class TallerJpaApplicationTests {
     @Test
     public void testTokenEndpointWithInvalidEmail() throws Exception {
         var result = mockMvc.perform(MockMvcRequestBuilders.post("/token").content(
-                                objectMapper.writeValueAsString(new LoginDTO("johndoe@email.com", "password"))
+                                objectMapper.writeValueAsString(new LoginDTO("johnwithout@email.com", "password"))
                         )
                         .contentType(MediaType.APPLICATION_JSON)
                         .accept(MediaType.APPLICATION_JSON))
-                .andExpect(status().isOk())
+                .andExpect(status().isUnauthorized())
                 .andReturn();
 
-        //IcesiError error = objectMapper.readValue(result.getResponse().getContentAsString(), TokenDTO.class);
-        //assertNotNull(token);
+        assertEquals(result.getResponse().getContentAsString(), "");
     }
+
 }

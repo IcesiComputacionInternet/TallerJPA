@@ -12,7 +12,8 @@ import java.util.List;
 
 import static com.edu.icesi.TallerJPA.api.AccountAPI.BASE_ACCOUNT_URL;
 
-@RestController(BASE_ACCOUNT_URL)
+@RequestMapping(BASE_ACCOUNT_URL)
+@RestController
 @AllArgsConstructor
 public class AccountController implements AccountAPI {
 

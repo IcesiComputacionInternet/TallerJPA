@@ -1,11 +1,10 @@
 package com.edu.icesi.TallerJPA.service;
 
 import com.edu.icesi.TallerJPA.Enums.Scopes;
-import com.edu.icesi.TallerJPA.dto.AccountCreateDTO;
-import com.edu.icesi.TallerJPA.dto.RoleCreateDTO;
 import com.edu.icesi.TallerJPA.dto.UserCreateDTO;
 import com.edu.icesi.TallerJPA.error.exception.DetailBuilder;
 import com.edu.icesi.TallerJPA.error.exception.ErrorCode;
+import com.edu.icesi.TallerJPA.mapper.RoleMapper;
 import com.edu.icesi.TallerJPA.mapper.UserMapper;
 import com.edu.icesi.TallerJPA.model.IcesiRole;
 import com.edu.icesi.TallerJPA.model.IcesiUser;
@@ -29,7 +28,11 @@ public class UserService {
 
     private final UserMapper userMapper;
 
+    private final RoleMapper roleMapper;
+
     private final RoleRepository roleRepository;
+
+    private final RoleService roleService;
 
     public UserCreateDTO save(UserCreateDTO userCreateDTO){
 
@@ -40,23 +43,24 @@ public class UserService {
         findByEmailIfIsDuplicated(userCreateDTO.getEmail());
         findByPhoneNumberIfIsDuplicated(userCreateDTO.getPhoneNumber());
 
-        String roleName = userCreateDTO.getIcesiRole().getName();
-        roleRepository.findByName(roleName).orElseThrow(() -> new RuntimeException("The role "+roleName+" not exists"));
+        String roleName = userCreateDTO.getIcesiRole();
+        IcesiRole role = roleRepository.findByName(roleName).orElseThrow(() -> new RuntimeException("The role "+roleName+" not exists"));
 
         IcesiUser icesiUser = userMapper.fromIcesiUserDTO(userCreateDTO);
         icesiUser.setUserId(UUID.randomUUID());
-        icesiUser.setIcesiRole(userCreateDTO.getIcesiRole());
+        icesiUser.setIcesiRole(role);
+        roleService.addUserToRole(roleMapper.fromIcesiRole(role), icesiUser);
 
         return userMapper.fromIcesiUser(userRepository.save(icesiUser));
     }
 
     private void definePermissions(UserCreateDTO userCreateDTO){
 
-        String roleName = userCreateDTO.getIcesiRole().getName();
+        String roleName = userCreateDTO.getIcesiRole();
 
         switch (roleName) {
-            case "Admin" -> verifyUserRoleForAdmin(IcesiSecurityContext.getCurrentRol());
-            case "Bank" -> verifyUserRoleForBank(IcesiSecurityContext.getCurrentRol());
+            case "ADMIN" -> verifyUserRoleForAdmin(IcesiSecurityContext.getCurrentRol());
+            case "BANK" -> verifyUserRoleForBank(IcesiSecurityContext.getCurrentRol());
         }
     }
 

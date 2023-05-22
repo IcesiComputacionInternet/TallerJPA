@@ -4,13 +4,16 @@ import com.edu.icesi.TallerJPA.api.RoleAPI;
 import com.edu.icesi.TallerJPA.dto.RoleCreateDTO;
 import com.edu.icesi.TallerJPA.service.RoleService;
 import lombok.AllArgsConstructor;
+import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
 import java.util.List;
 
 import static com.edu.icesi.TallerJPA.api.RoleAPI.BASE_ROLE_URL;
+import static com.edu.icesi.TallerJPA.api.UserAPI.BASE_USER_URL;
 
-@RestController(BASE_ROLE_URL)
+@RequestMapping(BASE_ROLE_URL)
+@RestController
 @AllArgsConstructor
 public class RoleController implements RoleAPI {
 

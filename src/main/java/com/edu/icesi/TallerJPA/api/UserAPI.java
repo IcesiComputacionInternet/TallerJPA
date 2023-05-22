@@ -19,7 +19,7 @@ public interface UserAPI {
     List<UserCreateDTO> getAllUsers();
 
     @PostMapping("/create/")
-    UserCreateDTO addUser(@Valid @RequestBody UserCreateDTO userCreateDTO);
+    UserCreateDTO createUser(@Valid @RequestBody UserCreateDTO userCreateDTO);
 
     @GetMapping("/{phoneNumber}/")
     UserCreateDTO getUserByPhoneNumber(@PathVariable String phoneNumber);
