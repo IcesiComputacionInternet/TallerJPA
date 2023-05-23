@@ -15,7 +15,7 @@ import org.springframework.security.crypto.password.PasswordEncoder;
 import java.util.UUID;
 @TestConfiguration
 public class TestConfigurationData {
-   /* @Bean
+    @Bean
     CommandLineRunner commandLineRunner(UserRepository userRepository, RoleRepository
             roleRepository, AccountRepository accountRepository, PasswordEncoder encoder) {
         IcesiRole icesiRole = IcesiRole.builder()
@@ -103,5 +103,5 @@ public class TestConfigurationData {
             accountRepository.save(icesiAccount2);
             accountRepository.save(icesiAccount3);
         };
-    }*/
+    }
 }

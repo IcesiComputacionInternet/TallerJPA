@@ -125,7 +125,7 @@ public class AccountService {
     }
 
     private void checkPermissionsToUpdate(String accUserId) {
-        if((IcesiSecurityContext.getCurrentUserRole().equals("BANK_USER"))||(IcesiSecurityContext.getCurrentUserRole().equals("USER")&&IcesiSecurityContext.getCurrentUserId().equals(accUserId))){
+        if((IcesiSecurityContext.getCurrentUserRole().equals("BANK_USER"))||(IcesiSecurityContext.getCurrentUserRole().equals("USER")&&!IcesiSecurityContext.getCurrentUserId().equals(accUserId))){
             throw createAccountSystemException(
                     "Only an ADMIN user or the owner or the account can update it.",
                     HttpStatus.FORBIDDEN,

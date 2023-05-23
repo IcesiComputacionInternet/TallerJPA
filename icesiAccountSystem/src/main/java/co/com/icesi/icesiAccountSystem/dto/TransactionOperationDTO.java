@@ -1,12 +1,16 @@
 package co.com.icesi.icesiAccountSystem.dto;
 
+import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
+import lombok.NoArgsConstructor;
 
 import javax.validation.constraints.Min;
 
 @Builder
 @Data
+@AllArgsConstructor
+@NoArgsConstructor
 public class TransactionOperationDTO {
     private String result;
     private String accountFrom;

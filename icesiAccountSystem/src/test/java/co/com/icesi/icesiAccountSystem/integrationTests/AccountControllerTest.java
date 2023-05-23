@@ -4,13 +4,7 @@ import co.com.icesi.icesiAccountSystem.dto.LoginDTO;
 import co.com.icesi.icesiAccountSystem.dto.RequestAccountDTO;
 import co.com.icesi.icesiAccountSystem.dto.TokenDTO;
 import co.com.icesi.icesiAccountSystem.dto.TransactionOperationDTO;
-import co.com.icesi.icesiAccountSystem.mapper.AccountMapper;
-import co.com.icesi.icesiAccountSystem.mapper.AccountMapperImpl;
-import co.com.icesi.icesiAccountSystem.repository.AccountRepository;
-import co.com.icesi.icesiAccountSystem.repository.UserRepository;
-import co.com.icesi.icesiAccountSystem.service.AccountService;
 import com.fasterxml.jackson.databind.ObjectMapper;
-import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Order;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -22,8 +16,6 @@ import org.springframework.test.context.ActiveProfiles;
 import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.request.MockMvcRequestBuilders;
 
-import static org.mockito.Mockito.mock;
-import static org.mockito.Mockito.spy;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
 @AutoConfigureMockMvc
@@ -43,7 +35,6 @@ public class AccountControllerTest {
 
     }
 
-    @Order(1)
     @Test
     public void testCreateAnAccountWhenLoggedUserIsAdmin() throws Exception {
         var resultToken = mockMvc.perform(MockMvcRequestBuilders.post("/login").content(
@@ -69,7 +60,6 @@ public class AccountControllerTest {
         System.out.println(result.getResponse().getContentAsString());
     }
 
-    @Order(2)
     @Test
     public void testCreateAnAccountWhenUserLoggedIsABankUser() throws Exception {
         var resultToken = mockMvc.perform(MockMvcRequestBuilders.post("/login").content(
@@ -94,7 +84,7 @@ public class AccountControllerTest {
                 .andReturn();
         System.out.println(result.getResponse().getContentAsString());
     }
-    @Order(3)
+
     @Test
     public void testAUserCanCreateAccountsByHimself() throws Exception {
         var resultToken = mockMvc.perform(MockMvcRequestBuilders.post("/login").content(
@@ -120,7 +110,6 @@ public class AccountControllerTest {
         System.out.println(result.getResponse().getContentAsString());
     }
 
-    @Order(4)
     @Test
     public void testAUserCannotCreateAccountsForOtherUsers() throws Exception {
         var resultToken = mockMvc.perform(MockMvcRequestBuilders.post("/login").content(
@@ -146,7 +135,6 @@ public class AccountControllerTest {
         System.out.println(result.getResponse().getContentAsString());
     }
 
-    @Order(5)
     @Test
     public void testDisableAnAccountWhenLoggedUserIsAdmin() throws Exception {
         var resultToken = mockMvc.perform(MockMvcRequestBuilders.post("/login").content(
@@ -165,7 +153,6 @@ public class AccountControllerTest {
         System.out.println(result.getResponse().getContentAsString());
     }
 
-    @Order(6)
     @Test
     public void testDisableAnAccountWhenLoggedUserIsNotOwner() throws Exception {
         var resultToken = mockMvc.perform(MockMvcRequestBuilders.post("/login").content(
@@ -184,7 +171,6 @@ public class AccountControllerTest {
         System.out.println(result.getResponse().getContentAsString());
     }
 
-    @Order(7)
     @Test
     public void testTransferMoneyHappyPath() throws Exception {
         var resultToken = mockMvc.perform(MockMvcRequestBuilders.post("/login").content(

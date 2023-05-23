@@ -34,7 +34,6 @@ class RoleControllerTest {
     void contextLoads() {
     }
 
-    @Order(1)
     @Test
     public void testCreateARoleWhenLoggedUserIsAdmin() throws Exception {
         var resultToken = mockMvc.perform(MockMvcRequestBuilders.post("/login").content(
@@ -59,7 +58,6 @@ class RoleControllerTest {
         System.out.println(result.getResponse().getContentAsString());
     }
 
-    @Order(2)
     @Test
     public void testCreateARoleWhenLoggedUserIsABankUser() throws Exception {
         var resultToken = mockMvc.perform(MockMvcRequestBuilders.post("/login").content(
@@ -84,7 +82,6 @@ class RoleControllerTest {
         System.out.println(result.getResponse().getContentAsString());
     }
 
-    @Order(3)
     @Test
     public void testCreateARoleWhenLoggedUserIsANormalUser() throws Exception {
         var resultToken = mockMvc.perform(MockMvcRequestBuilders.post("/login").content(
@@ -109,7 +106,6 @@ class RoleControllerTest {
         System.out.println(result.getResponse().getContentAsString());
     }
 
-    @Order(4)
     @Test
     public void testGetARoleWhenLoggedUserIsAdmin() throws Exception {
         var resultToken = mockMvc.perform(MockMvcRequestBuilders.post("/login").content(
@@ -128,7 +124,6 @@ class RoleControllerTest {
         System.out.println(result.getResponse().getContentAsString());
     }
 
-    @Order(5)
     @Test
     public void testGetARoleWhenLoggedUserIsABankUser() throws Exception {
         var resultToken = mockMvc.perform(MockMvcRequestBuilders.post("/login").content(
@@ -147,7 +142,6 @@ class RoleControllerTest {
         System.out.println(result.getResponse().getContentAsString());
     }
 
-    @Order(6)
     @Test
     public void testGetARoleWhenLoggedUserIsANormalUser() throws Exception {
         var resultToken = mockMvc.perform(MockMvcRequestBuilders.post("/login").content(

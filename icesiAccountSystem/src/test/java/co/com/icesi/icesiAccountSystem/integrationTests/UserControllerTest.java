@@ -32,7 +32,6 @@ class UserControllerTest {
     @Test
     void contextLoads() {
     }
-    @Order(1)
     @Test
     public void testCreateAUserWhenRoleNameIsNull() throws Exception {
         var resultToken = mockMvc.perform(MockMvcRequestBuilders.post("/login").content(
@@ -61,7 +60,6 @@ class UserControllerTest {
         System.out.println(result.getResponse().getContentAsString());
     }
 
-    @Order(2)
     @Test
     public void testCreateAdminUserWhenUserLoggedIsABankUser() throws Exception {
         var resultToken = mockMvc.perform(MockMvcRequestBuilders.post("/login").content(
@@ -83,7 +81,6 @@ class UserControllerTest {
                 .andReturn();
         System.out.println(result.getResponse().getContentAsString());
     }
-    @Order(3)
     @Test
     public void testCreateAUserWhenUserLoggedIsABankUser() throws Exception {
         var resultToken = mockMvc.perform(MockMvcRequestBuilders.post("/login").content(
@@ -104,7 +101,6 @@ class UserControllerTest {
                 .andReturn();
         System.out.println(result.getResponse().getContentAsString());
     }
-    @Order(4)
     @Test
     public void testCreateAUserWhenUserLoggedIsANormalUser() throws Exception {
         var resultToken = mockMvc.perform(MockMvcRequestBuilders.post("/login").content(
@@ -125,7 +121,6 @@ class UserControllerTest {
                 .andReturn();
         System.out.println(result.getResponse().getContentAsString());
     }
-    @Order(5)
     @Test
     public void testCreateAUserWhenLoggedUserIsAdminHappyPath() throws Exception {
         var resultToken = mockMvc.perform(MockMvcRequestBuilders.post("/login").content(

@@ -22,7 +22,7 @@ public class IcesiAccountSystemApplication {
 		SpringApplication.run(IcesiAccountSystemApplication.class, args);
 	}
 
-	@Bean
+	/*@Bean
 	CommandLineRunner commandLineRunner(UserRepository userRepository, RoleRepository
 			roleRepository, AccountRepository accountRepository, PasswordEncoder encoder) {
 		IcesiRole icesiRole = IcesiRole.builder()
@@ -110,5 +110,5 @@ public class IcesiAccountSystemApplication {
 			accountRepository.save(icesiAccount2);
 			accountRepository.save(icesiAccount3);
 		};
-	}
+	}*/
 }
