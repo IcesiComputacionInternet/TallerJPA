@@ -28,6 +28,6 @@ public interface AccountAPI {
     @PatchMapping("/deposit/{accountNumber}")
     String depositAccount(@PathVariable String accountNumber, @RequestBody Long value);
 
-    @PatchMapping("/transfer/{accountNumberOrigin}/{accountNumberDestination}")
+    @PatchMapping("/transfer/")
     String transferAccount(@PathVariable String accountNumberOrigin, @PathVariable String accountNumberDestination, @RequestBody Long value);
 }

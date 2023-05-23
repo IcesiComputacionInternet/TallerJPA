@@ -12,5 +12,4 @@ public class IcesiTransactionsDTO {
     private String accountDestination;
     private Long amount;
 
-    private String result;
 }

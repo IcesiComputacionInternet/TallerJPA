@@ -437,7 +437,7 @@ public class IcesiAccountServiceTest {
                 .balance(50L)
                 .type("Deposit only")
                 .active(true)
-              //  .icesiUser(defaultIcesiUser())
+                .icesiUser(defaultIcesiUser())
                 .build();
     }
     private IcesiAccount defaultAccount() {
@@ -446,7 +446,7 @@ public class IcesiAccountServiceTest {
                 .balance(50L)
                 .type("Normal")
                 .active(true)
-               // .icesiUser(defaultIcesiUser())
+                .icesiUser(defaultIcesiUser())
                 .build();
     }
     private IcesiUser defaultIcesiUser(){
@@ -475,7 +475,7 @@ public class IcesiAccountServiceTest {
                 .balance(50L)
                 .type("Normal")
                 .active(true)
-               // .icesiUser(defaultIcesiUser2())
+                .icesiUser(defaultIcesiUser2())
                 .build();
     }
     private IcesiUser defaultIcesiUser2(){
