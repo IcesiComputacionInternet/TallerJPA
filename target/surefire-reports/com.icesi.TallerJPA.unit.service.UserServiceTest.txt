@@ -1,0 +1,8 @@
+-------------------------------------------------------------------------------
+Test set: com.icesi.TallerJPA.unit.service.UserServiceTest
+-------------------------------------------------------------------------------
+Tests run: 4, Failures: 1, Errors: 0, Skipped: 0, Time elapsed: 0.021 s <<< FAILURE! - in com.icesi.TallerJPA.unit.service.UserServiceTest
+testSaveUserWhenEmailAndPhoneNumberAlreadyExists  Time elapsed: 0.004 s  <<< FAILURE!
+org.opentest4j.AssertionFailedError: expected: <Email and Phone is repeated> but was: <Email and phone are repeated>
+	at com.icesi.TallerJPA.unit.service.UserServiceTest.testSaveUserWhenEmailAndPhoneNumberAlreadyExists(UserServiceTest.java:116)
+

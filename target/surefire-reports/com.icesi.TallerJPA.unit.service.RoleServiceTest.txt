@@ -1,0 +1,8 @@
+-------------------------------------------------------------------------------
+Test set: com.icesi.TallerJPA.unit.service.RoleServiceTest
+-------------------------------------------------------------------------------
+Tests run: 2, Failures: 1, Errors: 0, Skipped: 0, Time elapsed: 0.046 s <<< FAILURE! - in com.icesi.TallerJPA.unit.service.RoleServiceTest
+testSaveRoleWhenNameAlreadyExists  Time elapsed: 0.003 s  <<< FAILURE!
+org.opentest4j.AssertionFailedError: expected: <Name must be unique> but was: <Role already exists>
+	at com.icesi.TallerJPA.unit.service.RoleServiceTest.testSaveRoleWhenNameAlreadyExists(RoleServiceTest.java:65)
+
