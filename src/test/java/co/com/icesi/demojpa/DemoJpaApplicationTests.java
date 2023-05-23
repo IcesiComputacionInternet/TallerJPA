@@ -3,6 +3,7 @@ package co.com.icesi.demojpa;
 
 
 import co.com.icesi.demojpa.dto.LoginDTO;
+import co.com.icesi.demojpa.dto.TokenDTO;
 import co.com.icesi.demojpa.dto.TransactionDTO;
 import co.com.icesi.demojpa.dto.UserCreateDTO;
 import co.com.icesi.demojpa.dto.response.ResponseUserDTO;
@@ -14,6 +15,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.context.annotation.Import;
+import org.springframework.http.HttpHeaders;
 import org.springframework.http.MediaType;
 import org.springframework.test.context.ActiveProfiles;
 import org.springframework.test.web.servlet.MockMvc;
@@ -26,7 +28,7 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 @SpringBootTest
 @Import(TestConfigurationData.class)
 @ActiveProfiles(profiles = "test")
-class TallerJpaApplicationTests {
+class DemoJpaApplicationTests{
 
 	@Autowired
 	private MockMvc mocMvc;
@@ -34,6 +36,7 @@ class TallerJpaApplicationTests {
 	@Autowired
 	ObjectMapper objectMapper;
 
+	String token;
 	@Test
 	void contextLoads() {
 
@@ -84,13 +87,14 @@ class TallerJpaApplicationTests {
 
 	@Test
 	public void testCreateAdminUserEndpointHappyPath() throws Exception {
-		mocMvc.perform(MockMvcRequestBuilders.post("/token").content(
+		token =mocMvc.perform(MockMvcRequestBuilders.post("/token").content(
 								objectMapper.writeValueAsString(new LoginDTO("johndoe@email.com", "password"))
 						)
 						.contentType(MediaType.APPLICATION_JSON)
 						.accept(MediaType.APPLICATION_JSON))
 				.andExpect(status().isOk())
-				.andReturn();
+				.andReturn().getResponse().getContentAsString();
+		TokenDTO tokenDTO = objectMapper.readValue(token, TokenDTO.class);
 		var result = mocMvc.perform(MockMvcRequestBuilders.post("/users/").content(
 								objectMapper.writeValueAsString(new UserCreateDTO(
 										"nombre",
@@ -100,7 +104,8 @@ class TallerJpaApplicationTests {
 										"123",
 										"ADMIN")))
 						.contentType(MediaType.APPLICATION_JSON)
-						.accept(MediaType.APPLICATION_JSON))
+						.accept(MediaType.APPLICATION_JSON)
+						.header(HttpHeaders.AUTHORIZATION, "Bearer "+tokenDTO.getToken()))
 				.andExpect(status().isOk());
 		ResponseUserDTO user = objectMapper.readValue(result.andReturn().getResponse().getContentAsString(), ResponseUserDTO.class);
 		assertNotNull(user);
@@ -108,13 +113,14 @@ class TallerJpaApplicationTests {
 
 	@Test
 	public void testCreateAdminUserNotValidEndpoint() throws Exception {
-		mocMvc.perform(MockMvcRequestBuilders.post("/token").content(
+		token =mocMvc.perform(MockMvcRequestBuilders.post("/token").content(
 								objectMapper.writeValueAsString(new LoginDTO("johndoe2@email.com", "password"))
 						)
 						.contentType(MediaType.APPLICATION_JSON)
 						.accept(MediaType.APPLICATION_JSON))
 				.andExpect(status().isOk())
-				.andReturn();
+				.andReturn().getResponse().getContentAsString();
+		TokenDTO tokenDTO = objectMapper.readValue(token, TokenDTO.class);
 		var result = mocMvc.perform(MockMvcRequestBuilders.post("/users/").content(
 								objectMapper.writeValueAsString(new UserCreateDTO(
 										"nombre",
@@ -124,7 +130,8 @@ class TallerJpaApplicationTests {
 										"123",
 										"ADMIN")))
 						.contentType(MediaType.APPLICATION_JSON)
-						.accept(MediaType.APPLICATION_JSON))
+						.accept(MediaType.APPLICATION_JSON)
+						.header(HttpHeaders.AUTHORIZATION, "Bearer "+tokenDTO.getToken()))
 				.andExpect(status().is5xxServerError());
 		IcesiException exception = objectMapper.readValue(result.andReturn().getResponse().getContentAsString(), IcesiException.class);
 		assertNotNull(exception);
@@ -132,36 +139,39 @@ class TallerJpaApplicationTests {
 
 	@Test
 	public void testCreateUserEndpointHappyPath() throws Exception {
-		mocMvc.perform(MockMvcRequestBuilders.post("/token").content(
+		token=mocMvc.perform(MockMvcRequestBuilders.post("/token").content(
 								objectMapper.writeValueAsString(new LoginDTO("johndoe2@email.com", "password"))
 						)
 						.contentType(MediaType.APPLICATION_JSON)
 						.accept(MediaType.APPLICATION_JSON))
 				.andExpect(status().isOk())
-				.andReturn();
+				.andReturn().getResponse().getContentAsString();
+		TokenDTO tokenDTO = objectMapper.readValue(token, TokenDTO.class);
 		var result = mocMvc.perform(MockMvcRequestBuilders.post("/users/").content(
 								objectMapper.writeValueAsString(new UserCreateDTO(
 										"nombre",
 										"apellido",
-										"123@gmail.co",
-										"+57 305 123 432",
+										"1235@gmail.co",
+										"+57 305 153 432",
 										"123",
 										"USER")))
 						.contentType(MediaType.APPLICATION_JSON)
-						.accept(MediaType.APPLICATION_JSON))
+						.accept(MediaType.APPLICATION_JSON)
+						.header(HttpHeaders.AUTHORIZATION, "Bearer "+tokenDTO.getToken()))
 				.andExpect(status().isOk());
 		assertTrue(result.andReturn().getResponse().getContentAsString().contains("USER"));
 	}
 
 	@Test
 	public void testCreateUserEndpointInvalidRole() throws Exception {
-		mocMvc.perform(MockMvcRequestBuilders.post("/token").content(
+		token=mocMvc.perform(MockMvcRequestBuilders.post("/token").content(
 								objectMapper.writeValueAsString(new LoginDTO("johndoe2@email.com", "password"))
 						)
 						.contentType(MediaType.APPLICATION_JSON)
 						.accept(MediaType.APPLICATION_JSON))
 				.andExpect(status().isOk())
-				.andReturn();
+				.andReturn().getResponse().getContentAsString();
+		TokenDTO tokenDTO = objectMapper.readValue(token, TokenDTO.class);
 		var result = mocMvc.perform(MockMvcRequestBuilders.post("/users/").content(
 								objectMapper.writeValueAsString(new UserCreateDTO(
 										"nombre",
@@ -171,7 +181,8 @@ class TallerJpaApplicationTests {
 										"123",
 										"a")))
 						.contentType(MediaType.APPLICATION_JSON)
-						.accept(MediaType.APPLICATION_JSON))
+						.accept(MediaType.APPLICATION_JSON)
+						.header(HttpHeaders.AUTHORIZATION, "Bearer "+tokenDTO.getToken()))
 				.andExpect(status().is4xxClientError());
 		System.out.println(result.andReturn().getResponse().getContentAsString());
 		IcesiError error = objectMapper.readValue(result.andReturn().getResponse().getContentAsString(), IcesiError.class);
@@ -182,13 +193,14 @@ class TallerJpaApplicationTests {
 
 	@Test
 	public void testTransferEndpointHappyPath() throws Exception {
-		mocMvc.perform(MockMvcRequestBuilders.post("/token").content(
+		token=mocMvc.perform(MockMvcRequestBuilders.post("/token").content(
 								objectMapper.writeValueAsString(new LoginDTO("johndoe@email.com", "password"))
 						)
 						.contentType(MediaType.APPLICATION_JSON)
 						.accept(MediaType.APPLICATION_JSON))
 				.andExpect(status().isOk())
-				.andReturn();
+				.andReturn().getResponse().getContentAsString();
+		TokenDTO tokenDTO = objectMapper.readValue(token, TokenDTO.class);
 		var result = mocMvc.perform(MockMvcRequestBuilders.post("/accounts/transfer/").content(
 								objectMapper.writeValueAsString(TransactionDTO.builder()
 										.accountNumberOrigin("1234567899")
@@ -197,7 +209,8 @@ class TallerJpaApplicationTests {
 										.resultMessage("")
 										.build()))
 						.contentType(MediaType.APPLICATION_JSON)
-						.accept(MediaType.APPLICATION_JSON))
+						.accept(MediaType.APPLICATION_JSON)
+						.header(HttpHeaders.AUTHORIZATION, "Bearer "+tokenDTO.getToken()))
 				.andExpect(status().isOk());
 		System.out.println(result.andReturn().getResponse().getContentAsString());
 		TransactionDTO transactionDTO = objectMapper.readValue(result.andReturn().getResponse().getContentAsString(), TransactionDTO.class);
@@ -206,13 +219,14 @@ class TallerJpaApplicationTests {
 
 	@Test
 	public void testTransferEndpointBankRole() throws Exception {
-		mocMvc.perform(MockMvcRequestBuilders.post("/token").content(
+		token= mocMvc.perform(MockMvcRequestBuilders.post("/token").content(
 								objectMapper.writeValueAsString(new LoginDTO("johndoe2@email.com", "password"))
 						)
 						.contentType(MediaType.APPLICATION_JSON)
 						.accept(MediaType.APPLICATION_JSON))
 				.andExpect(status().isOk())
-				.andReturn();
+				.andReturn().getResponse().getContentAsString();
+		TokenDTO tokenDTO = objectMapper.readValue(token, TokenDTO.class);
 		mocMvc.perform(MockMvcRequestBuilders.post("/accounts/transfer/").content(
 								objectMapper.writeValueAsString(TransactionDTO.builder()
 										.accountNumberOrigin("1234567899")
@@ -221,19 +235,21 @@ class TallerJpaApplicationTests {
 										.resultMessage("")
 										.build()))
 						.contentType(MediaType.APPLICATION_JSON)
-						.accept(MediaType.APPLICATION_JSON))
+						.accept(MediaType.APPLICATION_JSON)
+						.header(HttpHeaders.AUTHORIZATION, "Bearer "+tokenDTO.getToken()))
 				.andExpect(status().is4xxClientError());
 	}
 
 	@Test
 	public void testTransferEndpointInValidAccNumber() throws Exception {
-		mocMvc.perform(MockMvcRequestBuilders.post("/token").content(
+		token=mocMvc.perform(MockMvcRequestBuilders.post("/token").content(
 								objectMapper.writeValueAsString(new LoginDTO("johndoe@email.com", "password"))
 						)
 						.contentType(MediaType.APPLICATION_JSON)
 						.accept(MediaType.APPLICATION_JSON))
 				.andExpect(status().isOk())
-				.andReturn();
+				.andReturn().getResponse().getContentAsString();
+		TokenDTO tokenDTO = objectMapper.readValue(token, TokenDTO.class);
 		var result = mocMvc.perform(MockMvcRequestBuilders.post("/accounts/transfer/").content(
 								objectMapper.writeValueAsString(TransactionDTO.builder()
 										.accountNumberOrigin("1234567899")
@@ -242,7 +258,8 @@ class TallerJpaApplicationTests {
 										.resultMessage("")
 										.build()))
 						.contentType(MediaType.APPLICATION_JSON)
-						.accept(MediaType.APPLICATION_JSON))
+						.accept(MediaType.APPLICATION_JSON)
+						.header(HttpHeaders.AUTHORIZATION, "Bearer "+tokenDTO.getToken()))
 				.andExpect(status().is4xxClientError());
 		System.out.println(result.andReturn().getResponse().getContentAsString());
 		IcesiError error = objectMapper.readValue(result.andReturn().getResponse().getContentAsString(), IcesiError.class);
@@ -251,13 +268,14 @@ class TallerJpaApplicationTests {
 
 	@Test
 	public void testTransferEndpointBalance() throws Exception {
-		mocMvc.perform(MockMvcRequestBuilders.post("/token").content(
+		token=mocMvc.perform(MockMvcRequestBuilders.post("/token").content(
 								objectMapper.writeValueAsString(new LoginDTO("johndoe@email.com", "password"))
 						)
 						.contentType(MediaType.APPLICATION_JSON)
 						.accept(MediaType.APPLICATION_JSON))
 				.andExpect(status().isOk())
-				.andReturn();
+				.andReturn().getResponse().getContentAsString();
+		TokenDTO tokenDTO = objectMapper.readValue(token, TokenDTO.class);
 		var result = mocMvc.perform(MockMvcRequestBuilders.post("/accounts/transfer/").content(
 								objectMapper.writeValueAsString(TransactionDTO.builder()
 										.accountNumberOrigin("1234567899")
@@ -266,7 +284,8 @@ class TallerJpaApplicationTests {
 										.resultMessage("")
 										.build()))
 						.contentType(MediaType.APPLICATION_JSON)
-						.accept(MediaType.APPLICATION_JSON))
+						.accept(MediaType.APPLICATION_JSON)
+						.header(HttpHeaders.AUTHORIZATION, "Bearer "+tokenDTO.getToken()))
 				.andExpect(status().is5xxServerError());
 		System.out.println(result.andReturn().getResponse().getContentAsString());
 		IcesiError error = objectMapper.readValue(result.andReturn().getResponse().getContentAsString(), IcesiError.class);
