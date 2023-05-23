@@ -348,7 +348,7 @@ public class IcesiAccountServiceTest {
         try {
             icesiAccountService.sendMoney(sourceAccount, destinationDepositOnlyAccount, 1000);
             fail();
-        } catch (RuntimeException exception) {
+        } catch (RuntimeException  exception) {
             String messageOfException = exception.getMessage();
             assertEquals("THIS TYPE OF ACCOUNT DOES NOT ALLOW TO MAKE TRANSFERS", messageOfException);
         }

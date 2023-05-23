@@ -3,10 +3,13 @@ package com.Icesi.TallerJPA.service;
 import com.Icesi.TallerJPA.dto.IcesiAccountDTO;
 import com.Icesi.TallerJPA.dto.IcesiTransactionsDTO;
 import com.Icesi.TallerJPA.enums.ErrorConstants;
+import com.Icesi.TallerJPA.error.exception.IcesiError;
+import com.Icesi.TallerJPA.error.exception.IcesiException;
 import com.Icesi.TallerJPA.mapper.IcesiAccountMapper;
 import com.Icesi.TallerJPA.model.IcesiAccount;
 import com.Icesi.TallerJPA.repository.IcesiAccountRepository;
 import lombok.AllArgsConstructor;
+import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
 
 import java.util.Random;
@@ -65,7 +68,7 @@ public class IcesiAccountService {
         if(icesiAccountRepository.findByAccountNumber(accountNumber).isEmpty()){
             throw new RuntimeException(String.valueOf(ErrorConstants.CODE_UD_08.getMessage()));
         }
-        //icesiAccountRepository.enableAccount(accountNumber);
+        icesiAccountRepository.enableAccount(accountNumber);
         return IcesiAccountDTO.builder().accountNumber(accountNumber).active(true).build();
     }
 
@@ -75,7 +78,7 @@ public class IcesiAccountService {
         if(icesiAccountRepository.findByAccountNumber(accountNumber).isEmpty()){
             throw new RuntimeException(String.valueOf(ErrorConstants.CODE_UD_08.getMessage()));
         }
-     //   icesiAccountRepository.disableAccount(accountNumber);
+        icesiAccountRepository.disableAccount(accountNumber);
         return IcesiAccountDTO.builder().accountNumber(accountNumber).build();
     }
 
@@ -147,6 +150,7 @@ public class IcesiAccountService {
 
         return transactionDTO;
     }
+
     public IcesiAccount getAccountByAccountNumber(String accountNumber){
         return icesiAccountRepository.findByAccountNumber(accountNumber).orElseThrow(() ->  new RuntimeException(String.valueOf(ErrorConstants.CODE_UD_08.getMessage())));
     }

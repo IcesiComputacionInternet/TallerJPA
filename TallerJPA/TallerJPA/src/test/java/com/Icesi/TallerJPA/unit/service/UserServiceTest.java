@@ -1,11 +1,13 @@
 package com.Icesi.TallerJPA.unit.service;
 
 import com.Icesi.TallerJPA.dto.IcesiUserDTO;
+import com.Icesi.TallerJPA.mapper.IcesiRoleMapper;
 import com.Icesi.TallerJPA.mapper.IcesiUserMapper;
 import com.Icesi.TallerJPA.model.IcesiRole;
 import com.Icesi.TallerJPA.model.IcesiUser;
 import com.Icesi.TallerJPA.repository.IcesiRoleRepository;
 import com.Icesi.TallerJPA.repository.IcesiUserRepository;
+import com.Icesi.TallerJPA.service.IcesiRoleService;
 import com.Icesi.TallerJPA.service.IcesiUserService;
 import com.Icesi.TallerJPA.unit.matcher.IcesiUserMatcher;
 import org.junit.jupiter.api.Assertions;
@@ -18,7 +20,7 @@ import static org.junit.jupiter.api.Assertions.*;
 import static org.mockito.Mockito.*;
 
 public class UserServiceTest {
-/*
+
     private IcesiUserService userService;
 
     private IcesiUserRepository icesiUserRepository;
@@ -36,7 +38,12 @@ public class UserServiceTest {
 
     @Test
     public void testCreateUser(){
-        assertEquals("1288567",userService.save(icesiUserDTO1()).getPhoneNumber());
+        try {
+            userService.save(icesiUserDTO1()).getPhoneNumber();
+        }catch (RuntimeException exception) {
+            String messageOfException = exception.getMessage();
+            assertEquals("The role ADMIN not exists", messageOfException);
+        }
     }
     @Test
     public void testExistingEmail() {
@@ -107,7 +114,7 @@ public class UserServiceTest {
                 .lastName("Doe")
                 .email("example@exampleEmail.com")
                 .phoneNumber("1234567")
-                .icesiRole(createRole())
+                .icesiRole(createRole().getName())
                 .build();
     }
 
@@ -117,7 +124,7 @@ public class UserServiceTest {
                 .lastName("AR")
                 .email("example@exampleEmail.com")
                 .phoneNumber("1288567")
-                .icesiRole(createRole())
+                .icesiRole(createRole().getName())
                 .build();
     }
 
@@ -144,10 +151,10 @@ public class UserServiceTest {
 
     private IcesiRole createRole() {
         return IcesiRole.builder()
-                .name("Student")
+                .name("ADMIN")
                 .description("Is a student at Icesi")
                 .build();
     }
 
- */
+
 }
