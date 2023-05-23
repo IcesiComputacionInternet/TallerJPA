@@ -86,4 +86,19 @@ The application should handle the input validations by using the @Valid @Validat
 The integration test should include the happy path and possible errors throw by the application
 
 
+### PART 3
+
+Interface implementation:
+
+- Implement the loggin interface using react and axios.
+- Implement a home page showing the current user accounts. Number + Balance
+- Implement a logout feature.
+
+Calification:
+
+- The interface works as expected
+- Uses Boostrap to add css styles to the home page
+- The logout function redirects the user to the login page and deletes the token from the local store.
+
+
 
