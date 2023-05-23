@@ -12,7 +12,7 @@ import java.util.UUID;
 public interface IcesiUserRepository extends JpaRepository<IcesiUser, UUID> {
 
     @Query("SELECT u FROM IcesiUser u WHERE u.email = :email")
-    Optional<IcesiUser> findByEmail(String email);
+    static Optional<IcesiUser> findByEmail(String email);
 
     @Query("SELECT u FROM IcesiUser u WHERE u.phoneNumber = :phoneNumber")
     Optional<IcesiUser> findByPhoneNumber(String phoneNumber);
