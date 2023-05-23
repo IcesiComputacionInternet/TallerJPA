@@ -2,6 +2,7 @@ package com.example.tallerjpa.integration;
 
 import com.example.tallerjpa.dto.AccountDTO;
 import com.example.tallerjpa.dto.LoginDTO;
+import com.example.tallerjpa.dto.TokenDTO;
 import com.example.tallerjpa.dto.TransactionRequestDTO;
 import com.example.tallerjpa.enums.AccountType;
 import com.fasterxml.jackson.databind.ObjectMapper;
@@ -105,7 +106,8 @@ public class AccountControllerTest {
                         .accept(MediaType.APPLICATION_JSON))
                 .andExpect(status().isOk())
                 .andReturn();
-        token = login.getResponse().getContentAsString();
+        TokenDTO tokenDTO = objectMapper.readValue(login.getResponse().getContentAsString(), TokenDTO.class);
+        token = tokenDTO.getToken();
     }
 
     private TransactionRequestDTO defaultTransaction(){

@@ -1,5 +1,6 @@
 package com.example.tallerjpa.service;
 
+import com.example.tallerjpa.dto.TokenDTO;
 import com.example.tallerjpa.security.CustomAuthentication;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
@@ -24,7 +25,7 @@ public class TokenService {
     private final JwtEncoder encoder;
 
 
-    public String generateToken(Authentication authentication){
+    public TokenDTO generateToken(Authentication authentication){
         CustomAuthentication customAuthentication = (CustomAuthentication) authentication;
         Instant now = Instant.now();
         String scope = authentication.getAuthorities().stream()
@@ -39,6 +40,9 @@ public class TokenService {
                 .claim("icesiUserId", customAuthentication.getUserId())
                 .build();
         var encoderParameters = JwtEncoderParameters.from(JwsHeader.with(MacAlgorithm.HS256).build(), claims);
-        return this.encoder.encode(encoderParameters).getTokenValue();
+        String token = encoder.encode(encoderParameters).getTokenValue();
+        return TokenDTO.builder()
+                .token(token)
+                .build();
     }
 }

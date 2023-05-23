@@ -3,6 +3,7 @@ package com.example.tallerjpa.integration;
 
 import com.example.tallerjpa.dto.LoginDTO;
 import com.example.tallerjpa.dto.RoleDTO;
+import com.example.tallerjpa.dto.TokenDTO;
 import com.example.tallerjpa.dto.UserDTO;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import org.junit.jupiter.api.Test;
@@ -104,8 +105,8 @@ public class UserControllerTest {
                         .accept(MediaType.APPLICATION_JSON))
                 .andExpect(status().isOk())
                 .andReturn();
-        token = login.getResponse().getContentAsString();
-
+        TokenDTO tokenDTO = objectMapper.readValue(login.getResponse().getContentAsString(), TokenDTO.class);
+        token = tokenDTO.getToken();
     }
 
     private UserDTO defaultUser(){

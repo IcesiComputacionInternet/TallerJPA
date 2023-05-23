@@ -1,6 +1,7 @@
 package com.example.tallerjpa.controller;
 
 import com.example.tallerjpa.dto.LoginDTO;
+import com.example.tallerjpa.dto.TokenDTO;
 import com.example.tallerjpa.service.TokenService;
 import lombok.AllArgsConstructor;
 import org.springframework.security.authentication.AuthenticationManager;
@@ -19,7 +20,7 @@ public class AuthController {
     private final AuthenticationManager authenticationManager;
 
     @PostMapping("/login")
-    public String token(@RequestBody LoginDTO loginDTO){
+    public TokenDTO token(@RequestBody LoginDTO loginDTO){
         Authentication authentication = authenticationManager
                 .authenticate(new UsernamePasswordAuthenticationToken(loginDTO.getUsername(), loginDTO.getPassword()));
         return tokenService.generateToken(authentication);
