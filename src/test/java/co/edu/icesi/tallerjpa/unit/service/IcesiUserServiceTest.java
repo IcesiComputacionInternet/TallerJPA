@@ -30,14 +30,12 @@ import static co.edu.icesi.tallerjpa.util.ModelBuilder.*;
 import static org.junit.jupiter.api.Assertions.*;
 import static org.mockito.Mockito.*;
 
-@SpringBootTest
+
 public class IcesiUserServiceTest {
     private IcesiUserService icesiUserService;
     private IcesiUserRepository icesiUserRepository;
     private IcesiUserMapper icesiUserMapper;
     private IcesiRoleRepository icesiRoleRepository;
-
-    @Autowired
     private PasswordEncoder passwordEncoder;
 
     @BeforeEach
@@ -45,6 +43,7 @@ public class IcesiUserServiceTest {
       icesiUserRepository = mock(IcesiUserRepository.class);
       icesiRoleRepository = mock(IcesiRoleRepository.class);
       icesiUserMapper = spy(IcesiUserMapperImpl.class);
+      passwordEncoder = mock(PasswordEncoder.class);
 
       icesiUserService = new IcesiUserService(icesiUserRepository, icesiRoleRepository, icesiUserMapper, passwordEncoder);
     }
@@ -55,6 +54,7 @@ public class IcesiUserServiceTest {
         when(icesiRoleRepository.findByName(NameIcesiRole.ADMIN.toString())).thenReturn(Optional.of(adminIcesiRole()));
         when(icesiRoleRepository.findByName(NameIcesiRole.USER.toString())).thenReturn(Optional.of(defaultIcesiRole()));
         when(icesiUserRepository.findById(icesiUser.getUserId())).thenReturn(Optional.of(icesiUser));
+        when(passwordEncoder.encode("password")).thenReturn("password");
         icesiUserService.save(defaultIcesiUserCreateDTO(), icesiUser.getUserId().toString());
         IcesiUser icesiUser1 = IcesiUser.builder()
                 .userId(null)
