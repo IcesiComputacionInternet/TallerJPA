@@ -93,8 +93,19 @@ public class TestConfigurationData {
                 .balance(50000000)
                 .type(AccountType.NORMAL)
                 .build();
+        IcesiAccount icesiAccount4 = IcesiAccount.builder()
+                .accountNumber("025-253568-01")
+                .active(true)
+                .accountId(UUID.randomUUID())
+                .user(icesiUser4)
+                .balance(60000)
+                .type(AccountType.DEPOSIT_ONLY)
+                .build();
 
         return args -> {
+            roleRepository.save(icesiRole);
+            roleRepository.save(icesiRole2);
+            roleRepository.save(icesiRole3);
             userRepository.save(icesiUser);
             userRepository.save(icesiUser2);
             userRepository.save(icesiUser3);
@@ -102,6 +113,7 @@ public class TestConfigurationData {
             accountRepository.save(icesiAccount);
             accountRepository.save(icesiAccount2);
             accountRepository.save(icesiAccount3);
+            accountRepository.save(icesiAccount4);
         };
     }
 }

@@ -35,7 +35,10 @@ public class AccountService {
     public ResponseAccountDTO saveAccount(RequestAccountDTO requestAccountDTO){
         List<DetailBuilder> errors = new ArrayList<>();
         checkPermissionsToCreate(requestAccountDTO.getUserEmail());
-        var user = validateIfUserExists(requestAccountDTO.getUserEmail(),errors);
+        var user = userRepository.findByEmail(requestAccountDTO.getUserEmail());
+        if(!user.isPresent()){
+            errors.add(new DetailBuilder(ErrorCode.ERR_404, "User", "email", requestAccountDTO.getUserEmail()));
+        }
         var type = checkAccountType(requestAccountDTO.getType(),errors);
 
         if (!errors.isEmpty()){
@@ -48,20 +51,12 @@ public class AccountService {
 
         IcesiAccount icesiAccount = accountMapper.fromAccountDTO(requestAccountDTO);
         icesiAccount.setAccountId(UUID.randomUUID());
-        icesiAccount.setUser(user);
+        icesiAccount.setUser(user.get());
         icesiAccount.setAccountNumber(getAccountNumber());
         icesiAccount.setType(type);
         icesiAccount.setActive(true);
         accountRepository.save(icesiAccount);
         return accountMapper.fromAccountToResponseAccountDTO(icesiAccount);
-    }
-
-    private IcesiUser validateIfUserExists(String userEmail, List<DetailBuilder> errors) {
-        var user = userRepository.findByEmail(userEmail);
-        if(!user.isPresent()){
-            errors.add(new DetailBuilder(ErrorCode.ERR_404, "User", "email", userEmail));
-        }
-        return user.get();
     }
 
     private AccountType checkAccountType(String type, List<DetailBuilder> errors){
@@ -165,7 +160,7 @@ public class AccountService {
         if (amount>account.getBalance()) {
             throw createAccountSystemException(
                     "Insufficient funds.",
-                    HttpStatus.FORBIDDEN,
+                    HttpStatus.BAD_REQUEST,
                     new DetailBuilder(ErrorCode.ERR_400, "amount is greater than balance", account.getBalance())
             ).get();
         }
@@ -175,7 +170,7 @@ public class AccountService {
         if(!account.isActive()){
             throw createAccountSystemException(
                     "The account to/from which you want to make a transaction is inactive.",
-                    HttpStatus.FORBIDDEN,
+                    HttpStatus.BAD_REQUEST,
                     new DetailBuilder(ErrorCode.ERR_400, "active of "+account.getAccountNumber(), "is false")
             ).get();
         }
@@ -212,7 +207,7 @@ public class AccountService {
         if (accountFrom.getType()==AccountType.DEPOSIT_ONLY || accountTo.getType()==AccountType.DEPOSIT_ONLY){
             throw createAccountSystemException(
                     "The source or destination account is marked as deposit only, it can't transfer or be transferred money, only withdrawal and deposit.",
-                    HttpStatus.FORBIDDEN,
+                    HttpStatus.BAD_REQUEST,
                     new DetailBuilder(ErrorCode.ERR_400, "account from type is "+accountFrom.getType()+" and account to is", accountTo.getType())
             ).get();
         }

@@ -30,11 +30,11 @@ public class GlobalExceptionHandler {
         return ResponseEntity.status(icesiException.getError().getStatus()).body(icesiException.getError());
     }
 
-    @ExceptionHandler(RuntimeException.class)
+ /*   @ExceptionHandler(RuntimeException.class)
     public ResponseEntity<AccountSystemError> handleRuntimeException(RuntimeException runtimeException){
         var error = createAccountSystemError(runtimeException.getMessage(), HttpStatus.INTERNAL_SERVER_ERROR, new DetailBuilder(ErrorCode.ERR_500));
         return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(error);
-    }
+    }*/
 
     @ExceptionHandler(BadCredentialsException.class)
     public ResponseEntity<AccountSystemError> handleBadCredentialsException(BadCredentialsException exception){
@@ -50,72 +50,11 @@ public class GlobalExceptionHandler {
         return ResponseEntity.status(error.getStatus()).body(error);
     }
 
-    @ExceptionHandler(value = ConstraintViolationException.class)
-    public ResponseEntity<AccountSystemError> handleValidationExceptions1(ConstraintViolationException ex) {
-        var errorBuilder = AccountSystemError.builder().status(HttpStatus.BAD_REQUEST);
-        var details = ex.getConstraintViolations().stream().map(this::mapConstraintViolationToError).toList();
-        var error = errorBuilder.details(details).build();
-        return ResponseEntity.status(error.getStatus()).body(error);
-    }
-
-    private AccountSystemErrorDetail mapConstraintViolationToError(ConstraintViolation<?> violation) {
-        String field = violation.getPropertyPath().toString();
-        String message = violation.getMessage();
-        return AccountSystemErrorDetail.builder()
-                .errorCode(ErrorCode.ERR_400.getCode())
-                .errorMessage(field+message)
-                .build();
-    }
-
     private AccountSystemErrorDetail mapBindingResultToError(ObjectError objectError){
         var message = ErrorCode.ERR_400.getMessage().formatted(((FieldError) objectError).getField(), objectError.getDefaultMessage());
         return AccountSystemErrorDetail.builder()
                 .errorCode(ErrorCode.ERR_400.getCode())
                 .errorMessage(message).build();
     }
-/*
-    @ExceptionHandler({MethodArgumentNotValidException.class, BindException.class, ConstraintViolationException.class})
-    private ResponseEntity<AccountSystemError> handleValidationExceptions(Exception ex) {
-        var errorBuilder = AccountSystemError.builder().status(HttpStatus.BAD_REQUEST);
-        var details = new ArrayList<AccountSystemErrorDetail>();
 
-        if (ex instanceof MethodArgumentNotValidException) {
-            MethodArgumentNotValidException methodArgumentNotValidException = (MethodArgumentNotValidException) ex;
-            details = (ArrayList<AccountSystemErrorDetail>) methodArgumentNotValidException.getBindingResult().getFieldErrors().stream()
-                    .map(this::mapFieldErrorToErrorDetail)
-                    .toList();
-        } else if (ex instanceof BindException) {
-            BindException bindException = (BindException) ex;
-            details = (ArrayList<AccountSystemErrorDetail>) bindException.getBindingResult().getFieldErrors().stream()
-                    .map(this::mapFieldErrorToErrorDetail)
-                    .toList();
-        } else if (ex instanceof ConstraintViolationException) {
-            ConstraintViolationException constraintViolationException = (ConstraintViolationException) ex;
-            details = (ArrayList<AccountSystemErrorDetail>) constraintViolationException.getConstraintViolations().stream()
-                    .map(this::mapConstraintViolationToErrorDetail)
-                    .toList();
-        }
-
-        var error = errorBuilder.details(details).build();
-        return ResponseEntity.status(error.getStatus()).body(error);
-    }
-
-    private AccountSystemErrorDetail mapFieldErrorToErrorDetail(FieldError fieldError) {
-        String field = fieldError.getField();
-        String message = fieldError.getDefaultMessage();
-        return AccountSystemErrorDetail.builder()
-                .errorCode(ErrorCode.ERR_400.getCode())
-                .errorMessage(field + ": " + message)
-                .build();
-    }
-
-    private AccountSystemErrorDetail mapConstraintViolationToErrorDetail(ConstraintViolation<?> constraintViolation) {
-        String field = constraintViolation.getPropertyPath().toString();
-        String message = constraintViolation.getMessage();
-        return AccountSystemErrorDetail.builder()
-                .errorCode(ErrorCode.ERR_400.getCode())
-                .errorMessage(field + ": " + message)
-                .build();
-    }
-*/
 }

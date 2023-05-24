@@ -30,6 +30,7 @@ import static org.mockito.Mockito.*;
 import static org.mockito.Mockito.times;
 
 public class AccountServiceTest {
+
     private AccountService accountService;
     private AccountRepository accountRepository;
     private UserRepository userRepository;
