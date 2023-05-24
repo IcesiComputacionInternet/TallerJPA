@@ -512,7 +512,7 @@ public class AccountServiceTest {
             accountService.transfer(TransactionDTO.builder()
                     .accountNumberOrigin(icesiAccount.getAccountNumber())
                     .accountNumberDestination(icesiAccount2.getAccountNumber())
-                    .amount(1000L)
+                    .amount(-10L)
                     .resultMessage("")
                     .build());
             fail();
