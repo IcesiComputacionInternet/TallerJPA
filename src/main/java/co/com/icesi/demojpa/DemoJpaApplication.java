@@ -20,7 +20,7 @@ public class DemoJpaApplication {
 
 		SpringApplication.run(DemoJpaApplication.class, args);
 	}
-
+	/*
 	@Bean
 	public CommandLineRunner commandLineRunner(UserRepository users,
 											   RoleRepository roleRepository,
@@ -68,6 +68,6 @@ public class DemoJpaApplication {
 			users.save(icesiUser2);
 		};
 	}
-
+*/
 
 }
