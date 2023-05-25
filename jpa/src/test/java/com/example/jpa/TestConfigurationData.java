@@ -31,7 +31,7 @@ public class TestConfigurationData {
         IcesiRole bank = IcesiRole.builder()
                 .roleId(UUID.randomUUID())
                 .description("Role for demo")
-                .name("BANK")
+                .name("BANK_USER")
                 .build();
         IcesiUser adminUser = IcesiUser.builder()
                 .userId(UUID.randomUUID())
@@ -60,7 +60,18 @@ public class TestConfigurationData {
                 .password(encoder.encode("password"))
                 .role(bank)
                 .build();
+        //This user is for /users/{id}/ test
+        IcesiUser userForTest = IcesiUser.builder()
+                .userId(UUID.fromString("a0eebc99-9c0b-4ef8-bb6d-6bb9bd380a11"))
+                .firstName("User")
+                .lastName("Test")
+                .password(encoder.encode("password"))
+                .email("usertest@email.com")
+                .phoneNumber("+573174687853")
+                .role(user)
+                .build();
         IcesiAccount account1 = IcesiAccount.builder()
+                    .id(UUID.randomUUID())
                     .accountNumber("897-887868-67")
                     .balance(10L)
                     .active(true)
@@ -68,19 +79,19 @@ public class TestConfigurationData {
                     .user(adminUser)
                     .build();
         IcesiAccount account2 = IcesiAccount.builder()
+                .id(UUID.randomUUID())
                 .accountNumber("893-887868-67")
                 .balance(10L)
                 .active(true)
                 .type("AHORROS")
                 .user(adminUser)
                 .build();
+
+        users.save(adminUser);
+        users.save(normalUser);
+        users.save(bankUser);
+        users.save(userForTest);
         return args -> {
-            roleRepository.save(admin);
-            roleRepository.save(user);
-            roleRepository.save(bank);
-            users.save(adminUser);
-            users.save(normalUser);
-            users.save(bankUser);
             accounts.save(account1);
             accounts.save(account2);
         };

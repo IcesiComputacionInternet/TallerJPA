@@ -9,7 +9,6 @@ public class RegionPhoneNumberValidator implements ConstraintValidator<RegionPho
 
     @Override
     public void initialize(RegionPhoneNumberValidation constraintAnnotation) {
-        ConstraintValidator.super.initialize(constraintAnnotation);
     }
 
     @Override

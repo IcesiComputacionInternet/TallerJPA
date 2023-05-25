@@ -1,12 +1,12 @@
 package com.example.jpa.integration;
 
 import com.example.jpa.TestConfigurationData;
+import com.example.jpa.dto.LoginDTO;
 import com.example.jpa.dto.RoleDTO;
 import com.example.jpa.dto.UserDTO;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.beans.factory.annotation.Value;
 import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.context.annotation.Import;
@@ -15,6 +15,8 @@ import org.springframework.test.context.ActiveProfiles;
 import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.request.MockMvcRequestBuilders;
 
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertNotNull;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
 @AutoConfigureMockMvc
@@ -29,12 +31,12 @@ public class UserIntegrationTest {
     @Autowired
     ObjectMapper objectMapper;
 
-    @Value("${security.token.admin}")
     private String tokenAdmin;
-    @Value("${security.token.user}")
     private String tokenUser;
-    @Value("${security.token.bank}")
     private String tokenBank;
+
+    private final static String CREATE_USER_URL = "/users/createUser";
+    private final static String GET_ALL_USERS_URL = "/users/all";
 
     @Test
     void contextLoads() {
@@ -42,59 +44,52 @@ public class UserIntegrationTest {
 
     @Test
     public void testCreateUserEndpoint() throws Exception {
-        var result = mockMvc.perform(MockMvcRequestBuilders.post("/users/createUser").content(
+        tokenAdmin = getTokenAdmin();
+        var result = mockMvc.perform(MockMvcRequestBuilders.post(CREATE_USER_URL).content(
                                 objectMapper.writeValueAsString(defaultUserDTO())
                         )
                         .contentType(MediaType.APPLICATION_JSON)
-                        .accept(MediaType.APPLICATION_JSON))
+                        .accept(MediaType.APPLICATION_JSON)
+                        .header("Authorization", "Bearer " + tokenAdmin))
                 .andExpect(status().isOk())
                 .andReturn();
         System.out.println(result.getResponse().getContentAsString());
     }
 
-    // Create a integration test for the endpoint /users/all
+    // Create an integration test for the endpoint /users/all
     // The test should return a list of users
     // The test should return a status 200
     @Test
     public void testGetAllUsersEndpoint() throws Exception {
-        var result = mockMvc.perform(MockMvcRequestBuilders.get("/users/all")
+        tokenAdmin = getTokenAdmin();
+        var result = mockMvc.perform(MockMvcRequestBuilders.get(GET_ALL_USERS_URL)
                         .contentType(MediaType.APPLICATION_JSON)
-                        .accept(MediaType.APPLICATION_JSON))
+                        .accept(MediaType.APPLICATION_JSON)
+                        .header("Authorization", "Bearer " + tokenAdmin))
                 .andExpect(status().isOk())
                 .andReturn();
         System.out.println(result.getResponse().getContentAsString());
     }
 
     //Create an integration test fot the endpoint /users/{userId}/
-    //The test should return a user
-    //The test should return a status 200
+    //The test should return a status 400 - User not found
     @Test
     public void testGetUserEndpoint() throws Exception {
-        var result = mockMvc.perform(MockMvcRequestBuilders.get("/users/1")
-                        .contentType(MediaType.APPLICATION_JSON)
-                        .accept(MediaType.APPLICATION_JSON))
-                .andExpect(status().isOk())
-                .andReturn();
-        System.out.println(result.getResponse().getContentAsString());
-    }
-
-    @Test
-    public void testUsersEndpointWhenUserAuthAdminToCreateUser() throws Exception{
-        var result = mockMvc.perform(MockMvcRequestBuilders.post("/users/createUser").content(
-                                objectMapper.writeValueAsString(defaultUserDTO())
-                        )
+        tokenAdmin = getTokenAdmin();
+        var result = mockMvc.perform(MockMvcRequestBuilders.get("/users/a0eebc99-9c0b-4ef8-bb6d-6bb9bd380a11")
                         .contentType(MediaType.APPLICATION_JSON)
                         .accept(MediaType.APPLICATION_JSON)
                         .header("Authorization", "Bearer " + tokenAdmin))
-                .andExpect(status().isOk())
+                .andExpect(status().is4xxClientError())
                 .andReturn();
-
         System.out.println(result.getResponse().getContentAsString());
+
     }
 
     @Test
-    public void testUsersEndpointWhenUserAuthAdminToCreateBank() throws Exception{
-        var result = mockMvc.perform(MockMvcRequestBuilders.post("/users/createUser").content(
+    public void testCreateBankUserWhenUserAuthAdmin() throws Exception{
+        tokenAdmin = getTokenAdmin();
+        var result = mockMvc.perform(MockMvcRequestBuilders.post(CREATE_USER_URL).content(
                                 objectMapper.writeValueAsString(defaultBankDTO())
                         )
                         .contentType(MediaType.APPLICATION_JSON)
@@ -102,13 +97,13 @@ public class UserIntegrationTest {
                         .header("Authorization", "Bearer " + tokenAdmin))
                 .andExpect(status().isOk())
                 .andReturn();
-
         System.out.println(result.getResponse().getContentAsString());
     }
 
     @Test
-    public void testUsersEndpointWhenUserAuthAdminToCreateAdmin() throws Exception{
-        var result = mockMvc.perform(MockMvcRequestBuilders.post("/users/createUser").content(
+    public void testCreateAdminWhenUserAuthAdmin() throws Exception{
+        tokenAdmin = getTokenAdmin();
+        var result = mockMvc.perform(MockMvcRequestBuilders.post(CREATE_USER_URL).content(
                                 objectMapper.writeValueAsString(defaultAdminDTO())
                         )
                         .contentType(MediaType.APPLICATION_JSON)
@@ -116,13 +111,13 @@ public class UserIntegrationTest {
                         .header("Authorization", "Bearer " + tokenAdmin))
                 .andExpect(status().isOk())
                 .andReturn();
-
         System.out.println(result.getResponse().getContentAsString());
     }
 
     @Test
-    public void testUsersEndpointWhenUserAuthUserToCreateUser() throws Exception{
-        var result = mockMvc.perform(MockMvcRequestBuilders.post("/users/createUser").content(
+    public void testCreateUserWhenUserAuthUser() throws Exception{
+        tokenUser = getTokenUser();
+        var result = mockMvc.perform(MockMvcRequestBuilders.post(CREATE_USER_URL).content(
                                 objectMapper.writeValueAsString(defaultUserDTO())
                         )
                         .contentType(MediaType.APPLICATION_JSON)
@@ -130,12 +125,12 @@ public class UserIntegrationTest {
                         .header("Authorization", "Bearer " + tokenUser))
                 .andExpect(status().isForbidden())
                 .andReturn();
-
         System.out.println(result.getResponse().getContentAsString());
     }
     @Test
-    public void testUsersEndpointWhenUserAuthUserToCreateBank() throws Exception{
-        var result = mockMvc.perform(MockMvcRequestBuilders.post("/users/createUser").content(
+    public void testCreateBankUserWhenUserAuthUser() throws Exception{
+        tokenUser = getTokenUser();
+        var result = mockMvc.perform(MockMvcRequestBuilders.post(CREATE_USER_URL).content(
                                 objectMapper.writeValueAsString(defaultBankDTO())
                         )
                         .contentType(MediaType.APPLICATION_JSON)
@@ -143,13 +138,13 @@ public class UserIntegrationTest {
                         .header("Authorization", "Bearer " + tokenUser))
                 .andExpect(status().isForbidden())
                 .andReturn();
-
         System.out.println(result.getResponse().getContentAsString());
     }
 
     @Test
-    public void testUsersEndpointWhenUserAuthUserToCreateAdmin() throws Exception{
-        var result = mockMvc.perform(MockMvcRequestBuilders.post("/users/createUser").content(
+    public void testCreateAdminUserWhenUserAuthUser() throws Exception{
+        tokenUser = getTokenUser();
+        var result = mockMvc.perform(MockMvcRequestBuilders.post(CREATE_USER_URL).content(
                                 objectMapper.writeValueAsString(defaultAdminDTO())
                         )
                         .contentType(MediaType.APPLICATION_JSON)
@@ -157,57 +152,59 @@ public class UserIntegrationTest {
                         .header("Authorization", "Bearer " + tokenUser))
                 .andExpect(status().isForbidden())
                 .andReturn();
-
         System.out.println(result.getResponse().getContentAsString());
     }
 
     @Test
-    public void testUsersEndpointWhenUserAuthBankToCreateUser() throws Exception{
-        var result = mockMvc.perform(MockMvcRequestBuilders.post("/users/createUser").content(
-                                objectMapper.writeValueAsString(userByBankCreateDTO())
+    public void testCreateUserWhenUserAuthBank() throws Exception{
+        tokenBank = getTokenBank();
+        System.out.println(tokenBank);
+        var result = mockMvc.perform(MockMvcRequestBuilders.post(CREATE_USER_URL).content(
+                                objectMapper.writeValueAsString(defaultUserDTO())
                         )
                         .contentType(MediaType.APPLICATION_JSON)
                         .accept(MediaType.APPLICATION_JSON)
                         .header("Authorization", "Bearer " + tokenBank))
                 .andExpect(status().isOk())
                 .andReturn();
-
         System.out.println(result.getResponse().getContentAsString());
     }
 
     @Test
-    public void testUsersEndpointWhenUserAuthBankToCreateAdmin() throws Exception{
-        var result = mockMvc.perform(MockMvcRequestBuilders.post("/users/createUser").content(
+    public void testCreateAdminUserWhenUserAuthBank() throws Exception{
+        tokenBank = getTokenBank();
+        var result = mockMvc.perform(MockMvcRequestBuilders.post(CREATE_USER_URL).content(
                                 objectMapper.writeValueAsString(defaultAdminDTO())
                         )
                         .contentType(MediaType.APPLICATION_JSON)
                         .accept(MediaType.APPLICATION_JSON)
                         .header("Authorization", "Bearer " + tokenBank))
-                .andExpect(status().isUnauthorized())
+                .andExpect(status().isForbidden())
                 .andReturn();
-
         System.out.println(result.getResponse().getContentAsString());
     }
 
     @Test
-    public void testUsersEndpointWhenUserAuthBankToCreateBank() throws Exception{
-        var result = mockMvc.perform(MockMvcRequestBuilders.post("/users/createUser").content(
-                                objectMapper.writeValueAsString(bankByBankCreateDTO())
+    public void testCreateBankUserWhenUserAuthBank() throws Exception{
+        tokenBank = getTokenBank();
+        System.out.println(tokenBank);
+        var result = mockMvc.perform(MockMvcRequestBuilders.post(CREATE_USER_URL).content(
+                                objectMapper.writeValueAsString(defaultBankDTO())
                         )
                         .contentType(MediaType.APPLICATION_JSON)
                         .accept(MediaType.APPLICATION_JSON)
                         .header("Authorization", "Bearer " + tokenBank))
                 .andExpect(status().isOk())
                 .andReturn();
-
         System.out.println(result.getResponse().getContentAsString());
     }
 
     //These tests were done to fail the input validations (@Valid)
 
     @Test   //This test is to fail the input validation of the @NotBlank firstName
-    public void testUsersEndpointWhenUserAuthAdminToCreateUserWithoutFirtsName() throws Exception{
-        var result = mockMvc.perform(MockMvcRequestBuilders.post("/users/createUser").content(
+    public void testCreateUserWithoutFirtsNameWhenUserAuthAdmin() throws Exception{
+        tokenAdmin = getTokenAdmin();
+        var result = mockMvc.perform(MockMvcRequestBuilders.post(CREATE_USER_URL).content(
                                 objectMapper.writeValueAsString(userWithoutAnything())
                         )
                         .contentType(MediaType.APPLICATION_JSON)
@@ -215,13 +212,13 @@ public class UserIntegrationTest {
                         .header("Authorization", "Bearer " + tokenAdmin))
                 .andExpect(status().isBadRequest())
                 .andReturn();
-
         System.out.println(result.getResponse().getContentAsString());
     }
 
     @Test   //This test is to fail the input validation of the @NotBlank lastName
-    public void testUsersEndpointWhenUserAuthAdminToCreateUserWithoutLastName() throws Exception{
-        var result = mockMvc.perform(MockMvcRequestBuilders.post("/users/createUser").content(
+    public void testCreateUserWithoutLastNameWhenUserAuthAdmin() throws Exception{
+        tokenAdmin = getTokenAdmin();
+        var result = mockMvc.perform(MockMvcRequestBuilders.post(CREATE_USER_URL).content(
                                 objectMapper.writeValueAsString(userWithoutAnything())
                         )
                         .contentType(MediaType.APPLICATION_JSON)
@@ -229,13 +226,13 @@ public class UserIntegrationTest {
                         .header("Authorization", "Bearer " + tokenAdmin))
                 .andExpect(status().isBadRequest())
                 .andReturn();
-
         System.out.println(result.getResponse().getContentAsString());
     }
 
     @Test   //This test is to fail the input validation of the @Email email
-    public void testUsersEndpointWhenUserAuthAdminToCreateUserWithEmailBadFormat() throws Exception{
-        var result = mockMvc.perform(MockMvcRequestBuilders.post("/users/createUser").content(
+    public void testCreateUserWithEmailBadFormatWhenUserAuthAdmin() throws Exception{
+        tokenAdmin = getTokenAdmin();
+        var result = mockMvc.perform(MockMvcRequestBuilders.post(CREATE_USER_URL).content(
                                 objectMapper.writeValueAsString(userWithoutAnything())
                         )
                         .contentType(MediaType.APPLICATION_JSON)
@@ -243,14 +240,15 @@ public class UserIntegrationTest {
                         .header("Authorization", "Bearer " + tokenAdmin))
                 .andExpect(status().isBadRequest())
                 .andReturn();
-
-        System.out.println(result.getResponse().getContentAsString());
+        assertNotNull(result.getResponse().getContentAsString());
+        assertEquals(400, result.getResponse().getStatus());
     }
 
 
-    @Test   //This test is to fail the input validation of the @ColombianNumberConstraint phoneNumber
-    public void testUsersEndpointWhenUserAuthAdminToCreateUserWithPhoneBadFormat() throws Exception{
-        var result = mockMvc.perform(MockMvcRequestBuilders.post("/users/createUser").content(
+    @Test   //This test is to fail the input validation of the @RegionPhoneNumberValidation phoneNumber
+    public void testCreateUserWithPhoneBadFormatWhenUserAuthAdmin() throws Exception{
+        tokenAdmin = getTokenAdmin();
+        var result = mockMvc.perform(MockMvcRequestBuilders.post(CREATE_USER_URL).content(
                                 objectMapper.writeValueAsString(userWithoutAnything())
                         )
                         .contentType(MediaType.APPLICATION_JSON)
@@ -258,13 +256,14 @@ public class UserIntegrationTest {
                         .header("Authorization", "Bearer " + tokenAdmin))
                 .andExpect(status().isBadRequest())
                 .andReturn();
-
-        System.out.println(result.getResponse().getContentAsString());
+        assertNotNull(result.getResponse().getContentAsString());
+        assertEquals(400, result.getResponse().getStatus());
     }
 
     @Test   //This test is to fail the input validation of the @NotBlank password
-    public void testUsersEndpointWhenUserAuthAdminToCreateUserWithoutPassword() throws Exception{
-        var result = mockMvc.perform(MockMvcRequestBuilders.post("/users/createUser").content(
+    public void testCreateUserWithoutPasswordWhenUserAuthAdmin() throws Exception{
+        tokenAdmin = getTokenAdmin();
+        var result = mockMvc.perform(MockMvcRequestBuilders.post(CREATE_USER_URL).content(
                                 objectMapper.writeValueAsString(userWithoutAnything())
                         )
                         .contentType(MediaType.APPLICATION_JSON)
@@ -272,13 +271,14 @@ public class UserIntegrationTest {
                         .header("Authorization", "Bearer " + tokenAdmin))
                 .andExpect(status().isBadRequest())
                 .andReturn();
-
-        System.out.println(result.getResponse().getContentAsString());
+        assertNotNull(result.getResponse().getContentAsString());
+        assertEquals(400, result.getResponse().getStatus());
     }
 
     @Test   //This test is to fail the input validation of the @NotBlank role
-    public void testUsersEndpointWhenUserAuthAdminToCreateUserWithoutRole() throws Exception{
-        var result = mockMvc.perform(MockMvcRequestBuilders.post("/users/createUser").content(
+    public void testCreateUserWithoutRoleWhenUserAuthAdmin() throws Exception{
+        tokenAdmin = getTokenAdmin();
+        var result = mockMvc.perform(MockMvcRequestBuilders.post(CREATE_USER_URL).content(
                                 objectMapper.writeValueAsString(userWithoutAnything())
                         )
                         .contentType(MediaType.APPLICATION_JSON)
@@ -286,8 +286,40 @@ public class UserIntegrationTest {
                         .header("Authorization", "Bearer " + tokenAdmin))
                 .andExpect(status().isBadRequest())
                 .andReturn();
-
         System.out.println(result.getResponse().getContentAsString());
+    }
+
+    //Method to log in and get an admin token
+    private String getTokenAdmin() throws Exception {
+        return mockMvc.perform(MockMvcRequestBuilders.post("/token").content(
+                                objectMapper.writeValueAsString(new LoginDTO("johndoe@email.com", "password"))
+                        )
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .accept(MediaType.APPLICATION_JSON))
+                .andExpect(status().isOk())
+                .andReturn().getResponse().getContentAsString();
+    }
+
+    //Method to log in and get a user token
+    private String getTokenUser() throws Exception {
+        return mockMvc.perform(MockMvcRequestBuilders.post("/token").content(
+                                objectMapper.writeValueAsString(new LoginDTO("johndoe2@email.com","password"))
+                        )
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .accept(MediaType.APPLICATION_JSON))
+                .andExpect(status().isOk())
+                .andReturn().getResponse().getContentAsString();
+    }
+
+    //Method to log ing and get a bank token
+    private String getTokenBank() throws Exception {
+        return mockMvc.perform(MockMvcRequestBuilders.post("/token").content(
+                                objectMapper.writeValueAsString(new LoginDTO("johndoe3@email.com","password"))
+                        )
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .accept(MediaType.APPLICATION_JSON))
+                .andExpect(status().isOk())
+                .andReturn().getResponse().getContentAsString();
     }
 
     private UserDTO defaultUserDTO() {
@@ -296,7 +328,7 @@ public class UserIntegrationTest {
                 .lastName("Arevalo")
                 .password("1234567")
                 .email("santiarevalo@gmail.com")
-                .phoneNumber("+573162499422")
+                .phoneNumber("+573162499421")
                 .role(defaultRoleDTO())
                 .build();
     }
@@ -318,7 +350,7 @@ public class UserIntegrationTest {
                 .lastName("Arevalo")
                 .password("1234567")
                 .email("santiarevalobank@gmail.com")
-                .phoneNumber("+573162499422")
+                .phoneNumber("+573162499423")
                 .role(defaultBankRoleDTO())
                 .build();
     }
@@ -372,7 +404,7 @@ public class UserIntegrationTest {
 
     private RoleDTO defaultBankRoleDTO() {
         return RoleDTO.builder()
-                .name("BANK")
+                .name("BANK_USER")
                 .description("Bank role for test")
                 .build();
     }

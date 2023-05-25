@@ -14,6 +14,7 @@ import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Service;
 
+import javax.validation.ValidationException;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.UUID;
@@ -68,16 +69,16 @@ public class UserService {
     private IcesiRole validateRoleExists(UserDTO user) {
         if(user.getRole() != null) {
             return roleRepository.getByName(user.getRole().getName()).
-                    orElseThrow(() -> new RoleException("Role " + user.getRole().getName() + " not found or is null"));
+                    orElseThrow(() -> new RoleException("Role " + user.getRole().getName() + " not found"));
         }else {
-            throw new RoleException("Role is null");
+            throw new ValidationException("Role is required");
         }
     }
 
     //Validate if the user that is creating a new user has the role ADMIN or BANK_USER
     private void validateRoleAdminOrBankUser(String newRole) {
         var role = IcesiSecurityContext.getCurrentUserRole();
-        if (!(role.equalsIgnoreCase("ADMIN") || role.equalsIgnoreCase("BANK_USER"))) {
+        if (role.equalsIgnoreCase("USER")) {
             throw new UserException("You don't have the permissions to create a new user");
         }
         if(role.equalsIgnoreCase("BANK_USER") && newRole.equalsIgnoreCase("ADMIN")) {

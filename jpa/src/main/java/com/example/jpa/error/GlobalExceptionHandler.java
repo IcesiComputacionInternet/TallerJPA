@@ -15,6 +15,7 @@ import org.springframework.web.bind.annotation.ControllerAdvice;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 
 import java.util.List;
+import java.util.Objects;
 
 @ControllerAdvice
 public class GlobalExceptionHandler {
@@ -46,9 +47,10 @@ public class GlobalExceptionHandler {
 
     //Private method to map an Object Error to IcesiErrorDetail
     private IcesiErrorDetail mapErrorToIcesiErrorDetail(ObjectError error){
+        var field = ((DefaultMessageSourceResolvable) Objects.requireNonNull(error.getArguments())[0]).getDefaultMessage();
         return IcesiErrorDetail.builder()
                 .errorCode(error.getCode())
-                .errorMessage(error.getDefaultMessage())
+                .errorMessage(field + error.getDefaultMessage())
                 .build();
     }
 

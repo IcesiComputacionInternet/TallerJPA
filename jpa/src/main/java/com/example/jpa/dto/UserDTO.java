@@ -12,6 +12,8 @@ import javax.validation.constraints.NotNull;
 
 @Data
 @Builder
+@Email
+@AtLeastOneNotNull
 @AllArgsConstructor
 public class UserDTO {
 
@@ -22,8 +24,8 @@ public class UserDTO {
     @NotBlank
     private String password;
 
-    @NotNull
     @Email
+    @NotNull
     private String email;
 
     @NotNull
