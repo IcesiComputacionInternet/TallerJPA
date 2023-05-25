@@ -9,6 +9,7 @@ import co.com.icesi.TallerJpa.service.IcesiUserService;
 import lombok.AllArgsConstructor;
 import org.springframework.web.bind.annotation.RestController;
 
+import java.util.List;
 import java.util.UUID;
 
 @RestController
@@ -36,5 +37,10 @@ public class IcesiUserController implements IcesiUserApi {
     @Override
     public IcesiUserResponseDTO getIcesiUserByEmail(String email) {
         return icesiUserService.getUserByEmail(email);
+    }
+
+    @Override
+    public List<IcesiUserResponseDTO> getIcesiUsersAll() {
+        return icesiUserService.getAllUsers();
     }
 }

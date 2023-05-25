@@ -12,11 +12,13 @@ import co.com.icesi.TallerJpa.repository.IcesiRoleRepository;
 import co.com.icesi.TallerJpa.repository.IcesiUserRepository;
 import lombok.AllArgsConstructor;
 import org.springframework.http.HttpStatus;
+import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
 import java.util.ArrayList;
 import java.util.List;
 import java.util.UUID;
+import java.util.stream.Collectors;
 
 import static co.com.icesi.TallerJpa.error.util.IcesiExceptionBuilder.createIcesiException;
 
@@ -26,6 +28,7 @@ public class IcesiUserService {
     private final IcesiUserRepository icesiUserRepository;
     private final IcesiRoleRepository icesiRoleRepository;
     private final IcesiUserMapper icesiUserMapper;
+    private final PasswordEncoder encoder;
 
     public IcesiUserResponseDTO saveUser(IcesiUserRequestDTO icesiUserRequestDTO, String actualUserRole){
         List<String> errors = new ArrayList<>();
@@ -48,6 +51,7 @@ public class IcesiUserService {
         checkPermissionsToCreateUser(actualUserRole, icesiRole.getName());
 
         IcesiUser icesiUser = icesiUserMapper.fromUserDto(icesiUserRequestDTO);
+        icesiUser.setPassword(encoder.encode(icesiUserRequestDTO.getPassword()));
         icesiUser.setUserId(UUID.randomUUID());
         icesiUser.setIcesiRole(icesiRole);
         return icesiUserMapper.fromIcesiUserToResponse(icesiUserRepository.save(icesiUser));
@@ -66,6 +70,10 @@ public class IcesiUserService {
 
     public IcesiUserResponseDTO getUserByEmail(String email){
         return icesiUserMapper.fromIcesiUserToResponse(privateGetUserByEmail(email));
+    }
+
+    public List<IcesiUserResponseDTO> getAllUsers(){
+        return icesiUserRepository.findAll().stream().map(icesiUserMapper::fromIcesiUserToResponse).collect(Collectors.toList());
     }
 
     private void checkPermissionsToCreateUser(String actualUserRole, String role){

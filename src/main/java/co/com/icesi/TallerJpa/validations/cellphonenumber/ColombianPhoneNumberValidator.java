@@ -13,8 +13,8 @@ public class ColombianPhoneNumberValidator implements ConstraintValidator<Colomb
 
     @Override
     public boolean isValid(String s, ConstraintValidatorContext constraintValidatorContext) {
-        if(s.isBlank()){
-            return true;
+        if (s == null){
+            return false;
         }
         return s.matches(COLOMBIAN_NUMBER_REGEX);
     }

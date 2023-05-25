@@ -7,6 +7,7 @@ import org.springframework.web.bind.annotation.*;
 
 import javax.validation.Valid;
 import javax.validation.constraints.Email;
+import java.util.List;
 
 @RequestMapping(value = IcesiUserApi.USER_BASE_URL)
 public interface IcesiUserApi {
@@ -24,4 +25,7 @@ public interface IcesiUserApi {
 
     @GetMapping("/email/{email}")
     IcesiUserResponseDTO getIcesiUserByEmail(@PathVariable @Valid @Email String email);
+
+    @GetMapping
+    List<IcesiUserResponseDTO> getIcesiUsersAll();
 }

@@ -16,6 +16,7 @@ import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.springframework.http.HttpStatus;
+import org.springframework.security.crypto.password.PasswordEncoder;
 
 import java.util.Optional;
 import java.util.UUID;
@@ -28,12 +29,14 @@ public class UserServiceTest {
     private IcesiUserRepository icesiUserRepository;
     private IcesiRoleRepository icesiRoleRepository;
     private IcesiUserMapper icesiUserMapper;
+
     @BeforeEach
     public void init(){
         icesiUserRepository = mock(IcesiUserRepository.class);
         icesiUserMapper = spy(IcesiUserMapperImpl.class);
         icesiRoleRepository = mock(IcesiRoleRepository.class);
-        icesiUserService = new IcesiUserService(icesiUserRepository, icesiRoleRepository, icesiUserMapper);
+        PasswordEncoder encoder = spy(PasswordEncoder.class);
+        icesiUserService = new IcesiUserService(icesiUserRepository, icesiRoleRepository, icesiUserMapper, encoder);
     }
 
     @Test
@@ -44,9 +47,9 @@ public class UserServiceTest {
         when(icesiUserRepository.findByPhoneNumber(any())).thenReturn(Optional.empty());
         when(icesiRoleRepository.findByName(any())).thenReturn(Optional.of(defaultIcesiRole()));
         icesiUserService.saveUser(defaultIcesiUserDTO(), actualUser.getIcesiRole().getName());
-        verify(icesiUserRepository,times(1)).findByEmail(any());
-        verify(icesiUserRepository,times(1)).findByPhoneNumber(any());
-        verify(icesiRoleRepository,times(1)).findByName(any());
+        verify(icesiUserRepository,times(1)).findByEmail(defaultIcesiUserDTO().getEmail());
+        verify(icesiUserRepository,times(1)).findByPhoneNumber(defaultIcesiUserDTO().getPhoneNumber());
+        verify(icesiRoleRepository,times(1)).findByName(defaultIcesiUserDTO().getRole());
         verify(icesiUserMapper,times(1)).fromUserDto(defaultIcesiUserDTO());
         verify(icesiUserMapper,times(1)).fromIcesiUserToResponse(any());
         verify(icesiUserRepository,times(1)).save(argThat(new IcesiUserMatcher(defaultIcesiUser())));

@@ -68,6 +68,14 @@ public class GlobalExceptionHandler {
         return ResponseEntity.status(error.getStatus()).body(error);
     }
 
+    @ExceptionHandler(ClassCastException.class)
+    public ResponseEntity<IcesiError> handleClassCastException(){
+        var errorBuilder = IcesiError.builder().status(HttpStatus.UNAUTHORIZED);
+        var details = new IcesiErrorDetail(ErrorCode.ERR_401.getCode(), "Tienes que autenticarte primero.");
+        var error = errorBuilder.details(List.of(details)).build();
+        return ResponseEntity.status(error.getStatus()).body(error);
+    }
+
     @ExceptionHandler(IcesiException.class)
     public ResponseEntity<IcesiError> handleIcesiException(IcesiException icesiException){
         return ResponseEntity.status(icesiException.getError().getStatus()).body(icesiException.getError());

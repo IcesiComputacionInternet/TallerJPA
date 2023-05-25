@@ -17,7 +17,6 @@ public class IcesiUserMatcher implements ArgumentMatcher<IcesiUser> {
                 Objects.equals(icesiUserRight.getLastName(),icesiUserLeft.getLastName()) &&
                 Objects.equals(icesiUserRight.getEmail(),icesiUserLeft.getEmail()) &&
                 Objects.equals(icesiUserRight.getPhoneNumber(),icesiUserLeft.getPhoneNumber()) &&
-                Objects.equals(icesiUserRight.getPassword(),icesiUserLeft.getPassword()) &&
                 Objects.equals(icesiUserRight.getIcesiRole().getName(), icesiUserLeft.getIcesiRole().getName());
     }
 }
