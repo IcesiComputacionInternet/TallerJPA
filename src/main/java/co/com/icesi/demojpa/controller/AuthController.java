@@ -29,4 +29,9 @@ public class AuthController {
     public String tokenScope() {
     	return IcesiSecurityContext.getCurrentUserRole();
     }
+
+    @GetMapping("/token/id")
+    public String tokenId() {
+        return IcesiSecurityContext.getCurrentUserId();
+    }
 }

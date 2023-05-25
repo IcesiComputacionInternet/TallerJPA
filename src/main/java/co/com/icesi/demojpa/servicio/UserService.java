@@ -82,8 +82,14 @@ public class UserService {
     }
 
 
-    public Optional<IcesiUser> findById(UUID fromString){
-        return userRepository.findById(fromString);
+    public Optional<IcesiUser> findById(String fromString){
+
+        return userRepository.findById(UUID.fromString(fromString));
+    }
+
+    public ResponseUserDTO getCurrentUser(){
+        return userResponseMapper.fromIcesUser(userRepository.findById(UUID.fromString(IcesiSecurityContext.getCurrentUserId())).orElseThrow(
+                ()-> IcesiExceptionBuilder.createIcesiException("No existe un usuario con este id", HttpStatus.NOT_FOUND,"USER_NOT_FOUND")));
     }
 
 }

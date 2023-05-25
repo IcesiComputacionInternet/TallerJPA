@@ -28,4 +28,9 @@ public class UserController implements UserAPI {
         return userService.save(user);
     }
 
+    @Override
+    public ResponseUserDTO getUser(){
+        return userService.getCurrentUser();
+    }
+
 }

@@ -14,4 +14,5 @@ public interface UserRepository extends JpaRepository<IcesiUser, UUID> {
     Optional<IcesiUser> findByEmail(String fromString);
 
     Optional<IcesiUser> findByPhone(String fromString);
+
 }

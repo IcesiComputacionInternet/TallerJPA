@@ -16,6 +16,7 @@ import java.util.UUID;
 @TestConfiguration
 public class TestConfigurationData {
 
+    /*
     @Bean
     public CommandLineRunner commandLineRunner(UserRepository users,
                                                RoleRepository roleRepository,
@@ -93,5 +94,9 @@ public class TestConfigurationData {
 
             System.out.println("Data loaded");
         };
+
+
     }
+
+     */
 }

@@ -20,7 +20,7 @@ public class DemoJpaApplication {
 
 		SpringApplication.run(DemoJpaApplication.class, args);
 	}
-/*
+
 	@Bean
 	public CommandLineRunner commandLineRunner(UserRepository users,
 											   RoleRepository roleRepository,
@@ -46,7 +46,7 @@ public class DemoJpaApplication {
 				.email("johndoe@email.com")
 				.role(admin)
 				.firstName("John")
-				.lastname("Doe")
+				.lastName("Doe")
 				.phone("+57123123123")
 				.password(encoder.encode("password"))
 				.build();
@@ -55,7 +55,7 @@ public class DemoJpaApplication {
 				.email("johndoe2@email.com")
 				.role(bank)
 				.firstName("John")
-				.lastname("Doe")
+				.lastName("Doe")
 				.phone("+57123123123")
 				.password(encoder.encode("password"))
 				.build();
@@ -68,6 +68,6 @@ public class DemoJpaApplication {
 			users.save(icesiUser2);
 		};
 	}
-*/
+
 
 }
