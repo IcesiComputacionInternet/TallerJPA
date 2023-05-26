@@ -3,6 +3,7 @@ package com.example.jpa.service;
 import com.example.jpa.dto.RoleDTO;
 import com.example.jpa.error.exceptions.RoleException;
 import com.example.jpa.error.util.IcesiError;
+import com.example.jpa.error.util.IcesiErrorCode;
 import com.example.jpa.error.util.IcesiErrorDetail;
 import com.example.jpa.mapper.RoleMapper;
 import com.example.jpa.model.IcesiRole;
@@ -43,7 +44,7 @@ public class RoleService {
             throw new RoleException(IcesiError.builder()
                     .status(HttpStatus.BAD_REQUEST)
                     .details(List.of(IcesiErrorDetail.builder()
-                            .errorCode("400")
+                            .errorCode(IcesiErrorCode.ERR_400)
                             .errorMessage("Role name is required")
                             .build()))
                     .build());

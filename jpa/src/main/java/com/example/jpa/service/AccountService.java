@@ -6,6 +6,9 @@ import com.example.jpa.dto.TransactionRequestDTO;
 import com.example.jpa.dto.TransactionResponseDTO;
 import com.example.jpa.error.exceptions.AccountException;
 import com.example.jpa.error.exceptions.UserException;
+import com.example.jpa.error.util.IcesiError;
+import com.example.jpa.error.util.IcesiErrorCode;
+import com.example.jpa.error.util.IcesiErrorDetail;
 import com.example.jpa.mapper.AccountMapper;
 import com.example.jpa.model.IcesiAccount;
 import com.example.jpa.model.IcesiUser;
@@ -13,6 +16,7 @@ import com.example.jpa.repository.AccountRepository;
 import com.example.jpa.repository.UserRepository;
 import com.example.jpa.security.IcesiSecurityContext;
 import lombok.AllArgsConstructor;
+import org.springframework.http.HttpStatus;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Service;
@@ -75,7 +79,13 @@ public class AccountService {
                     + "/n" + "Balance can't be negative");
         }
         if(amount < 0){
-            throw new AccountException("Amount can't be negative");
+            throw new AccountException(IcesiError.builder()
+                    .status(HttpStatus.BAD_REQUEST)
+                    .details(List.of(IcesiErrorDetail.builder()
+                            .errorCode(IcesiErrorCode.ERR_400)
+                            .errorMessage("Balance can't be negative")
+                            .build()))
+                    .build());
         }
     }
 
@@ -88,7 +98,13 @@ public class AccountService {
     //Validate if the user of a new account exists
     private IcesiUser validateUserExists(AccountRequestDTO accountDTO) {
         if (accountDTO.getUser() == null) {
-            throw new UserException("User is null");
+            throw new UserException(IcesiError.builder()
+                    .status(HttpStatus.BAD_REQUEST)
+                    .details(List.of(IcesiErrorDetail.builder()
+                            .errorCode(IcesiErrorCode.ERR_400)
+                            .errorMessage("User can't be null")
+                            .build()))
+                    .build());
         }
         return userRepository.findByEmail(accountDTO.getUser().getEmail()).orElseThrow(() -> new UserException("User not found"));
     }
@@ -144,6 +160,7 @@ public class AccountService {
     public TransactionResponseDTO transfer(TransactionRequestDTO transactionRequestDTO){
         IcesiAccount accountFrom = validateAccountExists(transactionRequestDTO.getSourceAccount());
         IcesiAccount accountTo = validateAccountExists(transactionRequestDTO.getTargetAccount());
+        validateAmountNotBlank(transactionRequestDTO);
         validateTransferConditions(accountFrom, accountTo);
         validateAccountBalance(accountFrom, transactionRequestDTO.getAmount());
         accountFrom.setBalance(accountFrom.getBalance() - transactionRequestDTO.getAmount());
@@ -153,13 +170,37 @@ public class AccountService {
         return accountMapper.fromTransactionRequest(transactionRequestDTO, "Transfer successful");
     }
 
+    private void validateAmountNotBlank(TransactionRequestDTO transactionRequestDTO){
+        if(transactionRequestDTO.getAmount() == null){
+            throw new AccountException(IcesiError.builder()
+                    .status(HttpStatus.BAD_REQUEST)
+                    .details(List.of(IcesiErrorDetail.builder()
+                            .errorCode(IcesiErrorCode.ERR_400)
+                            .errorMessage("Amount can't be blank")
+                            .build()))
+                    .build());
+        }
+    }
+
     private void validateTransferConditions(IcesiAccount accountFrom, IcesiAccount accountTo){
         if(!(accountFrom.isActive()) || !(accountTo.isActive())) {
-            throw new AccountException("One or both accounts are not active");
+            throw new AccountException(IcesiError.builder()
+                    .status(HttpStatus.BAD_REQUEST)
+                    .details(List.of(IcesiErrorDetail.builder()
+                            .errorCode(IcesiErrorCode.ERR_400)
+                            .errorMessage("One or both accounts are inactive")
+                            .build()))
+                    .build());
         }
         if((accountFrom.getType().equalsIgnoreCase("deposit") ||
                 accountTo.getType().equalsIgnoreCase("deposit"))) {
-            throw new AccountException("One or both accounts are of type deposit");
+            throw new AccountException(IcesiError.builder()
+                    .status(HttpStatus.FORBIDDEN)
+                    .details(List.of(IcesiErrorDetail.builder()
+                            .errorCode(IcesiErrorCode.ERR_403)
+                            .errorMessage("One or both accounts are deposit accounts")
+                            .build()))
+                    .build());
         }
     }
 
@@ -167,7 +208,13 @@ public class AccountService {
     public void validateAccountOwner(String accountNumber){
         var userId = IcesiSecurityContext.getCurrentUserId();
         if(!accountRepository.isAccountOwner(userId, accountNumber)) {
-            throw new AccountException("You are not the owner of this account");
+            throw new AccountException(IcesiError.builder()
+                    .status(HttpStatus.FORBIDDEN)
+                    .details(List.of(IcesiErrorDetail.builder()
+                            .errorCode(IcesiErrorCode.ERR_403)
+                            .errorMessage("You are not the owner of this account")
+                            .build()))
+                    .build());
         }
     }
 

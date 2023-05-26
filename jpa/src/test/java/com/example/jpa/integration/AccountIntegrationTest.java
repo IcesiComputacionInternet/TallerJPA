@@ -1,14 +1,11 @@
 package com.example.jpa.integration;
 
 import com.example.jpa.TestConfigurationData;
-import com.example.jpa.dto.RoleDTO;
-import com.example.jpa.dto.TransactionRequestDTO;
-import com.example.jpa.dto.UserDTO;
+import com.example.jpa.dto.*;
 import com.example.jpa.repository.UserRepository;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.beans.factory.annotation.Value;
 import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.context.annotation.Import;
@@ -35,12 +32,12 @@ public class AccountIntegrationTest {
     @Autowired
     UserRepository userRepository;
 
-    @Value("${security.token.admin}")
+
     private String tokenAdmin;
-    @Value("${security.token.user}")
     private String tokenUser;
-    @Value("${security.token.bank}")
     private String tokenBank;
+
+    private final static String CREATE_ACCOUNT_URL = "/accounts/createAccount";
 
     @Test
     void contextLoads() {
@@ -48,7 +45,7 @@ public class AccountIntegrationTest {
 
     @Test
     public void testAccountEndpointWhenUserNotAuth() throws Exception{
-        var result = mockMvc.perform(MockMvcRequestBuilders.post("/accounts/createAccount").content(
+        var result = mockMvc.perform(MockMvcRequestBuilders.post(CREATE_ACCOUNT_URL).content(
                                 objectMapper.writeValueAsString(defaultAdminDTO())
                         )
                         .contentType(MediaType.APPLICATION_JSON)
@@ -59,63 +56,33 @@ public class AccountIntegrationTest {
     }
 
     @Test
-    public void testAccountEndpointWhenUserAuthAdminToCreateAccount() throws Exception {
-        var result = mockMvc.perform(MockMvcRequestBuilders.post("/accounts/createAccount").content(
-                                objectMapper.writeValueAsString(defaultAdminDTO())
+    public void testCreateAccountWhenUserAuthAdmin() throws Exception {
+        tokenAdmin = getTokenAdmin();
+        var result = mockMvc.perform(MockMvcRequestBuilders.post(CREATE_ACCOUNT_URL).content(
+                                objectMapper.writeValueAsString(defaultAccountRequestDTO())
                         )
                         .contentType(MediaType.APPLICATION_JSON)
-                        .accept(MediaType.APPLICATION_JSON))
-                .andExpect(status().isCreated())
-                .andReturn();
-        System.out.println(result.getResponse().getContentAsString());
-    }
-
-    @Test
-    public void testAccountEndpointWhenUserAuthUserToCreateAccount() throws Exception {
-        var result = mockMvc.perform(MockMvcRequestBuilders.post("/accounts/createAccount").content(
-                                objectMapper.writeValueAsString(defaultUserDTO())
-                        )
-                        .contentType(MediaType.APPLICATION_JSON)
-                        .accept(MediaType.APPLICATION_JSON))
+                        .accept(MediaType.APPLICATION_JSON)
+                        .header("Authorization", "Bearer " + tokenAdmin))
                 .andExpect(status().isOk())
                 .andReturn();
         System.out.println(result.getResponse().getContentAsString());
     }
 
     @Test
-    public void testAccountEndpointWhenUserAuthBankToCreateAccount() throws Exception {
-        var result = mockMvc.perform(MockMvcRequestBuilders.post("/accounts/createAccount").content(
-                                objectMapper.writeValueAsString(defaultUserDTO())
-                        )
-                        .contentType(MediaType.APPLICATION_JSON)
-                        .accept(MediaType.APPLICATION_JSON))
-                .andExpect(status().isOk())
-                .andReturn();
-        System.out.println(result.getResponse().getContentAsString());
-    }
-
-    @Test
-    public void testAccountEndpointWhenUserAuthAdminToGetAccount() throws Exception {
-        var result = mockMvc.perform(MockMvcRequestBuilders.get("/accounts/1")
-                        .contentType(MediaType.APPLICATION_JSON)
-                        .accept(MediaType.APPLICATION_JSON))
-                .andExpect(status().isOk())
-                .andReturn();
-        System.out.println(result.getResponse().getContentAsString());
-    }
-
-    @Test
-    public void testAccountEndpointWhenUserAuthAdminToGetAllAccounts() throws Exception {
+    public void testGetAllAccountsWhenUserAuthAdmin() throws Exception {
+        tokenAdmin = getTokenAdmin();
         var result = mockMvc.perform(MockMvcRequestBuilders.get("/accounts/all")
                         .contentType(MediaType.APPLICATION_JSON)
-                        .accept(MediaType.APPLICATION_JSON))
+                        .accept(MediaType.APPLICATION_JSON)
+                        .header("Authorization", "Bearer " + tokenAdmin))
                 .andExpect(status().isOk())
                 .andReturn();
         System.out.println(result.getResponse().getContentAsString());
     }
 
     @Test
-    public void testTransferMoneyEndPointWhenUserIsNotAuth() throws Exception {
+    public void testTransferMoneyWhenUserIsNotAuth() throws Exception {
         var result = mockMvc.perform(patch("/accounts/transfer")
                         .content(objectMapper.writeValueAsString(defaultTransactionRequestDTO()))
                         .contentType(MediaType.APPLICATION_JSON)
@@ -123,12 +90,12 @@ public class AccountIntegrationTest {
                 )
                 .andExpect(status().isUnauthorized())
                 .andReturn();
-
         System.out.println(result.getResponse().getContentAsString());
     }
 
     @Test
     public void testTransferMoneyEndPointWhenUserIsAuth() throws Exception {
+        tokenAdmin = getTokenAdmin();
         var result = mockMvc.perform(patch("/accounts/transfer")
                         .content(objectMapper.writeValueAsString(defaultTransactionRequestDTO()))
                         .header("Authorization", "Bearer " + tokenAdmin)
@@ -141,13 +108,14 @@ public class AccountIntegrationTest {
     }
 
     @Test
-    public void testTransactionDTOWhenAmountIsNegative() throws Exception {
+    public void testTransactionWhenAmountIsNegative() throws Exception {
+        tokenAdmin = getTokenAdmin();
         var result = mockMvc.perform(patch("/accounts/transfer")
                         .content(objectMapper.writeValueAsString(
                                 TransactionRequestDTO.builder()
                                         .amount(-1000L)
-                                        .sourceAccount("123456789")
-                                        .targetAccount("987654321")
+                                        .sourceAccount("893-887868-67")
+                                        .targetAccount("897-887868-67")
                                         .build()
                         ))
                         .header("Authorization", "Bearer " + tokenAdmin)
@@ -160,13 +128,14 @@ public class AccountIntegrationTest {
     }
 
     @Test
-    public void testTransactionDTOWhenAmountIsBlank() throws Exception {
+    public void testTransactionWhenAmountIsBlank() throws Exception {
+        tokenAdmin = getTokenAdmin();
         var result = mockMvc.perform(patch("/accounts/transfer")
                         .content(objectMapper.writeValueAsString(
                                 TransactionRequestDTO.builder()
                                         .amount(null)
-                                        .sourceAccount("123456789")
-                                        .targetAccount("987654321")
+                                        .sourceAccount("893-887868-67")
+                                        .targetAccount("897-887868-67")
                                         .build()
                         ))
                         .header("Authorization", "Bearer " + tokenAdmin)
@@ -175,15 +144,69 @@ public class AccountIntegrationTest {
                 )
                 .andExpect(status().isBadRequest())
                 .andReturn();
-
         System.out.println(result.getResponse().getContentAsString());
+    }
+
+    //Method to log in and get an admin token
+    private String getTokenAdmin() throws Exception {
+        return mockMvc.perform(MockMvcRequestBuilders.post("/token").content(
+                                objectMapper.writeValueAsString(new LoginDTO("johndoe@email.com", "password"))
+                        )
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .accept(MediaType.APPLICATION_JSON))
+                .andExpect(status().isOk())
+                .andReturn().getResponse().getContentAsString();
+    }
+
+    //Method to log in and get a user token
+    private String getTokenUser() throws Exception {
+        return mockMvc.perform(MockMvcRequestBuilders.post("/token").content(
+                                objectMapper.writeValueAsString(new LoginDTO("johndoe2@email.com","password"))
+                        )
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .accept(MediaType.APPLICATION_JSON))
+                .andExpect(status().isOk())
+                .andReturn().getResponse().getContentAsString();
+    }
+
+    //Method to log ing and get a bank token
+    private String getTokenBank() throws Exception {
+        return mockMvc.perform(MockMvcRequestBuilders.post("/token").content(
+                                objectMapper.writeValueAsString(new LoginDTO("johndoe3@email.com","password"))
+                        )
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .accept(MediaType.APPLICATION_JSON))
+                .andExpect(status().isOk())
+                .andReturn().getResponse().getContentAsString();
     }
 
     private TransactionRequestDTO defaultTransactionRequestDTO() {
         return TransactionRequestDTO.builder()
-                .amount(1000L)
-                .sourceAccount("123456789")
-                .targetAccount("987654321")
+                .amount(5L)
+                .sourceAccount("897-887868-67")
+                .targetAccount("893-887868-67")
+                .build();
+    }
+
+    private AccountRequestDTO defaultAccountRequestDTO() {
+        return AccountRequestDTO.builder()
+                .balance(1000L)
+                .type("AHORROS")
+                .user(defaultUserDTO())
+                .build();
+    }
+
+    private RoleDTO defaultRoleDTO() {
+        return RoleDTO.builder()
+                .name("USER")
+                .description("Ninguna")
+                .build();
+    }
+
+    private RoleDTO defaultAdminRoleDTO() {
+        return RoleDTO.builder()
+                .name("ADMIN")
+                .description("Admin role for test")
                 .build();
     }
 
@@ -198,27 +221,13 @@ public class AccountIntegrationTest {
                 .build();
     }
 
-    private RoleDTO defaultRoleDTO() {
-        return RoleDTO.builder()
-                .name("SUPERADMIN")
-                .description("Ninguna")
-                .build();
-    }
-
-    private RoleDTO defaultAdminRoleDTO() {
-        return RoleDTO.builder()
-                .name("ADMIN")
-                .description("Admin role for test")
-                .build();
-    }
-
     private UserDTO defaultUserDTO() {
         return UserDTO.builder()
-                .firstName("Santiago")
-                .lastName("Arevalo")
-                .password("1234567")
-                .email("santiarevalo@gmail.com")
-                .phoneNumber("+573162499422")
+                .firstName("John")
+                .lastName("Doe")
+                .password("password")
+                .email("johndoe2@email.com")
+                .phoneNumber("+573174657863")
                 .role(defaultRoleDTO())
                 .build();
     }

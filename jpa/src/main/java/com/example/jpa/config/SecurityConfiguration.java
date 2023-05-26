@@ -80,6 +80,8 @@ public class SecurityConfiguration {
         //These lines give acces to the /accounts/** path  to users with the SCOPE_USER authority
         managerBuilder.add(new MvcRequestMatcher(introspector, "/accounts/**"),
                 AuthorityAuthorizationManager.hasAnyAuthority("SCOPE_USER"));
+        managerBuilder.add(new MvcRequestMatcher(introspector, "/accounts/createAccount"),
+                AuthorityAuthorizationManager.hasAnyAuthority("SCOPE_USER"));
         //These lines give acces to the /accounts/createAccount path only to users with the SCOPE_BANK_USER authority
         managerBuilder.add(new MvcRequestMatcher(introspector, "/accounts/createAcoount"),
                 AuthorityAuthorizationManager.hasAnyAuthority("SCOPE_BANK_USER"));
