@@ -159,6 +159,7 @@ public class UserIntegrationTest {
     public void testCreateUserWhenUserAuthBank() throws Exception{
         tokenBank = getTokenBank();
         System.out.println(tokenBank);
+        System.out.println(defaultUserDTO().getRole().getName());
         var result = mockMvc.perform(MockMvcRequestBuilders.post(CREATE_USER_URL).content(
                                 objectMapper.writeValueAsString(defaultUserDTO())
                         )
