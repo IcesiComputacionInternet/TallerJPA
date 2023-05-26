@@ -26,7 +26,7 @@ public class IcesiUserService {
 
     private final IcesiAccountRepository icesiAccountRepository;
 
-    public IcesiUser createUser(IcesiUserDTO user) {
+    public IcesiUser        createUser(IcesiUserDTO user) {
         boolean[] checks = {false, false, false};
         checks[0] = icesiUserRepository.findByEmail(user.getEmail()).isPresent();
         checks[1] = icesiUserRepository.findByPhoneNumber(user.getPhoneNumber()).isPresent();
