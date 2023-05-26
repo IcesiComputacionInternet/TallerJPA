@@ -6,6 +6,7 @@ import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RestController;
 import com.example.demo.DTO.LoginDTO;
+import com.example.demo.DTO.TokenDTO;
 import com.example.demo.service.TokenService;
 import org.springframework.security.core.Authentication ;
 
@@ -20,9 +21,9 @@ public class AuthController {
 
     @CrossOrigin
     @PostMapping("/token")
-    public String token(@RequestBody LoginDTO LoginDTO) {
+    public TokenDTO token(@RequestBody LoginDTO LoginDTO) {
         Authentication authentication = authenticationManager
             .authenticate(new UsernamePasswordAuthenticationToken(LoginDTO.username(), LoginDTO.password()));
-        return tokenService.generateToken(authentication);
+        return TokenDTO.builder().token(tokenService.generateToken(authentication)).build();
     }
 }
