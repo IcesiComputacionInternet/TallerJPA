@@ -17,7 +17,7 @@ import com.example.demo.repository.PermissionRepository;
 
 @TestConfiguration
 public class TestConfigurationData {
-	@Bean
+	/**@Bean
 	CommandLineRunner commandLineRunner(IcesiUserRepository users,
 										IcesiRoleRepository roleRepository,
 										PermissionRepository permissionRepository,
@@ -67,5 +67,5 @@ public class TestConfigurationData {
 			users.save(icesiUser);
 			users.save(icesiUser2);
 		};
-	}
+	}**/
 }
