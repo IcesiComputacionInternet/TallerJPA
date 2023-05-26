@@ -1,5 +1,7 @@
 package co.com.icesi.jpataller.dto;
 
+import co.com.icesi.jpataller.validations.email.EmailConstraint;
+import co.com.icesi.jpataller.validations.phone.PhoneConstraint;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
@@ -20,10 +22,12 @@ public class IcesiUserCreateDTO {
     private String lastName;
 
     // Requires extra Email Constraint
+    @EmailConstraint
     @NotBlank
     private String email;
 
     // Requires extra Phone Constraint
+    @PhoneConstraint
     @NotBlank
     private String phone;
 
