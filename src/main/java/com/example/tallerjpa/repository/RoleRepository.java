@@ -13,7 +13,7 @@ import java.util.UUID;
 public interface RoleRepository extends JpaRepository <IcesiRole, UUID> {
 
     @Query("SELECT CASE WHEN (COUNT(u) > 0) THEN true ELSE false END FROM IcesiRole u WHERE u.name = :name")
-    boolean existsByName(String name);
+    boolean existsByName(@Param("name") String name);
 
     @Query("SELECT role FROM IcesiRole role WHERE role.name = :name")
     Optional<IcesiRole> searchByName(@Param("name") String name);
