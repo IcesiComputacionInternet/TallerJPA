@@ -15,6 +15,7 @@ import co.com.icesi.TallerJpa.repository.IcesiUserRepository;
 import lombok.AllArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.util.*;
 import java.util.stream.Collectors;
@@ -122,6 +123,7 @@ public class IcesiAccountService {
                         ?"Account can't be disable, balance higher than 0":"Account disabled")
                 .build();
     }
+    @Transactional
     public TransactionDTO withdrawal(TransactionDTO transactionDTO, UUID userId) {
         IcesiAccountResponseDTO icesiAccount = getAccountByAccountNumber(transactionDTO.getAccountNumberOrigin());
         isAccountOwner(icesiAccount.getAccountNumber(), userId);
@@ -135,6 +137,7 @@ public class IcesiAccountService {
         transactionDTO.setMessage("The withdrawal was successful");
         return transactionDTO;
     }
+    @Transactional
     public TransactionDTO deposit(TransactionDTO transactionDTO, UUID userId){
         IcesiAccountResponseDTO icesiAccount = getAccountByAccountNumber(transactionDTO.getAccountNumberOrigin());
         isAccountOwner(icesiAccount.getAccountNumber(), userId);
@@ -147,9 +150,10 @@ public class IcesiAccountService {
         transactionDTO.setMessage("The deposit was successful");
         return transactionDTO;
     }
+    @Transactional
     public TransactionDTO transfer(TransactionDTO transactionDTO, UUID userId){
         IcesiAccountResponseDTO icesiAccountOrigin = getAccountByAccountNumber(transactionDTO.getAccountNumberOrigin());
-        isAccountOwner(icesiAccountOrigin.getAccountNumber(), userId);
+        isAccountOwner(transactionDTO.getAccountNumberOrigin(), userId);
         isAccountDisabled(icesiAccountOrigin.getAccountNumber());
         isValidAccountType(icesiAccountOrigin.getType());
         enoughMoney(icesiAccountOrigin.getBalance(), transactionDTO.getAmount());

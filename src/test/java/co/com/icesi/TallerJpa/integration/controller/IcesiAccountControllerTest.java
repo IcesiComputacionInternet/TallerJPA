@@ -159,6 +159,87 @@ public class IcesiAccountControllerTest {
         assertEquals(HttpStatus.BAD_REQUEST, icesiError.getStatus());
         checkIfErrorIsInTheResponse(icesiError, "field amount El monto de una transaccion no puede ser menor a 0.");
     }
+    @Test
+    @DisplayName("Transfer money with user credentials Happy Path.")
+    public void testTransferMoneyWithUserCredentialsHappyPath() throws Exception {
+        var transfer = defaultTranferDTO();
+        var result = mvc.perform(MockMvcRequestBuilders.patch(IcesiAccountApi.ACCOUNT_BASE_URL+"/transfer")
+                        .header(HttpHeaders.AUTHORIZATION,"Bearer "+user1TokenDTO.getToken())
+                        .content(mapper.writeValueAsString(transfer))
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .accept(MediaType.APPLICATION_JSON))
+                .andExpect(status().isOk())
+                .andReturn();
+    }
+
+    @Test
+    @DisplayName("Transfer money with user credentials from Normal to Deposit.")
+    public void testTransferMoneyWithUserCredentialsFromNormalToDeposit() throws Exception {
+        var transfer = defaultTranferDTO();
+        transfer.setAccountNumberDestiny(user2Deposit());
+        var result = mvc.perform(MockMvcRequestBuilders.patch(IcesiAccountApi.ACCOUNT_BASE_URL+"/transfer")
+                        .header(HttpHeaders.AUTHORIZATION,"Bearer "+user1TokenDTO.getToken())
+                        .content(mapper.writeValueAsString(transfer))
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .accept(MediaType.APPLICATION_JSON))
+                .andExpect(status().isBadRequest())
+                .andReturn();
+
+        IcesiError icesiError = mapper.readValue(result.getResponse().getContentAsString(), IcesiError.class);
+        checkIfErrorIsInTheResponse(icesiError, "field AccountType is deposit only");
+    }
+
+    @Test
+    @DisplayName("Transfer money with user credentials from Deposit to Normal.")
+    public void testTransferMoneyWithUserCredentialsFromDepositToNormal() throws Exception {
+        var transfer = defaultTranferDTO();
+        transfer.setAccountNumberOrigin(user1Deposit());
+        var result = mvc.perform(MockMvcRequestBuilders.patch(IcesiAccountApi.ACCOUNT_BASE_URL+"/transfer")
+                        .header(HttpHeaders.AUTHORIZATION,"Bearer "+user1TokenDTO.getToken())
+                        .content(mapper.writeValueAsString(transfer))
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .accept(MediaType.APPLICATION_JSON))
+                .andExpect(status().isBadRequest())
+                .andReturn();
+
+        IcesiError icesiError = mapper.readValue(result.getResponse().getContentAsString(), IcesiError.class);
+        checkIfErrorIsInTheResponse(icesiError, "field AccountType is deposit only");
+    }
+
+    @Test
+    @DisplayName("Transfer money with user credentials from Deposit to Deposit.")
+    public void testTransferMoneyWithUserCredentialsFromDepositToDeposit() throws Exception {
+        var transfer = defaultTranferDTO();
+        transfer.setAccountNumberOrigin(user1Deposit());
+        transfer.setAccountNumberDestiny(user2Deposit());
+        var result = mvc.perform(MockMvcRequestBuilders.patch(IcesiAccountApi.ACCOUNT_BASE_URL+"/transfer")
+                        .header(HttpHeaders.AUTHORIZATION,"Bearer "+user1TokenDTO.getToken())
+                        .content(mapper.writeValueAsString(transfer))
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .accept(MediaType.APPLICATION_JSON))
+                .andExpect(status().isBadRequest())
+                .andReturn();
+
+        IcesiError icesiError = mapper.readValue(result.getResponse().getContentAsString(), IcesiError.class);
+        checkIfErrorIsInTheResponse(icesiError, "field AccountType is deposit only");
+    }
+
+    @Test
+    @DisplayName("Transfer money with user credentials not enough money.")
+    public void testTransferMoneyWithUserCredentialsNotEnoughMoney() throws Exception {
+        var transfer = defaultTranferDTO();
+        transfer.setAmount(10000L);
+        var result = mvc.perform(MockMvcRequestBuilders.patch(IcesiAccountApi.ACCOUNT_BASE_URL+"/transfer")
+                        .header(HttpHeaders.AUTHORIZATION,"Bearer "+user1TokenDTO.getToken())
+                        .content(mapper.writeValueAsString(transfer))
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .accept(MediaType.APPLICATION_JSON))
+                .andExpect(status().isBadRequest())
+                .andReturn();
+
+        IcesiError icesiError = mapper.readValue(result.getResponse().getContentAsString(), IcesiError.class);
+        checkIfErrorIsInTheResponse(icesiError, "field Balance has not enough money");
+    }
 
     private TokenDTO loginAsUser1() {
         return login("johndoe.user@hotmail.com");
