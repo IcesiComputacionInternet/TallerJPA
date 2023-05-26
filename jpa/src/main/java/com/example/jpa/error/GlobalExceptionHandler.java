@@ -5,6 +5,7 @@ import com.example.jpa.error.exceptions.RoleException;
 import com.example.jpa.error.exceptions.UserException;
 import com.example.jpa.error.exceptions.ValidationException;
 import com.example.jpa.error.util.IcesiError;
+import com.example.jpa.error.util.IcesiErrorCode;
 import com.example.jpa.error.util.IcesiErrorDetail;
 import org.springframework.context.support.DefaultMessageSourceResolvable;
 import org.springframework.http.HttpStatus;
@@ -26,7 +27,7 @@ public class GlobalExceptionHandler {
         var error = IcesiError.builder()
                 .status(HttpStatus.INTERNAL_SERVER_ERROR)
                 .details(List.of(IcesiErrorDetail.builder()
-                        .errorCode("ERR_500")
+                        .errorCode(IcesiErrorCode.ERR_500)
                         .errorMessage("Oops, we ran into an error")
                         .build()))
                 .build();
@@ -49,33 +50,53 @@ public class GlobalExceptionHandler {
     private IcesiErrorDetail mapErrorToIcesiErrorDetail(ObjectError error){
         var field = ((DefaultMessageSourceResolvable) Objects.requireNonNull(error.getArguments())[0]).getDefaultMessage();
         return IcesiErrorDetail.builder()
-                .errorCode(error.getCode())
+                .errorCode(IcesiErrorCode.valueOf(error.getCode()))
                 .errorMessage(field + error.getDefaultMessage())
                 .build();
     }
 
     @ExceptionHandler(AccountException.class)
-    public ResponseEntity<String> handleAccountException(AccountException accountException){
-        accountException.printStackTrace();
-        return ResponseEntity.badRequest().body(accountException.getMessage());
+    public ResponseEntity<IcesiError> handleAccountException(AccountException accountException){
+        IcesiErrorDetail errorDetail = accountException.getIcesiError().getDetails().get(0);
+        List<IcesiErrorDetail> listOfErrors = accountException.getIcesiError().getDetails();
+        var argumentsError = IcesiError.builder()
+                .status(HttpStatus.BAD_REQUEST)
+                .details(listOfErrors)
+                .build();
+        return ResponseEntity.badRequest().body(argumentsError);
     }
 
     @ExceptionHandler(RoleException.class)
-    public ResponseEntity<String> handleRoleException(RoleException roleException){
-        roleException.printStackTrace();
-        return ResponseEntity.badRequest().body(roleException.getMessage());
+    public ResponseEntity<IcesiError> handleRoleException(RoleException roleException){
+        IcesiErrorDetail errorDetail = roleException.getIcesiError().getDetails().get(0);
+        List<IcesiErrorDetail> listOfErrors = roleException.getIcesiError().getDetails();
+        var argumentsError = IcesiError.builder()
+                .status(HttpStatus.BAD_REQUEST)
+                .details(listOfErrors)
+                .build();
+        return ResponseEntity.badRequest().body(argumentsError);
     }
 
     @ExceptionHandler(UserException.class)
-    public ResponseEntity<String> handleUserException(UserException userException){
-        userException.printStackTrace();
-        return ResponseEntity.badRequest().body(userException.getMessage());
+    public ResponseEntity<IcesiError> handleUserException(UserException userException){
+        IcesiErrorDetail errorDetail = userException.getIcesiError().getDetails().get(0);
+        List<IcesiErrorDetail> listOfErrors = userException.getIcesiError().getDetails();
+        var argumentsError = IcesiError.builder()
+                .status(HttpStatus.BAD_REQUEST)
+                .details(listOfErrors)
+                .build();
+        return ResponseEntity.badRequest().body(argumentsError);
     }
 
     @ExceptionHandler(ValidationException.class)
-    public ResponseEntity<String> handleValidationException(ValidationException validationException){
-        validationException.printStackTrace();
-        return ResponseEntity.badRequest().body(validationException.getMessage());
+    public ResponseEntity<IcesiError> handleValidationException(ValidationException validationException){
+        IcesiErrorDetail errorDetail = validationException.getIcesiError().getDetails().get(0);
+        List<IcesiErrorDetail> listOfErrors = validationException.getIcesiError().getDetails();
+        var argumentsError = IcesiError.builder()
+                .status(HttpStatus.BAD_REQUEST)
+                .details(listOfErrors)
+                .build();
+        return ResponseEntity.badRequest().body(argumentsError);
     }
 
 }

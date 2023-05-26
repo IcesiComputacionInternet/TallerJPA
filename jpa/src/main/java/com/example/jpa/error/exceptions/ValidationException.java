@@ -1,7 +1,9 @@
 package com.example.jpa.error.exceptions;
 
 import com.example.jpa.error.util.IcesiError;
+import lombok.Getter;
 
+@Getter
 public class ValidationException extends RuntimeException {
 
     private IcesiError icesiError;

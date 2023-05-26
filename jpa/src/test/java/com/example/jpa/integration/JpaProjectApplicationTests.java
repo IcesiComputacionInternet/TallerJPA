@@ -1,5 +1,6 @@
-package com.example.jpa;
+package com.example.jpa.integration;
 
+import com.example.jpa.TestConfigurationData;
 import com.example.jpa.dto.LoginDTO;
 import com.example.jpa.error.util.IcesiError;
 import com.fasterxml.jackson.databind.ObjectMapper;

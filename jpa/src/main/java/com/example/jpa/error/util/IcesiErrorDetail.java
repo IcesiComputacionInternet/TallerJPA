@@ -10,6 +10,6 @@ import lombok.NoArgsConstructor;
 @AllArgsConstructor
 public class IcesiErrorDetail {
 
-    private String errorCode;
+    private IcesiErrorCode errorCode;
     private String errorMessage;
 }
