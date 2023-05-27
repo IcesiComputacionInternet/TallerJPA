@@ -14,6 +14,7 @@ import co.com.icesi.TallerJPA.repository.UserRepository;
 import co.com.icesi.TallerJPA.security.IcesiSecurityContext;
 import lombok.AllArgsConstructor;
 import org.springframework.http.HttpStatus;
+import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
@@ -26,7 +27,8 @@ public class UserService {
     private final RoleRepository roleRepository;
     private final UserMapper userMapper;
     private final UserResponseMapper userResponseMapper;
-    private final PasswordEncoderConfiguration passwordEncoderConfiguration;
+    private final PasswordEncoder encoder;
+    private final IcesiSecurityContext context;
 
 
     public UserResponseDTO save(UserCreateDTO user) {
@@ -55,7 +57,7 @@ public class UserService {
         ));
 
         icesiUser.setUserId(UUID.randomUUID());
-        icesiUser.setPassword(passwordEncoderConfiguration.passwordEncoder().encode(user.getPassword()));
+        icesiUser.setPassword(encoder.encode(user.getPassword()));
         //userResponseMapper.fromICesiUSer(userRepository.save(userMapper.fromIcesiUserDTO(user)));
         UserResponseDTO userResponseDTO = userResponseMapper.fromICesiUSer(userRepository.save(icesiUser));
         userResponseDTO.setUserId(icesiUser.getUserId());
@@ -93,20 +95,9 @@ public class UserService {
 
 
     private void roleValidations(UserCreateDTO user){
-        var role = IcesiSecurityContext.getCurrentUserRole();
+        var role = context.getCurrentUserRole();
         System.out.println("Role login: "+ role);
-        validateUserRole(role);
         validateBankRole(role,user);
-    }
-
-    private void validateUserRole(String role){
-        if(role.equals("USER")){
-            throw ArgumentsExceptionBuilder.createArgumentsException(
-                    "Unauthorized",
-                    HttpStatus.UNAUTHORIZED,
-                    new DetailBuilder(ErrorCode.ERR_401)
-            );
-        }
     }
 
     private void validateBankRole(String role,UserCreateDTO user){
@@ -120,6 +111,7 @@ public class UserService {
             }
         }
     }
+
 
 
     public UserResponseDTO getUserByEmail(String userEmail) {

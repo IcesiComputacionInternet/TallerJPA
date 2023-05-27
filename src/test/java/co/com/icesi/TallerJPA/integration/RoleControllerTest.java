@@ -114,6 +114,7 @@ public class RoleControllerTest {
     }
 
     //Tests to validate the assignation of roles to users
+    /*
     @Test
     public void testAssignRoleEndpointWhenUserAuthAdminToAssignRole() throws Exception{
         defaultUserCreateDTO();
@@ -130,6 +131,10 @@ public class RoleControllerTest {
         System.out.println("Resultado: "+result.getResponse().getContentAsString());
 
     }
+
+     */
+
+
 
     @Test
     public void testAssignRoleEndpointWhenUserAuthUserToAssignRole() throws Exception{

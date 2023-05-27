@@ -13,9 +13,11 @@ import co.com.icesi.TallerJPA.model.IcesiRole;
 import co.com.icesi.TallerJPA.model.IcesiUser;
 import co.com.icesi.TallerJPA.repository.RoleRepository;
 import co.com.icesi.TallerJPA.repository.UserRepository;
+import co.com.icesi.TallerJPA.security.IcesiSecurityContext;
 import co.com.icesi.TallerJPA.service.UserService;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
+import org.springframework.security.crypto.password.PasswordEncoder;
 
 
 import java.util.Optional;
@@ -31,7 +33,7 @@ public class UserServiceTest {
     private RoleRepository roleRepository;
     private UserMapper userMapper;
     private UserResponseMapper userResponseMapper;
-    private PasswordEncoderConfiguration passwordEncoderConfiguration;
+    private PasswordEncoder enconder;
 
     @BeforeEach
     private void init(){
@@ -39,8 +41,10 @@ public class UserServiceTest {
         roleRepository = mock(RoleRepository.class);
         userMapper = spy(UserMapperImpl.class);
         userResponseMapper = spy(UserResponseMapperImpl.class);
-        passwordEncoderConfiguration = mock(PasswordEncoderConfiguration.class);
-        userService = new UserService(userRepository,roleRepository,userMapper,userResponseMapper,passwordEncoderConfiguration);
+        IcesiSecurityContext securityContext = mock(IcesiSecurityContext.class);
+        enconder = mock(PasswordEncoder.class);
+        userService = new UserService(userRepository,roleRepository,userMapper,userResponseMapper,enconder,securityContext);
+        when(securityContext.getCurrentUserRole()).thenReturn("ADMIN");
     }
 
     @Test

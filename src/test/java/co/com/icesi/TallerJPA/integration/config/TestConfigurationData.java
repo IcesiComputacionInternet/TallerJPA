@@ -16,7 +16,7 @@ import java.util.UUID;
 @TestConfiguration
 public class TestConfigurationData {
 
-    @Bean
+    //@Bean
     CommandLineRunner commandLineRunner(UserRepository users,
                                         PasswordEncoder encoder,
                                         AccountRepository accounts) {

@@ -7,6 +7,7 @@ import org.springframework.data.jpa.repository.Modifying;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.stereotype.Repository;
 
+import java.util.List;
 import java.util.Optional;
 import java.util.UUID;
 
@@ -28,4 +29,9 @@ public interface AccountRepository extends JpaRepository<IcesiAccount, UUID> {
 
     @Query(value =  "SELECT CASE WHEN(COUNT(*) > 0) THEN true ELSE false END FROM IcesiAccount a WHERE a.accountNumber = :accountNumber AND a.user = :user")
     boolean findIfUserIsOwner(String accountNumber, IcesiUser user);
+
+    @Query(value = "SELECT a FROM IcesiAccount a WHERE a.user = :user")
+    List<IcesiAccount> findAccountsByUser(IcesiUser user);
+
+
 }

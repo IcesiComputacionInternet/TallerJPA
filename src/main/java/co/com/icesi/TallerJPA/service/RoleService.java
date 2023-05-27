@@ -30,7 +30,6 @@ public class RoleService {
     private final UserResponseMapper userResponseMapper;
 
     public RoleCreateDTO save(RoleCreateDTO role) {
-        validateRoleName();
 
         boolean name = roleRepository.findByName(role.getName());
         if (name) {
@@ -48,22 +47,10 @@ public class RoleService {
 
     }
 
-    private void validateRoleName() {
-        var role = IcesiSecurityContext.getCurrentUserRole();
-
-        if (!role.equals("ADMIN")){
-            throw ArgumentsExceptionBuilder.createArgumentsException(
-                    "Unauthorized",
-                    HttpStatus.UNAUTHORIZED,
-                    new DetailBuilder(ErrorCode.ERR_401)
-            );
-            //throw new ArgumentsException("Unauthorized");
-        }
-    }
 
     @Transactional
     public UserResponseDTO assignRole(AssignRoleDTO assignRoleDTO){
-        validateRoleName();
+
         IcesiRole role = validateExistingRole(assignRoleDTO.roleName());
         IcesiUser user = validateExistingUser(assignRoleDTO.username());
 

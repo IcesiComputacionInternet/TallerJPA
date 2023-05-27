@@ -3,6 +3,7 @@ package co.com.icesi.TallerJPA.api;
 import co.com.icesi.TallerJPA.dto.AccountCreateDTO;
 import co.com.icesi.TallerJPA.dto.TransactionOperationDTO;
 import co.com.icesi.TallerJPA.dto.response.AccountResponseDTO;
+import co.com.icesi.TallerJPA.dto.response.AccountsDTO;
 import org.springframework.web.bind.annotation.*;
 
 import javax.validation.Valid;
@@ -34,6 +35,9 @@ public interface IcesiAccountAPI {
         AccountResponseDTO getAccountByNumber(@PathVariable String accountNumber);
 
         @GetMapping("/allAccounts")
-        List<AccountResponseDTO> getAllAccounts();
+        List<AccountsDTO> getAllAccounts();
+
+        @GetMapping("/allAccountsByUser/{email}")
+        List<AccountsDTO> getAllAccountsFromUser(@PathVariable String email);
 
 }

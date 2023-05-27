@@ -4,6 +4,7 @@ import co.com.icesi.TallerJPA.Enum.AccountType;
 import co.com.icesi.TallerJPA.dto.AccountCreateDTO;
 import co.com.icesi.TallerJPA.dto.TransactionOperationDTO;
 import co.com.icesi.TallerJPA.dto.response.AccountResponseDTO;
+import co.com.icesi.TallerJPA.dto.response.AccountsDTO;
 import co.com.icesi.TallerJPA.error.enums.ErrorCode;
 import co.com.icesi.TallerJPA.error.util.ArgumentsExceptionBuilder;
 import co.com.icesi.TallerJPA.error.util.DetailBuilder;
@@ -34,6 +35,7 @@ public class AccountService {
     private final UserRepository userRepository;
     private final AccountMapper accountMapper;
     private final AccountResponseMapper accountResponseMapper;
+    private final IcesiSecurityContext context;
 
     public AccountResponseDTO save(AccountCreateDTO account){
         if (account.getBalance()<0){
@@ -52,7 +54,7 @@ public class AccountService {
 
     }
     private void validateRoleName(){
-        var role = IcesiSecurityContext.getCurrentUserRole();
+        var role = context.getCurrentUserRole();
         if (role.equals("BANK")){
             throw ArgumentsExceptionBuilder.createArgumentsException(
                     "Unauthorized",
@@ -64,21 +66,26 @@ public class AccountService {
     }
 
     private void validateIfUserIsOwner(String accountNumber){
-        var userId = IcesiSecurityContext.getCurrentUserId();
-        System.out.println("Hello "+ userId);
-        boolean owner = accountRepository.findIfUserIsOwner(accountNumber,userRepository.findUserById(UUID.fromString(userId)).orElse(null));
-        boolean admin = validateIfUserIsAdmin();
-        if (!owner && !admin){
-            throw ArgumentsExceptionBuilder.createArgumentsException(
-                    "Unauthorized, you are not the owner of the account",
-                    HttpStatus.UNAUTHORIZED,
-                    new DetailBuilder(ErrorCode.ERR_401)
-            );
+        if (!validateIfUserIsAdmin()){
+            if (context.getCurrentUserRole().equals("USER")){
+                var userId = context.getCurrentUserId();
+                System.out.println("Hello "+ userId);
+                boolean owner = accountRepository.findIfUserIsOwner(accountNumber,userRepository.findUserById(UUID.fromString(userId)).orElse(null));
+                if (!owner){
+                    throw ArgumentsExceptionBuilder.createArgumentsException(
+                            "Unauthorized, you are not the owner of the account",
+                            HttpStatus.UNAUTHORIZED,
+                            new DetailBuilder(ErrorCode.ERR_401)
+                    );
+                }
+            }
         }
+
+
     }
 
     private boolean validateIfUserIsAdmin(){
-        var role = IcesiSecurityContext.getCurrentUserRole();
+        var role = context.getCurrentUserRole();
         return role.equals("ADMIN");
     }
 
@@ -180,10 +187,16 @@ public class AccountService {
         return accountResponseMapper.fromIcesiAccount(getAccountByAccountNumber(accountNumber));
     }
 
-    public List<AccountResponseDTO> getAllAccounts(){
+    public List<AccountsDTO> getAllAccounts(){
         validateRoleName();
         List<IcesiAccount> accounts = accountRepository.findAll();
-        return accounts.stream().map(accountResponseMapper::fromIcesiAccount).collect(Collectors.toList());
+        return accounts.stream().map(accountResponseMapper::fromIcesiAccountToAccountsDTO).collect(Collectors.toList());
+    }
+    public List<AccountsDTO> getAllAccountsFromUser(String email){
+        validateRoleName();
+        IcesiUser user = userRepository.findUserByEmail(email).orElseThrow(()-> new RuntimeException("User not found"));
+        List<IcesiAccount> accounts = accountRepository.findAccountsByUser(user);
+        return accounts.stream().map(accountResponseMapper::fromIcesiAccountToAccountsDTO).collect(Collectors.toList());
     }
 
     private String validateAccountNumber(String accountNumber){

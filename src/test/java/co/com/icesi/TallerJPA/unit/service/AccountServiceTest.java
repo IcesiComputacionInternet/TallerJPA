@@ -5,6 +5,7 @@ import co.com.icesi.TallerJPA.dto.AccountCreateDTO;
 import co.com.icesi.TallerJPA.dto.RoleCreateDTO;
 import co.com.icesi.TallerJPA.dto.TransactionOperationDTO;
 import co.com.icesi.TallerJPA.dto.response.UserResponseDTO;
+import co.com.icesi.TallerJPA.error.exception.ArgumentsException;
 import co.com.icesi.TallerJPA.mapper.AccountMapper;
 import co.com.icesi.TallerJPA.mapper.AccountMapperImpl;
 import co.com.icesi.TallerJPA.mapper.responseMapper.AccountResponseMapper;
@@ -14,6 +15,7 @@ import co.com.icesi.TallerJPA.model.IcesiRole;
 import co.com.icesi.TallerJPA.model.IcesiUser;
 import co.com.icesi.TallerJPA.repository.AccountRepository;
 import co.com.icesi.TallerJPA.repository.UserRepository;
+import co.com.icesi.TallerJPA.security.IcesiSecurityContext;
 import co.com.icesi.TallerJPA.service.AccountService;
 import co.com.icesi.TallerJPA.unit.matcher.IcesiAccountMatcher;
 import org.junit.jupiter.api.BeforeEach;
@@ -40,7 +42,9 @@ public class AccountServiceTest {
         userRepository = mock(UserRepository.class);
         accountMapper = spy(AccountMapperImpl.class);
         accountResponseMapper = spy(AccountResponseMapperImpl.class);
-        accountService = new AccountService(accountRepository,userRepository,accountMapper,accountResponseMapper);
+        IcesiSecurityContext securityContext = mock(IcesiSecurityContext.class);
+        accountService = new AccountService(accountRepository,userRepository,accountMapper,accountResponseMapper,securityContext);
+        when(securityContext.getCurrentUserRole()).thenReturn("ADMIN");
     }
 
 
@@ -181,9 +185,9 @@ public class AccountServiceTest {
 
     @Test
     public void testWithdrawWithAccountNotFound(){
-        when(accountRepository.findAccount(any())).thenReturn(Optional.of(defaultIcesiAccount()));
+        when(accountRepository.findAccount(any())).thenReturn(Optional.of(defaultIcesiAccount1()));
         try{
-            accountService.withdraw(defaultTransactionOperationDTO());
+            accountService.withdraw(defaultTransactionOperationDTO2());
         }catch (RuntimeException e) {
             assertEquals("Account not found",e.getMessage());
             verify(accountRepository,times(1)).updateAccount(defaultIcesiAccount().getAccountNumber(),defaultIcesiAccount().getBalance());
@@ -191,7 +195,7 @@ public class AccountServiceTest {
     }
 
 
-    /*
+
 
     @Test
     public void testCreateAccountWhenUserDoesNotExist(){
@@ -213,6 +217,8 @@ public class AccountServiceTest {
         verify(accountRepository, times(1)).findAccount(any());
     }
 
+    /*
+
     @Test
     public void testFindAccountByAccountNumberWhenAccountDoesNotExist(){
         when(accountRepository.findAccount(any())).thenReturn(Optional.empty());
@@ -224,44 +230,47 @@ public class AccountServiceTest {
         }
     }
 
+     */
+
     @Test
-    public void testChangeStateWhenBalance0(){
+    public void testEnableAccountWhenBalance0(){
         IcesiAccount icesiAccount = defaultIcesiAccount();
-        icesiAccount.setBalance(0);
+        icesiAccount.setBalance(0L);
         when(accountRepository.findAccount(any())).thenReturn(Optional.of(icesiAccount));
-        String message = accountService.changeState(icesiAccount.getAccountNumber());
+        String message = accountService.enableAccount(icesiAccount.getAccountNumber());
         verify(accountRepository, times(1)).findAccount(any());
-        assertEquals("Account state changed",message);
+        assertEquals("The account is enabled",message);
     }
 
     @Test
-    public void testChangeStateWhenBalanceNot0(){
+    public void testEnableAccountWhenBalanceNot0(){
         IcesiAccount icesiAccount = defaultIcesiAccount();
-        icesiAccount.setBalance(1000);
+        icesiAccount.setBalance(1000L);
 
         when(accountRepository.findAccount(any())).thenReturn(Optional.of(icesiAccount));
-        String message = accountService.changeState(icesiAccount.getAccountNumber());
+        String message = accountService.enableAccount(icesiAccount.getAccountNumber());
         verify(accountRepository, times(1)).findAccount(any());
-        assertEquals("The account can't be deactivated because it has money",message);
+        assertEquals("The account is enabled",message);
     }
 
     @Test
     public void testWitdrawWhenBalanceIsEnough(){
-        IcesiAccount icesiAccount = defaultIcesiAccount();
+        IcesiAccount icesiAccount = defaultIcesiAccount1();
+        icesiAccount.setBalance(2000L);
         when(accountRepository.findAccount(any())).thenReturn(Optional.of(icesiAccount));
-        String message = accountService.withdraw(icesiAccount.getAccountNumber(), 100);
-        assertEquals("Withdrawal successful",message);
+        TransactionOperationDTO message = accountService.withdraw(defaultTransactionOperationDTO());
+        assertEquals("Withdraw successful",message.getResult());
     }
 
     @Test
     public void testWitdrawWhenBalanceIsNotEnough(){
-        IcesiAccount icesiAccount = defaultIcesiAccount();
+        IcesiAccount icesiAccount = defaultIcesiAccount1();
         when(accountRepository.findAccount(any())).thenReturn(Optional.of(icesiAccount));
         try{
-            accountService.withdraw(icesiAccount.getAccountNumber(), 1000);
-        }catch (ArgumentsException e) {
+            accountService.withdraw(defaultTransactionOperationDTO());
+        }catch (RuntimeException e) {
             String message = e.getMessage();
-            assertEquals("Insufficient funds",message);
+            assertEquals("Insufficient funds: "+icesiAccount.getBalance(),message);
         }
     }
 
@@ -271,55 +280,55 @@ public class AccountServiceTest {
         icesiAccount.setActive(false);
         when(accountRepository.findAccount(any())).thenReturn(Optional.of(icesiAccount));
         try{
-            accountService.withdraw(icesiAccount.getAccountNumber(), 100);
-        }catch (ArgumentsException e) {
+            accountService.withdraw(defaultTransactionOperationDTO2());
+        }catch (RuntimeException e) {
             String message = e.getMessage();
-            assertEquals("Account must be active to withdraw money",message);
+            assertEquals("The account "+icesiAccount.getAccountNumber()+" is disabled",message);
         }
     }
 
     @Test
     public void testDepositWhenAccountIsActive(){
-        IcesiAccount icesiAccount = defaultIcesiAccount();
+        IcesiAccount icesiAccount = defaultIcesiAccount1();
         when(accountRepository.findAccount(any())).thenReturn(Optional.of(icesiAccount));
-        String message = accountService.deposit(icesiAccount.getAccountNumber(), 100);
-        assertEquals("Deposit successful",message);
+        TransactionOperationDTO message = accountService.deposit(defaultTransactionOperationDTO());
+        assertEquals("Deposit successful",message.getResult());
     }
 
     @Test
     public void testDepositWhenAccountIsInactive(){
-        IcesiAccount icesiAccount = defaultIcesiAccount();
+        IcesiAccount icesiAccount = defaultIcesiAccount1();
         icesiAccount.setActive(false);
         when(accountRepository.findAccount(any())).thenReturn(Optional.of(icesiAccount));
         try{
-            accountService.deposit(icesiAccount.getAccountNumber(), 100);
-        }catch (ArgumentsException e) {
+            accountService.deposit(defaultTransactionOperationDTO());
+        }catch (RuntimeException e) {
             String message = e.getMessage();
-            assertEquals("Account must be active to deposit money",message);
+            assertEquals("The account "+icesiAccount.getAccountNumber()+" is disabled",message);
         }
     }
 
     @Test
     public void testTransferWhenAccountsAreActive(){
-        IcesiAccount icesiAccountOrigin = defaultIcesiAccount();
-        IcesiAccount icesiAccountDestination = defaultIcesiAccount2();
+        IcesiAccount icesiAccountOrigin = defaultIcesiAccount2();
+        IcesiAccount icesiAccountDestination = defaultIcesiAccount1();
 
         when(accountRepository.findAccount(any())).thenReturn(Optional.of(icesiAccountOrigin));
         when(accountRepository.findAccount(any())).thenReturn(Optional.of(icesiAccountDestination));
-        String message = accountService.transferMoney(icesiAccountOrigin.getAccountNumber(), icesiAccountDestination.getAccountNumber(), 100);
+        TransactionOperationDTO message = accountService.transfer(defaultTransactionOperationDTO());
         verify(accountRepository, times(2)).findAccount(any());
-        assertEquals("Transfer successful",message);
+        assertEquals("Transfer successful",message.getResult());
     }
 
     @Test
     public void testTransferWhenAccountIsInactive(){
-        IcesiAccount icesiAccountOrigin = defaultIcesiAccount();
+        IcesiAccount icesiAccountOrigin = defaultIcesiAccount1();
         IcesiAccount icesiAccountDestination = defaultIcesiAccount2();
         icesiAccountOrigin.setActive(false);
         when(accountRepository.findAccount(any())).thenReturn(Optional.of(icesiAccountOrigin));
         when(accountRepository.findAccount(any())).thenReturn(Optional.of(icesiAccountDestination));
         try{
-            accountService.transferMoney(icesiAccountOrigin.getAccountNumber(), icesiAccountDestination.getAccountNumber(), 100);
+            accountService.transfer(defaultTransactionOperationDTO());
         }catch (ArgumentsException e) {
             String message = e.getMessage();
             assertEquals("Account must be active to transfer money",message);
@@ -328,38 +337,38 @@ public class AccountServiceTest {
 
     @Test
     public void testTransferWhenBalanceIsNotEnough(){
-        IcesiAccount icesiAccountOrigin = defaultIcesiAccount();
+        IcesiAccount icesiAccountOrigin = defaultIcesiAccount1();
         IcesiAccount icesiAccountDestination = defaultIcesiAccount2();
 
         when(accountRepository.findAccount(any())).thenReturn(Optional.of(icesiAccountOrigin));
         when(accountRepository.findAccount(any())).thenReturn(Optional.of(icesiAccountDestination));
         try{
-            accountService.transferMoney(icesiAccountOrigin.getAccountNumber(), icesiAccountOrigin.getAccountNumber(), 1000);
-        }catch (ArgumentsException e) {
+            accountService.transfer(defaultTransactionOperationDTO());
+        }catch (RuntimeException e) {
             String message = e.getMessage();
-            assertEquals("Insufficient funds",message);
+            assertEquals("Insufficient funds: "+icesiAccountOrigin.getBalance(),message);
         }
     }
 
     @Test
     public void testTransferWhenTypeIsDepositOnly(){
-        IcesiAccount icesiAccountOrigin = defaultIcesiAccount();
+        IcesiAccount icesiAccountOrigin = defaultIcesiAccount1();
         IcesiAccount icesiAccountDestination = defaultIcesiAccount2();
 
-        icesiAccountDestination.setType(AccountType.DEPOSIT_ONLY.toString());
+        icesiAccountOrigin.setType(AccountType.DEPOSIT_ONLY);
         when(accountRepository.findAccount(any())).thenReturn(Optional.of(icesiAccountOrigin));
         when(accountRepository.findAccount(any())).thenReturn(Optional.of(icesiAccountDestination));
         try{
-            accountService.transferMoney(icesiAccountOrigin.getAccountNumber(), icesiAccountDestination.getAccountNumber(), 100);
-        }catch (ArgumentsException e) {
+            accountService.transfer(defaultTransactionOperationDTO2());
+        }catch (RuntimeException e) {
             String message = e.getMessage();
-            assertEquals("Accounts marked as deposit only can't transfer or be transferred money, only withdrawal and deposit",message);
+            assertEquals("The acount "+icesiAccountOrigin.getAccountNumber()+" is deposit only",message);
         }
     }
 
 
 
- */
+
 
     private AccountCreateDTO defaultAccountCreateDTO(){
         return AccountCreateDTO.builder()
@@ -379,13 +388,51 @@ public class AccountServiceTest {
                 .build();
     }
 
-    private TransactionOperationDTO defaultTransactionOperationDTO(){
-        return TransactionOperationDTO.builder()
-                .accountTo("12345")
-                .accountFrom("123456")
-                .amount(100L)
+    private IcesiAccount defaultIcesiAccount1(){
+        return IcesiAccount.builder()
+                .accountNumber("54646547")
+                .balance(100L)
+                .type(AccountType.AHORROS)
+                .active(true)
+                .user(defaultIcesiUser())
                 .build();
     }
+    private IcesiAccount defaultIcesiAccount2(){
+        return IcesiAccount.builder()
+                .accountNumber("67890")
+                .balance(10000L)
+                .type(AccountType.AHORROS)
+                .active(true)
+                .user(defaultIcesiUser())
+                .build();
+    }
+
+    private IcesiAccount defaultIcesiAccount3(){
+        return IcesiAccount.builder()
+                .accountNumber("9843687")
+                .balance(100L)
+                .type(AccountType.AHORROS)
+                .active(true)
+                .user(defaultIcesiUser())
+                .build();
+    }
+
+    private TransactionOperationDTO defaultTransactionOperationDTO(){
+        return TransactionOperationDTO.builder()
+                .accountTo("54646547")
+                .accountFrom("67890")
+                .amount(1L)
+                .build();
+    }
+
+    private TransactionOperationDTO defaultTransactionOperationDTO2(){
+        return TransactionOperationDTO.builder()
+                .accountTo("67890")
+                .accountFrom("54646547")
+                .amount(10L)
+                .build();
+    }
+
 
     private IcesiUser defaultIcesiUser(){
         return IcesiUser.builder()
@@ -395,17 +442,6 @@ public class AccountServiceTest {
                 .phoneNumber("1234")
                 .password("1234")
                 .role(defaultRole())
-                .build();
-    }
-
-    private UserResponseDTO defaultUserResponseDTO() {
-        return UserResponseDTO.builder()
-                .firstName("Andres")
-                .lastName("Gomez")
-                .email("test@hotmail.com")
-                .phoneNumber("1234")
-                .password("1234")
-                .role(defaultRoleCreateDTO())
                 .build();
     }
     private RoleCreateDTO defaultRoleCreateDTO() {

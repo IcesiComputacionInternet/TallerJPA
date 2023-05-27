@@ -1,8 +1,10 @@
 package co.com.icesi.TallerJPA;
 
+import co.com.icesi.TallerJPA.Enum.AccountType;
+import co.com.icesi.TallerJPA.model.IcesiAccount;
 import co.com.icesi.TallerJPA.model.IcesiRole;
 import co.com.icesi.TallerJPA.model.IcesiUser;
-import co.com.icesi.TallerJPA.repository.RoleRepository;
+import co.com.icesi.TallerJPA.repository.AccountRepository;
 import co.com.icesi.TallerJPA.repository.UserRepository;
 import org.springframework.boot.CommandLineRunner;
 import org.springframework.boot.SpringApplication;
@@ -19,10 +21,10 @@ public class TallerJpaApplication {
 		SpringApplication.run(TallerJpaApplication.class, args);
 	}
 
-	//@Bean
+	@Bean
 	CommandLineRunner commandLineRunner(UserRepository users,
-										RoleRepository roleRepository,
-										PasswordEncoder encoder) {
+										PasswordEncoder encoder,
+										AccountRepository accounts) {
 
 		IcesiRole admin = IcesiRole.builder()
 				.roleId(UUID.randomUUID())
@@ -70,10 +72,31 @@ public class TallerJpaApplication {
 				.role(bank)
 				.build();
 
+		IcesiAccount account1 = IcesiAccount.builder()
+				.accountId(UUID.randomUUID())
+				.accountNumber("123456789")
+				.balance(1000L)
+				.type(AccountType.AHORROS)
+				.active(true)
+				.user(adminUser)
+				.build();
+
+		IcesiAccount account2 = IcesiAccount.builder()
+				.accountId(UUID.randomUUID())
+				.accountNumber("987654321")
+				.balance(1000L)
+				.type(AccountType.AHORROS)
+				.active(true)
+				.user(adminUser)
+				.build();
+
+		users.save(adminUser);
+		users.save(normalUser);
+		users.save(bankUser);
+
 		return args -> {
-			users.save(adminUser);
-			users.save(normalUser);
-			users.save(bankUser);
+			accounts.save(account1);
+			accounts.save(account2);
 		};
 	}
 
