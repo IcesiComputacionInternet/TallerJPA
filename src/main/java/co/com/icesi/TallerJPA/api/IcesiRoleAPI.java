@@ -6,12 +6,13 @@ import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 
+import javax.validation.Valid;
 import java.util.List;
 
 public interface IcesiRoleAPI {
     String BASE_ROLE_URL = "/roles";
     @PostMapping
-    IcesiRoleCreateDTO addRole(@RequestBody IcesiRoleCreateDTO roleDTO);
+    IcesiRoleCreateDTO addRole(@Valid @RequestBody IcesiRoleCreateDTO roleDTO);
     @GetMapping
     List<IcesiRoleCreateDTO> getAllRoles();
     @GetMapping("/{name}")

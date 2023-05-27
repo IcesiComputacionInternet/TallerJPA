@@ -5,32 +5,33 @@ import co.com.icesi.TallerJPA.dto.requestDTO.IcesiTransactionDTO;
 import co.com.icesi.TallerJPA.dto.responseDTO.IcesiAccountCreateResponseDTO;
 import org.springframework.web.bind.annotation.*;
 
+import javax.validation.Valid;
 import java.util.List;
 
 public interface IcesiAccountAPI {
     String BASE_ACCOUNT_URL = "/accounts";
 
-    @GetMapping
+    @GetMapping("/getAccounts")
     List<IcesiAccountCreateResponseDTO> getAllAccounts();
 
     @GetMapping("/{accountNumber}")
     IcesiAccountCreateDTO getAccountByNumber(@PathVariable String accountNumber);
 
-    @PostMapping
-    IcesiAccountCreateResponseDTO addAccount(@RequestBody IcesiAccountCreateDTO accountDto);
+    @PostMapping("/create")
+    IcesiAccountCreateResponseDTO addAccount(@Valid @RequestBody IcesiAccountCreateDTO accountDto);
 
-    @PutMapping("/depositOnly")
-    IcesiTransactionDTO depositOnlyMoney(@RequestBody IcesiTransactionDTO transactionDTODeposit);
+    @PatchMapping("/depositOnly")
+    IcesiTransactionDTO depositOnlyMoney(@Valid @RequestBody IcesiTransactionDTO transactionDTODeposit);
 
-    @PutMapping("/withdraw")
-    IcesiTransactionDTO withdrawMoney(@RequestBody IcesiTransactionDTO transactionDTOWithdraw);
+    @PatchMapping("/withdraw")
+    IcesiTransactionDTO withdrawMoney(@Valid @RequestBody IcesiTransactionDTO transactionDTOWithdraw);
 
-    @PutMapping("/transferMoney")
-    IcesiTransactionDTO transferMoney(@RequestBody IcesiTransactionDTO transactionDTOMoney);
+    @PatchMapping("/transferMoney")
+    IcesiTransactionDTO transferMoney(@Valid @RequestBody IcesiTransactionDTO transactionDTOMoney);
 
-    @PutMapping("/enableAccount")
+    @PatchMapping("/enableAccount/{accountNumber}")
     String enableAccount(@PathVariable String accountNumber);
 
-    @PutMapping("/disableAccount")
+    @PatchMapping("/disableAccount/{accountNumber}")
     String disableAccount(@PathVariable String accountNumber);
 }

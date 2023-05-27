@@ -39,12 +39,12 @@ public class AccountControllerTest {
 
         TokenDTO token = objectMapper.readValue(resultTransfer.getResponse().getContentAsString(), TokenDTO.class);
 
-        mockMvc.perform(MockMvcRequestBuilders.patch("/accounts/transfer").content(
+        mockMvc.perform(MockMvcRequestBuilders.patch("/accounts/transferMoney").content(
                                 objectMapper.writeValueAsString(
                                         IcesiTransactionDTO.builder()
                                                 .accountNumberOrigin("799-948879-27")
                                                 .accountNumberDestination("452-976314-32")
-                                                .amount(150L)
+                                                .amount(35L)
                                                 .messageResult("")
                                                 .build()
                                 ))
@@ -66,18 +66,18 @@ public class AccountControllerTest {
 
         TokenDTO token = objectMapper.readValue(resultTransfer.getResponse().getContentAsString(), TokenDTO.class);
 
-        mockMvc.perform(MockMvcRequestBuilders.patch("/accounts/transfer").content(
+        mockMvc.perform(MockMvcRequestBuilders.patch("/accounts/transferMoney").content(
                                 objectMapper.writeValueAsString(
                                         IcesiTransactionDTO.builder()
-                                                .accountNumberOrigin("799-948879-59")
-                                                .accountNumberDestination("203-976314-32")
-                                                .amount(150L)
+                                                .accountNumberOrigin("799-245879-27")
+                                                .accountNumberDestination("452-976314-32")
+                                                .amount(35L)
                                                 .messageResult("")
                                                 .build()
                                 ))
                         .header("Authorization", "Bearer " + token.getToken())
                         .contentType(MediaType.APPLICATION_JSON).accept(MediaType.APPLICATION_JSON))
-                .andExpect(status().isNotFound())
+                .andExpect(status().isNotAcceptable())
                 .andReturn();
     }
 
@@ -93,18 +93,18 @@ public class AccountControllerTest {
 
         TokenDTO token = objectMapper.readValue(resultTransfer.getResponse().getContentAsString(), TokenDTO.class);
 
-        mockMvc.perform(MockMvcRequestBuilders.patch("/accounts/transfer").content(
+        mockMvc.perform(MockMvcRequestBuilders.patch("/accounts/transferMoney").content(
                                 objectMapper.writeValueAsString(
                                         IcesiTransactionDTO.builder()
-                                                .accountNumberOrigin("799-948879-59")
-                                                .accountNumberDestination("203-976314-32")
-                                                .amount(0L)
+                                                .accountNumberOrigin("799-948879-40")
+                                                .accountNumberDestination("452-976314-32")
+                                                .amount(35L)
                                                 .messageResult("")
                                                 .build()
                                 ))
                         .header("Authorization", "Bearer " + token.getToken())
                         .contentType(MediaType.APPLICATION_JSON).accept(MediaType.APPLICATION_JSON))
-                .andExpect(status().isNotFound())
+                .andExpect(status().isNotAcceptable())
                 .andReturn();
     }
 
@@ -120,7 +120,7 @@ public class AccountControllerTest {
 
         TokenDTO token = objectMapper.readValue(resultTransfer.getResponse().getContentAsString(), TokenDTO.class);
 
-        mockMvc.perform(MockMvcRequestBuilders.patch("/accounts/transfer").content(
+        mockMvc.perform(MockMvcRequestBuilders.patch("/accounts/transferMoney").content(
                                 objectMapper.writeValueAsString(
                                         IcesiTransactionDTO.builder()
                                                 .accountNumberOrigin("799-948879-59")
@@ -134,5 +134,4 @@ public class AccountControllerTest {
                 .andExpect(status().isNotFound())
                 .andReturn();
     }
-
 }

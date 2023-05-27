@@ -1,7 +1,10 @@
 package co.com.icesi.TallerJPA;
 
+import co.com.icesi.TallerJPA.enums.AccountType;
+import co.com.icesi.TallerJPA.model.IcesiAccount;
 import co.com.icesi.TallerJPA.model.IcesiRole;
 import co.com.icesi.TallerJPA.model.IcesiUser;
+import co.com.icesi.TallerJPA.repository.IcesiAccountRepository;
 import co.com.icesi.TallerJPA.repository.IcesiRoleRepository;
 import co.com.icesi.TallerJPA.repository.IcesiUserRepository;
 import org.springframework.boot.CommandLineRunner;
@@ -16,6 +19,7 @@ public class TestConfigurationData {
     @Bean
     CommandLineRunner commandLineRunner(IcesiUserRepository users,
                                         IcesiRoleRepository roleRepository,
+                                        IcesiAccountRepository accounts,
                                         PasswordEncoder encoder) {
         IcesiRole icesiRole1 = IcesiRole.builder()
                 .roleId(UUID.randomUUID())
@@ -65,10 +69,60 @@ public class TestConfigurationData {
                 .role(icesiRole3)
                 .build();
 
+        IcesiAccount account1= IcesiAccount.builder()
+                .accountId(UUID.randomUUID())
+                .accountNumber("799-948879-27")
+                .balance(100L)
+                .accountType(AccountType.STANDARD_ACCOUNT)
+                .active(true)
+                .icesiUser(icesiUser2)
+                .build();
+
+        IcesiAccount account2= IcesiAccount.builder()
+                .accountId(UUID.randomUUID())
+                .accountNumber("452-976314-32")
+                .balance(100L)
+                .accountType(AccountType.STANDARD_ACCOUNT)
+                .active(true)
+                .icesiUser(icesiUser2)
+                .build();
+
+        IcesiAccount account3= IcesiAccount.builder()
+                .accountId(UUID.randomUUID())
+                .accountNumber("799-245879-27")
+                .balance(100L)
+                .accountType(AccountType.DEPOSIT_ONLY)
+                .active(true)
+                .icesiUser(icesiUser2)
+                .build();
+
+        IcesiAccount account4= IcesiAccount.builder()
+                .accountId(UUID.randomUUID())
+                .accountNumber("799-948879-40")
+                .balance(0L)
+                .accountType(AccountType.STANDARD_ACCOUNT)
+                .active(true)
+                .icesiUser(icesiUser2)
+                .build();
+
+        IcesiAccount account5= IcesiAccount.builder()
+                .accountId(UUID.randomUUID())
+                .accountNumber("98974629")
+                .balance(0L)
+                .accountType(AccountType.STANDARD_ACCOUNT)
+                .active(true)
+                .icesiUser(icesiUser2)
+                .build();
+
         return args -> {
             users.save(icesiUser1);
             users.save(icesiUser2);
             users.save(icesiUser3);
+            accounts.save(account1);
+            accounts.save(account2);
+            accounts.save(account3);
+            accounts.save(account4);
+            accounts.save(account5);
         };
     }
 }

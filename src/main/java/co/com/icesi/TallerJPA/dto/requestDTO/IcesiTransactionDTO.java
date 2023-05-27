@@ -1,13 +1,12 @@
 package co.com.icesi.TallerJPA.dto.requestDTO;
 
-import lombok.Builder;
-import lombok.Data;
-import lombok.Getter;
-import lombok.Setter;
+import lombok.*;
 
 @Getter
 @Setter
 @Builder
+@NoArgsConstructor
+@AllArgsConstructor
 public class IcesiTransactionDTO {
     private String accountNumberOrigin;
     private String accountNumberDestination;

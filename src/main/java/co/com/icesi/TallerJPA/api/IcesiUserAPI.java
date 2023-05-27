@@ -7,12 +7,13 @@ import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 
+import javax.validation.Valid;
 import java.util.List;
 
 public interface IcesiUserAPI {
     String BASE_USER_URL = "/users";
     @PostMapping("/create")
-    IcesiUserCreateResponseDTO addUser(@RequestBody IcesiUserCreateDTO userDTO);
+    IcesiUserCreateResponseDTO addUser(@Valid @RequestBody IcesiUserCreateDTO userDTO);
     @GetMapping
     List<IcesiUserCreateResponseDTO> getAllUsers();
     @GetMapping("/{userId}")
