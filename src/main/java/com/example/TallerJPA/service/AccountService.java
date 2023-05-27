@@ -11,9 +11,11 @@ import lombok.AllArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.util.List;
 import java.util.Optional;
 import java.util.Random;
 import java.util.UUID;
+import java.util.stream.Collectors;
 
 @Service
 @AllArgsConstructor
@@ -33,6 +35,28 @@ public class AccountService {
         icesiAccount.setBalance(0);
         icesiAccount.setActive(true);
         return accountMapper.fromAccountToResponse(accountRepository.save(icesiAccount));
+    }
+    @Transactional
+    public AccountListResponseDTO getAccounts() {
+        String userID = IcesiSecurityContext.getCurrentUserId();
+        Optional<IcesiUser> userOptional = userRepository.findById(UUID.fromString(userID));
+        if(userOptional.isEmpty()){
+            throw new RuntimeException("User not found");
+        }
+        IcesiUser user = userOptional.get();
+        List<IcesiAccount> accounts = user.getAccounts();
+        List<AccountResponseDTO> accountResponses = accounts.stream()
+                .map(icesiAccount -> {
+                    AccountResponseDTO accountResponse = new AccountResponseDTO();
+                    accountResponse.setAccountNumber(icesiAccount.getAccountNumber());
+                    accountResponse.setUserEmail(icesiAccount.getUser().getEmail());
+                    accountResponse.setBalance(icesiAccount.getBalance());
+                    accountResponse.setActive(icesiAccount.getActive());
+                    accountResponse.setAccountType(icesiAccount.getType());
+                    return accountResponse;
+                })
+                .toList();
+        return AccountListResponseDTO.builder().accounts(accountResponses).build();
     }
 
     @Transactional

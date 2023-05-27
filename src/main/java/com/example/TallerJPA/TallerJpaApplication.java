@@ -22,7 +22,7 @@ public class TallerJpaApplication {
 		SpringApplication.run(TallerJpaApplication.class, args);
 	}
 
-	//@Bean
+	@Bean
 	CommandLineRunner commandLineRunner(UserRepository users,
 										RoleRepository roleRepository,
 										AccountRepository accountRepository,
@@ -79,12 +79,21 @@ public class TallerJpaApplication {
 				.balance(0)
 				.type("SAVINGS")
 				.build();
-
+		IcesiAccount icesiAccount2 = IcesiAccount.builder()
+				.accountId(UUID.randomUUID())
+				.accountNumber("123-456789-91")
+				.balance(1000000)
+				.user(icesiUser2)
+				.active(true)
+				.balance(0)
+				.type("DEPOSIT")
+				.build();
 		return args -> {
 			users.save(icesiUser);
 			users.save(icesiUser2);
 			users.save(icesiUser3);
 			accountRepository.save(icesiAccount);
+			accountRepository.save(icesiAccount2);
 		};
 		}
 }

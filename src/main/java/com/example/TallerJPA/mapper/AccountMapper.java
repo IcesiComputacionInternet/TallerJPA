@@ -8,6 +8,8 @@ import com.example.TallerJPA.service.UserService;
 import org.mapstruct.Mapper;
 import org.mapstruct.Mapping;
 
+import java.util.List;
+
 @Mapper(componentModel = "spring")
 public interface AccountMapper {
 
@@ -21,4 +23,5 @@ public interface AccountMapper {
     @Mapping(source = "destinationAccount.accountNumber", target = "destinationAccountNumber")
     @Mapping(source = "balance", target = "balance")
     TransferResponseDTO fromRequestToResponse(IcesiAccount originAccount, IcesiAccount destinationAccount, long amount, long balance);
+
 }

@@ -16,6 +16,10 @@ import javax.validation.Valid;
 public class AccountController implements AccountAPI {
     private final AccountService accountService;
     @Override
+    public AccountListResponseDTO getAccounts(){
+        return accountService.getAccounts();
+    }
+    @Override
     public AccountResponseDTO save(@RequestBody @Valid AccountCreateDTO account){
         return accountService.save(account);
     }

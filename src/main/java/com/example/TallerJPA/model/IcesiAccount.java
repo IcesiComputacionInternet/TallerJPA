@@ -1,9 +1,6 @@
 package com.example.TallerJPA.model;
 
-import lombok.AllArgsConstructor;
-import lombok.Builder;
-import lombok.Data;
-import lombok.NoArgsConstructor;
+import lombok.*;
 import org.springframework.beans.factory.annotation.Value;
 
 import javax.persistence.Entity;
@@ -17,6 +14,7 @@ import java.util.UUID;
 @Builder
 @AllArgsConstructor
 @NoArgsConstructor
+@Getter
 public class IcesiAccount {
     @Id
     private UUID accountId;

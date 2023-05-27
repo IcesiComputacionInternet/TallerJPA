@@ -6,6 +6,9 @@ import org.springframework.web.bind.annotation.*;
 @RequestMapping(AccountAPI.BASE_ACCOUNT_URL)
 public interface AccountAPI {
     String BASE_ACCOUNT_URL = "/accounts";
+    @GetMapping("/getAccounts")
+    public AccountListResponseDTO getAccounts();
+
     @PostMapping("/add/account")
     public AccountResponseDTO save(@RequestBody AccountCreateDTO account);
     @PatchMapping("/withdraw/")
