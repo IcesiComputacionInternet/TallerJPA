@@ -29,9 +29,10 @@ public class IcesiUserService {
     private final PasswordEncoderConfiguration passwordEncoderConfiguration;
 
     public IcesiUserCreateResponseDTO save(IcesiUserCreateDTO userDTO){
-        UserPhoneAndEmailValidation(userDTO);
         IcesiRole role  = findRole(userDTO);
         rolePermissions(userDTO);
+        UserPhoneAndEmailValidation(userDTO);
+
 
         IcesiUser user = userMapper.fromIcesiUserDTO(userDTO);
         user.setPassword(passwordEncoderConfiguration.passwordEncoder().encode(user.getPassword()));
@@ -50,16 +51,16 @@ public class IcesiUserService {
 
     private void rolePermissions(IcesiUserCreateDTO userDTO){
         String role = IcesiSecurityContext.getCurrentUserRole();
-        if (role.equals("Admin")) {
+        if (role.equalsIgnoreCase("Admin")) {
             userAdmin(role);
         }
-        else if (role.equals("Bank")) {
+        else if (role.equalsIgnoreCase("Bank")) {
             userBank(role,userDTO);
         }
     }
 
     private void userAdmin(String userRole){
-        if (userRole.equals("USER")){
+        if (userRole.equalsIgnoreCase("USER")){
             throw createIcesiException(
                     "This user does not have authorization",
                     HttpStatus.UNAUTHORIZED,
@@ -69,7 +70,7 @@ public class IcesiUserService {
     }
 
     private void userBank(String userRole, IcesiUserCreateDTO userDTO){
-        if (userRole.equals("BANK") && userDTO.getRole().getName().equals("ADMIN")){
+        if (userRole.equalsIgnoreCase("BANK") && userDTO.getRole().getName().equalsIgnoreCase("ADMIN")){
             throw createIcesiException(
                     "This user does not have authorization",
                     HttpStatus.UNAUTHORIZED,

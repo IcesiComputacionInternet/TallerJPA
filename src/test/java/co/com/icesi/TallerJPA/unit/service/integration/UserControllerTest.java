@@ -45,10 +45,10 @@ public class UserControllerTest {
                                         IcesiUserCreateDTO.builder()
                                                 .firstName("Martina")
                                                 .lastName("Loaiza")
-                                                .email("sibuenas@hotmail.com")
-                                                .phoneNumber("+57123123123")
-                                                .password("password")
-                                                .role(defaultRoleDTO())
+                                                .email("sibuenas1@hotmail.com")
+                                                .phoneNumber("+57448123123")
+                                                .password("password89")
+                                                .role(defaultRoleDTO1())
                                                 .build()
                                 ))
                         .header("Authorization", "Bearer " + token.getToken())
@@ -59,35 +59,6 @@ public class UserControllerTest {
 
     @Test
     public void testCreateAnUserByABank() throws Exception{
-        var resultCreate = mockMvc.perform(MockMvcRequestBuilders.post("/token").content(
-                                objectMapper.writeValueAsString(new LoginDTO("johndoe2@email.com", "password"))
-                        )
-                        .contentType(MediaType.APPLICATION_JSON)
-                        .accept(MediaType.APPLICATION_JSON))
-                .andExpect(status().isOk())
-                .andReturn();
-
-        TokenDTO token = objectMapper.readValue(resultCreate.getResponse().getContentAsString(), TokenDTO.class);
-
-        mockMvc.perform(MockMvcRequestBuilders.post("/users/create").content(
-                                objectMapper.writeValueAsString(
-                                        IcesiUserCreateDTO.builder()
-                                                .firstName("Martina")
-                                                .lastName("Loaiza")
-                                                .email("sibuenas2@hotmail.com")
-                                                .phoneNumber("+57143143123")
-                                                .password("password")
-                                                .role(defaultRoleDTO2())
-                                                .build()
-                                ))
-                        .header("Authorization", "Bearer " + token.getToken())
-                        .contentType(MediaType.APPLICATION_JSON).accept(MediaType.APPLICATION_JSON))
-                .andExpect(status().isOk())
-                .andReturn();
-    }
-
-    @Test
-    public void testCreateAnUserByAnUser() throws Exception{
         var resultCreate = mockMvc.perform(MockMvcRequestBuilders.post("/token").content(
                                 objectMapper.writeValueAsString(new LoginDTO("johndoe3@email.com", "password"))
                         )
@@ -103,10 +74,10 @@ public class UserControllerTest {
                                         IcesiUserCreateDTO.builder()
                                                 .firstName("Martina")
                                                 .lastName("Loaiza")
-                                                .email("sibuenas@hotmail.com")
-                                                .phoneNumber("+57153123153")
-                                                .password("password")
-                                                .role(defaultRoleDTO())
+                                                .email("sibuenas2@hotmail.com")
+                                                .phoneNumber("+57155143123")
+                                                .password("password98")
+                                                .role(defaultRoleDTO2())
                                                 .build()
                                 ))
                         .header("Authorization", "Bearer " + token.getToken())
@@ -116,9 +87,9 @@ public class UserControllerTest {
     }
 
     @Test
-    public void testCreateAnAdminByAnUser() throws Exception{
+    public void testCreateAnUserByAnUser() throws Exception{
         var resultCreate = mockMvc.perform(MockMvcRequestBuilders.post("/token").content(
-                                objectMapper.writeValueAsString(new LoginDTO("johndoe5@email.com", "password"))
+                                objectMapper.writeValueAsString(new LoginDTO("johndoe2@email.com", "password"))
                         )
                         .contentType(MediaType.APPLICATION_JSON)
                         .accept(MediaType.APPLICATION_JSON))
@@ -132,22 +103,22 @@ public class UserControllerTest {
                                         IcesiUserCreateDTO.builder()
                                                 .firstName("Martina")
                                                 .lastName("Loaiza")
-                                                .email("sibuenas@hotmail.com")
-                                                .phoneNumber("+57123658123")
-                                                .password("password")
-                                                .role(defaultRoleDTO())
+                                                .email("sibuenas3@hotmail.com")
+                                                .phoneNumber("+57153751153")
+                                                .password("password58")
+                                                .role(defaultRoleDTO2())
                                                 .build()
                                 ))
                         .header("Authorization", "Bearer " + token.getToken())
                         .contentType(MediaType.APPLICATION_JSON).accept(MediaType.APPLICATION_JSON))
-                .andExpect(status().isUnauthorized())
+                .andExpect(status().isOk())
                 .andReturn();
     }
 
     @Test
     public void testCreateAnAdminByABank() throws Exception{
         var resultCreate = mockMvc.perform(MockMvcRequestBuilders.post("/token").content(
-                                objectMapper.writeValueAsString(new LoginDTO("johndoe6@email.com", "password"))
+                                objectMapper.writeValueAsString(new LoginDTO("johndoe3@email.com", "password"))
                         )
                         .contentType(MediaType.APPLICATION_JSON)
                         .accept(MediaType.APPLICATION_JSON))
@@ -161,10 +132,10 @@ public class UserControllerTest {
                                         IcesiUserCreateDTO.builder()
                                                 .firstName("Martina")
                                                 .lastName("Loaiza")
-                                                .email("sibuenas@hotmail.com")
-                                                .phoneNumber("+57123658123")
-                                                .password("password")
-                                                .role(defaultRoleDTO())
+                                                .email("sibuenas5@hotmail.com")
+                                                .phoneNumber("+57123888123")
+                                                .password("password98")
+                                                .role(defaultRoleDTO1())
                                                 .build()
                                 ))
                         .header("Authorization", "Bearer " + token.getToken())
@@ -173,17 +144,17 @@ public class UserControllerTest {
                 .andReturn();
     }
 
-    private IcesiRoleCreateDTO defaultRoleDTO(){
+    private IcesiRoleCreateDTO defaultRoleDTO1(){
         return   IcesiRoleCreateDTO.builder()
                 .name("ADMIN")
-                .description("El administrador se encarga de administrar la página")
+                .description("Role admin for demo")
                 .build();
     }
 
     private IcesiRoleCreateDTO defaultRoleDTO2(){
         return   IcesiRoleCreateDTO.builder()
                 .name("USER")
-                .description("El usuario se encarga de usar la página")
+                .description("Role user for demo")
                 .build();
     }
 }

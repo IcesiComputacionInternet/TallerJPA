@@ -1,10 +1,12 @@
 package co.com.icesi.TallerJPA.dto.requestDTO;
 
-import lombok.Builder;
-import lombok.Data;
+import lombok.*;
 
-@Data
+@Getter
+@Setter
 @Builder
+@AllArgsConstructor
+@NoArgsConstructor
 public class IcesiRoleCreateDTO {
     private String name;
     private String description;

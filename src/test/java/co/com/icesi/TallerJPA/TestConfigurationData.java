@@ -20,20 +20,26 @@ public class TestConfigurationData {
         IcesiRole icesiRole1 = IcesiRole.builder()
                 .roleId(UUID.randomUUID())
                 .name("ADMIN")
-                .description("Role for demo")
+                .description("Role admin for demo")
                 .build();
 
         IcesiRole icesiRole2 = IcesiRole.builder()
                 .roleId(UUID.randomUUID())
                 .name("USER")
-                .description("Role for demo")
+                .description("Role user for demo")
                 .build();
 
-        IcesiUser icesiUser = IcesiUser.builder()
+        IcesiRole icesiRole3 = IcesiRole.builder()
+                .roleId(UUID.randomUUID())
+                .name("BANK")
+                .description("Role bank for demo")
+                .build();
+
+        IcesiUser icesiUser1 = IcesiUser.builder()
                 .userId(UUID.randomUUID())
                 .firstName("John")
                 .lastName("Doe")
-                .email("johndoe@email.com")
+                .email("johndoe1@email.com")
                 .phoneNumber("+57123123123")
                 .password(encoder.encode("password"))
                 .role(icesiRole1)
@@ -44,14 +50,25 @@ public class TestConfigurationData {
                 .firstName("John")
                 .lastName("Doe")
                 .email("johndoe2@email.com")
-                .phoneNumber("+57123123123")
+                .phoneNumber("+57123123145")
                 .password(encoder.encode("password"))
                 .role(icesiRole2)
                 .build();
 
+        IcesiUser icesiUser3 = IcesiUser.builder()
+                .userId(UUID.randomUUID())
+                .firstName("John")
+                .lastName("Doe")
+                .email("johndoe3@email.com")
+                .phoneNumber("+57123166345")
+                .password(encoder.encode("password"))
+                .role(icesiRole3)
+                .build();
+
         return args -> {
-            users.save(icesiUser);
+            users.save(icesiUser1);
             users.save(icesiUser2);
+            users.save(icesiUser3);
         };
     }
 }

@@ -11,7 +11,7 @@ import java.util.List;
 
 public interface IcesiUserAPI {
     String BASE_USER_URL = "/users";
-    @PostMapping
+    @PostMapping("/create")
     IcesiUserCreateResponseDTO addUser(@RequestBody IcesiUserCreateDTO userDTO);
     @GetMapping
     List<IcesiUserCreateResponseDTO> getAllUsers();
