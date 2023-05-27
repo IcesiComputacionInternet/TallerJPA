@@ -33,7 +33,7 @@ class DemoJpaApplicationTests {
 
 	@Test
 	public void testLoginEndPoint() throws Exception{
-		var result = mockMvc.perform(MockMvcRequestBuilders.post("/login").content(
+		var result = mockMvc.perform(MockMvcRequestBuilders.post("/token").content(
 				objectMapper.writeValueAsString(new LoginDTO("johndoe@email.com", "password")))
 						.contentType(MediaType.APPLICATION_JSON)
 						.accept(MediaType.APPLICATION_JSON))
@@ -45,7 +45,7 @@ class DemoJpaApplicationTests {
 
 	@Test
 	public void testLoginInvalidEmail() throws Exception{
-		var result = mockMvc.perform(MockMvcRequestBuilders.post("/login").content(
+		var result = mockMvc.perform(MockMvcRequestBuilders.post("/token").content(
 								objectMapper.writeValueAsString(new LoginDTO("jhondoe@email.com", "password")))
 						.contentType(MediaType.APPLICATION_JSON)
 						.accept(MediaType.APPLICATION_JSON))
@@ -55,7 +55,7 @@ class DemoJpaApplicationTests {
 
 	@Test
 	public void testLoginInvalidPassword() throws Exception{
-		var result = mockMvc.perform(MockMvcRequestBuilders.post("/login").content(
+		var result = mockMvc.perform(MockMvcRequestBuilders.post("/token").content(
 								objectMapper.writeValueAsString(new LoginDTO("johndoe@email.com", "paswor")))
 						.contentType(MediaType.APPLICATION_JSON)
 						.accept(MediaType.APPLICATION_JSON))
@@ -65,7 +65,7 @@ class DemoJpaApplicationTests {
 
 	@Test
 	public void testCreateAccountByAdmin() throws Exception {
-		var resultToken = mockMvc.perform(MockMvcRequestBuilders.post("/login").content(
+		var resultToken = mockMvc.perform(MockMvcRequestBuilders.post("/token").content(
 								objectMapper.writeValueAsString(new LoginDTO("johndoe@email.com", "password"))
 						)
 						.contentType(MediaType.APPLICATION_JSON)
@@ -81,7 +81,7 @@ class DemoJpaApplicationTests {
 										.firstName("Luis Miguel")
 										.lastName("Ossa Arias")
 										.password("password")
-										.roleType("USER")
+										.role("USER")
 										.build()
 						))
 						.header("Authorization", "Bearer " + token.getToken())
@@ -89,18 +89,4 @@ class DemoJpaApplicationTests {
 				.andExpect(status().isOk())
 				.andReturn();
 	}
-
-/*	@Test
-	public void testTokenEndpointWithInvalidEmail() throws Exception{
-		var result = mockMvc.perform(MockMvcRequestBuilders.get("/token").content(
-								objectMapper.writeValueAsString(new LoginDTO("incorret@gmail.com", "password"))
-						)
-						.contentType(MediaType.APPLICATION_JSON)
-						.accept(MediaType.APPLICATION_JSON))
-				.andExpect(status().isOk())
-				.andReturn();
-
-		TokenDTO token = objectMapper.readValue(result.getResponse().getContentAsString(),TokenDTO.class);
-		assertNotNull(token);
-	}*/
 }

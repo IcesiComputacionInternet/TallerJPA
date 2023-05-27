@@ -2,8 +2,11 @@ package com.edu.icesi.demojpa.dto.response;
 
 import lombok.Builder;
 import lombok.Data;
+import lombok.Getter;
+import lombok.Setter;
 
-@Data
+@Getter
+@Setter
 @Builder
 public class ResponseTransactionDTO {
     private String result;

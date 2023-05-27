@@ -29,7 +29,6 @@ public class AccountService {
     private final AccountMapper accountMapper;
 
     private final IcesiExceptionBuilder icesiExceptionBuilder = new IcesiExceptionBuilder();
-    private final AccountType depositOnly = AccountType.DEPOSIT_ONLY;
 
     public ResponseAccountDTO save(RequestAccountDTO account){
         hasPermission(account.getAccountNumber());
@@ -42,6 +41,7 @@ public class AccountService {
         icesiAccount.setAccountNumber(accountNumber);
         icesiAccount.setIcesiUser(icesiUser);
         icesiAccount.setActive(true);
+        icesiUser.getAccounts().add(icesiAccount);
         accountRepository.save(icesiAccount);
         return accountMapper.fromAccountDTO(icesiAccount, "The user has been saved");
     }
@@ -120,12 +120,12 @@ public class AccountService {
         IcesiAccount accountToDeposit = accountRepository.findAccountByAccountNumber(transaction.getAccountTo(), true)
                 .orElseThrow(() -> icesiExceptionBuilder.badRequestException("Money couldn't be transferred. The account is disable", "account to deposit"));
 
-        if(accountToWithdrawal.getType().equals(depositOnly.getType())){
+        if(accountToWithdrawal.getType().equals(AccountType.DEPOSIT_ONLY.getType())){
             throw icesiExceptionBuilder.badRequestException("The account with number " + accountToWithdrawal.getAccountNumber() + " can't transfer money",
                     "account to withdrawal. Deposit only.");
         }
 
-        if(accountToDeposit.getType().equals(depositOnly.getType())){
+        if(accountToDeposit.getType().equals(AccountType.DEPOSIT_ONLY.getType())){
             throw icesiExceptionBuilder.badRequestException("The account with number " + accountToDeposit.getAccountNumber() + " can't be transferred money",
                     "account to deposit. Deposit only.");
         }
@@ -153,9 +153,10 @@ public class AccountService {
     }
 
     public List<ResponseAccountDTO> getAllAccounts(){
-        return accountRepository
-                .findAll()
-                .stream()
+        UUID userId = IcesiSecurityContext.getCurrentUserId();
+        Optional<List<IcesiAccount>> optionalAccounts = accountRepository.findUserAccount(userId);
+        List<IcesiAccount> accounts = optionalAccounts.orElse(Collections.emptyList());
+        return accounts.stream()
                 .map(accountMapper::fromAccountToDTO)
                 .collect(Collectors.toList());
     }

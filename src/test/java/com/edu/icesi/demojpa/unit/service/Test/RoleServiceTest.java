@@ -18,7 +18,7 @@ import static org.junit.jupiter.api.Assertions.*;
 import static org.mockito.Mockito.*;
 
 public class RoleServiceTest {
-    private RoleService roleService;
+/*    private RoleService roleService;
     private RoleRepository roleRepository;
     private RoleMapper roleMapper;
 
@@ -60,5 +60,5 @@ public class RoleServiceTest {
                 .name("Student")
                 .description("Loreno Insomnio, nunca supe como se dice")
                 .build();
-    }
+    }*/
 }

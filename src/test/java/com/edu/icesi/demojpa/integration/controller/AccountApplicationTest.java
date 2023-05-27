@@ -2,10 +2,7 @@ package com.edu.icesi.demojpa.integration.controller;
 
 import com.edu.icesi.demojpa.dto.request.*;
 import com.edu.icesi.demojpa.integration.TestConfigurationData;
-import com.edu.icesi.demojpa.model.IcesiRole;
-import com.edu.icesi.demojpa.model.IcesiUser;
 import com.fasterxml.jackson.databind.ObjectMapper;
-import org.junit.jupiter.api.Order;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;
@@ -32,7 +29,7 @@ public class AccountApplicationTest {
 
     @Test
     public void testTransferMoney() throws Exception{
-        var result = mockMvc.perform(MockMvcRequestBuilders.post("/login").content(
+        var result = mockMvc.perform(MockMvcRequestBuilders.post("/token").content(
                                 objectMapper.writeValueAsString(new LoginDTO("johndoe2@email.com", "password")))
                         .contentType(MediaType.APPLICATION_JSON)
                         .accept(MediaType.APPLICATION_JSON))
@@ -55,7 +52,7 @@ public class AccountApplicationTest {
 
     @Test
     public void testAccountDepositOnlyCantTransferMoney() throws Exception{
-        var result = mockMvc.perform(MockMvcRequestBuilders.post("/login").content(
+        var result = mockMvc.perform(MockMvcRequestBuilders.post("/token").content(
                                 objectMapper.writeValueAsString(new LoginDTO("johndoe2@email.com", "password")))
                         .contentType(MediaType.APPLICATION_JSON)
                         .accept(MediaType.APPLICATION_JSON))
@@ -78,7 +75,7 @@ public class AccountApplicationTest {
 
     @Test
     public void testAccountDepositOnlyCantBeTransferredMoney() throws Exception{
-        var result = mockMvc.perform(MockMvcRequestBuilders.post("/login").content(
+        var result = mockMvc.perform(MockMvcRequestBuilders.post("/token").content(
                                 objectMapper.writeValueAsString(new LoginDTO("johndoe2@email.com", "password")))
                         .contentType(MediaType.APPLICATION_JSON)
                         .accept(MediaType.APPLICATION_JSON))
@@ -101,7 +98,7 @@ public class AccountApplicationTest {
 
     @Test
     public void testTransferWithoutFunds() throws Exception{
-        var result = mockMvc.perform(MockMvcRequestBuilders.post("/login").content(
+        var result = mockMvc.perform(MockMvcRequestBuilders.post("/token").content(
                                 objectMapper.writeValueAsString(new LoginDTO("johndoe2@email.com", "password")))
                         .contentType(MediaType.APPLICATION_JSON)
                         .accept(MediaType.APPLICATION_JSON))

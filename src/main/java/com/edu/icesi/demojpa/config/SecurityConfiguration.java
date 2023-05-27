@@ -1,13 +1,9 @@
 package com.edu.icesi.demojpa.config;
 
-import com.edu.icesi.demojpa.api.AccountAPI;
-import com.edu.icesi.demojpa.api.RoleAPI;
-import com.edu.icesi.demojpa.api.UserAPI;
 import com.nimbusds.jose.jwk.source.ImmutableSecret;
 import lombok.AllArgsConstructor;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
-import org.springframework.http.HttpMethod;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.ProviderManager;
 import org.springframework.security.authorization.AuthorityAuthorizationManager;
@@ -75,7 +71,7 @@ public class SecurityConfiguration {
     @Bean
     public AuthorizationManager<RequestAuthorizationContext> requestAuthorizationContextAuthorizationManager
             (HandlerMappingIntrospector introspector){
-        RequestMatcher permitAll = new AndRequestMatcher(new MvcRequestMatcher(introspector, "/login"));
+        RequestMatcher permitAll = new AndRequestMatcher(new MvcRequestMatcher(introspector, "/token"));
 
         MvcRequestMatcher mvcRequestMatcher;
 

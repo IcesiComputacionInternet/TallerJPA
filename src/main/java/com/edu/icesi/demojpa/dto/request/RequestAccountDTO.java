@@ -1,14 +1,12 @@
 package com.edu.icesi.demojpa.dto.request;
 
-import lombok.AllArgsConstructor;
-import lombok.Builder;
-import lombok.Data;
-import lombok.NoArgsConstructor;
+import lombok.*;
 
 import javax.validation.constraints.Min;
 import java.util.UUID;
 
-@Data
+@Getter
+@Setter
 @Builder
 @AllArgsConstructor
 @NoArgsConstructor

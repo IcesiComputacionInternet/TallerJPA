@@ -4,8 +4,13 @@ import com.edu.icesi.demojpa.dto.request.RequestUserDTO;
 import com.edu.icesi.demojpa.model.IcesiUser;
 import lombok.Builder;
 import lombok.Data;
+import lombok.Getter;
+import lombok.Setter;
 
-@Data
+import java.util.UUID;
+
+@Getter
+@Setter
 @Builder
 public class ResponseAccountDTO {
     private String result;
@@ -13,5 +18,5 @@ public class ResponseAccountDTO {
     private String type;
     private boolean active;
     private String accountNumber;
-    private IcesiUser icesiUser;
+    private UUID userId;
 }

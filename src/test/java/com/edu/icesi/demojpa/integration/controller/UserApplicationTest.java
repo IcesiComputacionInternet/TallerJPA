@@ -2,7 +2,6 @@ package com.edu.icesi.demojpa.integration.controller;
 
 import com.edu.icesi.demojpa.dto.request.LoginDTO;
 import com.edu.icesi.demojpa.dto.request.RequestUserDTO;
-import com.edu.icesi.demojpa.dto.request.RoleDTO;
 import com.edu.icesi.demojpa.dto.request.TokenDTO;
 import com.edu.icesi.demojpa.integration.TestConfigurationData;
 import com.fasterxml.jackson.databind.ObjectMapper;
@@ -30,7 +29,7 @@ public class UserApplicationTest {
 
     @Test
     public void testCreateUserByAdmin() throws Exception{
-        var result = mockMvc.perform(MockMvcRequestBuilders.post("/login").content(
+        var result = mockMvc.perform(MockMvcRequestBuilders.post("/token").content(
                                 objectMapper.writeValueAsString(new LoginDTO("johndoe@email.com", "password")))
                         .contentType(MediaType.APPLICATION_JSON)
                         .accept(MediaType.APPLICATION_JSON))
@@ -45,7 +44,7 @@ public class UserApplicationTest {
                                                 .firstName("Luis Miguel")
                                                 .lastName("Ossa Arias")
                                                 .password("password")
-                                                .roleType("USER")
+                                                .role("USER")
                                                 .build()
                                 ))
                         .header("Authorization", "Bearer " + token.getToken())
@@ -56,7 +55,7 @@ public class UserApplicationTest {
 
     @Test
     public void testCreateUserByBank() throws Exception{
-        var result = mockMvc.perform(MockMvcRequestBuilders.post("/login").content(
+        var result = mockMvc.perform(MockMvcRequestBuilders.post("/token").content(
                                 objectMapper.writeValueAsString(new LoginDTO("johndoe3@email.com", "password")))
                         .contentType(MediaType.APPLICATION_JSON)
                         .accept(MediaType.APPLICATION_JSON))
@@ -66,12 +65,12 @@ public class UserApplicationTest {
         mockMvc.perform(MockMvcRequestBuilders.post("/users/create").content(
                                 objectMapper.writeValueAsString(
                                         RequestUserDTO.builder()
-                                                .email("luismiguelossaarias05@gmail.com")
-                                                .phoneNumber("+573174833968")
-                                                .firstName("Luis Miguel")
-                                                .lastName("Ossa Arias")
+                                                .email("exmaample@gmail.com")
+                                                .phoneNumber("+573174839968")
+                                                .firstName("Lois")
+                                                .lastName("Prank")
                                                 .password("password")
-                                                .roleType("USER")
+                                                .role("USER")
                                                 .build()
                                 ))
                         .header("Authorization", "Bearer " + token.getToken())
@@ -82,7 +81,7 @@ public class UserApplicationTest {
 
     @Test
     public void testCreateAdminUserByBank() throws Exception{
-        var result = mockMvc.perform(MockMvcRequestBuilders.post("/login").content(
+        var result = mockMvc.perform(MockMvcRequestBuilders.post("/token").content(
                                 objectMapper.writeValueAsString(new LoginDTO("johndoe3@email.com", "password")))
                         .contentType(MediaType.APPLICATION_JSON)
                         .accept(MediaType.APPLICATION_JSON))
@@ -97,7 +96,7 @@ public class UserApplicationTest {
                                                 .firstName("Luis Miguel")
                                                 .lastName("Ossa Arias")
                                                 .password("password")
-                                                .roleType("ADMIN")
+                                                .role("ADMIN")
                                                 .build()
                                 ))
                         .header("Authorization", "Bearer " + token.getToken())
@@ -108,7 +107,7 @@ public class UserApplicationTest {
 
     @Test
     public void testCreateUserByUser() throws Exception{
-        var result = mockMvc.perform(MockMvcRequestBuilders.post("/login").content(
+        var result = mockMvc.perform(MockMvcRequestBuilders.post("/token").content(
                                 objectMapper.writeValueAsString(new LoginDTO("johndoe2@email.com", "password")))
                         .contentType(MediaType.APPLICATION_JSON)
                         .accept(MediaType.APPLICATION_JSON))
@@ -123,7 +122,7 @@ public class UserApplicationTest {
                                                 .firstName("Luis Miguel")
                                                 .lastName("Ossa Arias")
                                                 .password("password")
-                                                .roleType("USER")
+                                                .role("USER")
                                                 .build()
                                 ))
                         .header("Authorization", "Bearer " + token.getToken())

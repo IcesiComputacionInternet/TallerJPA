@@ -6,6 +6,7 @@ import com.edu.icesi.demojpa.dto.response.ResponseUserDTO;
 import com.edu.icesi.demojpa.error.exception.IcesiException;
 import com.edu.icesi.demojpa.error.util.IcesiExceptionBuilder;
 import com.edu.icesi.demojpa.mapper.UserMapper;
+import com.edu.icesi.demojpa.model.IcesiAccount;
 import com.edu.icesi.demojpa.model.IcesiRole;
 import com.edu.icesi.demojpa.model.IcesiUser;
 import com.edu.icesi.demojpa.repository.RoleRepository;
@@ -27,10 +28,10 @@ public class UserService {
     private final IcesiExceptionBuilder icesiExceptionBuilder = new IcesiExceptionBuilder();
 
     public ResponseUserDTO save(RequestUserDTO user){
-        hasPermission(user.getRoleType());
+        hasPermission(user.getRole());
         boolean emailInUse = userRepository.isEmailInUse(user.getEmail()).isPresent();
         boolean phoneNumberInUse = userRepository.isPhoneNumberInUse(user.getPhoneNumber()).isPresent();
-        IcesiRole role = roleRepository.findRoleByName(user.getRoleType()).orElseThrow(() -> new RuntimeException("The role "+ user.getRoleType() +" doesn't exist"));
+        IcesiRole role = roleRepository.findRoleByName(user.getRole()).orElseThrow(() -> new RuntimeException("The role "+ user.getRole() +" doesn't exist"));
 
         List<IcesiException> errors = new ArrayList<>();
 

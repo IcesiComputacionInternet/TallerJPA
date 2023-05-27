@@ -1,16 +1,13 @@
 package com.edu.icesi.demojpa.model;
 
-import com.sun.istack.NotNull;
-import lombok.AllArgsConstructor;
-import lombok.Builder;
-import lombok.Data;
-import lombok.NoArgsConstructor;
+import lombok.*;
 
 import javax.persistence.*;
-import java.util.Set;
+import java.util.List;
 import java.util.UUID;
 
-@Data
+@Getter
+@Setter
 @Entity
 @Builder
 @AllArgsConstructor
@@ -26,9 +23,9 @@ public class IcesiUser {
     private String password;
 
     @OneToMany(mappedBy = "icesiUser")
-    private Set<IcesiAccount> accounts;
+    private List<IcesiAccount> accounts;
 
     @ManyToOne(optional = false, cascade = CascadeType.ALL)
-    @JoinColumn(name = "icesi_role_users", nullable = false)
+    @JoinColumn(name = "icesi_role_role_id", nullable = false)
     private IcesiRole role;
 }

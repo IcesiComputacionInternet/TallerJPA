@@ -9,14 +9,18 @@ import org.mapstruct.Mapper;
 import org.mapstruct.Mapping;
 
 @Mapper(componentModel = "spring")
+
 public interface AccountMapper {
+    @Mapping(target = "icesiUser", source = "icesiUserId", ignore = true)
     IcesiAccount fromIcesiAccountDTO(RequestAccountDTO requestAccountDTO);
 
     @Mapping(target = "result", source = "result")
     ResponseTransactionDTO fromTransactionDTO(RequestTransactionDTO transactionDTO, String result);
 
     @Mapping(target = "result", source = "result")
+    @Mapping(target = "userId", expression = "java(icesiAccount.getIcesiUser().getUserId())")
     ResponseAccountDTO fromAccountDTO(IcesiAccount icesiAccount, String result);
 
+    @Mapping(target = "userId", expression = "java(icesiAccount.getIcesiUser().getUserId())")
     ResponseAccountDTO fromAccountToDTO(IcesiAccount icesiAccount);
 }

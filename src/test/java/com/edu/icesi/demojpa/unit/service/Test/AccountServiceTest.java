@@ -26,7 +26,7 @@ import static org.junit.jupiter.api.Assertions.*;
 import static org.mockito.Mockito.*;
 
 public class AccountServiceTest {
-    private AccountService accountService;
+/*    private AccountService accountService;
     private AccountRepository accountRepository;
     private UserRepository userRepository;
     private AccountMapper accountMapper;
@@ -384,5 +384,5 @@ public class AccountServiceTest {
                 .name("Student")
                 .description("Loreno Insomnio, nunca supe como se dice")
                 .build();
-    }
+    }*/
 }

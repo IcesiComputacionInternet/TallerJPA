@@ -71,6 +71,24 @@ public class TestConfigurationData {
                 .balance(0)
                 .build();
 
+        IcesiAccount secondAccount = IcesiAccount.builder()
+                .accountId(UUID.randomUUID())
+                .accountNumber("000-000000-03")
+                .active(true)
+                .icesiUser(normalUser)
+                .type(AccountType.NORMAL.getType())
+                .balance(0)
+                .build();
+
+        IcesiAccount thirdAccount = IcesiAccount.builder()
+                .accountId(UUID.randomUUID())
+                .accountNumber("000-000000-04")
+                .active(true)
+                .icesiUser(normalUser)
+                .type(AccountType.NORMAL.getType())
+                .balance(0)
+                .build();
+
         IcesiAccount icesiAccount2 = IcesiAccount.builder()
                 .accountId(UUID.randomUUID())
                 .accountNumber("000-000000-01")
@@ -98,6 +116,8 @@ public class TestConfigurationData {
 
             accountRepository.save(icesiAccount1);
             accountRepository.save(icesiAccount2);
+            accountRepository.save(secondAccount);
+            accountRepository.save(thirdAccount);
             accountRepository.save(icesiAccount3);
         };
     }

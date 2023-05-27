@@ -1,27 +1,23 @@
 package com.edu.icesi.demojpa.model;
 
-import lombok.AllArgsConstructor;
-import lombok.Builder;
-import lombok.Data;
-import lombok.NoArgsConstructor;
+import lombok.*;
 
 import javax.persistence.*;
-import java.util.Set;
+import java.util.List;
 import java.util.UUID;
 
-@Data
+@Getter
+@Setter
 @Entity
 @Builder
 @AllArgsConstructor
 @NoArgsConstructor
 public class IcesiRole {
-
     @Id
     private UUID roleId;
     private String description;
     private String name;
 
     @OneToMany(mappedBy = "role")
-    private Set<IcesiUser> users;
-
+    private List<IcesiUser> users;
 }

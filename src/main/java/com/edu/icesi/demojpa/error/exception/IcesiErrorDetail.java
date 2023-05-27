@@ -1,11 +1,10 @@
 package com.edu.icesi.demojpa.error.exception;
 
-import lombok.AllArgsConstructor;
-import lombok.Builder;
-import lombok.Data;
+import lombok.*;
 
 @Builder
-@Data
+@Getter
+@Setter
 @AllArgsConstructor
 public class IcesiErrorDetail {
     private String errorCode;

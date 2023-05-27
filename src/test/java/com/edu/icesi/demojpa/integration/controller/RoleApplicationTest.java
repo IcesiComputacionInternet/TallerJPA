@@ -1,7 +1,6 @@
 package com.edu.icesi.demojpa.integration.controller;
 
 import com.edu.icesi.demojpa.dto.request.LoginDTO;
-import com.edu.icesi.demojpa.dto.request.RequestUserDTO;
 import com.edu.icesi.demojpa.dto.request.RoleDTO;
 import com.edu.icesi.demojpa.dto.request.TokenDTO;
 import com.edu.icesi.demojpa.integration.TestConfigurationData;
@@ -16,7 +15,6 @@ import org.springframework.test.context.ActiveProfiles;
 import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.request.MockMvcRequestBuilders;
 
-import static org.junit.jupiter.api.Assertions.assertNotNull;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
 @AutoConfigureMockMvc
@@ -31,7 +29,7 @@ public class RoleApplicationTest {
 
     @Test
     public void testCreateRoleByAdmin() throws Exception{
-        var result = mockMvc.perform(MockMvcRequestBuilders.post("/login").content(
+        var result = mockMvc.perform(MockMvcRequestBuilders.post("/token").content(
                                 objectMapper.writeValueAsString(new LoginDTO("johndoe@email.com", "password")))
                         .contentType(MediaType.APPLICATION_JSON)
                         .accept(MediaType.APPLICATION_JSON))
@@ -53,7 +51,7 @@ public class RoleApplicationTest {
 
     @Test
     public void testCreateRoleByBank() throws Exception{
-        var result = mockMvc.perform(MockMvcRequestBuilders.post("/login").content(
+        var result = mockMvc.perform(MockMvcRequestBuilders.post("/token").content(
                                 objectMapper.writeValueAsString(new LoginDTO("johndoe3@email.com", "password")))
                         .contentType(MediaType.APPLICATION_JSON)
                         .accept(MediaType.APPLICATION_JSON))
