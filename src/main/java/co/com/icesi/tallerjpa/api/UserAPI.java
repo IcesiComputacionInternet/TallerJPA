@@ -1,6 +1,7 @@
 package co.com.icesi.tallerjpa.api;
 
 import co.com.icesi.tallerjpa.dto.RequestUserDTO;
+import co.com.icesi.tallerjpa.dto.ResponseAccountDTO;
 import co.com.icesi.tallerjpa.dto.ResponseUserDTO;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
@@ -20,4 +21,7 @@ public interface UserAPI {
 
     @PostMapping("/createUser")
     ResponseUserDTO addUser(@Valid @RequestBody RequestUserDTO requestUserDTO);
+
+    @GetMapping("/getAccounts")
+    List<ResponseAccountDTO> getAccounts();
 }

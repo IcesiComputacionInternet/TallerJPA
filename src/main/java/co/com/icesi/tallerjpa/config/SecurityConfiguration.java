@@ -49,8 +49,9 @@ public class SecurityConfiguration {
     @Bean
     public SecurityFilterChain securityFilterChain(HttpSecurity http, AuthorizationManager<RequestAuthorizationContext> access) throws Exception {
         return http
+                .cors().and()
                 .csrf(AbstractHttpConfigurer::disable)
-                .cors(AbstractHttpConfigurer::disable)
+                //.cors(AbstractHttpConfigurer::disable)
                 .authorizeHttpRequests(auth -> auth
                         .anyRequest()
                         .access(access)) //.authenticated()
@@ -87,7 +88,7 @@ public class SecurityConfiguration {
                 AuthorityAuthorizationManager.hasAnyAuthority("SCOPE_ADMIN"));
 
         managerBuilder.add(new MvcRequestMatcher(introspector, "/users/**"),
-                AuthorityAuthorizationManager.hasAnyAuthority("SCOPE_ADMIN","SCOPE_BANK"));
+                AuthorityAuthorizationManager.hasAnyAuthority("SCOPE_ADMIN","SCOPE_BANK","SCOPE_USER"));
 
         managerBuilder.add(new MvcRequestMatcher(introspector, "/accounts/**"),
                 AuthorityAuthorizationManager.hasAnyAuthority("SCOPE_USER", "SCOPE_ADMIN"));

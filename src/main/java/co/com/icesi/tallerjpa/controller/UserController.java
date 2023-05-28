@@ -2,6 +2,7 @@ package co.com.icesi.tallerjpa.controller;
 
 import co.com.icesi.tallerjpa.api.UserAPI;
 import co.com.icesi.tallerjpa.dto.RequestUserDTO;
+import co.com.icesi.tallerjpa.dto.ResponseAccountDTO;
 import co.com.icesi.tallerjpa.dto.ResponseUserDTO;
 import co.com.icesi.tallerjpa.service.UserService;
 import lombok.AllArgsConstructor;
@@ -32,5 +33,10 @@ public class UserController implements UserAPI {
     @Override
     public ResponseUserDTO addUser(@RequestBody RequestUserDTO requestUserDTO){
         return userService.save(requestUserDTO);
+    }
+
+    @Override
+    public List<ResponseAccountDTO> getAccounts() {
+        return userService.getAccounts();
     }
 }

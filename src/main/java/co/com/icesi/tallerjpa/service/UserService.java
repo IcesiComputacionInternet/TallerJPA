@@ -3,9 +3,12 @@ package co.com.icesi.tallerjpa.service;
 import co.com.icesi.tallerjpa.config.PasswordEncoderConfiguration;
 import co.com.icesi.tallerjpa.config.SecurityConfiguration;
 import co.com.icesi.tallerjpa.dto.RequestUserDTO;
+import co.com.icesi.tallerjpa.dto.ResponseAccountDTO;
 import co.com.icesi.tallerjpa.dto.ResponseUserDTO;
 import co.com.icesi.tallerjpa.error.util.IcesiExceptionBuilder;
+import co.com.icesi.tallerjpa.mapper.AccountMapper;
 import co.com.icesi.tallerjpa.mapper.UserMapper;
+import co.com.icesi.tallerjpa.model.IcesiAccount;
 import co.com.icesi.tallerjpa.model.IcesiUser;
 import co.com.icesi.tallerjpa.repository.RoleRepository;
 import co.com.icesi.tallerjpa.repository.UserRepository;
@@ -25,6 +28,7 @@ public class UserService {
     private final UserRepository userRepository;
     private final RoleRepository roleRepository;
     private final UserMapper userMapper;
+    private final AccountMapper accountMapper;
     private final IcesiExceptionBuilder exceptionBuilder = new IcesiExceptionBuilder();
     private final PasswordEncoderConfiguration encoder = new PasswordEncoderConfiguration();
 
@@ -71,6 +75,23 @@ public class UserService {
             throw exceptionBuilder.forbiddenException("You can't create an admin user");
         }
 
+    }
+
+    public List<ResponseAccountDTO> getAccounts(){
+        IcesiUser actualUser = getIcesiUser(IcesiSecurityContext.getCurrentUserId());
+        return saveAccount(actualUser.getAccount());
+    }
+
+    public List<ResponseAccountDTO> saveAccount(List<IcesiAccount> accounts) {
+        return accounts.stream().map(accountMapper::fromIcesiAccountToResUserDTO).toList();
+    }
+
+    public IcesiUser getIcesiUser(String actualId) {
+        var user = userRepository.findById(UUID.fromString(actualId)).isEmpty();
+        if (user) {
+            throw exceptionBuilder.notFoundException("User does not exist", "User", "id", actualId);
+        }
+        return userRepository.findById(UUID.fromString(actualId)).get();
     }
 
 }
