@@ -36,7 +36,7 @@ class RoleControllerTest {
 
     @Test
     public void testCreateARoleWhenLoggedUserIsAdmin() throws Exception {
-        var resultToken = mockMvc.perform(MockMvcRequestBuilders.post("/login").content(
+        var resultToken = mockMvc.perform(MockMvcRequestBuilders.post("/token").content(
                                 objectMapper.writeValueAsString(new LoginDTO("johndoe@email.com", "password"))
                         )
                         .contentType(MediaType.APPLICATION_JSON)
@@ -60,7 +60,7 @@ class RoleControllerTest {
 
     @Test
     public void testCreateARoleWhenLoggedUserIsABankUser() throws Exception {
-        var resultToken = mockMvc.perform(MockMvcRequestBuilders.post("/login").content(
+        var resultToken = mockMvc.perform(MockMvcRequestBuilders.post("/token").content(
                                 objectMapper.writeValueAsString(new LoginDTO("ethan@email.com", "password"))
                         )
                         .contentType(MediaType.APPLICATION_JSON)
@@ -84,7 +84,7 @@ class RoleControllerTest {
 
     @Test
     public void testCreateARoleWhenLoggedUserIsANormalUser() throws Exception {
-        var resultToken = mockMvc.perform(MockMvcRequestBuilders.post("/login").content(
+        var resultToken = mockMvc.perform(MockMvcRequestBuilders.post("/token").content(
                                 objectMapper.writeValueAsString(new LoginDTO("keren@email.com", "password"))
                         )
                         .contentType(MediaType.APPLICATION_JSON)
@@ -108,7 +108,7 @@ class RoleControllerTest {
 
     @Test
     public void testGetARoleWhenLoggedUserIsAdmin() throws Exception {
-        var resultToken = mockMvc.perform(MockMvcRequestBuilders.post("/login").content(
+        var resultToken = mockMvc.perform(MockMvcRequestBuilders.post("/token").content(
                                 objectMapper.writeValueAsString(new LoginDTO("johndoe@email.com", "password"))
                         )
                         .contentType(MediaType.APPLICATION_JSON)
@@ -126,7 +126,7 @@ class RoleControllerTest {
 
     @Test
     public void testGetARoleWhenLoggedUserIsABankUser() throws Exception {
-        var resultToken = mockMvc.perform(MockMvcRequestBuilders.post("/login").content(
+        var resultToken = mockMvc.perform(MockMvcRequestBuilders.post("/token").content(
                                 objectMapper.writeValueAsString(new LoginDTO("ethan@email.com", "password"))
                         )
                         .contentType(MediaType.APPLICATION_JSON)
@@ -144,7 +144,7 @@ class RoleControllerTest {
 
     @Test
     public void testGetARoleWhenLoggedUserIsANormalUser() throws Exception {
-        var resultToken = mockMvc.perform(MockMvcRequestBuilders.post("/login").content(
+        var resultToken = mockMvc.perform(MockMvcRequestBuilders.post("/token").content(
                                 objectMapper.writeValueAsString(new LoginDTO("keren@email.com", "password"))
                         )
                         .contentType(MediaType.APPLICATION_JSON)

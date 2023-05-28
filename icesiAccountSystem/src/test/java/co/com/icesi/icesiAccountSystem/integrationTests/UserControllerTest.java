@@ -38,7 +38,7 @@ class UserControllerTest {
     }
     @Test
     public void testCreateAUserWhenRoleNameIsNull() throws Exception {
-        var resultToken = mockMvc.perform(MockMvcRequestBuilders.post("/login").content(
+        var resultToken = mockMvc.perform(MockMvcRequestBuilders.post("/token").content(
                                 objectMapper.writeValueAsString(new LoginDTO("johndoe@email.com", "password"))
                         )
                         .contentType(MediaType.APPLICATION_JSON)
@@ -54,19 +54,47 @@ class UserControllerTest {
                                                 .firstName("Sara")
                                                 .lastName("Alvarez")
                                                 .password("password")
-                                                .roleName(null)
+                                                .role(null)
                                                 .build()
                                 ))
                         .header("Authorization", "Bearer "+token.getToken())
                         .contentType(MediaType.APPLICATION_JSON).accept(MediaType.APPLICATION_JSON))
-                .andExpect(status().isBadRequest())
+                .andExpect(status().isNotFound())
+                .andReturn();
+        System.out.println(result.getResponse().getContentAsString());
+    }
+
+    @Test
+    public void testCreateAUserWhenRoleDoesNotExists() throws Exception {
+        var resultToken = mockMvc.perform(MockMvcRequestBuilders.post("/token").content(
+                                objectMapper.writeValueAsString(new LoginDTO("johndoe@email.com", "password"))
+                        )
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .accept(MediaType.APPLICATION_JSON))
+                .andExpect(status().isOk())
+                .andReturn();
+        TokenDTO token = objectMapper.readValue(resultToken.getResponse().getContentAsString(),TokenDTO.class);
+        var result = mockMvc.perform(MockMvcRequestBuilders.post("/users/create").content(
+                                objectMapper.writeValueAsString(
+                                        RequestUserDTO.builder()
+                                                .email("sara@gmail.com")
+                                                .phoneNumber("+573254789615")
+                                                .firstName("Sara")
+                                                .lastName("Alvarez")
+                                                .password("password")
+                                                .role("MANAGER")
+                                                .build()
+                                ))
+                        .header("Authorization", "Bearer "+token.getToken())
+                        .contentType(MediaType.APPLICATION_JSON).accept(MediaType.APPLICATION_JSON))
+                .andExpect(status().isNotFound())
                 .andReturn();
         System.out.println(result.getResponse().getContentAsString());
     }
 
     @Test
     public void testCreateAdminUserWhenUserLoggedIsABankUser() throws Exception {
-        var resultToken = mockMvc.perform(MockMvcRequestBuilders.post("/login").content(
+        var resultToken = mockMvc.perform(MockMvcRequestBuilders.post("/token").content(
                                 objectMapper.writeValueAsString(new LoginDTO("ethan@email.com", "password"))
                         )
                         .contentType(MediaType.APPLICATION_JSON)
@@ -74,7 +102,7 @@ class UserControllerTest {
                 .andExpect(status().isOk())
                 .andReturn();
         TokenDTO token = objectMapper.readValue(resultToken.getResponse().getContentAsString(),TokenDTO.class);
-        defaultUserDTO().setRoleName("ADMIN");
+        defaultUserDTO().setRole("ADMIN");
         var result = mockMvc.perform(MockMvcRequestBuilders.post("/users/create").content(
                                 objectMapper.writeValueAsString(
                                         defaultUserDTO()
@@ -87,7 +115,7 @@ class UserControllerTest {
     }
     @Test
     public void testCreateAUserWhenUserLoggedIsABankUser() throws Exception {
-        var resultToken = mockMvc.perform(MockMvcRequestBuilders.post("/login").content(
+        var resultToken = mockMvc.perform(MockMvcRequestBuilders.post("/token").content(
                                 objectMapper.writeValueAsString(new LoginDTO("ethan@email.com", "password"))
                         )
                         .contentType(MediaType.APPLICATION_JSON)
@@ -107,7 +135,7 @@ class UserControllerTest {
     }
     @Test
     public void testCreateAUserWhenUserLoggedIsANormalUser() throws Exception {
-        var resultToken = mockMvc.perform(MockMvcRequestBuilders.post("/login").content(
+        var resultToken = mockMvc.perform(MockMvcRequestBuilders.post("/token").content(
                                 objectMapper.writeValueAsString(new LoginDTO("keren@email.com", "password"))
                         )
                         .contentType(MediaType.APPLICATION_JSON)
@@ -127,7 +155,7 @@ class UserControllerTest {
     }
     @Test
     public void testCreateAUserWhenLoggedUserIsAdminHappyPath() throws Exception {
-        var resultToken = mockMvc.perform(MockMvcRequestBuilders.post("/login").content(
+        var resultToken = mockMvc.perform(MockMvcRequestBuilders.post("/token").content(
                                 objectMapper.writeValueAsString(new LoginDTO("johndoe@email.com", "password"))
                         )
                         .contentType(MediaType.APPLICATION_JSON)
@@ -137,7 +165,14 @@ class UserControllerTest {
         TokenDTO token = objectMapper.readValue(resultToken.getResponse().getContentAsString(),TokenDTO.class);
         var result = mockMvc.perform(MockMvcRequestBuilders.post("/users/create").content(
                                 objectMapper.writeValueAsString(
-                                        defaultUserDTO()
+                                        RequestUserDTO.builder()
+                                                .email("damiano@gmail.com")
+                                                .phoneNumber("+573197419033")
+                                                .firstName("Damiano")
+                                                .lastName("David")
+                                                .password("password")
+                                                .role("USER")
+                                                .build()
                                 ))
                         .header("Authorization", "Bearer "+token.getToken())
                         .contentType(MediaType.APPLICATION_JSON).accept(MediaType.APPLICATION_JSON))
@@ -148,7 +183,7 @@ class UserControllerTest {
 
     @Test
     public void testCreateAUserWithBlankRole() throws Exception {
-        var resultToken = mockMvc.perform(MockMvcRequestBuilders.post("/login").content(
+        var resultToken = mockMvc.perform(MockMvcRequestBuilders.post("/token").content(
                                 objectMapper.writeValueAsString(new LoginDTO("johndoe@email.com", "password"))
                         )
                         .contentType(MediaType.APPLICATION_JSON)
@@ -164,19 +199,70 @@ class UserControllerTest {
                                                 .firstName("Sara")
                                                 .lastName("Alvarez")
                                                 .password("password")
-                                                .roleName("")
+                                                .role("")
                                                 .build()
                                 ))
                         .header("Authorization", "Bearer "+token.getToken())
                         .contentType(MediaType.APPLICATION_JSON).accept(MediaType.APPLICATION_JSON))
-                .andExpect(status().isBadRequest())
+                .andExpect(status().isNotFound())
                 .andReturn();
-        AccountSystemError error =objectMapper.readValue(result.getResponse().getContentAsString(),AccountSystemError.class);
-        assertNotNull(error);
-        var details = error.getDetails();
-        assertEquals(1, details.size());
-        var detail = details.get(0);
-        assertEquals("Role with name:  not found.",detail.getErrorMessage());
+        System.out.println(result.getResponse().getContentAsString());
+    }
+
+    @Test
+    public void testCreateAUserWithAnEmailThatAlreadyExists() throws Exception {
+        var resultToken = mockMvc.perform(MockMvcRequestBuilders.post("/token").content(
+                                objectMapper.writeValueAsString(new LoginDTO("johndoe@email.com", "password"))
+                        )
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .accept(MediaType.APPLICATION_JSON))
+                .andExpect(status().isOk())
+                .andReturn();
+        TokenDTO token = objectMapper.readValue(resultToken.getResponse().getContentAsString(),TokenDTO.class);
+        var result = mockMvc.perform(MockMvcRequestBuilders.post("/users/create").content(
+                                objectMapper.writeValueAsString(
+                                        RequestUserDTO.builder()
+                                                .email("keren@email.com")
+                                                .phoneNumber("+573254789615")
+                                                .firstName("Sara")
+                                                .lastName("Alvarez")
+                                                .password("password")
+                                                .role("USER")
+                                                .build()
+                                ))
+                        .header("Authorization", "Bearer "+token.getToken())
+                        .contentType(MediaType.APPLICATION_JSON).accept(MediaType.APPLICATION_JSON))
+                .andExpect(status().isConflict())
+                .andReturn();
+        System.out.println(result.getResponse().getContentAsString());
+    }
+
+    @Test
+    public void testCreateAUserWithAnPhoneThatAlreadyExists() throws Exception {
+        var resultToken = mockMvc.perform(MockMvcRequestBuilders.post("/token").content(
+                                objectMapper.writeValueAsString(new LoginDTO("johndoe@email.com", "password"))
+                        )
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .accept(MediaType.APPLICATION_JSON))
+                .andExpect(status().isOk())
+                .andReturn();
+        TokenDTO token = objectMapper.readValue(resultToken.getResponse().getContentAsString(),TokenDTO.class);
+        var result = mockMvc.perform(MockMvcRequestBuilders.post("/users/create").content(
+                                objectMapper.writeValueAsString(
+                                        RequestUserDTO.builder()
+                                                .email("sara@gmail.com")
+                                                .phoneNumber("+57320154789")
+                                                .firstName("Sara")
+                                                .lastName("Alvarez")
+                                                .password("password")
+                                                .role("USER")
+                                                .build()
+                                ))
+                        .header("Authorization", "Bearer "+token.getToken())
+                        .contentType(MediaType.APPLICATION_JSON).accept(MediaType.APPLICATION_JSON))
+                .andExpect(status().isConflict())
+                .andReturn();
+        System.out.println(result.getResponse().getContentAsString());
     }
 
     private RequestUserDTO defaultUserDTO(){
@@ -186,7 +272,7 @@ class UserControllerTest {
                 .firstName("Damiano")
                 .lastName("David")
                 .password("password")
-                .roleName("USER")
+                .role("USER")
                 .build();
     }
 

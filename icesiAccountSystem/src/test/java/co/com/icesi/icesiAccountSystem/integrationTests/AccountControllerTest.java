@@ -39,7 +39,7 @@ public class AccountControllerTest {
 
     @Test
     public void testCreateAnAccountWhenLoggedUserIsAdmin() throws Exception {
-        var resultToken = mockMvc.perform(MockMvcRequestBuilders.post("/login").content(
+        var resultToken = mockMvc.perform(MockMvcRequestBuilders.post("/token").content(
                                 objectMapper.writeValueAsString(new LoginDTO("johndoe@email.com", "password"))
                         )
                         .contentType(MediaType.APPLICATION_JSON)
@@ -64,7 +64,7 @@ public class AccountControllerTest {
 
     @Test
     public void testCreateAnAccountWhenUserLoggedIsABankUser() throws Exception {
-        var resultToken = mockMvc.perform(MockMvcRequestBuilders.post("/login").content(
+        var resultToken = mockMvc.perform(MockMvcRequestBuilders.post("/token").content(
                                 objectMapper.writeValueAsString(new LoginDTO("ethan@email.com", "password"))
                         )
                         .contentType(MediaType.APPLICATION_JSON)
@@ -91,7 +91,7 @@ public class AccountControllerTest {
 
     @Test
     public void testAUserCanCreateAccountsByHimself() throws Exception {
-        var resultToken = mockMvc.perform(MockMvcRequestBuilders.post("/login").content(
+        var resultToken = mockMvc.perform(MockMvcRequestBuilders.post("/token").content(
                                 objectMapper.writeValueAsString(new LoginDTO("keren@email.com", "password"))
                         )
                         .contentType(MediaType.APPLICATION_JSON)
@@ -116,7 +116,7 @@ public class AccountControllerTest {
 
     @Test
     public void testAUserCannotCreateAccountsForOtherUsers() throws Exception {
-        var resultToken = mockMvc.perform(MockMvcRequestBuilders.post("/login").content(
+        var resultToken = mockMvc.perform(MockMvcRequestBuilders.post("/token").content(
                                 objectMapper.writeValueAsString(new LoginDTO("keren@email.com", "password"))
                         )
                         .contentType(MediaType.APPLICATION_JSON)
@@ -143,7 +143,7 @@ public class AccountControllerTest {
 
     @Test
     public void testDisableAnAccountWhenLoggedUserIsAdmin() throws Exception {
-        var resultToken = mockMvc.perform(MockMvcRequestBuilders.post("/login").content(
+        var resultToken = mockMvc.perform(MockMvcRequestBuilders.post("/token").content(
                                 objectMapper.writeValueAsString(new LoginDTO("johndoe@email.com", "password"))
                         )
                         .contentType(MediaType.APPLICATION_JSON)
@@ -161,7 +161,7 @@ public class AccountControllerTest {
 
     @Test
     public void testEnableAnAccountWhenLoggedUserIsAdmin() throws Exception {
-        var resultToken = mockMvc.perform(MockMvcRequestBuilders.post("/login").content(
+        var resultToken = mockMvc.perform(MockMvcRequestBuilders.post("/token").content(
                                 objectMapper.writeValueAsString(new LoginDTO("johndoe@email.com", "password"))
                         )
                         .contentType(MediaType.APPLICATION_JSON)
@@ -185,7 +185,7 @@ public class AccountControllerTest {
 
     @Test
     public void testDisableAnAccountWhenLoggedUserIsNotOwner() throws Exception {
-        var resultToken = mockMvc.perform(MockMvcRequestBuilders.post("/login").content(
+        var resultToken = mockMvc.perform(MockMvcRequestBuilders.post("/token").content(
                                 objectMapper.writeValueAsString(new LoginDTO("ethan@email.com", "password"))
                         )
                         .contentType(MediaType.APPLICATION_JSON)
@@ -205,7 +205,7 @@ public class AccountControllerTest {
 
     @Test
     public void testEnableAnAccountWhenLoggedUserIsNotOwner() throws Exception {
-        var resultToken1 = mockMvc.perform(MockMvcRequestBuilders.post("/login").content(
+        var resultToken1 = mockMvc.perform(MockMvcRequestBuilders.post("/token").content(
                                 objectMapper.writeValueAsString(new LoginDTO("johndoe@email.com", "password"))
                         )
                         .contentType(MediaType.APPLICATION_JSON)
@@ -218,7 +218,7 @@ public class AccountControllerTest {
                         .contentType(MediaType.APPLICATION_JSON).accept(MediaType.APPLICATION_JSON))
                 .andExpect(status().isOk())
                 .andReturn();
-        var resultToken2 = mockMvc.perform(MockMvcRequestBuilders.post("/login").content(
+        var resultToken2 = mockMvc.perform(MockMvcRequestBuilders.post("/token").content(
                                 objectMapper.writeValueAsString(new LoginDTO("ethan@email.com", "password"))
                         )
                         .contentType(MediaType.APPLICATION_JSON)
@@ -239,7 +239,7 @@ public class AccountControllerTest {
 
     @Test
     public void testTransferMoneyWhenAccountFromDoesNotExists() throws Exception {
-        var resultToken = mockMvc.perform(MockMvcRequestBuilders.post("/login").content(
+        var resultToken = mockMvc.perform(MockMvcRequestBuilders.post("/token").content(
                                 objectMapper.writeValueAsString(new LoginDTO("keren@email.com", "password"))
                         )
                         .contentType(MediaType.APPLICATION_JSON)
@@ -265,7 +265,7 @@ public class AccountControllerTest {
 
     @Test
     public void testTransferMoneyWhenAccountToDoesNotExists() throws Exception {
-        var resultToken = mockMvc.perform(MockMvcRequestBuilders.post("/login").content(
+        var resultToken = mockMvc.perform(MockMvcRequestBuilders.post("/token").content(
                                 objectMapper.writeValueAsString(new LoginDTO("keren@email.com", "password"))
                         )
                         .contentType(MediaType.APPLICATION_JSON)
@@ -291,7 +291,7 @@ public class AccountControllerTest {
 
     @Test
     public void testTransferMoneyWhenAmountIsGreaterThanAccountsFromBalance() throws Exception {
-        var resultToken = mockMvc.perform(MockMvcRequestBuilders.post("/login").content(
+        var resultToken = mockMvc.perform(MockMvcRequestBuilders.post("/token").content(
                                 objectMapper.writeValueAsString(new LoginDTO("keren@email.com", "password"))
                         )
                         .contentType(MediaType.APPLICATION_JSON)
@@ -320,7 +320,7 @@ public class AccountControllerTest {
 
     @Test
     public void testTransferMoneyWhenAccountFromIsDisabled() throws Exception {
-        var resultToken1 = mockMvc.perform(MockMvcRequestBuilders.post("/login").content(
+        var resultToken1 = mockMvc.perform(MockMvcRequestBuilders.post("/token").content(
                                 objectMapper.writeValueAsString(new LoginDTO("johndoe@email.com", "password"))
                         )
                         .contentType(MediaType.APPLICATION_JSON)
@@ -333,7 +333,7 @@ public class AccountControllerTest {
                         .contentType(MediaType.APPLICATION_JSON).accept(MediaType.APPLICATION_JSON))
                 .andExpect(status().isOk())
                 .andReturn();
-        var resultToken2 = mockMvc.perform(MockMvcRequestBuilders.post("/login").content(
+        var resultToken2 = mockMvc.perform(MockMvcRequestBuilders.post("/token").content(
                                 objectMapper.writeValueAsString(new LoginDTO("keren@email.com", "password"))
                         )
                         .contentType(MediaType.APPLICATION_JSON)
@@ -362,7 +362,7 @@ public class AccountControllerTest {
 
     @Test
     public void testTransferMoneyWhenAccountToIsDisabled() throws Exception {
-        var resultToken1 = mockMvc.perform(MockMvcRequestBuilders.post("/login").content(
+        var resultToken1 = mockMvc.perform(MockMvcRequestBuilders.post("/token").content(
                                 objectMapper.writeValueAsString(new LoginDTO("johndoe@email.com", "password"))
                         )
                         .contentType(MediaType.APPLICATION_JSON)
@@ -375,7 +375,7 @@ public class AccountControllerTest {
                         .contentType(MediaType.APPLICATION_JSON).accept(MediaType.APPLICATION_JSON))
                 .andExpect(status().isOk())
                 .andReturn();
-        var resultToken2 = mockMvc.perform(MockMvcRequestBuilders.post("/login").content(
+        var resultToken2 = mockMvc.perform(MockMvcRequestBuilders.post("/token").content(
                                 objectMapper.writeValueAsString(new LoginDTO("luis@email.com", "password"))
                         )
                         .contentType(MediaType.APPLICATION_JSON)
@@ -404,7 +404,7 @@ public class AccountControllerTest {
 
     @Test
     public void testTransferMoneyWhenAccountFromIsDepositOnly() throws Exception {
-        var resultToken = mockMvc.perform(MockMvcRequestBuilders.post("/login").content(
+        var resultToken = mockMvc.perform(MockMvcRequestBuilders.post("/token").content(
                                 objectMapper.writeValueAsString(new LoginDTO("luis@email.com", "password"))
                         )
                         .contentType(MediaType.APPLICATION_JSON)
@@ -432,7 +432,7 @@ public class AccountControllerTest {
 
     @Test
     public void testTransferMoneyWhenAccountToIsDepositOnly() throws Exception {
-        var resultToken = mockMvc.perform(MockMvcRequestBuilders.post("/login").content(
+        var resultToken = mockMvc.perform(MockMvcRequestBuilders.post("/token").content(
                                 objectMapper.writeValueAsString(new LoginDTO("keren@email.com", "password"))
                         )
                         .contentType(MediaType.APPLICATION_JSON)

@@ -5,8 +5,7 @@ import co.com.icesi.icesiAccountSystem.dto.ResponseAccountDTO;
 import co.com.icesi.icesiAccountSystem.dto.TransactionOperationDTO;
 import co.com.icesi.icesiAccountSystem.enums.AccountType;
 import co.com.icesi.icesiAccountSystem.error.exception.AccountSystemException;
-import co.com.icesi.icesiAccountSystem.mapper.AccountMapper;
-import co.com.icesi.icesiAccountSystem.mapper.AccountMapperImpl;
+import co.com.icesi.icesiAccountSystem.mapper.*;
 import co.com.icesi.icesiAccountSystem.model.IcesiAccount;
 import co.com.icesi.icesiAccountSystem.model.IcesiRole;
 import co.com.icesi.icesiAccountSystem.model.IcesiUser;
@@ -35,13 +34,17 @@ public class AccountServiceTest {
     private AccountRepository accountRepository;
     private UserRepository userRepository;
     private AccountMapper accountMapper;
+    private UserMapper userMapper;
+    private RoleMapper roleMapper;
 
     @BeforeEach
     private void init(){
         accountRepository = mock(AccountRepository.class);
         userRepository = mock(UserRepository.class);
         accountMapper=spy(AccountMapperImpl.class);
-        accountService = new AccountService(accountRepository, userRepository, accountMapper);
+        userMapper =spy(UserMapperImpl.class);
+        roleMapper = spy(RoleMapper.class);
+        accountService = new AccountService(accountRepository, userRepository, accountMapper, userMapper,roleMapper);
     }
 
     @Test

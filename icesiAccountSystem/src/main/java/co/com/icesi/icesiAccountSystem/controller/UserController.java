@@ -23,6 +23,7 @@ public class UserController implements UserAPI {
         return userService.getUser(userEmail);
     }
 
+
     @Override
     public List<ResponseUserDTO> getAllUsers() {
         return userService.getAllUsers();

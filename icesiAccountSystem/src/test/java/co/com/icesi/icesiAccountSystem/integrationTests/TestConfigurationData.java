@@ -106,10 +106,12 @@ public class TestConfigurationData {
             roleRepository.save(icesiRole);
             roleRepository.save(icesiRole2);
             roleRepository.save(icesiRole3);
+
             userRepository.save(icesiUser);
             userRepository.save(icesiUser2);
             userRepository.save(icesiUser3);
             userRepository.save(icesiUser4);
+
             accountRepository.save(icesiAccount);
             accountRepository.save(icesiAccount2);
             accountRepository.save(icesiAccount3);

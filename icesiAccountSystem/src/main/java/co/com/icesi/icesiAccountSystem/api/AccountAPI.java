@@ -13,6 +13,7 @@ public interface AccountAPI {
     String BASE_ACCOUNT_URL="/accounts";
     @GetMapping("/{accountNumber}")
     ResponseAccountDTO getAccount(@PathVariable("accountNumber")  String accountNumber);
+    @GetMapping("/getList")
     List<ResponseAccountDTO> getAllAccounts();
     @PostMapping("/create")
     ResponseAccountDTO createAccount(@Valid @RequestBody RequestAccountDTO requestAccountDTO);

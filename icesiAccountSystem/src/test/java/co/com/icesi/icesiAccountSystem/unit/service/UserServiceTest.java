@@ -5,6 +5,7 @@ import co.com.icesi.icesiAccountSystem.dto.LoginDTO;
 import co.com.icesi.icesiAccountSystem.dto.RequestUserDTO;
 import co.com.icesi.icesiAccountSystem.dto.TokenDTO;
 import co.com.icesi.icesiAccountSystem.error.exception.AccountSystemException;
+import co.com.icesi.icesiAccountSystem.mapper.RoleMapper;
 import co.com.icesi.icesiAccountSystem.mapper.UserMapper;
 import co.com.icesi.icesiAccountSystem.mapper.UserMapperImpl;
 import co.com.icesi.icesiAccountSystem.model.IcesiRole;
@@ -38,13 +39,15 @@ public class UserServiceTest {
     private RoleRepository roleRepository;
 
     private UserMapper userMapper;
+    private RoleMapper roleMapper;
 
     @BeforeEach
     private void init(){
         userRepository = mock(UserRepository.class);
         roleRepository = mock(RoleRepository.class);
         userMapper = spy(UserMapperImpl.class);
-        userService = new UserService(userRepository, roleRepository, userMapper);
+        roleMapper = spy(RoleMapper.class);
+        userService = new UserService(userRepository, roleRepository, userMapper,roleMapper);
     }
 
     @Test
@@ -195,7 +198,7 @@ public class UserServiceTest {
 
     private RequestUserDTO defaultUserDTO(){
         return RequestUserDTO.builder()
-                .roleName("Director SIS")
+                .role("Director SIS")
                 .firstName("Damiano")
                 .lastName("David")
                 .email("ykaar@gmail.com")
@@ -206,7 +209,7 @@ public class UserServiceTest {
 
     private RequestUserDTO defaultUserDTO1(){
         return RequestUserDTO.builder()
-                .roleName("")
+                .role("")
                 .firstName("Damiano")
                 .lastName("David")
                 .email("ykaar@gmail.com")

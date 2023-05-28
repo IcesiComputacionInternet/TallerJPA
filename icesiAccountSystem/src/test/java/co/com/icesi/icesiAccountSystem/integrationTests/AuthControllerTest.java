@@ -33,7 +33,7 @@ class AuthControllerTest {
 
 	@Test
 	public void testTokenEndPoint() throws Exception{
-		var result = mockMvc.perform(MockMvcRequestBuilders.post("/login").content(
+		var result = mockMvc.perform(MockMvcRequestBuilders.post("/token").content(
 				objectMapper.writeValueAsString(new LoginDTO("johndoe@email.com", "password")))
 				.contentType(MediaType.APPLICATION_JSON)
 				.accept(MediaType.APPLICATION_JSON))
@@ -45,7 +45,7 @@ class AuthControllerTest {
 
 	@Test
 	public void testTokenEndPointWithInvalidEmail() throws Exception{
-		var result = mockMvc.perform(MockMvcRequestBuilders.post("/login").content(
+		var result = mockMvc.perform(MockMvcRequestBuilders.post("/token").content(
 								objectMapper.writeValueAsString(new LoginDTO("johndoeemail.com", "password")))
 						.contentType(MediaType.APPLICATION_JSON)
 						.accept(MediaType.APPLICATION_JSON))
@@ -57,7 +57,7 @@ class AuthControllerTest {
 
 	@Test
 	public void testTokenEndPointWithAnEmailThatDoesNotExists() throws Exception{
-		var result = mockMvc.perform(MockMvcRequestBuilders.post("/login").content(
+		var result = mockMvc.perform(MockMvcRequestBuilders.post("/token").content(
 								objectMapper.writeValueAsString(new LoginDTO("sara@email.com", "password")))
 						.contentType(MediaType.APPLICATION_JSON)
 						.accept(MediaType.APPLICATION_JSON))

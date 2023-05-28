@@ -3,8 +3,11 @@ package co.com.icesi.icesiAccountSystem.dto;
 import co.com.icesi.icesiAccountSystem.enums.AccountType;
 import lombok.Builder;
 import lombok.Data;
+import lombok.Getter;
+import lombok.Setter;
 
-@Data
+@Getter
+@Setter
 @Builder
 public class ResponseAccountDTO {
     private ResponseUserDTO user;

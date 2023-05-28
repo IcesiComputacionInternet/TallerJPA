@@ -46,7 +46,7 @@ public class SecurityConfiguration {
     @Bean
     public SecurityFilterChain securityFilterChain(HttpSecurity http, AuthorizationManager<RequestAuthorizationContext> access) throws Exception{
         return http
-                .cors(AbstractHttpConfigurer::disable)
+                .cors().and()
                 .csrf(AbstractHttpConfigurer::disable)
                 .authorizeHttpRequests(auth -> auth.anyRequest().access(access))
                 .oauth2ResourceServer(OAuth2ResourceServerConfigurer::jwt)
@@ -66,7 +66,7 @@ public class SecurityConfiguration {
 
     @Bean
     public AuthorizationManager<RequestAuthorizationContext> requestMatcherAuthorizationManager(HandlerMappingIntrospector introspector){
-        RequestMatcher permitAll = new AndRequestMatcher(new MvcRequestMatcher(introspector, "/login"));
+        RequestMatcher permitAll = new AndRequestMatcher(new MvcRequestMatcher(introspector, "/token"));
 
         RequestMatcherDelegatingAuthorizationManager.Builder managerBuilder =
                 RequestMatcherDelegatingAuthorizationManager.builder()

@@ -2,11 +2,14 @@ package co.com.icesi.icesiAccountSystem.service;
 
 import co.com.icesi.icesiAccountSystem.dto.RequestAccountDTO;
 import co.com.icesi.icesiAccountSystem.dto.ResponseAccountDTO;
+import co.com.icesi.icesiAccountSystem.dto.ResponseUserDTO;
 import co.com.icesi.icesiAccountSystem.dto.TransactionOperationDTO;
 import co.com.icesi.icesiAccountSystem.enums.ErrorCode;
 import co.com.icesi.icesiAccountSystem.error.exception.DetailBuilder;
 import co.com.icesi.icesiAccountSystem.mapper.AccountMapper;
 import co.com.icesi.icesiAccountSystem.enums.AccountType;
+import co.com.icesi.icesiAccountSystem.mapper.RoleMapper;
+import co.com.icesi.icesiAccountSystem.mapper.UserMapper;
 import co.com.icesi.icesiAccountSystem.model.IcesiAccount;
 import co.com.icesi.icesiAccountSystem.model.IcesiUser;
 import co.com.icesi.icesiAccountSystem.repository.AccountRepository;
@@ -31,14 +34,19 @@ public class AccountService {
     private final AccountRepository accountRepository;
     private final UserRepository userRepository;
     private final AccountMapper accountMapper;
+    private final UserMapper userMapper;
+    private final RoleMapper roleMapper;
 
     public ResponseAccountDTO saveAccount(RequestAccountDTO requestAccountDTO){
         List<DetailBuilder> errors = new ArrayList<>();
         checkPermissionsToCreate(requestAccountDTO.getUserEmail());
-        var user = userRepository.findByEmail(requestAccountDTO.getUserEmail());
-        if(!user.isPresent()){
-            errors.add(new DetailBuilder(ErrorCode.ERR_404, "User", "email", requestAccountDTO.getUserEmail()));
-        }
+        IcesiUser user = userRepository.findByEmail(requestAccountDTO.getUserEmail()).orElseThrow(
+                createAccountSystemException(
+                        "User does not exist.",
+                        HttpStatus.NOT_FOUND,
+                        new DetailBuilder(ErrorCode.ERR_404, "User", "email", requestAccountDTO.getUserEmail())
+                )
+        );
         var type = checkAccountType(requestAccountDTO.getType(),errors);
 
         if (!errors.isEmpty()){
@@ -48,15 +56,18 @@ public class AccountService {
                     errors.stream().toArray(DetailBuilder[]::new)
             ).get();
         }
-
         IcesiAccount icesiAccount = accountMapper.fromAccountDTO(requestAccountDTO);
         icesiAccount.setAccountId(UUID.randomUUID());
-        icesiAccount.setUser(user.get());
+        icesiAccount.setUser(user);
         icesiAccount.setAccountNumber(getAccountNumber());
         icesiAccount.setType(type);
         icesiAccount.setActive(true);
         accountRepository.save(icesiAccount);
-        return accountMapper.fromAccountToResponseAccountDTO(icesiAccount);
+        ResponseAccountDTO responseAccDTO = accountMapper.fromAccountToResponseAccountDTO(icesiAccount);
+        ResponseUserDTO responseUserDTO = userMapper.fromUserToResponseUserDTO(user);
+        responseUserDTO.setRole(roleMapper.fromRoleToRoleDTO(user.getRole()));
+        responseAccDTO.setUser(responseUserDTO);
+        return responseAccDTO;
     }
 
     private AccountType checkAccountType(String type, List<DetailBuilder> errors){
@@ -109,7 +120,6 @@ public class AccountService {
     }
 
     private void checkPermissionsToCreate(String accUserEmail) {
-        System.out.println(IcesiSecurityContext.getCurrentUserEmail());
         if((IcesiSecurityContext.getCurrentUserRole().equals("BANK_USER"))||(IcesiSecurityContext.getCurrentUserRole().equals("USER")&&!IcesiSecurityContext.getCurrentUserEmail().equals(accUserEmail))){
             throw createAccountSystemException(
                     "Only an ADMIN user can create new accounts for any user, and a normal USER only can create accounts for himself.",
@@ -134,7 +144,9 @@ public class AccountService {
         checkPermissionsToUpdate(account.getUser().getUserId().toString());
         account.setActive(true);
         accountRepository.save(account);
-        return accountMapper.fromAccountToResponseAccountDTO(account);
+        ResponseAccountDTO responseAccountDTO = accountMapper.fromAccountToResponseAccountDTO(account);
+        responseAccountDTO.setUser(userMapper.fromUserToResponseUserDTO(account.getUser()));
+        return responseAccountDTO;
     }
 
     private void checkBalanceIsZero(long balance) {
@@ -153,7 +165,9 @@ public class AccountService {
         checkBalanceIsZero(account.getBalance());
         account.setActive(false);
         accountRepository.save(account);
-        return accountMapper.fromAccountToResponseAccountDTO(account);
+        ResponseAccountDTO responseAccountDTO = accountMapper.fromAccountToResponseAccountDTO(account);
+        responseAccountDTO.setUser(userMapper.fromUserToResponseUserDTO(account.getUser()));
+        return responseAccountDTO;
     }
 
     private void validateAccountBalance(IcesiAccount account, long amount) {
@@ -224,6 +238,8 @@ public class AccountService {
     }
 
     public List<ResponseAccountDTO> getAllAccounts() {
-        return accountRepository.findAll().stream().map(accountMapper::fromAccountToResponseAccountDTO).collect(Collectors.toList());
+        return accountRepository.findAll().stream()
+                .filter(x -> x.getUser().getEmail().equals(IcesiSecurityContext.getCurrentUserEmail()))
+                .map(accountMapper::fromAccountToResponseAccountDTO).collect(Collectors.toList());
     }
 }

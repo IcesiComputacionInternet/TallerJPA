@@ -80,10 +80,10 @@ public class IcesiAccountSystemApplication {
 				.accountNumber("025-253568-54")
 				.active(true)
 				.accountId(UUID.randomUUID())
-                .user(icesiUser2)
-                .balance(0)
-                .type(AccountType.DEPOSIT_ONLY)
-                .build();
+				.user(icesiUser2)
+				.balance(0)
+				.type(AccountType.DEPOSIT_ONLY)
+				.build();
 		IcesiAccount icesiAccount2 = IcesiAccount.builder()
 				.accountNumber("025-253568-33")
 				.active(true)
@@ -92,23 +92,37 @@ public class IcesiAccountSystemApplication {
 				.balance(25000000)
 				.type(AccountType.NORMAL)
 				.build();
-        IcesiAccount icesiAccount3 = IcesiAccount.builder()
+		IcesiAccount icesiAccount3 = IcesiAccount.builder()
 				.accountNumber("025-253568-25")
 				.active(true)
 				.accountId(UUID.randomUUID())
-                .user(icesiUser2)
-                .balance(50000000)
-                .type(AccountType.NORMAL)
-                .build();
+				.user(icesiUser2)
+				.balance(50000000)
+				.type(AccountType.NORMAL)
+				.build();
+		IcesiAccount icesiAccount4 = IcesiAccount.builder()
+				.accountNumber("025-253568-01")
+				.active(true)
+				.accountId(UUID.randomUUID())
+				.user(icesiUser4)
+				.balance(60000)
+				.type(AccountType.DEPOSIT_ONLY)
+				.build();
 
 		return args -> {
+			roleRepository.save(icesiRole);
+			roleRepository.save(icesiRole2);
+			roleRepository.save(icesiRole3);
+
 			userRepository.save(icesiUser);
 			userRepository.save(icesiUser2);
 			userRepository.save(icesiUser3);
 			userRepository.save(icesiUser4);
+
 			accountRepository.save(icesiAccount);
 			accountRepository.save(icesiAccount2);
 			accountRepository.save(icesiAccount3);
+			accountRepository.save(icesiAccount4);
 		};
 	}*/
 }
