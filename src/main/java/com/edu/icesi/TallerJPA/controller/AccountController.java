@@ -25,11 +25,6 @@ public class AccountController implements AccountAPI {
     }
 
     @Override
-    public List<AccountCreateDTO> getAllUsers() {
-        return null;
-    }
-
-    @Override
     public AccountCreateDTO addAccount(AccountCreateDTO accountCreateDTO) {
         return accountService.save(accountCreateDTO);
     }

@@ -11,6 +11,6 @@ public interface UserMapper {
     @Mapping(target = "icesiRole", source = "icesiRole",ignore=true)
     IcesiUser fromIcesiUserDTO(UserCreateDTO userCreateDTO);
 
-    @Mapping(target = "icesiRole", source = "icesiRole",ignore=true)
+    @Mapping(target = "icesiRole", expression = "java(icesiUser.getIcesiRole().getName())")
     UserCreateDTO fromIcesiUser(IcesiUser icesiUser);
 }

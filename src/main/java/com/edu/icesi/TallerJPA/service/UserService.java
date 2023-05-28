@@ -4,17 +4,19 @@ import com.edu.icesi.TallerJPA.Enums.Scopes;
 import com.edu.icesi.TallerJPA.dto.UserCreateDTO;
 import com.edu.icesi.TallerJPA.error.exception.DetailBuilder;
 import com.edu.icesi.TallerJPA.error.exception.ErrorCode;
-import com.edu.icesi.TallerJPA.mapper.RoleMapper;
 import com.edu.icesi.TallerJPA.mapper.UserMapper;
+import com.edu.icesi.TallerJPA.model.IcesiAccount;
 import com.edu.icesi.TallerJPA.model.IcesiRole;
 import com.edu.icesi.TallerJPA.model.IcesiUser;
 import com.edu.icesi.TallerJPA.repository.RoleRepository;
 import com.edu.icesi.TallerJPA.repository.UserRepository;
 import com.edu.icesi.TallerJPA.security.IcesiSecurityContext;
+import com.fasterxml.jackson.databind.ObjectMapper;
 import lombok.AllArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
 
+import java.util.List;
 import java.util.Optional;
 import java.util.UUID;
 
@@ -28,11 +30,7 @@ public class UserService {
 
     private final UserMapper userMapper;
 
-    private final RoleMapper roleMapper;
-
     private final RoleRepository roleRepository;
-
-    private final RoleService roleService;
 
     public UserCreateDTO save(UserCreateDTO userCreateDTO){
 
@@ -49,8 +47,6 @@ public class UserService {
         IcesiUser icesiUser = userMapper.fromIcesiUserDTO(userCreateDTO);
         icesiUser.setUserId(UUID.randomUUID());
         icesiUser.setIcesiRole(role);
-        roleService.addUserToRole(roleMapper.fromIcesiRole(role), icesiUser);
-
         return userMapper.fromIcesiUser(userRepository.save(icesiUser));
     }
 
@@ -129,6 +125,29 @@ public class UserService {
 
     public UserCreateDTO findByPhoneNumber(String phoneNumber){
         return userMapper.fromIcesiUser(userRepository.findByEmail(phoneNumber).orElseThrow(() -> new RuntimeException("The user with phone number "+phoneNumber+" not exists")));
+    }
+
+    public List<String> getAccounts() {
+
+        IcesiUser user = getUserById(IcesiSecurityContext.getCurrentUserId());
+
+        return saveAccountsOfUser(user.getAccounts());
+    }
+
+    private List<String> saveAccountsOfUser(List<IcesiAccount> accounts){
+        return accounts.stream().map(account -> "Número de cuenta: "+account.getAccountNumber() + " - Balance: " + account.getBalance()).toList();
+    }
+
+    private IcesiUser getUserById(String userId){
+
+        if (userRepository.findById(UUID.fromString(userId)).isEmpty()){
+            throw createIcesiException(
+                    "User not found",
+                    HttpStatus.NOT_FOUND,
+                    new DetailBuilder(ErrorCode.ERR_404, "User", "id", userId)
+            ).get();
+        }
+        return userRepository.findById(UUID.fromString(userId)).get();
     }
 
 }

@@ -53,10 +53,10 @@ class TallerJpaApplicationTests {
                         )
                         .contentType(MediaType.APPLICATION_JSON)
                         .accept(MediaType.APPLICATION_JSON))
-                .andExpect(status().isInternalServerError())
+                .andExpect(status().isUnauthorized())
                 .andReturn();
 
-        assertEquals(result.getResponse().getStatus(), 500);
+        assertEquals(result.getResponse().getStatus(), 401);
     }
 
 }

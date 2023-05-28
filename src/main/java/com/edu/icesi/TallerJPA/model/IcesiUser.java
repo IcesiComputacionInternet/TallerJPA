@@ -1,16 +1,14 @@
 package com.edu.icesi.TallerJPA.model;
 
 import com.edu.icesi.TallerJPA.Constraint.PhoneAndEmailConstraint;
-import lombok.AllArgsConstructor;
-import lombok.Builder;
-import lombok.Data;
-import lombok.NoArgsConstructor;
+import lombok.*;
 
 import javax.persistence.*;
 import java.util.List;
 import java.util.UUID;
 
-@Data
+@Getter
+@Setter
 @Entity
 @Builder
 @AllArgsConstructor

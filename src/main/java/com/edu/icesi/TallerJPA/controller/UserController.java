@@ -1,8 +1,11 @@
 package com.edu.icesi.TallerJPA.controller;
 
 import com.edu.icesi.TallerJPA.api.UserAPI;
+import com.edu.icesi.TallerJPA.dto.AccountCreateDTO;
 import com.edu.icesi.TallerJPA.dto.UserCreateDTO;
+import com.edu.icesi.TallerJPA.model.IcesiAccount;
 import com.edu.icesi.TallerJPA.service.UserService;
+import com.fasterxml.jackson.core.JsonProcessingException;
 import lombok.AllArgsConstructor;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
@@ -35,6 +38,11 @@ public class UserController implements UserAPI {
     @Override
     public UserCreateDTO getUserByPhoneNumber(String phoneNumber) {
         return userService.findByPhoneNumber(phoneNumber);
+    }
+
+    @Override
+    public List<String> getAccounts() {
+        return userService.getAccounts();
     }
 
 }

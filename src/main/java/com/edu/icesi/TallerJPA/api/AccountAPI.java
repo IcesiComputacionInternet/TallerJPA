@@ -17,8 +17,6 @@ public interface AccountAPI {
     @GetMapping("/{accountNumber}/")
     AccountCreateDTO getAccount(@PathVariable String accountNumber);
 
-    List<AccountCreateDTO> getAllUsers();
-
     AccountCreateDTO addAccount(@Valid @RequestBody AccountCreateDTO accountCreateDTO);
 
     @PatchMapping("/withdraw/")

@@ -73,9 +73,4 @@ public class RoleService {
         }
         return roleMapper.fromIcesiRole(role.get());
     }
-
-    public RoleCreateDTO addUserToRole(RoleCreateDTO roleCreateDTO, IcesiUser user){
-        roleCreateDTO.getIcesiUsers().add(user);
-        return roleCreateDTO;
-    }
 }

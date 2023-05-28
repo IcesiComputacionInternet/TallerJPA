@@ -24,7 +24,6 @@ public class AuthController {
 
     private final AuthenticationManager authenticationManager;
 
-    @CrossOrigin
     @PostMapping("/token")
     public TokenDTO token(@RequestBody LoginDTO loginDTO){
         Authentication authentication = authenticationManager
