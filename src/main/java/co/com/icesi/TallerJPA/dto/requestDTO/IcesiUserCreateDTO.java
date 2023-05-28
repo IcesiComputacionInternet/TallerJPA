@@ -1,22 +1,28 @@
 package co.com.icesi.TallerJPA.dto.requestDTO;
 
 import co.com.icesi.TallerJPA.validations.ValidatePhoneNumber;
-import co.com.icesi.TallerJPA.validations.ValidatePhoneNumberAndEmail;
 import lombok.*;
+
+import javax.validation.constraints.Email;
+import javax.validation.constraints.NotNull;
 
 @Getter
 @Setter
 @Builder
-@ValidatePhoneNumberAndEmail
 @NoArgsConstructor
 @AllArgsConstructor
 public class IcesiUserCreateDTO {
+    @NotNull
     private String firstName;
+    @NotNull
     private String lastName;
-    //@ValidatePhoneNumberAndEmail
+    @NotNull
+    @Email
     private String email;
-    //@ValidatePhoneNumberAndEmail
+    @NotNull
+    @ValidatePhoneNumber
     private String phoneNumber;
     private String password;
+    @NotNull
     private IcesiRoleCreateDTO role;
 }
