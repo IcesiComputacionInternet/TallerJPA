@@ -1,6 +1,7 @@
 package com.example.tallerjpa.service;
 
 import com.example.tallerjpa.dto.AccountDTO;
+import com.example.tallerjpa.dto.AccountResponseDTO;
 import com.example.tallerjpa.dto.TransactionRequestDTO;
 import com.example.tallerjpa.dto.TransactionResponseDTO;
 import com.example.tallerjpa.error.exception.CustomException;
@@ -14,8 +15,10 @@ import org.springframework.stereotype.Service;
 
 import javax.transaction.Transactional;
 
+import java.util.List;
 import java.util.Random;
 import java.util.UUID;
+import java.util.stream.Collectors;
 
 @Service
 @AllArgsConstructor
@@ -32,7 +35,7 @@ public class AccountService {
         icesiAccount.setIcesiUser(userRepository.searchByEmail(accountDTO.getEmailUser()).orElseThrow(()-> new RuntimeException("User doesn't exists")));
         icesiAccount.setAccountId(UUID.randomUUID());
         icesiAccount.setAccountNumber(generateAccountNumber());
-        setTypeAccount(accountDTO.getType().toString(), icesiAccount);
+        setTypeAccount(accountDTO.getType().getValue(), icesiAccount);
         return accountRepository.save(icesiAccount);
 
     }
@@ -40,6 +43,7 @@ public class AccountService {
     public void setTypeAccount(String type, IcesiAccount icesiAccount){
         try {
             icesiAccount.setType(AccountType.valueOf(type.toUpperCase()));
+            System.out.println(icesiAccount.getType());
         } catch (IllegalArgumentException e){
             throw new CustomException("Account type does not exist");
         }
@@ -165,4 +169,11 @@ public class AccountService {
                 .orElseThrow(() -> new CustomException("The account was not found"));
     }
 
+    @Transactional
+    public List<AccountResponseDTO> getAllAccountsByUser(UUID userId){
+        return accountRepository.getAllAccounts(userId)
+                .stream()
+                .map(accountMapper::fromAccountToResponseDTO)
+                .collect(Collectors.toList());
+    }
 }

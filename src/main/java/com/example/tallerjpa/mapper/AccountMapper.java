@@ -1,6 +1,7 @@
 package com.example.tallerjpa.mapper;
 
 import com.example.tallerjpa.dto.AccountDTO;
+import com.example.tallerjpa.dto.AccountResponseDTO;
 import com.example.tallerjpa.model.IcesiAccount;
 import org.mapstruct.Mapper;
 
@@ -10,5 +11,6 @@ public interface AccountMapper {
     IcesiAccount fromAccountDTO (AccountDTO accountDTO);
 
     AccountDTO fromIcesiAccount (IcesiAccount icesiAccount);
+    AccountResponseDTO fromAccountToResponseDTO(IcesiAccount account);
 
 }

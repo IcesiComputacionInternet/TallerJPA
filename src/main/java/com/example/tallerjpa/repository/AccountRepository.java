@@ -7,6 +7,7 @@ import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
 import org.springframework.stereotype.Repository;
 
+import java.util.List;
 import java.util.Optional;
 import java.util.UUID;
 
@@ -21,6 +22,9 @@ public interface AccountRepository extends JpaRepository <IcesiAccount, UUID> {
 
     @Query("SELECT a FROM IcesiAccount a WHERE a.accountNumber = :accountNumber")
     Optional<IcesiAccount> getAccount(@Param("accountNumber") String accountNumber);
+
+    @Query("SELECT a FROM IcesiAccount a WHERE a.icesiUser.userId = :userId")
+    List<IcesiAccount> getAllAccounts(@Param("userId") UUID userID);
 
 
 }

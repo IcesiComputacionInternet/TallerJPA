@@ -1,6 +1,7 @@
 package com.example.tallerjpa.api;
 
 import com.example.tallerjpa.dto.AccountDTO;
+import com.example.tallerjpa.dto.AccountResponseDTO;
 import com.example.tallerjpa.dto.TransactionRequestDTO;
 import com.example.tallerjpa.dto.TransactionResponseDTO;
 import com.example.tallerjpa.model.IcesiAccount;
@@ -8,6 +9,7 @@ import org.springframework.data.repository.query.Param;
 import org.springframework.web.bind.annotation.*;
 
 import java.awt.*;
+import java.util.List;
 
 @RequestMapping(AccountAPI.BASE_ACCOUNT_URL)
 public interface AccountAPI {
@@ -30,6 +32,9 @@ public interface AccountAPI {
 
     @PatchMapping("/transfer/")
     TransactionResponseDTO transferMoney(@RequestBody TransactionRequestDTO transactionRequestDTO);
+
+    @GetMapping("/all/user")
+    List<AccountResponseDTO> getAccountsByUser();
 
 
 

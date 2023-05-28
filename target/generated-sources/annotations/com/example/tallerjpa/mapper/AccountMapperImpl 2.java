@@ -2,13 +2,14 @@ package com.example.tallerjpa.mapper;
 
 import com.example.tallerjpa.dto.AccountDTO;
 import com.example.tallerjpa.dto.AccountResponseDTO;
+import com.example.tallerjpa.enums.AccountType;
 import com.example.tallerjpa.model.IcesiAccount;
 import javax.annotation.processing.Generated;
 import org.springframework.stereotype.Component;
 
 @Generated(
     value = "org.mapstruct.ap.MappingProcessor",
-    date = "2023-05-28T13:34:59-0500",
+    date = "2023-05-28T12:35:59-0500",
     comments = "version: 1.5.3.Final, compiler: javac, environment: Java 17.0.6 (Oracle Corporation)"
 )
 @Component
@@ -23,7 +24,9 @@ public class AccountMapperImpl implements AccountMapper {
         IcesiAccount.IcesiAccountBuilder icesiAccount = IcesiAccount.builder();
 
         icesiAccount.balance( accountDTO.getBalance() );
-        icesiAccount.type( accountDTO.getType() );
+        if ( accountDTO.getType() != null ) {
+            icesiAccount.type( Enum.valueOf( AccountType.class, accountDTO.getType() ) );
+        }
         icesiAccount.active( accountDTO.isActive() );
 
         return icesiAccount.build();
@@ -38,7 +41,9 @@ public class AccountMapperImpl implements AccountMapper {
         AccountDTO.AccountDTOBuilder accountDTO = AccountDTO.builder();
 
         accountDTO.balance( icesiAccount.getBalance() );
-        accountDTO.type( icesiAccount.getType() );
+        if ( icesiAccount.getType() != null ) {
+            accountDTO.type( icesiAccount.getType().name() );
+        }
         accountDTO.active( icesiAccount.isActive() );
 
         return accountDTO.build();

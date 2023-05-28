@@ -1,5 +1,6 @@
 package com.example.tallerjpa.enums;
 
+
 public enum AccountType {
     DEPOSIT("Deposit"),
     DEFAULT("Default");
@@ -13,4 +14,5 @@ public enum AccountType {
     public String getValue(){
         return value;
     }
+
 }

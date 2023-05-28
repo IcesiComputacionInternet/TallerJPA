@@ -1,15 +1,13 @@
 package com.example.tallerjpa.model;
 
 import com.example.tallerjpa.enums.AccountType;
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
-import javax.persistence.Entity;
-import javax.persistence.Id;
-import javax.persistence.JoinColumn;
-import javax.persistence.ManyToOne;
+import javax.persistence.*;
 import java.util.UUID;
 
 @Entity
@@ -26,6 +24,7 @@ public class IcesiAccount {
     private AccountType type;
     private boolean active;
 
+    @JsonIgnore
     @ManyToOne
     @JoinColumn (name = "icesi_user_id")
     private IcesiUser icesiUser;
