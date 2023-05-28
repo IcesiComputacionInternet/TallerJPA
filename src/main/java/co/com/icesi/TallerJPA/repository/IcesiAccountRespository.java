@@ -16,8 +16,8 @@ public interface IcesiAccountRespository extends JpaRepository<IcesiAccount, UUI
     @Query(value = "SELECT a FROM IcesiAccount a where a.accountNumber = :accountNumber and a.active = true ")
     Optional<IcesiAccount> findByAccountNumber(@Param("accountNumber")String accountNumber);
 
-    @Query(value = "SELECT a FROM IcesiAccount  a where a.active = true")
-    List<IcesiAccount> findAllActivated();
+    @Query(value = "SELECT a FROM IcesiAccount a INNER JOIN IcesiUser u ON a.user.userID = u.userID where u.userID = :userId")
+    List<IcesiAccount> findAllActivatedByUser(@Param("userId") UUID userId);
 
 
 

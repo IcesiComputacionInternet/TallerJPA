@@ -5,6 +5,7 @@ import co.com.icesi.TallerJPA.dto.*;
 import org.springframework.web.bind.annotation.*;
 
 import javax.validation.Valid;
+import java.util.List;
 
 @RequestMapping("/account")
 public interface AccountApi {
@@ -27,6 +28,8 @@ public interface AccountApi {
     @PatchMapping("/depositMoney")
     TransactionResponseDTO depositMoney(@Valid @RequestBody TransactionRequestDTO transactionRequestDTO);
 
+    @GetMapping("/getAccounts")
+    List<IcesiAccountDTOResponse> getAccounts();
 
 
 }

@@ -46,7 +46,9 @@ public class SecurityConfiguration {
 
     @Bean
     public SecurityFilterChain securityFilterChain(HttpSecurity http, AuthorizationManager<RequestAuthorizationContext> acces) throws Exception {
-        return http.csrf(AbstractHttpConfigurer::disable)
+        return http.cors()
+                .and()
+                .csrf(AbstractHttpConfigurer::disable)
                 .authorizeHttpRequests(auth -> auth.anyRequest().access(acces))
                 .oauth2ResourceServer(OAuth2ResourceServerConfigurer::jwt)
                 .sessionManagement(session -> session.sessionCreationPolicy(SessionCreationPolicy.STATELESS))
@@ -68,9 +70,12 @@ public class SecurityConfiguration {
     @Bean
     public AuthorizationManager<RequestAuthorizationContext> requestAuthorizationContextAuthorizationManager(HandlerMappingIntrospector introspector){
         RequestMatcher permitAll = new AndRequestMatcher(new MvcRequestMatcher(introspector,"/auth/login"));
+      //  RequestMatcher permit2 = new AndRequestMatcher(new MvcRequestMatcher(introspector,"/account/getAccounts"));
 
+        //TODO: Probar endpoint desde el back
         RequestMatcherDelegatingAuthorizationManager.Builder mangerBuilder
                 = RequestMatcherDelegatingAuthorizationManager.builder().add(permitAll,(context,other) -> new AuthorizationDecision(true));
+       // mangerBuilder.add(permit2,(context,other) -> new AuthorizationDecision(true));
         mangerBuilder.add(new MvcRequestMatcher(introspector,"/user"), AuthorityAuthorizationManager.hasAnyAuthority("SCOPE_BANK", "SCOPE_ADMIN"));
         mangerBuilder.add(new MvcRequestMatcher(introspector,"/role"), AuthorityAuthorizationManager.hasAnyAuthority("SCOPE_ADMIN"));
         mangerBuilder.add(new MvcRequestMatcher(introspector,"/account"), AuthorityAuthorizationManager.hasAnyAuthority("SCOPE_NORMAL","SCOPE_BANK","SCOPE_ADMIN"));

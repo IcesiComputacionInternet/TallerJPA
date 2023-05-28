@@ -141,8 +141,9 @@ public class IcesiAccountService {
 
     }
 
-    public List<IcesiAccountDTOResponse> getAccounts(){
-        return accountRespository.findAllActivated().stream().map(mapper::fromIcesiAccount).collect(Collectors.toList());
+    public List<IcesiAccountDTOResponse> getUserAccounts(){
+        UUID userId = UUID.fromString(securityContext.getCurrenUserId());
+        return accountRespository.findAllActivatedByUser(userId).stream().map(mapper::fromIcesiAccount).collect(Collectors.toList());
     }
 
     private String newAccountNumber(){

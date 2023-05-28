@@ -44,4 +44,9 @@ public class IcesiAccountController implements AccountApi {
     public TransactionResponseDTO depositMoney(TransactionRequestDTO transactionRequestDTO) {
         return accountService.depositMoney(transactionRequestDTO);
     }
+
+    @Override
+    public List<IcesiAccountDTOResponse> getAccounts() {
+        return accountService.getUserAccounts();
+    }
 }
