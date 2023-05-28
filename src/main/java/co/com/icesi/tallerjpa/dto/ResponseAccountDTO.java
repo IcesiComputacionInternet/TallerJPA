@@ -11,5 +11,4 @@ public class ResponseAccountDTO {
     private Long balance;
     private TypeAccount type;
     private boolean active;
-    private ResponseUserDTO user;
 }

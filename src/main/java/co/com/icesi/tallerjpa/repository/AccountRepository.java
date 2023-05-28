@@ -7,6 +7,7 @@ import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
 import org.springframework.stereotype.Repository;
 
+import java.util.List;
 import java.util.Optional;
 import java.util.UUID;
 
@@ -30,7 +31,8 @@ public interface AccountRepository extends JpaRepository<Account, UUID> {
     boolean isActive(@Param("accountNumber") String accountNumber);
     @Query("SELECT CASE WHEN (COUNT(a) > 0) THEN true ELSE false END FROM Account a WHERE a.accountNumber = :accountNumber AND a.user.userId = :userId")
     boolean isAccountOwner(@Param("userId") UUID userId, @Param("accountNumber") String accountNumber);
-
+    @Query("SELECT a FROM Account a WHERE a.user.userId = :userId")
+    List<Account> findAllById(@Param("userId") UUID userId);
 
 
 }

@@ -7,6 +7,7 @@ import org.springframework.web.bind.annotation.*;
 
 import javax.validation.Valid;
 import java.security.Principal;
+import java.util.List;
 
 @RequestMapping(AccountApi.ACCOUNT_BASE_URL)
 public interface AccountApi {
@@ -29,5 +30,8 @@ public interface AccountApi {
 
     @PatchMapping("/disable/{accountNumber}")
     TransactionDTO disableAccount(@PathVariable String accountNumber);
+
+    @GetMapping("/all/user")
+    List<ResponseAccountDTO> findAllByUser();
 
 }

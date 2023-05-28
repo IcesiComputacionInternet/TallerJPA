@@ -9,6 +9,8 @@ import co.com.icesi.tallerjpa.service.AccountService;
 import lombok.AllArgsConstructor;
 import org.springframework.web.bind.annotation.*;
 
+import java.security.Principal;
+import java.util.List;
 import java.util.UUID;
 
 
@@ -47,5 +49,11 @@ public class AccountController implements AccountApi {
     public TransactionDTO disableAccount(String accountNumber){
         var userId = SecurityContext.getCurrentUserId();
         return accountService.disableAccount(accountNumber, UUID.fromString(userId));
+    }
+
+    @Override
+    public List<ResponseAccountDTO> findAllByUser() {
+        var userId = SecurityContext.getCurrentUserId();
+        return accountService.allAccountsByUser(UUID.fromString(userId));
     }
 }

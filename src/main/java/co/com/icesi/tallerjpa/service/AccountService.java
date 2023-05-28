@@ -13,6 +13,8 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.security.Principal;
+import java.util.Collections;
+import java.util.List;
 import java.util.Random;
 import java.util.UUID;
 import java.util.stream.Collectors;
@@ -92,6 +94,14 @@ public class AccountService {
                 .accountNumberOrigin(accountNumber)
                 .message(accountRepository.isActive(accountNumber) ? "The account can't be disabled" : "The account was disabled")
                 .build();
+    }
+
+    @Transactional
+    public List<ResponseAccountDTO> allAccountsByUser(UUID userId){
+        return accountRepository.findAllById(userId)
+                .stream()
+                .map(accountMapper::fromAccountToSendAccountDTO)
+                .collect(Collectors.toList());
     }
 
     private String validateAccountNumber(String accountNumber){
