@@ -4,10 +4,13 @@ import icesi.university.accountSystem.dto.RequestAccountDTO;
 import icesi.university.accountSystem.dto.ResponseAccountDTO;
 import icesi.university.accountSystem.dto.TransactionOperationDTO;
 import icesi.university.accountSystem.dto.TransactionResultDTO;
+import icesi.university.accountSystem.model.IcesiAccount;
 import icesi.university.accountSystem.services.AccountService;
 import lombok.AllArgsConstructor;
 import org.springframework.web.bind.annotation.*;
-import static icesi.university.accountSystem.api.AccountAPI.BASE_ACCOUNT_URL;
+
+import java.util.List;
+
 @RestController
 @AllArgsConstructor
 public class AccountController implements AccountAPI {
@@ -47,5 +50,11 @@ public class AccountController implements AccountAPI {
     @Override
     public String deactivateAccount(String accountNumber) {
         return accountService.deactivateAccount(accountNumber);
+    }
+
+    @GetMapping(BASE_ACCOUNT_URL+"/{userEmail}")
+    @Override
+    public List<IcesiAccount> getAccounts(String userEmail) {
+        return accountService.getAccounts(userEmail);
     }
 }

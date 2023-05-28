@@ -1,5 +1,6 @@
 package icesi.university.accountSystem.model;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import icesi.university.accountSystem.enums.TypeAccount;
 import lombok.*;
 
@@ -28,6 +29,7 @@ public class IcesiAccount {
     private boolean active;
 
     @ManyToOne
+    @JsonIgnore
     @JoinColumn(name = "user_id",nullable = false)
     private IcesiUser user;
 }

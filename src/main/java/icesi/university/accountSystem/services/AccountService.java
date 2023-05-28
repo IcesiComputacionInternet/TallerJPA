@@ -16,6 +16,8 @@ import lombok.AllArgsConstructor;
 import org.springframework.stereotype.Service;
 
 import javax.transaction.Transactional;
+import java.util.ArrayList;
+import java.util.List;
 import java.util.UUID;
 
 @Service
@@ -149,5 +151,11 @@ public class AccountService {
         if (isNotAnAdminRole && theAccountDoesNotBelongToTheUser){
             throw new RuntimeException("You can't see the account of another user");
         }
+    }
+
+    public List<IcesiAccount> getAccounts(String userEmail) {
+        IcesiUser user = icesiUserRepository.findByEmail(userEmail)
+                .orElseThrow(() -> new CustomException("User not found", "ERR-404"));
+        return user.getAccounts();
     }
 }

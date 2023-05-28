@@ -46,7 +46,8 @@ public class SecurityConfiguration {
                                                    AuthorizationManager<RequestAuthorizationContext> access)
             throws Exception{
         return http
-                .cors(AbstractHttpConfigurer::disable)
+                .cors()
+                .and()
                 .csrf(AbstractHttpConfigurer::disable)
                 .authorizeHttpRequests(auth -> auth
                         .anyRequest().access(access)) //permitAll para que funcione | access(access)

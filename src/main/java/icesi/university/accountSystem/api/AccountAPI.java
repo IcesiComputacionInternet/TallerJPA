@@ -4,12 +4,12 @@ import icesi.university.accountSystem.dto.RequestAccountDTO;
 import icesi.university.accountSystem.dto.ResponseAccountDTO;
 import icesi.university.accountSystem.dto.TransactionOperationDTO;
 import icesi.university.accountSystem.dto.TransactionResultDTO;
-import org.springframework.web.bind.annotation.PatchMapping;
+import icesi.university.accountSystem.model.IcesiAccount;
 import org.springframework.web.bind.annotation.PathVariable;
-import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 
 import javax.validation.Valid;
+import java.util.List;
 
 public interface AccountAPI {
     String BASE_ACCOUNT_URL = "/accounts";
@@ -31,5 +31,7 @@ public interface AccountAPI {
 
     
     String deactivateAccount(@PathVariable String accountNumber);
+
+    List<IcesiAccount> getAccounts(@PathVariable String userEmail);
 
 }
