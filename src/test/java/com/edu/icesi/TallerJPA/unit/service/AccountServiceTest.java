@@ -14,6 +14,7 @@ import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 
 import java.util.Optional;
+import java.util.UUID;
 
 import static org.junit.jupiter.api.Assertions.*;
 import static org.mockito.Mockito.*;
@@ -494,7 +495,7 @@ public class AccountServiceTest {
                 .balance(5000)
                 .type("Deposit only")
                 .active(true)
-                .icesiUser(createIcesiUser())
+                .icesiUserId(String.valueOf(createIcesiUser().getUserId()))
                 .build();
     }
 
@@ -540,7 +541,7 @@ public class AccountServiceTest {
                 .balance(-1)
                 .type("Deposit only")
                 .active(true)
-                .icesiUser(createIcesiUser())
+                .icesiUserId(String.valueOf(createIcesiUser().getUserId()))
                 .build();
     }
 

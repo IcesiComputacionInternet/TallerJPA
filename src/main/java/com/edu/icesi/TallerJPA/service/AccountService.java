@@ -7,6 +7,7 @@ import com.edu.icesi.TallerJPA.error.exception.DetailBuilder;
 import com.edu.icesi.TallerJPA.error.exception.ErrorCode;
 import com.edu.icesi.TallerJPA.mapper.AccountMapper;
 import com.edu.icesi.TallerJPA.model.IcesiAccount;
+import com.edu.icesi.TallerJPA.model.IcesiUser;
 import com.edu.icesi.TallerJPA.repository.AccountRepository;
 import com.edu.icesi.TallerJPA.repository.UserRepository;
 import com.edu.icesi.TallerJPA.security.IcesiSecurityContext;
@@ -32,7 +33,9 @@ public class AccountService {
 
     public AccountCreateDTO save(AccountCreateDTO accountCreateDTO) {
 
-        verifyUserRole(IcesiSecurityContext.getCurrentUserId(), IcesiSecurityContext.getCurrentRol(), accountCreateDTO.getIcesiUser().getUserId());
+        verifyUserRole(IcesiSecurityContext.getCurrentUserId(), IcesiSecurityContext.getCurrentRol(), accountCreateDTO.getIcesiUserId());
+
+        IcesiUser user = userRepository.findById(UUID.fromString(accountCreateDTO.getIcesiUserId())).orElseThrow(() -> new RuntimeException("User not found"));
 
         accountCreateDTO.setAccountNumber(sendToGenerateAccountNumbers());
 
@@ -40,6 +43,7 @@ public class AccountService {
 
         IcesiAccount icesiAccount = accountMapper.fromIcesiAccountDTO(accountCreateDTO);
         icesiAccount.setAccountId(UUID.randomUUID());
+        icesiAccount.setIcesiUser(user);
 
         return accountMapper.fromIcesiAccount(accountRepository.save(icesiAccount));
     }
@@ -88,7 +92,7 @@ public class AccountService {
 
         AccountCreateDTO accountToWithdraw = findByAccountNumber(transactionDTO.getSourceAccount());
 
-        verifyUserRole(IcesiSecurityContext.getCurrentUserId(), IcesiSecurityContext.getCurrentRol(), accountToWithdraw.getIcesiUser().getUserId());
+        verifyUserRole(IcesiSecurityContext.getCurrentUserId(), IcesiSecurityContext.getCurrentRol(), accountToWithdraw.getIcesiUserId());
 
         long balance = transactionDTO.getAmountMoney();
 
@@ -131,7 +135,7 @@ public class AccountService {
 
         AccountCreateDTO accountToDeposit = findByAccountNumber(transactionDTO.getDestinationAccount());
 
-        verifyUserRole(IcesiSecurityContext.getCurrentUserId(), IcesiSecurityContext.getCurrentRol(), accountToDeposit.getIcesiUser().getUserId());
+        verifyUserRole(IcesiSecurityContext.getCurrentUserId(), IcesiSecurityContext.getCurrentRol(), accountToDeposit.getIcesiUserId());
 
         long moneyToDeposit = transactionDTO.getAmountMoney();
 
@@ -148,11 +152,11 @@ public class AccountService {
 
         AccountCreateDTO sourceAccountToTransfer = findByAccountNumber(transactionDTO.getSourceAccount());
 
-        verifyUserRole(IcesiSecurityContext.getCurrentUserId(), IcesiSecurityContext.getCurrentRol(), sourceAccountToTransfer.getIcesiUser().getUserId());
+        verifyUserRole(IcesiSecurityContext.getCurrentUserId(), IcesiSecurityContext.getCurrentRol(), sourceAccountToTransfer.getIcesiUserId());
 
         AccountCreateDTO destinationAccountToTransfer = findByAccountNumber(transactionDTO.getDestinationAccount());
 
-        verifyUserRole(IcesiSecurityContext.getCurrentUserId(), IcesiSecurityContext.getCurrentRol(), destinationAccountToTransfer.getIcesiUser().getUserId());
+        verifyUserRole(IcesiSecurityContext.getCurrentUserId(), IcesiSecurityContext.getCurrentRol(), destinationAccountToTransfer.getIcesiUserId());
 
         validateAccountType(sourceAccountToTransfer, destinationAccountToTransfer);
 
@@ -188,7 +192,7 @@ public class AccountService {
 
         AccountCreateDTO accountToEnable = findByAccountNumber(accountNumber);
 
-        verifyUserRole(IcesiSecurityContext.getCurrentUserId(), IcesiSecurityContext.getCurrentRol(), accountToEnable.getIcesiUser().getUserId());
+        verifyUserRole(IcesiSecurityContext.getCurrentUserId(), IcesiSecurityContext.getCurrentRol(), accountToEnable.getIcesiUserId());
 
         validateStatusOfAccount(accountToEnable, true);
 
@@ -213,7 +217,7 @@ public class AccountService {
 
         AccountCreateDTO accountToDisable = findByAccountNumber(accountNumber);
 
-        verifyUserRole(IcesiSecurityContext.getCurrentUserId(), IcesiSecurityContext.getCurrentRol(), accountToDisable.getIcesiUser().getUserId());
+        verifyUserRole(IcesiSecurityContext.getCurrentUserId(), IcesiSecurityContext.getCurrentRol(), accountToDisable.getIcesiUserId());
 
         validateStatusOfAccount(accountToDisable, false);
 
@@ -226,11 +230,11 @@ public class AccountService {
         return accountToDisable;
     }
 
-    public void verifyUserRole(String idActualUser, String roleActualUser,UUID idUserOfAccount){
+    public void verifyUserRole(String idActualUser, String roleActualUser,String idUserOfAccount){
 
         searchUserById(idActualUser);
 
-        if (roleActualUser.equalsIgnoreCase(String.valueOf(Scopes.USER)) && !idActualUser.equalsIgnoreCase(String.valueOf(idUserOfAccount))){
+        if (roleActualUser.equalsIgnoreCase(String.valueOf(Scopes.USER)) && !idActualUser.equalsIgnoreCase(idUserOfAccount)){
             throw createIcesiException(
                     "User unauthorized",
                     HttpStatus.UNAUTHORIZED,

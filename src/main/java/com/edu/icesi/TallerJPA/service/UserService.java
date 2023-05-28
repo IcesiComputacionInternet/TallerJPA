@@ -1,9 +1,11 @@
 package com.edu.icesi.TallerJPA.service;
 
 import com.edu.icesi.TallerJPA.Enums.Scopes;
+import com.edu.icesi.TallerJPA.dto.AccountCreateDTO;
 import com.edu.icesi.TallerJPA.dto.UserCreateDTO;
 import com.edu.icesi.TallerJPA.error.exception.DetailBuilder;
 import com.edu.icesi.TallerJPA.error.exception.ErrorCode;
+import com.edu.icesi.TallerJPA.mapper.AccountMapper;
 import com.edu.icesi.TallerJPA.mapper.UserMapper;
 import com.edu.icesi.TallerJPA.model.IcesiAccount;
 import com.edu.icesi.TallerJPA.model.IcesiRole;
@@ -11,7 +13,6 @@ import com.edu.icesi.TallerJPA.model.IcesiUser;
 import com.edu.icesi.TallerJPA.repository.RoleRepository;
 import com.edu.icesi.TallerJPA.repository.UserRepository;
 import com.edu.icesi.TallerJPA.security.IcesiSecurityContext;
-import com.fasterxml.jackson.databind.ObjectMapper;
 import lombok.AllArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
@@ -29,6 +30,8 @@ public class UserService {
     private final UserRepository userRepository;
 
     private final UserMapper userMapper;
+
+    private final AccountMapper accountMapper;
 
     private final RoleRepository roleRepository;
 
@@ -127,15 +130,15 @@ public class UserService {
         return userMapper.fromIcesiUser(userRepository.findByEmail(phoneNumber).orElseThrow(() -> new RuntimeException("The user with phone number "+phoneNumber+" not exists")));
     }
 
-    public List<String> getAccounts() {
+    public List<AccountCreateDTO> getAccounts() {
 
         IcesiUser user = getUserById(IcesiSecurityContext.getCurrentUserId());
 
         return saveAccountsOfUser(user.getAccounts());
     }
 
-    private List<String> saveAccountsOfUser(List<IcesiAccount> accounts){
-        return accounts.stream().map(account -> "Número de cuenta: "+account.getAccountNumber() + " - Balance: " + account.getBalance()).toList();
+    private List<AccountCreateDTO> saveAccountsOfUser(List<IcesiAccount> accounts){
+        return accounts.stream().map(accountMapper::fromIcesiAccount).toList();
     }
 
     private IcesiUser getUserById(String userId){

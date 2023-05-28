@@ -28,6 +28,6 @@ public interface UserAPI {
     UserCreateDTO getUserByPhoneNumber(@PathVariable("phoneNumber") String phoneNumber);
 
     @GetMapping("/getAccounts/")
-    List<String> getAccounts();
+    List<AccountCreateDTO> getAccounts();
 
 }

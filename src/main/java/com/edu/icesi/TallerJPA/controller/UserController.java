@@ -41,7 +41,7 @@ public class UserController implements UserAPI {
     }
 
     @Override
-    public List<String> getAccounts() {
+    public List<AccountCreateDTO> getAccounts() {
         return userService.getAccounts();
     }
 

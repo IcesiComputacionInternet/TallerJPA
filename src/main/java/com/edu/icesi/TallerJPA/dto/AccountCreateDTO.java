@@ -30,5 +30,5 @@ public class AccountCreateDTO {
 
     @NotNull(message = "Account must have an icesi user")
     @NotBlank
-    private IcesiUser icesiUser;
+    private String icesiUserId;
 }
