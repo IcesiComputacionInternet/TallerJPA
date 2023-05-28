@@ -54,9 +54,11 @@ public class SecurityConfiguration {
 
     @Bean
     public SecurityFilterChain securityFilterChain(HttpSecurity http, AuthorizationManager<RequestAuthorizationContext> accessManager) throws Exception {
-        return http.csrf(AbstractHttpConfigurer::disable)
-                .authorizeHttpRequests(auth -> auth
-                        .anyRequest().access(accessManager))
+        return http
+                .cors()
+                .and()
+                .csrf(AbstractHttpConfigurer::disable)
+                .authorizeHttpRequests(auth -> auth.anyRequest().access(accessManager))
                 .oauth2ResourceServer(OAuth2ResourceServerConfigurer::jwt)
                 .sessionManagement(session -> session.sessionCreationPolicy(SessionCreationPolicy.STATELESS))
                 .build();
@@ -76,22 +78,21 @@ public class SecurityConfiguration {
 
     @Bean
     @Transactional(propagation = Propagation.REQUIRED, readOnly = true, noRollbackFor = Exception.class)
-    public AuthorizationManager<RequestAuthorizationContext> requestAuthorizationManager(HandlerMappingIntrospector introspector) {
-        Map<MvcRequestMatcher, List<String>> rolePaths = permissionRepository.findAll().stream()
-                .collect(Collectors.toMap(
-                        permission -> new MvcRequestMatcher(introspector, permission.getPath()),
-                        permission -> permission.getRoles().stream().map(role -> "SCOPE_" + role.getName()).toList()
-                ));
+    public AuthorizationManager<RequestAuthorizationContext> requestMatcherAuthorizationManager
+            (HandlerMappingIntrospector introspector) {
+        RequestMatcher permitAll = new AndRequestMatcher(new MvcRequestMatcher(introspector, "/token"));
 
-        RequestMatcher permitAll = new AndRequestMatcher(new MvcRequestMatcher(introspector, "/login"));
+        RequestMatcherDelegatingAuthorizationManager.Builder managerBuilder
+                = RequestMatcherDelegatingAuthorizationManager.builder()
+                .add(permitAll, (context, other) -> new AuthorizationDecision(true));
 
-        RequestMatcherDelegatingAuthorizationManager.Builder managerBuilder =
-                RequestMatcherDelegatingAuthorizationManager.builder()
-                        .add(permitAll, (context, other) -> new AuthorizationDecision(true));
+        managerBuilder.add(new MvcRequestMatcher(introspector, "/admin/**"),
+                AuthorityAuthorizationManager.hasAnyAuthority("SCOPE_ADMIN"));
+        managerBuilder.add(new MvcRequestMatcher(introspector, "/user"),
+                AuthorityAuthorizationManager.hasAnyAuthority("SCOPE_USER"));
+        managerBuilder.add(new MvcRequestMatcher(introspector, "/role"),
+                AuthorityAuthorizationManager.hasAnyAuthority("SCOPE_BANK"));
 
-        managerBuilder.add(new MvcRequestMatcher(introspector, "/user"), AuthorityAuthorizationManager.hasAnyAuthority("SCOPE_ADMIN", "SCOPE_BANK"));
-        managerBuilder.add(new MvcRequestMatcher(introspector, "/role"), AuthorityAuthorizationManager.hasAnyAuthority("SCOPE_ADMIN"));
-        managerBuilder.add(new MvcRequestMatcher(introspector, "/account/**"), AuthorityAuthorizationManager.hasAnyAuthority("SCOPE_USER"));
 
         AuthorizationManager<HttpServletRequest> manager = managerBuilder.build();
         return (authentication, object) -> manager.check(authentication, object.getRequest());

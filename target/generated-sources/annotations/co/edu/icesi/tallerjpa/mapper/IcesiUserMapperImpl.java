@@ -7,8 +7,8 @@ import org.springframework.stereotype.Component;
 
 @Generated(
     value = "org.mapstruct.ap.MappingProcessor",
-    date = "2023-03-18T11:48:09-0500",
-    comments = "version: 1.5.3.Final, compiler: javac, environment: Java 17.0.6 (Oracle Corporation)"
+    date = "2023-05-28T13:14:02-0500",
+    comments = "version: 1.5.3.Final, compiler: Eclipse JDT (IDE) 3.34.0.v20230413-0857, environment: Java 17.0.7 (Eclipse Adoptium)"
 )
 @Component
 public class IcesiUserMapperImpl implements IcesiUserMapper {
@@ -21,11 +21,11 @@ public class IcesiUserMapperImpl implements IcesiUserMapper {
 
         IcesiUser.IcesiUserBuilder icesiUser = IcesiUser.builder();
 
+        icesiUser.email( icesiUserDTO.getEmail() );
         icesiUser.firstName( icesiUserDTO.getFirstName() );
         icesiUser.lastName( icesiUserDTO.getLastName() );
-        icesiUser.email( icesiUserDTO.getEmail() );
-        icesiUser.phoneNumber( icesiUserDTO.getPhoneNumber() );
         icesiUser.password( icesiUserDTO.getPassword() );
+        icesiUser.phoneNumber( icesiUserDTO.getPhoneNumber() );
 
         return icesiUser.build();
     }
@@ -38,11 +38,11 @@ public class IcesiUserMapperImpl implements IcesiUserMapper {
 
         IcesiUserDTO.IcesiUserDTOBuilder icesiUserDTO = IcesiUserDTO.builder();
 
+        icesiUserDTO.email( icesiUser.getEmail() );
         icesiUserDTO.firstName( icesiUser.getFirstName() );
         icesiUserDTO.lastName( icesiUser.getLastName() );
-        icesiUserDTO.email( icesiUser.getEmail() );
-        icesiUserDTO.phoneNumber( icesiUser.getPhoneNumber() );
         icesiUserDTO.password( icesiUser.getPassword() );
+        icesiUserDTO.phoneNumber( icesiUser.getPhoneNumber() );
 
         return icesiUserDTO.build();
     }

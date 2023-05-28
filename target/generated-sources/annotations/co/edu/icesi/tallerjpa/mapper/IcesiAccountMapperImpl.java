@@ -7,8 +7,8 @@ import org.springframework.stereotype.Component;
 
 @Generated(
     value = "org.mapstruct.ap.MappingProcessor",
-    date = "2023-03-18T11:48:09-0500",
-    comments = "version: 1.5.3.Final, compiler: javac, environment: Java 17.0.6 (Oracle Corporation)"
+    date = "2023-05-28T13:14:02-0500",
+    comments = "version: 1.5.3.Final, compiler: Eclipse JDT (IDE) 3.34.0.v20230413-0857, environment: Java 17.0.7 (Eclipse Adoptium)"
 )
 @Component
 public class IcesiAccountMapperImpl implements IcesiAccountMapper {
@@ -21,11 +21,11 @@ public class IcesiAccountMapperImpl implements IcesiAccountMapper {
 
         IcesiAccount.IcesiAccountBuilder icesiAccount = IcesiAccount.builder();
 
+        icesiAccount.active( icesiAccountDTO.isActive() );
         if ( icesiAccountDTO.getBalance() != null ) {
             icesiAccount.balance( icesiAccountDTO.getBalance() );
         }
         icesiAccount.type( icesiAccountDTO.getType() );
-        icesiAccount.active( icesiAccountDTO.isActive() );
 
         return icesiAccount.build();
     }
@@ -38,9 +38,9 @@ public class IcesiAccountMapperImpl implements IcesiAccountMapper {
 
         IcesiAccountDTO.IcesiAccountDTOBuilder icesiAccountDTO = IcesiAccountDTO.builder();
 
+        icesiAccountDTO.active( icesiAccount.getActive() );
         icesiAccountDTO.balance( icesiAccount.getBalance() );
         icesiAccountDTO.type( icesiAccount.getType() );
-        icesiAccountDTO.active( icesiAccount.isActive() );
 
         return icesiAccountDTO.build();
     }

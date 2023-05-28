@@ -17,7 +17,7 @@ import java.util.stream.Collectors;
 
 @Service
 @AllArgsConstructor
-public class icesiTokenService {
+public class IcesiTokenService {
 
     private final JwtEncoder encoder;
 

@@ -7,8 +7,8 @@ import org.springframework.stereotype.Component;
 
 @Generated(
     value = "org.mapstruct.ap.MappingProcessor",
-    date = "2023-03-18T11:48:09-0500",
-    comments = "version: 1.5.3.Final, compiler: javac, environment: Java 17.0.6 (Oracle Corporation)"
+    date = "2023-05-28T13:14:02-0500",
+    comments = "version: 1.5.3.Final, compiler: Eclipse JDT (IDE) 3.34.0.v20230413-0857, environment: Java 17.0.7 (Eclipse Adoptium)"
 )
 @Component
 public class IcesiRoleMapperImpl implements IcesiRoleMapper {
@@ -21,8 +21,8 @@ public class IcesiRoleMapperImpl implements IcesiRoleMapper {
 
         IcesiRole.IcesiRoleBuilder icesiRole = IcesiRole.builder();
 
-        icesiRole.name( icesiRoleDTO.getName() );
         icesiRole.description( icesiRoleDTO.getDescription() );
+        icesiRole.name( icesiRoleDTO.getName() );
 
         return icesiRole.build();
     }
@@ -35,8 +35,8 @@ public class IcesiRoleMapperImpl implements IcesiRoleMapper {
 
         IcesiRoleDTO.IcesiRoleDTOBuilder icesiRoleDTO = IcesiRoleDTO.builder();
 
-        icesiRoleDTO.name( icesiRole.getName() );
         icesiRoleDTO.description( icesiRole.getDescription() );
+        icesiRoleDTO.name( icesiRole.getName() );
 
         return icesiRoleDTO.build();
     }
