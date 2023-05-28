@@ -22,7 +22,7 @@ public class AuthController {
 
     @CrossOrigin
     @PostMapping("/token")
-    public TokenDTO token(@RequestBody LoginDTO loginDTO){
+    public TokenDTO token(@Valid @RequestBody LoginDTO loginDTO){
         Authentication authentication = authenticationManager
                 .authenticate(new UsernamePasswordAuthenticationToken(loginDTO.username(), loginDTO.password()));
         return tokenService.generateToken(authentication);

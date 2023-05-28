@@ -37,6 +37,12 @@ public class IcesiAccountController implements IcesiAccountApi {
     }
 
     @Override
+    public List<IcesiAccountResponseDTO> getMyAccounts() {
+        String userId = IcesiSecurityContext.getCurrentUserId();
+        return icesiAccountService.getAllAccountsByUserId(UUID.fromString(userId));
+    }
+
+    @Override
     public IcesiAccountResponseDTO getIcesiAccount(String accountNumber) {
         return icesiAccountService.getAccountByAccountNumber(accountNumber);
     }

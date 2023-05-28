@@ -24,6 +24,9 @@ public interface IcesiAccountApi {
     @GetMapping
     List<IcesiAccountResponseDTO> getAllAccounts();
 
+    @GetMapping("/accounts")
+    List<IcesiAccountResponseDTO> getMyAccounts();
+
     @GetMapping("/{accountNumber}")
     IcesiAccountResponseDTO getIcesiAccount(@PathVariable String accountNumber);
 
