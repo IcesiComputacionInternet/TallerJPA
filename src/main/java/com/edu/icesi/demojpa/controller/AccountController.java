@@ -7,6 +7,7 @@ import com.edu.icesi.demojpa.dto.response.ResponseAccountDTO;
 import com.edu.icesi.demojpa.dto.response.ResponseTransactionDTO;
 import com.edu.icesi.demojpa.service.AccountService;
 import lombok.AllArgsConstructor;
+import org.springframework.web.bind.annotation.CrossOrigin;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 

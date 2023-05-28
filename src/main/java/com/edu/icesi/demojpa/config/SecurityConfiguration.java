@@ -45,8 +45,8 @@ public class SecurityConfiguration {
     @Bean
     public SecurityFilterChain securityFilterChain(HttpSecurity http, AuthorizationManager<RequestAuthorizationContext> access) throws Exception {
         return http
+                .cors().and()
                 .csrf(AbstractHttpConfigurer::disable)
-                .cors(AbstractHttpConfigurer::disable)
                 .authorizeHttpRequests(auth -> auth
                         .anyRequest()
                         .access(access)) //.access(access)
@@ -60,7 +60,6 @@ public class SecurityConfiguration {
         byte[] bytes = secret.getBytes();
         SecretKeySpec key = new SecretKeySpec(bytes,0, bytes.length, "RSA");
         return NimbusJwtDecoder.withSecretKey(key).macAlgorithm(MacAlgorithm.HS256).build();
-
     }
 
     @Bean
@@ -78,6 +77,9 @@ public class SecurityConfiguration {
         RequestMatcherDelegatingAuthorizationManager.Builder managerBuilder
                 = RequestMatcherDelegatingAuthorizationManager.builder()
                 .add(permitAll, (context, other) -> new AuthorizationDecision(true));
+
+        managerBuilder.add(new MvcRequestMatcher(introspector, "/accounts/getAccounts"),
+                AuthorityAuthorizationManager.hasAnyAuthority("SCOPE_USER", "SCOPE_ADMIN"));
 
         managerBuilder.add(new MvcRequestMatcher(introspector, "/accounts/**"),
                 AuthorityAuthorizationManager.hasAnyAuthority("SCOPE_USER", "SCOPE_ADMIN"));
