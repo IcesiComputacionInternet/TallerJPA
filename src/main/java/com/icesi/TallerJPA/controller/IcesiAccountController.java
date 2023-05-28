@@ -7,6 +7,8 @@ import com.icesi.TallerJPA.service.AccountService;
 import lombok.AllArgsConstructor;
 import org.springframework.web.bind.annotation.*;
 
+import java.util.List;
+
 @RestController
 @AllArgsConstructor
 public class IcesiAccountController implements AccountAPI {
@@ -41,5 +43,10 @@ public class IcesiAccountController implements AccountAPI {
     @Override
     public String transferAccount(@PathVariable String accountNumberOrigin, @PathVariable String accountNumberDestination, @RequestBody Long value){
         return accountService.transfer(accountNumberOrigin, accountNumberDestination, value);
+    }
+
+    @Override
+    public List<IcesiAccountResponseDTO> getAccountsOfUsers() {
+        return accountService.getAccountsOfUsers();
     }
 }

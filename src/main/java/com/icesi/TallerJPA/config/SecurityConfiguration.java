@@ -57,11 +57,13 @@ public class SecurityConfiguration {
 
     @Bean
     public SecurityFilterChain securityFilterChain(HttpSecurity http, AuthorizationManager<RequestAuthorizationContext> access) throws Exception {
-        return http.csrf(AbstractHttpConfigurer::disable)
-                .authorizeHttpRequests(auth -> auth
-                        .anyRequest().access(access))
+        return http
+                .cors().and()
+                .csrf(AbstractHttpConfigurer::disable)
+                .authorizeHttpRequests(auth -> auth.anyRequest().access(access))
                 .oauth2ResourceServer(OAuth2ResourceServerConfigurer::jwt)
-                .sessionManagement(session -> session.sessionCreationPolicy(SessionCreationPolicy.STATELESS)).build();
+                .sessionManagement(session -> session.sessionCreationPolicy(SessionCreationPolicy.STATELESS))
+                .build();
     }
 
     @Bean
@@ -88,10 +90,13 @@ public class SecurityConfiguration {
                 ));
 
         RequestMatcher permitAll = new AndRequestMatcher(new MvcRequestMatcher(introspector, "/login"));
+        //RequestMatcher permitAllTest = new AndRequestMatcher(new MvcRequestMatcher(introspector, "/account/getAccounts"));
+
 
         RequestMatcherDelegatingAuthorizationManager.Builder managerBuilder =
                 RequestMatcherDelegatingAuthorizationManager.builder()
                         .add(permitAll, (context, other)-> new AuthorizationDecision(true));
+                        //.add(permitAllTest, (context, other)-> new AuthorizationDecision(true));
 
 
         //rolePaths.forEach((paths, roles) -> managerBuilder.add(paths, AuthorityAuthorizationManager.hasAnyAuthority(roles.toArray(new String[0]))));

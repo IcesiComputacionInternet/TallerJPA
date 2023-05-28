@@ -4,6 +4,8 @@ import com.icesi.TallerJPA.dto.request.IcesiAccountDTO;
 import com.icesi.TallerJPA.dto.response.IcesiAccountResponseDTO;
 import org.springframework.web.bind.annotation.*;
 
+import java.util.List;
+
 @RequestMapping(AccountAPI.ACCOUNT_BASE_URL)
 public interface AccountAPI {
 
@@ -27,4 +29,6 @@ public interface AccountAPI {
     @PatchMapping("/transfer/{accountNumberOrigin}/{accountNumberDestination}")
     String transferAccount(@PathVariable String accountNumberOrigin, @PathVariable String accountNumberDestination, @RequestBody Long value);
 
+    @GetMapping("/getAccounts")
+    List<IcesiAccountResponseDTO> getAccountsOfUsers();
 }

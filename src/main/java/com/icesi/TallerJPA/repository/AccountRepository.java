@@ -6,6 +6,7 @@ import org.springframework.data.jpa.repository.Modifying;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
 
+import java.util.List;
 import java.util.Optional;
 import java.util.UUID;
 
@@ -38,5 +39,8 @@ public interface AccountRepository extends JpaRepository<IcesiAccount, UUID> {
 
     @Query("SELECT CASE WHEN COUNT(a)>0 THEN true ELSE false END FROM IcesiAccount a WHERE a.accountNumber = :accountNumber AND a.icesiUser.userId = :userId")
     Boolean accountOwner(@Param("accountNumber") String accountNumber, @Param("userId") UUID userId);
+
+    @Query("SELECT a FROM IcesiAccount a WHERE a.icesiUser.email = :email")
+    List<Optional<IcesiAccount>> getAccountsByEmail(@Param("email") String email);
 
 }

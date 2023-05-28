@@ -14,6 +14,8 @@ import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.util.ArrayList;
+import java.util.List;
 import java.util.Random;
 import java.util.UUID;
 
@@ -128,5 +130,14 @@ public class AccountService {
         if(!accountRepository.accountOwner(accountNumber, user.getUserId())){
             throw eb.exceptionNotFound("This account is not yours", "account Number in your accounts");
         }
+    }
+
+    public List<IcesiAccountResponseDTO> getAccountsOfUsers(){
+        var username = SecurityContextHolder.getContext().getAuthentication().getName();
+        System.out.println("test" + username);
+        var accounts = accountRepository.getAccountsByEmail(username);
+        List<IcesiAccountResponseDTO> accountsToGet = new ArrayList<>();
+        accounts.forEach(account -> accountsToGet.add(accountMapper.toResponse(account.get())));
+        return accountsToGet;
     }
 }
