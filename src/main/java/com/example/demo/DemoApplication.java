@@ -56,7 +56,6 @@ public class DemoApplication {
 		icesiRole = roleRepository.save(icesiRole);
 		icesiRole2 = roleRepository.save(icesiRole2);
 		IcesiUser icesiUser = IcesiUser.builder()
-				.userId(UUID.randomUUID())
 				.firstName("John")
 				.lastName("Doe")
 				.email("johndoe@email.com")
@@ -65,7 +64,6 @@ public class DemoApplication {
 				.icesiRole(icesiRole)
 				.build();
 		IcesiUser icesiUser2 = IcesiUser.builder()
-				.userId(UUID.randomUUID())
 				.firstName("John")
 				.lastName("Doe")
 				.email("johndoe2@email.com")
@@ -73,18 +71,21 @@ public class DemoApplication {
 				.password(encoder.encode("password"))
 				.icesiRole(icesiRole2)
 				.build();
+
 		IcesiAccount icesiAccount = IcesiAccount.builder()
-				.accountId(UUID.randomUUID())
+				.accountId(UUID.fromString("755a63f6-fdb1-11ed-be56-0242ac120002"))
 				.accountNumber("123-123456-12")
 				.balance(1000000)
 				.type(TypeIcesiAccount.normal)
 				.active(true)
 				.icesiUser(icesiUser)
 				.build();
+		
 											
 		return args -> {
 			users.save(icesiUser);
 			users.save(icesiUser2);
+			accountRepository.save(icesiAccount);
 		};
 	}
 }
