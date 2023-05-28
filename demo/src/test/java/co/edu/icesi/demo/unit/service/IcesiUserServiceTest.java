@@ -41,13 +41,13 @@ public class IcesiUserServiceTest {
     @Test
     public void testSaveUser(){
 
-        /*when(icesiRoleRepository.findByName(any())).thenReturn(Optional.of(defaultCreateRole()));
+        /*when(icesiRoleRepository.findByRoleName(any())).thenReturn(Optional.of(defaultCreateRole()));
         when(icesiUserRepository.findByPhoneNumber(any())).thenReturn(Optional.empty());
         when(icesiUserRepository.findByEmail(any())).thenReturn(Optional.ofNullable(createDefaultIcesiUser()));
 
         icesiUserService.save(createDefaultIcesiUserDto());
 
-        verify(icesiRoleRepository, times(1)).findByName(any());
+        verify(icesiRoleRepository, times(1)).findByRoleName(any());
         verify(icesiUserMapper, times(1)).fromIcesiUserDto(any());
         verify(icesiUserRepository, times(1)).save(argThat(new IcesiUserMatcher(createDefaultIcesiUser())));
         */
@@ -56,7 +56,7 @@ public class IcesiUserServiceTest {
 
     @Test
     public void testSaveUserEmailAlreadyExists(){
-        when(icesiRoleRepository.findByName(any())).thenReturn(Optional.of(defaultCreateRole()));
+        when(icesiRoleRepository.findByRoleName(any())).thenReturn(Optional.of(defaultCreateRole()));
         when(icesiUserRepository.findByEmail(any())).thenReturn(Optional.of(createDefaultIcesiUser()));
         try{
             icesiUserService.save(createDefaultIcesiUserDto());
@@ -70,7 +70,7 @@ public class IcesiUserServiceTest {
 
     @Test
     public void testSaveUserPhoneNumberAlreadyExists(){
-        when(icesiRoleRepository.findByName(any())).thenReturn(Optional.of(defaultCreateRole()));
+        when(icesiRoleRepository.findByRoleName(any())).thenReturn(Optional.of(defaultCreateRole()));
 
         when(icesiUserRepository.findByPhoneNumber(any())).thenReturn(Optional.of(createDefaultIcesiUser()));
         try{
@@ -84,7 +84,7 @@ public class IcesiUserServiceTest {
 
     @Test
     public void testSaveUserEmailAndPhoneNumberAlreadyExist(){
-        when(icesiRoleRepository.findByName(any())).thenReturn(Optional.of(defaultCreateRole()));
+        when(icesiRoleRepository.findByRoleName(any())).thenReturn(Optional.of(defaultCreateRole()));
         when(icesiUserRepository.findByEmail(any())).thenReturn(Optional.of(createDefaultIcesiUser()));
         when(icesiUserRepository.findByPhoneNumber(any())).thenReturn(Optional.of(createDefaultIcesiUser()));
         try{
@@ -117,7 +117,7 @@ public class IcesiUserServiceTest {
 
     @Test
     public void testSaveUserRoleNotExists(){
-        when(icesiRoleRepository.findByName(any())).thenReturn(Optional.empty());
+        when(icesiRoleRepository.findByRoleName(any())).thenReturn(Optional.empty());
         try{
             icesiUserService.save(createDefaultIcesiUserDto());
             fail();
@@ -156,7 +156,7 @@ public class IcesiUserServiceTest {
 
     @Test
     public void testSaveUserEmailAndPhoneNumberAlreadyExist(){
-        when(icesiRoleRepository.findByName(any())).thenReturn(Optional.of(defaultCreateRole()));
+        when(icesiRoleRepository.findByRoleName(any())).thenReturn(Optional.of(defaultCreateRole()));
         when(icesiUserRepository.findByEmail(any())).thenReturn(Optional.of(createDefaultIcesiUser()));
         when(icesiUserRepository.findByPhoneNumber(any())).thenReturn(Optional.of(createDefaultIcesiUser()));
         try{
@@ -182,7 +182,7 @@ public class IcesiUserServiceTest {
     private IcesiRole defaultCreateRole(){
         return IcesiRole.builder()
                 .roleId(UUID.randomUUID())
-                .name("ROLE_USER")
+                .roleName("ROLE_USER")
                 .build();
     }
 

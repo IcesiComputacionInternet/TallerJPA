@@ -33,7 +33,7 @@ public class IcesiRoleServiceTest {
 
     private IcesiRole createDefaultIcesiRole(){
         return IcesiRole.builder()
-                .name("suffering_soul")
+                .roleName("suffering_soul")
                 .roleDescription("me")
                 .build();
     }
@@ -68,7 +68,7 @@ public class IcesiRoleServiceTest {
 
     private IcesiRole defaultRoleCreate(){
         return IcesiRole.builder()
-                .name("Admin")
+                .roleName("Admin")
                 .roleDescription("Admin")
                 .build();
     }

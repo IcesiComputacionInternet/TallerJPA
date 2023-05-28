@@ -11,7 +11,7 @@ import java.util.stream.Stream;
 public record SecurityUser(IcesiUser icesiUser) implements UserDetails {
     @Override
     public Collection<? extends GrantedAuthority> getAuthorities() {
-        return Stream.of(icesiUser).map(IcesiUser::getRole).map(IcesiRole::getName).map(SimpleGrantedAuthority::new).collect(Collectors.toList());
+        return Stream.of(icesiUser).map(IcesiUser::getRole).map(IcesiRole::getRoleName).map(SimpleGrantedAuthority::new).collect(Collectors.toList());
     }
 
     @Override

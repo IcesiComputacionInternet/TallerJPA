@@ -28,7 +28,7 @@ public class IcesiRoleService {
     public IcesiRole saveRole(IcesiRoleDto roleToSave){
 
         //Role name should be unique
-        icesiRoleRepository.findByName(roleToSave.getName()).orElseThrow(
+        icesiRoleRepository.findByRoleName(roleToSave.getName()).orElseThrow(
                 createIcesiException(
                         "Role already exists",
                         HttpStatus.BAD_REQUEST,

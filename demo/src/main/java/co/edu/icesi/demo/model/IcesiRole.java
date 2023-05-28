@@ -22,7 +22,6 @@ public class IcesiRole {
 
     private String roleDescription;
 
-    private String name;
 
     private String roleName;
 

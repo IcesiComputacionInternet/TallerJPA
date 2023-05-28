@@ -382,7 +382,7 @@ public class IcesiAccountTest {
     private IcesiRole defaultCreateRole(){
         return IcesiRole.builder()
                 .roleId(UUID.randomUUID())
-                .name("ROLE_USER")
+                .roleName("ROLE_USER")
                 .build();
     }
 }

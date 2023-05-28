@@ -100,7 +100,7 @@ public class IcesiUserService {
         ));
 
 
-        icesiRoleRepository.findByName(roleName.getName()).orElseThrow(createIcesiException(
+        icesiRoleRepository.findByRoleName(roleName.getName()).orElseThrow(createIcesiException(
                 "Role does not exist",
                 HttpStatus.BAD_REQUEST,
                 new DetailBuilder(ErrorCode.ERR_404, "Role", "Name", roleName.getName())

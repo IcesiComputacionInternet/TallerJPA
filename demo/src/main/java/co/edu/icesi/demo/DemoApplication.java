@@ -1,11 +1,9 @@
 package co.edu.icesi.demo;
 
-import co.edu.icesi.demo.model.IcesiPermission;
 import co.edu.icesi.demo.model.IcesiRole;
 import co.edu.icesi.demo.model.IcesiUser;
 import co.edu.icesi.demo.repository.IcesiRoleRepository;
 import co.edu.icesi.demo.repository.IcesiUserRepository;
-import co.edu.icesi.demo.repository.PermissionRepository;
 import org.springframework.boot.CommandLineRunner;
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
@@ -23,24 +21,9 @@ public class DemoApplication {
 
 	@Bean
 	CommandLineRunner commandLineRunner(IcesiUserRepository users,
-										PermissionRepository permissionRepository,
 										IcesiRoleRepository roleRepository,
 										PasswordEncoder encoder) {
-		IcesiPermission adminPermission = IcesiPermission.builder()
-				.key("admin")
-				.path("/admin")
-				.build();
-		IcesiPermission bankPermission = IcesiPermission.builder()
-				.key("user")
-				.path("/user")
-				.build();
-		IcesiPermission normalPermission = IcesiPermission.builder()
-				.key("account")
-				.path("/account")
-				.build();
-		adminPermission = permissionRepository.save(adminPermission);
-		bankPermission = permissionRepository.save(bankPermission);
-		normalPermission = permissionRepository.save(normalPermission);
+
 
 
 		IcesiRole icesiRole = IcesiRole.builder()
@@ -67,6 +50,7 @@ public class DemoApplication {
 				.firstName("John")
 				.lastName("Doe")
 				.password(encoder.encode("password"))
+				.active(true)
 				.build();
 		IcesiUser icesiUser2 = IcesiUser.builder()
 				.userId(UUID.randomUUID())
@@ -75,6 +59,7 @@ public class DemoApplication {
 				.firstName("John")
 				.lastName("Doe")
 				.password(encoder.encode("password"))
+				.active(true)
 				.build();
 		IcesiUser icesiUser3 = IcesiUser.builder()
 				.userId(UUID.randomUUID())
@@ -83,6 +68,7 @@ public class DemoApplication {
 				.firstName("John")
 				.lastName("Doe")
 				.password(encoder.encode("password"))
+				.active(true)
 				.build();
 
 		return args -> {
