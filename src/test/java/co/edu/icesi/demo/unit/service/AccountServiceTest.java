@@ -38,13 +38,14 @@ public class AccountServiceTest {
         accountMapper=spy(AccountMapperImpl.class);
         userRepository=mock(UserRepository.class);
         accountService=new AccountService(accountRepository,accountMapper,userRepository);
+        accountService=spy(accountService);
 
     }
 
     @Test
     public void testCreateAccount(){
         when(userRepository.findByEmail(any())).thenReturn(Optional.of(defaultIcesiUser()));
-
+        doNothing().when(accountService).manageAuthorization(any());
         accountService.save(newAccountCreateDTO());
         IcesiAccount icesiAccount= newIcesiAccount();
 
@@ -57,6 +58,7 @@ public class AccountServiceTest {
     @Test
     public void testAccountNumberFormat(){
         when(userRepository.findByEmail(any())).thenReturn(Optional.of(defaultIcesiUser()));
+        doNothing().when(accountService).manageAuthorization(any());
         accountService.save(newAccountCreateDTO());
         verify(accountRepository,times(1)).save(argThat(a-> a.getAccountNumber().matches("[0-9]{3}-[0-9]{6}-[0-9]{2}")));
 
@@ -83,7 +85,7 @@ public class AccountServiceTest {
     public void testCreateAccountUniqueAccountNumber(){
         when(userRepository.findByEmail(any())).thenReturn(Optional.of(defaultIcesiUser()));
         when(accountRepository.findByAccountNumber(any())).thenReturn(Optional.of(accountDisabled()),Optional.empty());
-
+        doNothing().when(accountService).manageAuthorization(any());
         accountService.save(newAccountCreateDTO());
 
         verify(accountMapper,times(1)).fromIcesiAccountDTO(any());
@@ -96,7 +98,7 @@ public class AccountServiceTest {
     public void testEnableAccount() {
 
         when(accountRepository.findByAccountNumber(any(),eq(false))).thenReturn(Optional.of(accountDisabled()));
-
+        doNothing().when(accountService).manageAuthorization(any());
         accountService.enableAccount(accountDisabled().getAccountNumber());
 
         verify(accountRepository,times(1)).findByAccountNumber(accountDisabled().getAccountNumber(),false);
@@ -127,7 +129,7 @@ public class AccountServiceTest {
     public void testDisableAccount() {
 
         when(accountRepository.findByAccountNumber(any(),eq(true))).thenReturn(Optional.of(accountEnabled()));
-
+        doNothing().when(accountService).manageAuthorization(any());
         accountService.disableAccount(accountEnabled().getAccountNumber());
 
         verify(accountRepository,times(1)).findByAccountNumber(accountEnabled().getAccountNumber(),true);
@@ -157,7 +159,7 @@ public class AccountServiceTest {
     @Test
     public void testDisableAccountWhenBalanceIsNotZero() {
         when(accountRepository.findByAccountNumber(any(),eq(true))).thenReturn(Optional.of(accountNormalWithBalanceNotInZero()));
-
+        doNothing().when(accountService).manageAuthorization(any());
         try {
             accountService.disableAccount(accountNormalWithBalanceNotInZero().getAccountNumber());
             fail();
@@ -175,7 +177,7 @@ public class AccountServiceTest {
     @Test
     public void testWithdrawalMoney() {
         when(accountRepository.findByAccountNumber(any(),eq(true))).thenReturn(Optional.of(accountNormalWithBalanceNotInZero()));
-
+        doNothing().when(accountService).manageTransactionAuthorization(any());
        TransactionDTO transactionDTO= accountService.withdrawalMoney(defaultTransactionDTO());
        verify(accountRepository,times(1)).findByAccountNumber(any(),eq(true));
        verify(accountRepository,times(1)).save(argThat(a->a.getBalance()==490000));
@@ -202,7 +204,7 @@ public class AccountServiceTest {
     @Test
     public void testWithdrawalMoneyWhenAmountGreaterThanBalance() {
         when(accountRepository.findByAccountNumber(any(),eq(true))).thenReturn(Optional.of(accountEnabled()));
-
+        doNothing().when(accountService).manageTransactionAuthorization(any());
         try {
             accountService.withdrawalMoney(transactionDTOWithAccountFromBalanceInZero());
             fail();
@@ -248,7 +250,7 @@ public class AccountServiceTest {
     @Test
     public void testTransferMoney() {
         when(accountRepository.findByAccountNumber(any(),eq(true))).thenReturn(Optional.of(accountNormalWithBalanceNotInZero()),Optional.of(accountEnabled()));
-
+        doNothing().when(accountService).manageTransactionAuthorization(any());
         TransactionDTO transactionDTO= accountService.transferMoney(defaultTransactionDTO());
         verify(accountRepository,times(2)).findByAccountNumber(any(),eq(true));
         verify(accountRepository,times(2)).save(argThat(a->(a.getBalance()==10000 && a.getAccountNumber().equals(accountEnabled().getAccountNumber())) || (a.getBalance()==490000 && a.getAccountNumber().equals(accountNormalWithBalanceNotInZero().getAccountNumber()))));
@@ -274,7 +276,7 @@ public class AccountServiceTest {
     @Test
     public void testTransferMoneyWhenAccountToDoesNotExists() {
         when(accountRepository.findByAccountNumber(defaultTransactionDTO().getAccountNumberFrom(),true)).thenReturn(Optional.of(accountNormalWithBalanceNotInZero()));
-
+        doNothing().when(accountService).manageTransactionAuthorization(any());
         try {
             accountService.transferMoney(defaultTransactionDTO());
             fail();
@@ -290,7 +292,7 @@ public class AccountServiceTest {
     @Test
     public void testTransferMoneyWhenComesFromDepositOnlyAccount() {
         when(accountRepository.findByAccountNumber(any(),eq(true))).thenReturn(Optional.of(accountDepositOnly()),Optional.of(accountEnabled()));
-
+        doNothing().when(accountService).manageTransactionAuthorization(any());
         try {
             accountService.transferMoney(transactionDTOWithAccountDepositOnlyFrom());
             fail();
@@ -306,7 +308,7 @@ public class AccountServiceTest {
     @Test
     public void testTransferMoneyWhenGoesToDepositOnlyAccount() {
         when(accountRepository.findByAccountNumber(any(),eq(true))).thenReturn(Optional.of(accountNormalWithBalanceNotInZero()) ,Optional.of(accountDepositOnly()));
-
+        doNothing().when(accountService).manageTransactionAuthorization(any());
         try {
             accountService.transferMoney(transactionDTOWithAccountDepositOnlyTo());
             fail();
@@ -323,7 +325,7 @@ public class AccountServiceTest {
     @Test
     public void testTransferMoneyWhenAmountGreaterThanBalance() {
         when(accountRepository.findByAccountNumber(any(),eq(true))).thenReturn(Optional.of(accountEnabled()) ,Optional.of(accountNormalWithBalanceNotInZero()));
-
+        doNothing().when(accountService).manageTransactionAuthorization(any());
         try {
             accountService.transferMoney(transactionDTOWithAccountFromBalanceInZero());
             fail();

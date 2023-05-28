@@ -1,5 +1,6 @@
 package co.edu.icesi.demo.unit.service;
 
+import co.edu.icesi.demo.config.PasswordEncoderConfiguration;
 import co.edu.icesi.demo.dto.UserDTO;
 import co.edu.icesi.demo.error.exception.IcesiException;
 import co.edu.icesi.demo.mapper.UserMapper;
@@ -39,14 +40,18 @@ public class UserServiceTest {
         userRepository=mock(UserRepository.class);
         userMapper=spy(UserMapperImpl.class);
         roleRepository=mock(RoleRepository.class);
+        passwordEncoder=mock(PasswordEncoder.class);
 
         userService=new UserService(userRepository, userMapper, roleRepository,passwordEncoder);
+        userService=spy(userService);
     }
 
 
     @Test
     public void testCreateUser() {
         when(roleRepository.findByName(any())).thenReturn(Optional.of(defaultIcesiRole()));
+        doNothing().when(userService).manageAuthorization(any());
+
 
         userService.save(defaultUserCreateDTO());
         IcesiUser icesiUser = defaultIcesiUser();
@@ -60,6 +65,7 @@ public class UserServiceTest {
    @Test
     public void testCreateUserWhenEmailAlreadyExists(){
        when(userRepository.findByEmail(any())).thenReturn(Optional.of(defaultIcesiUser()));
+       doNothing().when(userService).manageAuthorization(any());
 
         try{
             userService.save(defaultUserCreateDTO());
@@ -81,6 +87,7 @@ public class UserServiceTest {
     public void testCreateUserWhenPhoneNumberAlreadyExists(){
 
         when(userRepository.findByPhoneNumber(any())).thenReturn(Optional.of(defaultIcesiUser()));
+        doNothing().when(userService).manageAuthorization(any());
         try{
             userService.save(defaultUserCreateDTO());
             fail();
@@ -100,6 +107,8 @@ public class UserServiceTest {
     public void testCreateUserWhenEmailAndPhoneNumberAlreadyExists(){
         when(userRepository.findByEmail(any())).thenReturn(Optional.of(defaultIcesiUser()));
         when(userRepository.findByPhoneNumber(any())).thenReturn(Optional.of(defaultIcesiUser()));
+        doNothing().when(userService).manageAuthorization(any());
+
 
         try{
             userService.save(defaultUserCreateDTO());
@@ -119,7 +128,7 @@ public class UserServiceTest {
 
     @Test
     public void testCreateUserWhenRoleDoesNotExists(){
-
+        doNothing().when(userService).manageAuthorization(any());
         try {
             userService.save(defaultUserCreateDTO());
             fail();
