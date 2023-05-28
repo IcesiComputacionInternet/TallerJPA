@@ -6,6 +6,7 @@ import java.util.UUID;
 import java.util.stream.Collectors;
 import java.util.stream.IntStream;
 
+import java.util.List;
 import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
 
@@ -212,4 +213,21 @@ public class IcesiAccountService {
                 new DetailBuilder(ErrorCode.ERR_404, "account", "the number", accountNumber)
         ));
     }
+
+    public List<ResponseIcesiAccountDTO> findAccountsOwnedByAUser(String userId) {
+        return findUserById(userId).getAccounts().stream()
+            .map(icesiAccountMapper::fromIcesiAccountToResponseIcesiAccountDTO)
+            .collect(Collectors.toList());
+    }
+
+    public IcesiUser findUserById(String userId) {
+        return icesiUserRepository.findById(UUID.fromString(userId))
+        .orElseThrow(IcesiExceptionBuilder.createIcesiException(
+                "The user with id " + userId + " is not present in the database",
+                HttpStatus.NOT_FOUND,
+                new DetailBuilder(ErrorCode.ERR_404, "user", "id", userId)
+        ));
+    }
+
+
 }

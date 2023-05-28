@@ -11,4 +11,5 @@ public interface IcesiUserAPI {
     String BASE_USER_URL = "/icesiUsers";
     
     ResponseIcesiUserDTO add(@Valid @RequestBody String userCreatorRole, IcesiUserCreateDTO requestIcesiUserCreateDTO);
+
 }

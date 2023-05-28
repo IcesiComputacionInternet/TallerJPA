@@ -1,5 +1,7 @@
 package com.example.demo.config;
 
+import java.util.Arrays;
+
 import javax.crypto.spec.SecretKeySpec;
 import javax.servlet.http.HttpServletRequest;
 import org.springframework.context.annotation.Bean;
@@ -25,6 +27,7 @@ import org.springframework.security.web.access.intercept.RequestMatcherDelegatin
 import org.springframework.security.web.servlet.util.matcher.MvcRequestMatcher;
 import org.springframework.security.web.util.matcher.AndRequestMatcher;
 import org.springframework.security.web.util.matcher.RequestMatcher;
+import org.springframework.web.cors.CorsConfiguration;
 import org.springframework.web.servlet.handler.HandlerMappingIntrospector;
 
 import com.nimbusds.jose.jwk.source.ImmutableSecret;
@@ -48,8 +51,14 @@ public class SecutiryConfiguration {
     public SecurityFilterChain securityFilterChain(HttpSecurity http, 
         AuthorizationManager<RequestAuthorizationContext> access) throws Exception {
         return http 
-            .cors(AbstractHttpConfigurer::disable)
-            .csrf(AbstractHttpConfigurer::disable)
+            .cors(cors -> cors.configurationSource(request -> {
+                CorsConfiguration config = new CorsConfiguration();
+                config.setAllowedOrigins(Arrays.asList("*"));
+                config.setAllowedMethods(Arrays.asList("GET", "POST", "PUT", "DELETE"));
+                config.setAllowedHeaders(Arrays.asList("*"));
+                return config;
+            }))
+            .csrf(AbstractHttpConfigurer::disable)  
             .authorizeHttpRequests(auth -> auth 
                 .anyRequest().access(access)) //.permitAll() to allow all request
                 .oauth2ResourceServer(OAuth2ResourceServerConfigurer::jwt)

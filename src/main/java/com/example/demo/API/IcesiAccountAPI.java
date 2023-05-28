@@ -2,6 +2,9 @@ package com.example.demo.API;
 
 import javax.validation.Valid;
 
+import java.util.List;
+
+import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -31,5 +34,8 @@ public interface IcesiAccountAPI {
 
     @PostMapping("transfer")
     public ResponseTransactionDTO transferMoneyToAnotherAccount(@Valid @RequestBody TransactionCreateDTO transactionCreateDTO);
+
+    @GetMapping("")
+    public List<ResponseIcesiAccountDTO> getAccountByUser();
     
 }

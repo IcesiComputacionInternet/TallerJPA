@@ -10,9 +10,12 @@ import org.springframework.boot.autoconfigure.SpringBootApplication;
 import org.springframework.context.annotation.Bean;
 import org.springframework.security.crypto.password.PasswordEncoder;
 
+import com.example.demo.model.IcesiAccount;
 import com.example.demo.model.IcesiPermission;
 import com.example.demo.model.IcesiRole;
 import com.example.demo.model.IcesiUser;
+import com.example.demo.model.enums.TypeIcesiAccount;
+import com.example.demo.repository.IcesiAccountRepository;
 import com.example.demo.repository.IcesiRoleRepository;
 import com.example.demo.repository.IcesiUserRepository;
 import com.example.demo.repository.PermissionRepository;
@@ -25,8 +28,9 @@ public class DemoApplication {
 	}
 
 	@Bean
-	CommandLineRunner commandLineRunner(IcesiUserRepository users,
+		CommandLineRunner commandLineRunner(IcesiUserRepository users,
 										IcesiRoleRepository roleRepository,
+										IcesiAccountRepository accountRepository,
 										PermissionRepository permissionRepository,
 										PasswordEncoder encoder) {
 		IcesiPermission icesiPermission = IcesiPermission.builder()
@@ -68,6 +72,14 @@ public class DemoApplication {
 				.phoneNumber("+57123123123")
 				.password(encoder.encode("password"))
 				.icesiRole(icesiRole2)
+				.build();
+		IcesiAccount icesiAccount = IcesiAccount.builder()
+				.accountId(UUID.randomUUID())
+				.accountNumber("123-123456-12")
+				.balance(1000000)
+				.type(TypeIcesiAccount.normal)
+				.active(true)
+				.icesiUser(icesiUser)
 				.build();
 											
 		return args -> {
