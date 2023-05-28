@@ -215,7 +215,6 @@ public class AccountService {
         }
     }
     public AccountDTO getAccount(String accountNumber) {
-        AdminAuthorizationOnly();
         return  accountMapper.fromIcesiAccount(accountRepository.findByAccountNumber(accountNumber).orElseThrow(
                 createIcesiException(
                         "Account number not found",
@@ -226,8 +225,8 @@ public class AccountService {
     }
 
     public List<AccountDTO> getAllAccounts() {
-        AdminAuthorizationOnly();
-        return accountRepository.findAll().stream()
+        IcesiUser user=userRepository.findById(UUID.fromString(IcesiSecurityContext.getCurrentUserId())).get();
+        return user.getAccounts().stream()
                 .map(accountMapper::fromIcesiAccount)
                 .toList();
     }

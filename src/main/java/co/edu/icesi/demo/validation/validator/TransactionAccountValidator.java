@@ -14,6 +14,6 @@ public class TransactionAccountValidator implements ConstraintValidator<Transact
 
     @Override
     public boolean isValid(TransactionDTO transactionDTO, ConstraintValidatorContext constraintValidatorContext) {
-        return !transactionDTO.getAccountNumberFrom().isEmpty() || !transactionDTO.getAccountNumberTo().isEmpty();
+        return transactionDTO.getAccountNumberFrom()!=null || transactionDTO.getAccountNumberTo()!=null;
     }
 }

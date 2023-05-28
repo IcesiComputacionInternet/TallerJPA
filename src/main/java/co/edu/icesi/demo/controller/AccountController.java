@@ -5,6 +5,7 @@ import co.edu.icesi.demo.dto.AccountDTO;
 import co.edu.icesi.demo.dto.TransactionDTO;
 import co.edu.icesi.demo.service.AccountService;
 import lombok.AllArgsConstructor;
+import org.springframework.web.bind.annotation.CrossOrigin;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
@@ -15,6 +16,7 @@ import static co.edu.icesi.demo.api.AccountAPI.BASE_ACCOUNT_URL;
 @RestController
 @RequestMapping(BASE_ACCOUNT_URL)
 @AllArgsConstructor
+@CrossOrigin
 public class AccountController implements AccountAPI {
 
     private final AccountService accountService;
