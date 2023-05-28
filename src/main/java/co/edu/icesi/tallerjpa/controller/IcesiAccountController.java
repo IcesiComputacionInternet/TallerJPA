@@ -5,16 +5,14 @@ import co.edu.icesi.tallerjpa.dto.*;
 import co.edu.icesi.tallerjpa.security.IcesiSecurityContext;
 import co.edu.icesi.tallerjpa.service.IcesiAccountService;
 import lombok.AllArgsConstructor;
-import org.springframework.security.core.context.SecurityContextHolder;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 
 import javax.validation.Valid;
+import java.util.List;
 
 @AllArgsConstructor
 @RestController
+@CrossOrigin("*")
 public class IcesiAccountController implements IcesiAccountApi {
 
     private final IcesiAccountService icesiAccountService;
@@ -60,5 +58,11 @@ public class IcesiAccountController implements IcesiAccountApi {
     public IcesiAccountShowDTO getAccountByAccountNumber(String accountId) {
         String icesiUserId = IcesiSecurityContext.getCurrentUserId();
         return icesiAccountService.getAccountByAccountNumber(accountId, icesiUserId);
+    }
+
+    @Override
+    public List<IcesiAccountShowDTO> getAccountsByUserId() {
+        String icesiUserId = IcesiSecurityContext.getCurrentUserId();
+        return icesiAccountService.getAccounts(icesiUserId);
     }
 }

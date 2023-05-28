@@ -1,12 +1,14 @@
 package co.edu.icesi.tallerjpa.api;
 
 import co.edu.icesi.tallerjpa.dto.*;
+import co.edu.icesi.tallerjpa.model.IcesiAccount;
 import org.springframework.web.bind.annotation.*;
 
 import javax.validation.Valid;
 import javax.validation.constraints.NotBlank;
 import javax.validation.constraints.NotEmpty;
 import javax.validation.constraints.NotNull;
+import java.util.List;
 
 @RequestMapping("/icesi_accounts")
 public interface IcesiAccountApi {
@@ -31,5 +33,8 @@ public interface IcesiAccountApi {
 
     @GetMapping("id/{accountNumber}")
     public IcesiAccountShowDTO getAccountByAccountNumber(@PathVariable("accountNumber") String accountNumber);
+
+    @GetMapping()
+    public List<IcesiAccountShowDTO> getAccountsByUserId();
 
 }

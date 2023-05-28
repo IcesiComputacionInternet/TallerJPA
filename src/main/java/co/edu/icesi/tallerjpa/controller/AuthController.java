@@ -14,7 +14,6 @@ import org.springframework.web.bind.annotation.RestController;
 
 @RestController
 @AllArgsConstructor
-@CrossOrigin(origins="*")
 public class AuthController {
     private final TokenService tokenService;
     private final AuthenticationManager authenticationManager;

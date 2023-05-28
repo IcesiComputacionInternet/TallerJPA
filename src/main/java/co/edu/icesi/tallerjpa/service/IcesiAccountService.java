@@ -15,10 +15,12 @@ import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.util.List;
 import java.util.Optional;
 import java.util.UUID;
 import java.util.stream.Collectors;
 import java.util.stream.IntStream;
+import java.util.stream.Stream;
 
 import static co.edu.icesi.tallerjpa.error.util.IcesiExceptionBuilder.createIcesiException;
 
@@ -305,5 +307,12 @@ public class IcesiAccountService {
                         HttpStatus.NOT_FOUND,
                         new DetailBuilder(ErrorCode.ERR_404, "Icesi user", "email", email)
                 ));
+    }
+
+    public List<IcesiAccountShowDTO> getAccounts(String icesiUserId){
+        IcesiUser icesiUser = getIcesiUserById(icesiUserId);
+        return icesiUser.getIcesiAccounts().stream()
+                .map(x -> icesiAccountMapper.fromIcesiAccountToShowDTO(x))
+                .toList();
     }
 }
