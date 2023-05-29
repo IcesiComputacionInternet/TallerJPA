@@ -1,5 +1,6 @@
 package co.edu.icesi.demo.api;
 
+import co.edu.icesi.demo.dto.AccountsUserDto;
 import co.edu.icesi.demo.dto.IcesiAccountDto;
 import co.edu.icesi.demo.dto.TransactionOperationDto;
 import co.edu.icesi.demo.dto.TransactionResultDto;
@@ -8,6 +9,7 @@ import org.springframework.web.bind.annotation.*;
 import javax.validation.Valid;
 
 @RequestMapping("/Accounts")
+@CrossOrigin(origins = "*")
 public interface AccountApi {
 
     @PostMapping("/add/account")
@@ -26,4 +28,7 @@ public interface AccountApi {
 
     @PatchMapping("/disableAccount/{accountNumber}")
     public String disableAccount(@PathVariable String accountNumber);
+    
+    @GetMapping("/getAccounts")
+    public AccountsUserDto getAccountsLoggedUser();
 }

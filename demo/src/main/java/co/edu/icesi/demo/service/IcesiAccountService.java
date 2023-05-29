@@ -2,19 +2,26 @@ package co.edu.icesi.demo.service;
 
 import co.edu.icesi.demo.dto.*;
 import co.edu.icesi.demo.enums.TypeAccount;
+import co.edu.icesi.demo.error.DetailBuilder;
+import co.edu.icesi.demo.error.ErrorCode;
 import co.edu.icesi.demo.mapper.IcesiAccountMapper;
 import co.edu.icesi.demo.model.IcesiAccount;
+import co.edu.icesi.demo.model.IcesiUser;
 import co.edu.icesi.demo.repository.IcesiAccountRepository;
 import co.edu.icesi.demo.repository.IcesiUserRepository;
+import co.edu.icesi.demo.security.SecurityContext;
 import lombok.AllArgsConstructor;
-import lombok.Builder;
-import lombok.NoArgsConstructor;
+import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
 
+import java.util.List;
+import java.util.Optional;
 import java.util.Random;
 import java.util.UUID;
 import java.util.stream.Collectors;
 import java.util.stream.IntStream;
+
+import static co.edu.icesi.demo.error.IcesiExceptionBuilder.createIcesiException;
 
 @Service
 @AllArgsConstructor
@@ -159,5 +166,33 @@ public class IcesiAccountService {
                 randomNumbers.substring(0, 3),
                 randomNumbers.substring(3, 9),
                 randomNumbers.substring(9, 11));
+    }
+
+    public AccountsUserDto getAccountsLoggedUser() {
+        String userID = SecurityContext.getCurrentUserId();
+        Optional<IcesiUser> userOptional = userRepository.findById(UUID.fromString(userID));
+        validateUserFound(userOptional);
+        IcesiUser user = userOptional.get();
+        List<IcesiAccount> accounts = user.getIcesiAccounts();
+
+        List<IcesiAccountDto> accountResponses = accounts.stream()
+                .map(icesiAccount -> {
+                    IcesiAccountDto accountResponse = new IcesiAccountDto();
+                    accountResponse.setAccountNumber(icesiAccount.getAccountNumber());
+                    accountResponse.setBalance(icesiAccount.getBalance());
+                    return accountResponse;
+                })
+                .toList();
+        return AccountsUserDto.builder().userAccounts(accountResponses).build();
+    }
+
+    private void validateUserFound( Optional<IcesiUser> user) {
+        if(user.isEmpty()){
+            throw createIcesiException(
+                    "Id not found",
+                    HttpStatus.BAD_REQUEST,
+                    new DetailBuilder(ErrorCode.ERR_DUPLICATED,user)
+            ).get();
+        }
     }
 }

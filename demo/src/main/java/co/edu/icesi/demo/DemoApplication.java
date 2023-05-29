@@ -1,7 +1,9 @@
 package co.edu.icesi.demo;
 
+import co.edu.icesi.demo.model.IcesiAccount;
 import co.edu.icesi.demo.model.IcesiRole;
 import co.edu.icesi.demo.model.IcesiUser;
+import co.edu.icesi.demo.repository.IcesiAccountRepository;
 import co.edu.icesi.demo.repository.IcesiRoleRepository;
 import co.edu.icesi.demo.repository.IcesiUserRepository;
 import org.springframework.boot.CommandLineRunner;
@@ -10,6 +12,8 @@ import org.springframework.boot.autoconfigure.SpringBootApplication;
 import org.springframework.context.annotation.Bean;
 import org.springframework.security.crypto.password.PasswordEncoder;
 
+import java.util.ArrayList;
+import java.util.List;
 import java.util.UUID;
 
 @SpringBootApplication
@@ -22,9 +26,17 @@ public class DemoApplication {
 	@Bean
 	CommandLineRunner commandLineRunner(IcesiUserRepository users,
 										IcesiRoleRepository roleRepository,
+										IcesiAccountRepository accountRepository,
 										PasswordEncoder encoder) {
 
 
+		IcesiAccount account1 = new IcesiAccount();
+		account1.setAccountId(UUID.randomUUID());
+		account1.setAccountNumber("123-456-789");
+		account1.setBalance(100);
+
+		List<IcesiAccount> accountList = new ArrayList<>();
+		accountList.add(account1);
 
 		IcesiRole icesiRole = IcesiRole.builder()
 				.roleId(UUID.randomUUID())
@@ -50,7 +62,9 @@ public class DemoApplication {
 				.firstName("John")
 				.lastName("Doe")
 				.password(encoder.encode("password"))
+				.icesiAccounts(accountList)
 				.active(true)
+
 				.build();
 		IcesiUser icesiUser2 = IcesiUser.builder()
 				.userId(UUID.randomUUID())
@@ -71,13 +85,18 @@ public class DemoApplication {
 				.active(true)
 				.build();
 
+
 		return args -> {
 			roleRepository.save(icesiRole);
 			roleRepository.save(icesiRole2);
 			roleRepository.save(icesiRole3);
+
+			accountRepository.save(account1);
+
 			users.save(icesiUser);
 			users.save(icesiUser2);
 			users.save(icesiUser3);
+
 		};
 	}
 }
