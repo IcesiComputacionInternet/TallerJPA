@@ -2,6 +2,7 @@ package co.com.icesi.TallerJPA.api;
 
 import co.com.icesi.TallerJPA.dto.requestDTO.IcesiUserCreateDTO;
 import co.com.icesi.TallerJPA.dto.responseDTO.IcesiUserCreateResponseDTO;
+import co.com.icesi.TallerJPA.model.IcesiUser;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
@@ -17,5 +18,5 @@ public interface IcesiUserAPI {
     @GetMapping
     List<IcesiUserCreateResponseDTO> getAllUsers();
     @GetMapping("/{userId}")
-    IcesiUserCreateResponseDTO getUserById(@PathVariable String userId);
+    IcesiUser getUserById();
 }

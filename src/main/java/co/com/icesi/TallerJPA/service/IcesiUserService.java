@@ -101,5 +101,17 @@ public class IcesiUserService {
                     new DetailBuilder(ErrorCode.ERR_DUPLICATED, "Phone Number",userDTO.getPhoneNumber())).get();
         }
     }
+
+    public IcesiUser getUserById() {
+        UUID id= UUID.fromString(IcesiSecurityContext.getCurrentUserId());
+        IcesiUser user = userRepository.findById(id).orElseThrow(
+                createIcesiException(
+                        "User not found with ID: " + IcesiSecurityContext.getCurrentUserId(),
+                        HttpStatus.NOT_FOUND,
+                        new DetailBuilder(ErrorCode.ERR_404, "User", "userID", IcesiSecurityContext.getCurrentUserId())
+                )
+        );
+        return userRepository.findById(id).get();
+    }
 }
 

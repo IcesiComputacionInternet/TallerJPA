@@ -3,6 +3,7 @@ package co.com.icesi.TallerJPA.api;
 import co.com.icesi.TallerJPA.dto.requestDTO.IcesiAccountCreateDTO;
 import co.com.icesi.TallerJPA.dto.requestDTO.IcesiTransactionDTO;
 import co.com.icesi.TallerJPA.dto.responseDTO.IcesiAccountCreateResponseDTO;
+import co.com.icesi.TallerJPA.model.IcesiAccount;
 import org.springframework.web.bind.annotation.*;
 
 import javax.validation.Valid;
@@ -15,7 +16,7 @@ public interface IcesiAccountAPI {
     List<IcesiAccountCreateResponseDTO> getAllAccounts();
 
     @GetMapping("/{accountNumber}")
-    IcesiAccountCreateDTO getAccountByNumber(@PathVariable String accountNumber);
+    IcesiAccount getAccountByNumber(@PathVariable String accountNumber);
 
     @PostMapping("/create")
     IcesiAccountCreateResponseDTO addAccount(@Valid @RequestBody IcesiAccountCreateDTO accountDto);
@@ -34,4 +35,7 @@ public interface IcesiAccountAPI {
 
     @PatchMapping("/disableAccount/{accountNumber}")
     String disableAccount(@PathVariable String accountNumber);
+
+    @GetMapping("/getUserAccounts")
+    List<IcesiAccountCreateResponseDTO> getIcesiIUserAccounts();
 }

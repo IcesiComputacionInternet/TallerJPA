@@ -17,8 +17,10 @@ import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.util.List;
 import java.util.Random;
 import java.util.UUID;
+import java.util.stream.Collectors;
 
 import static co.com.icesi.TallerJPA.error.util.IcesiExceptionBuilder.createIcesiException;
 
@@ -226,6 +228,22 @@ public class IcesiAccountService {
         account.setActive(false);
         accountRepository.save(account);
         return "The account was disabled successfully";
+    }
+
+    public List<IcesiAccountCreateResponseDTO> getIcesiIUserAccounts() {
+        UUID id= UUID.fromString(IcesiSecurityContext.getCurrentUserId());
+
+        IcesiUser user = userRepository.findById(id).orElseThrow(
+                createIcesiException(
+                        "User not found with ID: " + IcesiSecurityContext.getCurrentUserId(),
+                        HttpStatus.NOT_FOUND,
+                        new DetailBuilder(ErrorCode.ERR_404, "User", "userID", IcesiSecurityContext.getCurrentUserId())
+                )
+        );
+
+        return user.getAccounts().stream()
+                .map(accountMapper::fromIcesiAccount)
+                .collect(Collectors.toList());
     }
 }
 

@@ -4,6 +4,7 @@ import co.com.icesi.TallerJPA.api.IcesiAccountAPI;
 import co.com.icesi.TallerJPA.dto.requestDTO.IcesiAccountCreateDTO;
 import co.com.icesi.TallerJPA.dto.requestDTO.IcesiTransactionDTO;
 import co.com.icesi.TallerJPA.dto.responseDTO.IcesiAccountCreateResponseDTO;
+import co.com.icesi.TallerJPA.model.IcesiAccount;
 import co.com.icesi.TallerJPA.service.IcesiAccountService;
 import lombok.AllArgsConstructor;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -25,8 +26,8 @@ public class IcesiAccountController implements IcesiAccountAPI {
     }
 
     @Override
-    public IcesiAccountCreateDTO getAccountByNumber(String accountNumber) {
-        return null;
+    public IcesiAccount getAccountByNumber(String accountNumber) {
+        return accountService.getIcesiAccountNumber(accountNumber);
     }
 
     @Override
@@ -57,5 +58,10 @@ public class IcesiAccountController implements IcesiAccountAPI {
     @Override
     public String disableAccount(String accountNumber) {
         return accountService.disableAccount(accountNumber);
+    }
+
+    @Override
+    public List<IcesiAccountCreateResponseDTO> getIcesiIUserAccounts() {
+        return accountService.getIcesiIUserAccounts();
     }
 }

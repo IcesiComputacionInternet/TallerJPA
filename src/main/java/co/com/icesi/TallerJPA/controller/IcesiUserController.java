@@ -3,6 +3,7 @@ package co.com.icesi.TallerJPA.controller;
 import co.com.icesi.TallerJPA.api.IcesiUserAPI;
 import co.com.icesi.TallerJPA.dto.requestDTO.IcesiUserCreateDTO;
 import co.com.icesi.TallerJPA.dto.responseDTO.IcesiUserCreateResponseDTO;
+import co.com.icesi.TallerJPA.model.IcesiUser;
 import co.com.icesi.TallerJPA.service.IcesiUserService;
 import lombok.AllArgsConstructor;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -29,7 +30,7 @@ public class IcesiUserController implements IcesiUserAPI {
     }
 
     @Override
-    public IcesiUserCreateResponseDTO getUserById(String userId) {
-        return null;
+    public IcesiUser getUserById() {
+        return userService.getUserById();
     }
 }
