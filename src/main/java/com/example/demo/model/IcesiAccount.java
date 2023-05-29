@@ -20,7 +20,7 @@ import lombok.NoArgsConstructor;
 @AllArgsConstructor
 @NoArgsConstructor
 public class IcesiAccount {
-
+    
     @Id
     private UUID accountId;
     private String accountNumber;
