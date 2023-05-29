@@ -21,8 +21,8 @@ public class IcesiAccountSystemApplication {
 	public static void main(String[] args) {
 		SpringApplication.run(IcesiAccountSystemApplication.class, args);
 	}
-
-	/*@Bean
+/*
+	@Bean
 	CommandLineRunner commandLineRunner(UserRepository userRepository, RoleRepository
 			roleRepository, AccountRepository accountRepository, PasswordEncoder encoder) {
 		IcesiRole icesiRole = IcesiRole.builder()

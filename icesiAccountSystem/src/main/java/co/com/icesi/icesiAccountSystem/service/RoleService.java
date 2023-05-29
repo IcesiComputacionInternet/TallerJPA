@@ -53,7 +53,7 @@ public class RoleService {
         return roleMapper.fromRoleToRoleDTO(roleByName);
     }
 
-    private void checkPermissions() {
+    public void checkPermissions() {
         if(!IcesiSecurityContext.getCurrentUserRole().equals("ADMIN")){
             throw createAccountSystemException(
                     "Only an ADMIN user can create and see created roles.",

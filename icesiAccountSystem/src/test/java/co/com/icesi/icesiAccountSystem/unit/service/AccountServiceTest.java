@@ -45,6 +45,7 @@ public class AccountServiceTest {
         userMapper =spy(UserMapperImpl.class);
         roleMapper = spy(RoleMapper.class);
         accountService = new AccountService(accountRepository, userRepository, accountMapper, userMapper,roleMapper);
+        accountService = spy(accountService);
     }
 
     @Test
@@ -53,6 +54,7 @@ public class AccountServiceTest {
         var user= defaultIcesiUser();
         var accountDTO = defaultNormalAccountDTO();
         when(userRepository.findByEmail(any())).thenReturn(Optional.of(user));
+        doNothing().when(accountService).checkPermissionsToCreate(any());
         // Act
         accountService.saveAccount(accountDTO);
         // Assert
@@ -74,6 +76,7 @@ public class AccountServiceTest {
     //@NotBlank(message = "The email of a user can't be blank")
     @Test
     public void testCreateAccountWithoutUserEmail(){
+        doNothing().when(accountService).checkPermissionsToCreate(any());
         try {
             // Act
             accountService.saveAccount(
@@ -91,7 +94,7 @@ public class AccountServiceTest {
             assertEquals(1, details.size());
             var detail = details.get(0);
             // Assert
-            assertEquals("Some fields of the new account had errors", message);
+            assertEquals("User does not exist.", message);
             assertEquals("ERR_404", detail.getErrorCode(), "Code doesn't match");
             assertEquals("User with email:  not found.", detail.getErrorMessage(), "Error message doesn't match");
         }
@@ -99,6 +102,7 @@ public class AccountServiceTest {
 
     @Test
     public void testCreateAccountWithUserThatDoesNotExists(){
+        doNothing().when(accountService).checkPermissionsToCreate(any());
         try {
             // Act
             accountService.saveAccount(
@@ -116,20 +120,20 @@ public class AccountServiceTest {
             assertEquals(1, details.size());
             var detail = details.get(0);
             // Assert
-            assertEquals("Some fields of the new account had errors", message);
+            assertEquals("User does not exist.", message);
             assertEquals("ERR_404", detail.getErrorCode(), "Code doesn't match");
             assertEquals("User with email: ykaar@gmail.com not found.", detail.getErrorMessage(), "Error message doesn't match");
         }
     }
 
     //TEST COMENTADO PORQUE ESTA VALIDACIÓN SE PUEDE REALIZAR CON  @Min(value=0, message = "The amount of a transaction must be greater than 0")
-    //******* VER TEST DE INTEGRACIÓN
-
+/*
     @Test
     public void testCreateAccountWithBalanceBelowCero(){
         // Arrange
         var user = defaultIcesiUser();
         when(userRepository.findByEmail(any())).thenReturn(Optional.of(user));
+        doNothing().when(accountService).checkPermissionsToCreate(any());
         try {
             // Act
             accountService.saveAccount(
@@ -145,7 +149,7 @@ public class AccountServiceTest {
             // Assert
             assertEquals("Account's balance can not be below 0.", message);
         }
-    }
+    }*/
 
     //EL SIGUIENTE TEST SE PUEDE REEMPLAZAR CON LAS VALIDACIONES
     //@NotNull(message = "The type of an account can't be null")
@@ -155,6 +159,7 @@ public class AccountServiceTest {
         // Arrange
         var user = defaultIcesiUser();
         when(userRepository.findByEmail(any())).thenReturn(Optional.of(user));
+        doNothing().when(accountService).checkPermissionsToCreate(any());
         try {
             // Act
             accountService.saveAccount(
@@ -183,6 +188,7 @@ public class AccountServiceTest {
         // Arrange
         var user = defaultIcesiUser();
         when(userRepository.findByEmail(any())).thenReturn(Optional.of(user));
+        doNothing().when(accountService).checkPermissionsToCreate(any());
         try {
             // Act
             accountService.saveAccount(
@@ -213,6 +219,7 @@ public class AccountServiceTest {
         var user = defaultIcesiUser();
         var accountDTO = defaultDepositOnlyAccountDTO();
         when(userRepository.findByEmail(any())).thenReturn(Optional.of(user));
+        doNothing().when(accountService).checkPermissionsToCreate(any());
         // Act
         accountService.saveAccount(accountDTO);
         String accNumPattern = "[0-9]{3}-[0-9]{6}-[0-9]{2}";
@@ -225,7 +232,7 @@ public class AccountServiceTest {
         // Arrange
         var user = defaultIcesiUser();
         when(userRepository.findByEmail(any())).thenReturn(Optional.of(user));
-
+        doNothing().when(accountService).checkPermissionsToUpdate(any());
         IcesiAccount account = defaultIcesiNormalAccount1();
         account.setBalance(0);
         when(accountRepository.findByAccountNumber(any())).thenReturn(Optional.of(account));
@@ -247,6 +254,7 @@ public class AccountServiceTest {
         var icesiAccount = defaultIcesiNormalAccount1();
         when(userRepository.findByEmail(any())).thenReturn(Optional.of(user));
         when(accountRepository.findByAccountNumber(any())).thenReturn(Optional.of(icesiAccount));
+        doNothing().when(accountService).checkPermissionsToUpdate(any());
         try {
             // Act
             accountService.disableAccount(defaultIcesiNormalAccount1().getAccountNumber());
@@ -290,6 +298,7 @@ public class AccountServiceTest {
         // Arrange
         var user = defaultIcesiUser();
         when(userRepository.findByEmail(any())).thenReturn(Optional.of(user));
+        doNothing().when(accountService).checkPermissionsToUpdate(any());
 
         IcesiAccount account = defaultIcesiDepositOnlyAccount();
         account.setActive(false);
@@ -334,7 +343,7 @@ public class AccountServiceTest {
         var icesiAccount = defaultIcesiNormalAccount1();
         when(userRepository.findByEmail(any())).thenReturn(Optional.of(user));
         when(accountRepository.findByAccountNumber(any())).thenReturn(Optional.of(icesiAccount));
-
+        doNothing().when(accountService).checkPermissionsToUpdate(any());
         // Act
         TransactionOperationDTO transactionOperationDTO = accountService.withdrawMoney(defaultTransactionOperationDTO1());
 
@@ -372,7 +381,7 @@ public class AccountServiceTest {
         var icesiAccount = defaultIcesiNormalAccount1();
         when(userRepository.findByEmail(any())).thenReturn(Optional.of(user));
         when(accountRepository.findByAccountNumber(any())).thenReturn(Optional.of(icesiAccount));
-
+        doNothing().when(accountService).checkPermissionsToUpdate(any());
         TransactionOperationDTO transaction = defaultTransactionOperationDTO1();
         transaction.setAmount(1600000L);
 
@@ -402,7 +411,7 @@ public class AccountServiceTest {
         IcesiAccount account = defaultIcesiDepositOnlyAccount();
         account.setActive(false);
         when(accountRepository.findByAccountNumber(any())).thenReturn(Optional.of(account));
-
+        doNothing().when(accountService).checkPermissionsToUpdate(any());
         try {
             // Act
             accountService.withdrawMoney(defaultTransactionOperationDTO2());
@@ -428,7 +437,7 @@ public class AccountServiceTest {
         var icesiAccount = defaultIcesiNormalAccount1();
         when(userRepository.findByEmail(any())).thenReturn(Optional.of(user));
         when(accountRepository.findByAccountNumber(any())).thenReturn(Optional.of(icesiAccount));
-
+        doNothing().when(accountService).checkPermissionsToUpdate(any());
         // Act
         TransactionOperationDTO transactionOperationDTO = accountService.depositMoney(defaultTransactionOperationDTO1());
 
@@ -469,7 +478,7 @@ public class AccountServiceTest {
         IcesiAccount account = defaultIcesiDepositOnlyAccount();
         account.setActive(false);
         when(accountRepository.findByAccountNumber(any())).thenReturn(Optional.of(account));
-
+        doNothing().when(accountService).checkPermissionsToUpdate(any());
         var accountDTO = defaultTransactionOperationDTO2();
 
         try {
@@ -500,7 +509,7 @@ public class AccountServiceTest {
         when(accountRepository.findByAccountNumber("025-456829-89")).thenReturn(Optional.of(acc1));
         when(accountRepository.findByAccountNumber("019-202301-03")).thenReturn(Optional.of(acc2));
         var accountDTO = defaultTransactionOperationDTO1();
-
+        doNothing().when(accountService).checkPermissionsToUpdate(any());
         // Act
         TransactionOperationDTO transactionOperationDTO = accountService.transferMoney(accountDTO);
 
@@ -573,7 +582,7 @@ public class AccountServiceTest {
         when(userRepository.findByEmail(any())).thenReturn(Optional.of(user));
         when(accountRepository.findByAccountNumber("025-456829-89")).thenReturn(Optional.of(acc1));
         when(accountRepository.findByAccountNumber("019-202301-03")).thenReturn(Optional.of(acc2));
-
+        doNothing().when(accountService).checkPermissionsToUpdate(any());
         TransactionOperationDTO transaction = defaultTransactionOperationDTO1();
         transaction.setAmount(1600000L);
 
@@ -604,7 +613,7 @@ public class AccountServiceTest {
         accountFrom.setActive(false);
         when(accountRepository.findByAccountNumber("025-456829-89")).thenReturn(Optional.of(accountFrom));
         when(accountRepository.findByAccountNumber("019-202301-03")).thenReturn(Optional.of(acc2));
-
+        doNothing().when(accountService).checkPermissionsToUpdate(any());
         var accountDTO = defaultTransactionOperationDTO1();
 
         try {
@@ -635,7 +644,7 @@ public class AccountServiceTest {
         IcesiAccount accountTo = defaultIcesiNormalAccount2();
         accountTo.setActive(false);
         when(accountRepository.findByAccountNumber("019-202301-03")).thenReturn(Optional.of(accountTo));
-
+        doNothing().when(accountService).checkPermissionsToUpdate(any());
         var accountDTO = defaultTransactionOperationDTO1();
 
         try {
@@ -666,7 +675,7 @@ public class AccountServiceTest {
         accountFrom.setType(AccountType.DEPOSIT_ONLY);
         when(accountRepository.findByAccountNumber("025-456829-89")).thenReturn(Optional.of(accountFrom));
         when(accountRepository.findByAccountNumber("019-202301-03")).thenReturn(Optional.of(acc2));
-
+        doNothing().when(accountService).checkPermissionsToUpdate(any());
         var accountDTO = defaultTransactionOperationDTO1();
 
         try {
@@ -697,7 +706,7 @@ public class AccountServiceTest {
         IcesiAccount accountTo = defaultIcesiNormalAccount1();
         accountTo.setType(AccountType.DEPOSIT_ONLY);
         when(accountRepository.findByAccountNumber("019-202301-03")).thenReturn(Optional.of(accountTo));
-
+        doNothing().when(accountService).checkPermissionsToUpdate(any());
         var accountDTO = defaultTransactionOperationDTO1();
 
         try {

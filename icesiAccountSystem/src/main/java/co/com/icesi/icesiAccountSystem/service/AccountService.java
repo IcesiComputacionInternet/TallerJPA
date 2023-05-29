@@ -48,7 +48,6 @@ public class AccountService {
                 )
         );
         var type = checkAccountType(requestAccountDTO.getType(),errors);
-
         if (!errors.isEmpty()){
             throw createAccountSystemException(
                     "Some fields of the new account had errors",
@@ -119,7 +118,7 @@ public class AccountService {
         return account;
     }
 
-    private void checkPermissionsToCreate(String accUserEmail) {
+    public void checkPermissionsToCreate(String accUserEmail) {
         if((IcesiSecurityContext.getCurrentUserRole().equals("BANK_USER"))||(IcesiSecurityContext.getCurrentUserRole().equals("USER")&&!IcesiSecurityContext.getCurrentUserEmail().equals(accUserEmail))){
             throw createAccountSystemException(
                     "Only an ADMIN user can create new accounts for any user, and a normal USER only can create accounts for himself.",
@@ -129,7 +128,7 @@ public class AccountService {
         }
     }
 
-    private void checkPermissionsToUpdate(String accUserId) {
+    public void checkPermissionsToUpdate(String accUserId) {
         if((IcesiSecurityContext.getCurrentUserRole().equals("BANK_USER"))||(IcesiSecurityContext.getCurrentUserRole().equals("USER")&&!IcesiSecurityContext.getCurrentUserId().equals(accUserId))){
             throw createAccountSystemException(
                     "Only an ADMIN user or the owner or the account can update it.",

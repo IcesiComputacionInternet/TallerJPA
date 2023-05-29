@@ -29,6 +29,7 @@ public class RoleServiceTest {
         roleRepository = mock(RoleRepository.class);
         roleMapper = spy(RoleMapperImpl.class);
         roleService = new RoleService(roleRepository, roleMapper);
+        roleService=spy(roleService);
     }
 
     @Test
@@ -36,6 +37,7 @@ public class RoleServiceTest {
     public void testCreateRole_HappyPath(){
         // Arrange
         var roleDTO= defaultRoleDTO();
+        doNothing().when(roleService).checkPermissions();
         // Act
         roleService.saveRole(roleDTO);
         // Assert
@@ -55,7 +57,7 @@ public class RoleServiceTest {
         var roleDTO= defaultRoleDTO();
         var icesiRole= defaultIcesiRole();
         when(roleRepository.findByName(any())).thenReturn(Optional.of(icesiRole));
-
+        doNothing().when(roleService).checkPermissions();
         try {
             // Act
             roleService.saveRole(roleDTO);

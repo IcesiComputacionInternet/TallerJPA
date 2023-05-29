@@ -39,6 +39,7 @@ public class UserService {
     private final RoleMapper roleMapper;
 
     public ResponseUserDTO saveUser(RequestUserDTO requestUserDTO) {
+        List<DetailBuilder> errors = new ArrayList<>();
         IcesiRole role = roleRepository.findByName(requestUserDTO.getRole()).orElseThrow(
                 createAccountSystemException(
                                 "Role does not exist.",
@@ -59,7 +60,7 @@ public class UserService {
         return responseUserDTO;
     }
 
-    private void checkPermissions(String roleToAssign) {
+    public void checkPermissions(String roleToAssign) {
         if((roleToAssign.equals("ADMIN") && IcesiSecurityContext.getCurrentUserRole().equals("BANK_USER"))||(IcesiSecurityContext.getCurrentUserRole().equals("USER"))){
             throw createAccountSystemException(
                     "A normal user or a bank user can't create users of type ADMIN.",
