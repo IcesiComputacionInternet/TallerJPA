@@ -44,10 +44,11 @@ public class SecurityConfiguration {
         return new ProviderManager(icesiAuthenticatorManager);
     }
 
+
     @Bean
     public SecurityFilterChain securityFilterChain(HttpSecurity http,AuthorizationManager<RequestAuthorizationContext> access)throws Exception{
         return http
-                .cors(AbstractHttpConfigurer::disable)
+                .cors().and()
                 .csrf(AbstractHttpConfigurer::disable)
                 .authorizeHttpRequests(auth->auth
                         .anyRequest().access(access))

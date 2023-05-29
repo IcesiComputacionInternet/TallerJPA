@@ -57,4 +57,9 @@ public class AccountController implements AccountAPI {
     public TransactionDTO transfer(TransactionDTO transactionDTO){
         return accountService.transfer(transactionDTO);
     }
+
+    @Override
+    public List<ResponseAccountDTO> getAccounts(){
+        return accountService.getAccountsByUser();
+    }
 }

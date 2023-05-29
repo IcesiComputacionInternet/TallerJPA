@@ -1,13 +1,16 @@
 package co.com.icesi.demojpa;
 
+import co.com.icesi.demojpa.model.IcesiAccount;
 import co.com.icesi.demojpa.model.IcesiRole;
 import co.com.icesi.demojpa.model.IcesiUser;
+import co.com.icesi.demojpa.repository.AccountRepository;
 import co.com.icesi.demojpa.repository.RoleRepository;
 import co.com.icesi.demojpa.repository.UserRepository;
 import org.springframework.boot.CommandLineRunner;
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
 import org.springframework.context.annotation.Bean;
+import org.springframework.context.annotation.Profile;
 import org.springframework.security.crypto.password.PasswordEncoder;
 
 import java.util.List;
@@ -20,11 +23,13 @@ public class DemoJpaApplication {
 
 		SpringApplication.run(DemoJpaApplication.class, args);
 	}
-	/*
+
+	@Profile("!test")
 	@Bean
 	public CommandLineRunner commandLineRunner(UserRepository users,
 											   RoleRepository roleRepository,
-											   PasswordEncoder encoder) {
+											   PasswordEncoder encoder,
+											   AccountRepository accountRepository) {
 
 		IcesiRole admin = IcesiRole.builder()
 				.roleId(UUID.randomUUID())
@@ -59,6 +64,31 @@ public class DemoJpaApplication {
 				.phone("+57123123123")
 				.password(encoder.encode("password"))
 				.build();
+		IcesiUser icesiUser3 = IcesiUser.builder()
+				.userId(UUID.randomUUID())
+				.email("johndoe3@email,com")
+				.role(user)
+				.firstName("John")
+				.lastName("Doe")
+				.phone("+57123123123")
+				.password(encoder.encode("password"))
+				.build();
+		IcesiAccount accountUser1 = IcesiAccount.builder()
+				.accountId(UUID.randomUUID())
+				.accountNumber("1234567899")
+				.balance(1000000)
+				.account(icesiUser)
+				.active(true)
+				.type("polish emissary")
+				.build();
+		IcesiAccount accountUser3 = IcesiAccount.builder()
+				.accountId(UUID.randomUUID())
+				.accountNumber("123456789")
+				.balance(1000000)
+				.active(true)
+				.type("polish emissary")
+				.account(icesiUser3)
+				.build();
 
 		return args -> {
 			roleRepository.save(admin);
@@ -66,8 +96,15 @@ public class DemoJpaApplication {
 			roleRepository.save(bank);
 			users.save(icesiUser);
 			users.save(icesiUser2);
+			users.save(icesiUser3);
+			accountRepository.save(accountUser1);
+			accountRepository.save(accountUser3);
+
+			System.out.println("Data loaded");
 		};
+
+
 	}
-*/
+
 
 }

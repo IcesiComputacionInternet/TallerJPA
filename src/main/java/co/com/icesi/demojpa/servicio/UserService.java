@@ -88,6 +88,7 @@ public class UserService {
     }
 
     public ResponseUserDTO getCurrentUser(){
+        System.out.println("El id del usuario actual es: "+IcesiSecurityContext.getCurrentUserId());
         return userResponseMapper.fromIcesUser(userRepository.findById(UUID.fromString(IcesiSecurityContext.getCurrentUserId())).orElseThrow(
                 ()-> IcesiExceptionBuilder.createIcesiException("No existe un usuario con este id", HttpStatus.NOT_FOUND,"USER_NOT_FOUND")));
     }

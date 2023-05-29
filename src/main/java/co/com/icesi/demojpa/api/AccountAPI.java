@@ -3,10 +3,9 @@ package co.com.icesi.demojpa.api;
 import co.com.icesi.demojpa.dto.AccountCreateDTO;
 import co.com.icesi.demojpa.dto.TransactionDTO;
 import co.com.icesi.demojpa.dto.response.ResponseAccountDTO;
-import org.springframework.web.bind.annotation.PathVariable;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.*;
+
+import java.util.List;
 
 import static co.com.icesi.demojpa.api.AccountAPI.BASE_ACCOUNT_URL;
 
@@ -32,5 +31,8 @@ public interface AccountAPI {
     @PostMapping("/transfer/")
     TransactionDTO transfer( @RequestBody TransactionDTO transactionDTO);
 
+    @CrossOrigin
+    @GetMapping("/getUserAccounts/")
+    List<ResponseAccountDTO> getAccounts();
 
 }

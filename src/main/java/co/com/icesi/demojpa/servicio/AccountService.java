@@ -10,12 +10,12 @@ import co.com.icesi.demojpa.model.IcesiAccount;
 import co.com.icesi.demojpa.model.IcesiUser;
 import co.com.icesi.demojpa.repository.AccountRepository;
 import co.com.icesi.demojpa.repository.UserRepository;
+import co.com.icesi.demojpa.security.IcesiSecurityContext;
 import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
 
 import javax.transaction.Transactional;
-import java.util.Random;
-import java.util.UUID;
+import java.util.*;
 import java.util.stream.Collectors;
 import java.util.stream.IntStream;
 
@@ -169,5 +169,18 @@ public class AccountService {
 
     private boolean checkType(IcesiAccount account){
         return account.getType().equalsIgnoreCase("deposit only");
+    }
+
+    public List<ResponseAccountDTO> getAccountsByUser(){
+        System.out.println("Se llama el metodo getAccountsByUser");
+        Optional<List<IcesiAccount>> listIcesiAccounts=accountRepository.findIcesiAccountByAccount(
+                userRepository.findById(UUID.fromString(IcesiSecurityContext.getCurrentUserId())).orElseThrow(
+                        ()-> IcesiExceptionBuilder.createIcesiException("No existe un usuario con este id", HttpStatus.NOT_FOUND,"USER_NOT_FOUND")));
+
+        return listIcesiAccounts.map(icesiAccounts -> icesiAccounts.stream()
+                            .map(accountResponseMapper::fromIcesiAccount)
+                            .collect(Collectors.toList()))
+                    .orElse(Collections.emptyList());
+
     }
 }
