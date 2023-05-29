@@ -73,12 +73,39 @@ public class DemoApplication {
 				.build();
 
 		IcesiAccount icesiAccount = IcesiAccount.builder()
-				.accountId(UUID.fromString("755a63f6-fdb1-11ed-be56-0242ac120002"))
+				.accountId(UUID.randomUUID())
 				.accountNumber("123-123456-12")
 				.balance(1000000)
 				.type(TypeIcesiAccount.normal)
 				.active(true)
 				.icesiUser(icesiUser)
+				.build();
+
+		IcesiAccount icesiAccount2 = IcesiAccount.builder()
+				.accountId(UUID.randomUUID())
+				.accountNumber("123-123456-13")
+				.balance(1000000)
+				.type(TypeIcesiAccount.normal)
+				.active(true)
+				.icesiUser(icesiUser)
+				.build();
+		
+		IcesiAccount icesiAccount3 = IcesiAccount.builder()
+				.accountId(UUID.randomUUID())
+				.accountNumber("123-123456-14")
+				.balance(1000000)
+				.type(TypeIcesiAccount.normal)
+				.active(true)
+				.icesiUser(icesiUser)
+				.build();
+		
+		IcesiAccount icesiAccount4 = IcesiAccount.builder()
+				.accountId(UUID.randomUUID())
+				.accountNumber("123-123456-15")
+				.balance(1000000)
+				.type(TypeIcesiAccount.normal)
+				.active(true)
+				.icesiUser(icesiUser2)
 				.build();
 		
 											
@@ -86,6 +113,9 @@ public class DemoApplication {
 			users.save(icesiUser);
 			users.save(icesiUser2);
 			accountRepository.save(icesiAccount);
+			accountRepository.save(icesiAccount2);
+			accountRepository.save(icesiAccount3);
+			accountRepository.save(icesiAccount4);
 		};
 	}
 }
