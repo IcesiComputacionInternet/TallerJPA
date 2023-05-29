@@ -15,9 +15,9 @@ import co.com.icesi.demojpa.security.IcesiSecurityContext;
 import lombok.AllArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
+import org.springframework.web.bind.annotation.CrossOrigin;
 
-import java.util.Random;
-import java.util.UUID;
+import java.util.*;
 import java.util.stream.Collectors;
 import java.util.stream.IntStream;
 
@@ -56,6 +56,20 @@ public class AccountService {
         account.setAccountNumber(generateAccountNumber());
         account.setActive(true);
         return accountMapper.fromIcesiAccount(accountRepository.save(icesiAccount));
+    }
+
+
+    public List<AccountCreateDTO> findAll() {
+            String user = IcesiSecurityContext.getCurrentUserId();
+            IcesiUser user1 = userRepository.findById(UUID.fromString(user)).orElseThrow(
+                    createIcesiException(
+                            "User does not exist",
+                            HttpStatus.BAD_REQUEST,
+                            new DetailBuilder(ErrorCode.ERR_404, "User", "Id", user)
+                    )
+            );
+            //return user1.getAccounts().stream().collect(Collectors.toList());
+            return user1.getAccounts().stream().map(accountMapper::fromIcesiAccount).collect(Collectors.toList());
     }
 
     public AccountCreateDTO disableAccount(String accountNumber) {

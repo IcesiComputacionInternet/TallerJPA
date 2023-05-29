@@ -28,5 +28,4 @@ public class UserCreateDTO {
     private String phoneNumber;
     @NotNull(message = "Role is required")
     private RoleCreateDTO role;
-    private List<AccountCreateDTO> accounts;
 }

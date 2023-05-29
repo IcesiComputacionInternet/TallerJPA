@@ -7,4 +7,6 @@ import lombok.Data;
 @Builder
 public class TokenDTO {
 
+    String token;
+
 }
