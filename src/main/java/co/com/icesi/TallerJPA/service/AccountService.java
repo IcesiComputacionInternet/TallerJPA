@@ -189,16 +189,20 @@ public class AccountService {
 
     public List<AccountsDTO> getAllAccounts(){
         validateRoleName();
-        List<IcesiAccount> accounts = accountRepository.findAll();
-        return accounts.stream().map(accountResponseMapper::fromIcesiAccountToAccountsDTO).collect(Collectors.toList());
-    }
-    public List<AccountsDTO> getAllAccountsFromUser(String email){
-        validateRoleName();
-        IcesiUser user = userRepository.findUserByEmail(email).orElseThrow(()-> new RuntimeException("User not found"));
+        IcesiUser user = validateUser();
+        System.out.println("Cuentitas del user "+user.getEmail());
         List<IcesiAccount> accounts = accountRepository.findAccountsByUser(user);
         return accounts.stream().map(accountResponseMapper::fromIcesiAccountToAccountsDTO).collect(Collectors.toList());
     }
 
+    private IcesiUser validateUser(){
+        return userRepository.findUserById(UUID.fromString(context.getCurrentUserId())).orElseThrow(
+                ArgumentsExceptionBuilder.createArgumentsExceptionSup(
+                        "User not found",
+                        HttpStatus.BAD_REQUEST,
+                        new DetailBuilder(ErrorCode.ERR_NOT_FOUND,"user")
+                ));
+    }
     private String validateAccountNumber(String accountNumber){
         if(accountRepository.findByAccountNumber(accountNumber)){
             return validateAccountNumber(generateAccountNumber());

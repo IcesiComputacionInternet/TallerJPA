@@ -12,7 +12,6 @@ import co.com.icesi.TallerJPA.model.IcesiRole;
 import co.com.icesi.TallerJPA.model.IcesiUser;
 import co.com.icesi.TallerJPA.repository.RoleRepository;
 import co.com.icesi.TallerJPA.repository.UserRepository;
-import co.com.icesi.TallerJPA.security.IcesiSecurityContext;
 import lombok.AllArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
@@ -73,10 +72,10 @@ public class RoleService {
     private IcesiUser validateExistingUser(String username){
         return userRepository.findUserByEmail(username).orElseThrow(
                 ArgumentsExceptionBuilder.createArgumentsExceptionSup(
-                "User not found",
-                HttpStatus.NOT_FOUND,
-                new DetailBuilder(ErrorCode.ERR_NOT_FOUND,"User")
-        ));
+                        "User not found",
+                        HttpStatus.NOT_FOUND,
+                        new DetailBuilder(ErrorCode.ERR_NOT_FOUND,"User")
+                ));
     }
 
     public RoleCreateDTO getRoleByName(String roleName) {

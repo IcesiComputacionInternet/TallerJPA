@@ -37,7 +37,4 @@ public interface IcesiAccountAPI {
         @GetMapping("/allAccounts")
         List<AccountsDTO> getAllAccounts();
 
-        @GetMapping("/allAccountsByUser/{email}")
-        List<AccountsDTO> getAllAccountsFromUser(@PathVariable String email);
-
 }

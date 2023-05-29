@@ -58,10 +58,5 @@ public class AccountController implements IcesiAccountAPI {
         return accountService.getAllAccounts();
     }
 
-    @Override
-    public List<AccountsDTO> getAllAccountsFromUser(String email) {
-        return accountService.getAllAccountsFromUser(email);
-    }
-
 
 }
