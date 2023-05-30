@@ -5,6 +5,7 @@ import com.example.jpa.validations.interfaces.RegionPhoneNumberValidation;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
+import lombok.NoArgsConstructor;
 
 import javax.validation.constraints.Email;
 import javax.validation.constraints.NotBlank;
@@ -15,6 +16,7 @@ import javax.validation.constraints.NotNull;
 @Email
 @AtLeastOneNotNull
 @AllArgsConstructor
+@NoArgsConstructor
 public class UserDTO {
 
     @NotBlank
