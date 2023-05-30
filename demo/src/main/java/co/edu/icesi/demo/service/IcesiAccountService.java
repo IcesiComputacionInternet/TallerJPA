@@ -180,6 +180,7 @@ public class IcesiAccountService {
         List<IcesiAccountDto> accountResponses = accounts.stream()
                 .map(icesiAccount -> {
                     IcesiAccountDto accountResponse = new IcesiAccountDto();
+                    accountResponse.setAccountId(icesiAccount.getAccountId());
                     accountResponse.setAccountNumber(icesiAccount.getAccountNumber());
                     accountResponse.setBalance(icesiAccount.getBalance());
                     accountResponse.setActive(icesiAccount.isActive());

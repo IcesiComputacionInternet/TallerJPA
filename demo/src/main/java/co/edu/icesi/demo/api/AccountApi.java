@@ -28,7 +28,8 @@ public interface AccountApi {
 
     @PatchMapping("/disableAccount/{accountNumber}")
     public String disableAccount(@PathVariable String accountNumber);
-    
+
+
     @GetMapping("/getAccounts")
     public AccountsUserDto getAccountsLoggedUser();
 }

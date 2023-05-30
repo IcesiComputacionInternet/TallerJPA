@@ -47,6 +47,7 @@ public class AccountController implements AccountApi {
         return icesiAccountService.disableAccount(accountNumber);
     }
 
+    @CrossOrigin
     @Override
     public AccountsUserDto getAccountsLoggedUser() {
             return icesiAccountService.getAccountsLoggedUser();
