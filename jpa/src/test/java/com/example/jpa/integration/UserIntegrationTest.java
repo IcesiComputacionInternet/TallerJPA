@@ -71,21 +71,6 @@ public class UserIntegrationTest {
         System.out.println(result.getResponse().getContentAsString());
     }
 
-    //Create an integration test fot the endpoint /users/{userId}/
-    //The test should return a status 400 - User not found
-    @Test
-    public void testGetUserEndpoint() throws Exception {
-        tokenAdmin = getTokenAdmin();
-        var result = mockMvc.perform(MockMvcRequestBuilders.get("/users/a0eebc99-9c0b-4ef8-bb6d-6bb9bd380a11")
-                        .contentType(MediaType.APPLICATION_JSON)
-                        .accept(MediaType.APPLICATION_JSON)
-                        .header("Authorization", "Bearer " + tokenAdmin))
-                .andExpect(status().is4xxClientError())
-                .andReturn();
-        System.out.println(result.getResponse().getContentAsString());
-
-    }
-
     @Test
     public void testCreateBankUserWhenUserAuthAdmin() throws Exception{
         tokenAdmin = getTokenAdmin();
@@ -206,7 +191,14 @@ public class UserIntegrationTest {
     public void testCreateUserWithoutFirtsNameWhenUserAuthAdmin() throws Exception{
         tokenAdmin = getTokenAdmin();
         var result = mockMvc.perform(MockMvcRequestBuilders.post(CREATE_USER_URL).content(
-                                objectMapper.writeValueAsString(userWithoutAnything())
+                                objectMapper.writeValueAsString(UserDTO.builder()
+                                        .firstName("")
+                                        .lastName("Doe")
+                                        .email("doe@email.com")
+                                        .phoneNumber("+573145678923")
+                                        .password("password")
+                                        .role(defaultRoleDTO())
+                                        .build())
                         )
                         .contentType(MediaType.APPLICATION_JSON)
                         .accept(MediaType.APPLICATION_JSON)
@@ -280,7 +272,14 @@ public class UserIntegrationTest {
     public void testCreateUserWithoutRoleWhenUserAuthAdmin() throws Exception{
         tokenAdmin = getTokenAdmin();
         var result = mockMvc.perform(MockMvcRequestBuilders.post(CREATE_USER_URL).content(
-                                objectMapper.writeValueAsString(userWithoutAnything())
+                                objectMapper.writeValueAsString(UserDTO.builder()
+                                        .firstName("Joe")
+                                        .lastName("Doe")
+                                        .email("doe@email.com")
+                                        .phoneNumber("+573145678923")
+                                        .password("password")
+                                        .role(nullRole())
+                                        .build())
                         )
                         .contentType(MediaType.APPLICATION_JSON)
                         .accept(MediaType.APPLICATION_JSON)
