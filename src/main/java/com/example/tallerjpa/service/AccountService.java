@@ -176,4 +176,5 @@ public class AccountService {
                 .map(accountMapper::fromAccountToResponseDTO)
                 .collect(Collectors.toList());
     }
+
 }

@@ -51,8 +51,8 @@ public class IcesiAccountController implements AccountAPI {
 
     @Override
     public List<AccountResponseDTO> getAccountsByUser(){
-        var userId = IcesiSecurityContext.getCurrentUserId();
-        return accountService.getAllAccountsByUser(UUID.fromString(userId));
+        var usedId = IcesiSecurityContext.getCurrentUserId();
+        return accountService.getAllAccountsByUser(UUID.fromString(usedId));
     }
 
 
