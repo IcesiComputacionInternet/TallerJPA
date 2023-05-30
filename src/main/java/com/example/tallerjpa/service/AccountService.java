@@ -43,7 +43,6 @@ public class AccountService {
     public void setTypeAccount(String type, IcesiAccount icesiAccount){
         try {
             icesiAccount.setType(AccountType.valueOf(type.toUpperCase()));
-            System.out.println(icesiAccount.getType());
         } catch (IllegalArgumentException e){
             throw new CustomException("Account type does not exist");
         }
