@@ -49,6 +49,8 @@ public class AccountController implements AccountApi {
 
     @Override
     public AccountsUserDto getAccountsLoggedUser() {
-        return icesiAccountService.getAccountsLoggedUser();
+            return icesiAccountService.getAccountsLoggedUser();
     }
+
+
 }

@@ -34,8 +34,6 @@ public class IcesiUserDto {
 
     private String password;
 
-    private List<IcesiAccountDto> icesiAccounts;
-
     private IcesiRoleDto role;
 
 }

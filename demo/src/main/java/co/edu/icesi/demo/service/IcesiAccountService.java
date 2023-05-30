@@ -173,6 +173,8 @@ public class IcesiAccountService {
         Optional<IcesiUser> userOptional = userRepository.findById(UUID.fromString(userID));
         validateUserFound(userOptional);
         IcesiUser user = userOptional.get();
+
+
         List<IcesiAccount> accounts = user.getIcesiAccounts();
 
         List<IcesiAccountDto> accountResponses = accounts.stream()
@@ -180,10 +182,34 @@ public class IcesiAccountService {
                     IcesiAccountDto accountResponse = new IcesiAccountDto();
                     accountResponse.setAccountNumber(icesiAccount.getAccountNumber());
                     accountResponse.setBalance(icesiAccount.getBalance());
+                    accountResponse.setActive(icesiAccount.isActive());
+                    accountResponse.setType(icesiAccount.getType());
                     return accountResponse;
                 })
                 .toList();
         return AccountsUserDto.builder().userAccounts(accountResponses).build();
+        /*
+        String userID = SecurityContext.getCurrentUserId();
+        Optional<IcesiUser> userOptional = userRepository.findById(UUID.fromString(userID));
+        validateUserFound(userOptional);
+        IcesiUser user = userOptional.get();
+        System.out.println(user+"; "+user.getUserId()+"; "+user.getFirstName());
+        List<IcesiAccount> accounts = user.getIcesiAccounts();
+
+        List<IcesiAccountDto> accountResponses = accounts.stream()
+                .map(icesiAccount -> {
+                    IcesiAccountDto accountResponse = new IcesiAccountDto();
+                    accountResponse.setAccountNumber(icesiAccount.getAccountNumber());
+                    accountResponse.setBalance(icesiAccount.getBalance());
+                    accountResponse.setActive(icesiAccount.isActive());
+                    accountResponse.setType(icesiAccount.getType());
+                    return accountResponse;
+                })
+                .toList();
+        System.out.println(accountResponses);
+        System.out.println(accountResponses.isEmpty());
+        */
+        //return null;
     }
 
     private void validateUserFound( Optional<IcesiUser> user) {

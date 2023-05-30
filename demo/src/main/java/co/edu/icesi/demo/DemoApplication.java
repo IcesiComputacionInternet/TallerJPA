@@ -1,5 +1,6 @@
 package co.edu.icesi.demo;
 
+import co.edu.icesi.demo.enums.TypeAccount;
 import co.edu.icesi.demo.model.IcesiAccount;
 import co.edu.icesi.demo.model.IcesiRole;
 import co.edu.icesi.demo.model.IcesiUser;
@@ -30,13 +31,17 @@ public class DemoApplication {
 										PasswordEncoder encoder) {
 
 
-		IcesiAccount account1 = new IcesiAccount();
+		//UUID idAccount = UUID.randomUUID();
+		/*IcesiAccount account1 = new IcesiAccount();
 		account1.setAccountId(UUID.randomUUID());
 		account1.setAccountNumber("123-456-789");
 		account1.setBalance(100);
+		account1.setActive(true);
+		account1.setType(TypeAccount.ACCOUNT_NORMAL.toString());*/
 
-		List<IcesiAccount> accountList = new ArrayList<>();
-		accountList.add(account1);
+
+		/*List<IcesiAccount> accountList = new ArrayList<>();
+		accountList.add(account1);*/
 
 		IcesiRole icesiRole = IcesiRole.builder()
 				.roleId(UUID.randomUUID())
@@ -62,9 +67,7 @@ public class DemoApplication {
 				.firstName("John")
 				.lastName("Doe")
 				.password(encoder.encode("password"))
-				.icesiAccounts(accountList)
 				.active(true)
-
 				.build();
 		IcesiUser icesiUser2 = IcesiUser.builder()
 				.userId(UUID.randomUUID())
@@ -86,14 +89,37 @@ public class DemoApplication {
 				.build();
 
 
+
+
+		IcesiAccount account1 = IcesiAccount.builder()
+				.accountId(UUID.randomUUID())
+				.balance(100)
+				.accountNumber("123-144256-55")
+				.type(TypeAccount.ACCOUNT_NORMAL.toString())
+				.active(true)
+				.user(icesiUser)
+				.build();
+
+		IcesiAccount account2 = IcesiAccount.builder()
+				.accountId(UUID.randomUUID())
+				.balance(270)
+				.accountNumber("666-323232-88")
+				.type(TypeAccount.ACCOUNT_NORMAL.toString())
+				.active(true)
+				.user(icesiUser)
+				.build();
+
+
+
 		return args -> {
 			roleRepository.save(icesiRole);
 			roleRepository.save(icesiRole2);
 			roleRepository.save(icesiRole3);
 
-			accountRepository.save(account1);
-
 			users.save(icesiUser);
+			accountRepository.save(account1);
+			accountRepository.save(account2);
+
 			users.save(icesiUser2);
 			users.save(icesiUser3);
 
