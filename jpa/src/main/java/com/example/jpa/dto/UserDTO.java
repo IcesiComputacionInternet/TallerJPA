@@ -17,8 +17,10 @@ import javax.validation.constraints.NotNull;
 @AllArgsConstructor
 public class UserDTO {
 
+    @NotBlank
     private String firstName;
 
+    @NotBlank
     private String lastName;
 
     @NotBlank
