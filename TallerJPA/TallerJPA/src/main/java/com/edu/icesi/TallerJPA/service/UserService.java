@@ -60,8 +60,9 @@ public class UserService {
         String roleName = userCreateDTO.getIcesiRole();
         verifyRole(roleName);
         switch (roleName) {
-            case "ADMIN" -> verifyUserRoleForAdmin(IcesiSecurityContext.getCurrentRol());
+
             case "BANK" -> verifyUserRoleForBank(IcesiSecurityContext.getCurrentRol());
+            case "ADMIN" -> verifyUserRoleForAdmin(IcesiSecurityContext.getCurrentRol());
         }
     }
 
@@ -69,7 +70,7 @@ public class UserService {
         if (role == null) {
 
             throw createIcesiException(
-                    "Role null",
+                    "ROLE NULL",
                     HttpStatus.UNAUTHORIZED,
                     new DetailBuilder(ErrorCode.ERR_401)
             ).get();
@@ -81,7 +82,7 @@ public class UserService {
         if (!roleActualUser.equalsIgnoreCase(String.valueOf(Scopes.ADMIN))){
 
             throw createIcesiException(
-                    "User unauthorized",
+                    "UNAUTHORIZED",
                     HttpStatus.UNAUTHORIZED,
                     new DetailBuilder(ErrorCode.ERR_401)
             ).get();
@@ -95,7 +96,7 @@ public class UserService {
 
         if (roleActualUser.equalsIgnoreCase(String.valueOf(Scopes.USER))){
             throw createIcesiException(
-                    "User unauthorized",
+                    "UNAUTHORIZED",
                     HttpStatus.UNAUTHORIZED,
                     new DetailBuilder(ErrorCode.ERR_401)
             ).get();
@@ -110,7 +111,7 @@ public class UserService {
 
         if (userRepository.findByEmail(email).isPresent() && userRepository.findByPhoneNumber(phoneNumber).isPresent()){
             throw createIcesiException(
-                    "Invalid values",
+                    "INVALID VALUES",
                     HttpStatus.BAD_REQUEST,
                     new DetailBuilder(ErrorCode.ERR_400, "The email and phone number","save a user", "The email and phone number already exists")
             ).get();
@@ -128,9 +129,9 @@ public class UserService {
         if (user.isPresent()) {
 
             throw createIcesiException(
-                    "Duplicated email",
+                    "EMAIL DUPLICATED",
                     HttpStatus.CONFLICT,
-                    new DetailBuilder(ErrorCode.ERR_DUPLICATED, "user", "email", email)
+                    new DetailBuilder(ErrorCode.ERR_DUPLICATED, "USER", "EMAIL", email)
             ).get();
 
 
@@ -145,9 +146,9 @@ public class UserService {
         if (user.isPresent()) {
 
             throw createIcesiException(
-                    "Duplicated phoneNumber",
+                    "PHONE NUMBER DUPLICATED",
                     HttpStatus.CONFLICT,
-                    new DetailBuilder(ErrorCode.ERR_DUPLICATED, "user", "phone number", phoneNumber)
+                    new DetailBuilder(ErrorCode.ERR_DUPLICATED, "USER", "PHONE NUMBER", phoneNumber)
             ).get();
 
 
@@ -155,7 +156,8 @@ public class UserService {
     }
 
     public IcesiUserDTO findByEmail(String email){
-        return userMapper.fromIcesiUser(userRepository.findByEmail(email).orElseThrow(() -> new RuntimeException("The user with email "+email+" not exists")));
+        return userMapper.fromIcesiUser(userRepository.findByEmail(email).orElseThrow(
+                () -> new RuntimeException("THE EMAIL "+email+" NOT EXISTS")));
     }
 
     public IcesiUserDTO findByPhoneNumber(String phoneNumber){

@@ -16,7 +16,7 @@ import java.util.UUID;
 @TestConfiguration
 public class TestConfigurationData {
 
-    @Bean
+    //@Bean
     CommandLineRunner commandLineRunner(UserRepository users,
                                         RoleRepository roleRepository,
 										AccountRepository accounts,
@@ -51,7 +51,7 @@ public class TestConfigurationData {
 				.icesiRole(icesiRole2)
 				.firstName("John")
 				.lastName("Doe")
-				.phoneNumber("+57314555555")
+				.phoneNumber("+57312444556")
 				.password(encoder.encode("password"))
 				.build();
 		IcesiUser icesiUser3 = IcesiUser.builder()
@@ -60,12 +60,12 @@ public class TestConfigurationData {
 				.icesiRole(icesiRole3)
 				.firstName("John")
 				.lastName("Doe")
-				.phoneNumber("+57123125123")
+				.phoneNumber("+57123456123")
 				.password(encoder.encode("password"))
 				.build();
 		IcesiAccount icesiAccount = IcesiAccount.builder()
 				.accountId(UUID.randomUUID())
-				.accountNumber("000000000")
+				.accountNumber("101111101")
 				.active(true)
 				.balance(10000L)
 				.type("Normal")
@@ -73,7 +73,7 @@ public class TestConfigurationData {
 				.build();
 		IcesiAccount icesiAccount2 = IcesiAccount.builder()
 				.accountId(UUID.randomUUID())
-				.accountNumber("1234567")
+				.accountNumber("1233458")
 				.active(true)
 				.balance(15000L)
 				.type("Normal")
@@ -81,17 +81,17 @@ public class TestConfigurationData {
 				.build();
 		IcesiAccount icesiAccount3 = IcesiAccount.builder()
 				.accountId(UUID.randomUUID())
-				.accountNumber("0246810")
+				.accountNumber("0247910")
 				.active(true)
-				.balance(20000L)
+				.balance(25000L)
 				.type("Deposit only")
 				.icesiUser(icesiUser2)
 				.build();
 		IcesiAccount icesiAccount4 = IcesiAccount.builder()
 				.accountId(UUID.randomUUID())
-				.accountNumber("1357911")
+				.accountNumber("1399119")
 				.active(true)
-				.balance(5000L)
+				.balance(5500L)
 				.type("Normal")
 				.icesiUser(icesiUser)
 				.build();

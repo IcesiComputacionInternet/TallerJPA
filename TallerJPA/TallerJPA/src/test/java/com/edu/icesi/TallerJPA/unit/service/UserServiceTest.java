@@ -68,7 +68,7 @@ public class UserServiceTest {
             fail();
         } catch (RuntimeException exception) {
             String messageOfException = exception.getMessage();
-            assertEquals("Duplicated email", messageOfException);
+            assertEquals("EMAIL DUPLICATED", messageOfException);
         }
         verify(userRepository, times(0)).save(any());
     }
@@ -84,7 +84,7 @@ public class UserServiceTest {
             fail();
         } catch (RuntimeException exception) {
             String messageOfException = exception.getMessage();
-            assertEquals("Duplicated phoneNumber", messageOfException);
+            assertEquals("PHONE NUMBER DUPLICATED", messageOfException);
         }
         verify(userRepository, times(0)).save(any());
     }
@@ -100,7 +100,7 @@ public class UserServiceTest {
             fail();
         } catch (RuntimeException exception) {
             String messageOfException = exception.getMessage();
-            assertEquals("Invalid values", messageOfException);
+            assertEquals("INVALID VALUES", messageOfException);
         }
 
         verify(userRepository, times(0)).save(any());
@@ -114,7 +114,7 @@ public class UserServiceTest {
         } catch (RuntimeException exception) {
 
             String messageOfException = exception.getMessage();
-            assertEquals("Role null", messageOfException);
+            assertEquals("ROLE NULL", messageOfException);
         }
         verify(userRepository, times(0)).save(any());
     }

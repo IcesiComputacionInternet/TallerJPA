@@ -56,7 +56,7 @@ public class RoleServiceTest {
     }
 
     @Test
-    public void testCreateRoleWithAlreadyName(){
+    public void testCreateRoleWithAlreadyEXISTS(){
         when(roleRepository.findByName(any())).thenReturn(Optional.of(createRole()));
         IcesiRoleDTO role = createRoleDTO();
 
@@ -66,7 +66,7 @@ public class RoleServiceTest {
 
         }catch (RuntimeException exception){
             String messageOfException = exception.getMessage();
-            assertEquals("Role name already exists", messageOfException);
+            assertEquals("ROLE ALREADY EXISTS", messageOfException);
         }
     }
 

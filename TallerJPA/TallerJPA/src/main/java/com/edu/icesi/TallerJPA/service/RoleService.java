@@ -42,7 +42,7 @@ public class RoleService {
         if (!roleActualUser.equalsIgnoreCase(String.valueOf(Scopes.ADMIN))){
 
             throw createIcesiException(
-                    "User unauthorized",
+                    "UNAUTHORIZED",
                     HttpStatus.UNAUTHORIZED,
                     new DetailBuilder(ErrorCode.ERR_401)
             ).get();
@@ -57,9 +57,9 @@ public class RoleService {
         if (roleRepository.findByName(roleName).isPresent()){
 
             throw createIcesiException(
-                    "Role name already exists",
+                    "ROLE ALREADY EXISTS",
                     HttpStatus.CONFLICT,
-                    new DetailBuilder(ErrorCode.ERR_DUPLICATED, "Role", "role name", roleName)
+                    new DetailBuilder(ErrorCode.ERR_DUPLICATED, "ROLE", "", "")
             ).get();
 
 
@@ -75,9 +75,9 @@ public class RoleService {
         if (role.isEmpty()) {
 
             throw createIcesiException(
-                    "Role not found",
+                    "ROLE NOT FOUND",
                     HttpStatus.NOT_FOUND,
-                    new DetailBuilder(ErrorCode.ERR_404, "role", "role name", name)
+                    new DetailBuilder(ErrorCode.ERR_404, "ROLE", "", "")
             ).get();
 
 

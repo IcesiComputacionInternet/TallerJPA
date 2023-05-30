@@ -17,11 +17,8 @@ import java.util.List;
 @NoArgsConstructor
 public class IcesiRoleDTO {
 
-    @NotNull(message = "Role need a description")
     private String description;
 
-    @NotNull(message = "A name is required for the role")
-    @Column(unique = true)
     private String name;
 
     private List<IcesiUser> icesiUsers;

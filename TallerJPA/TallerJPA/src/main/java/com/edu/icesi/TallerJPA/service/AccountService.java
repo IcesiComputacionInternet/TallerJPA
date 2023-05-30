@@ -51,9 +51,9 @@ public class AccountService {
     public void validateBalanceCreate(long balance) {
         if (balance < 0) {
             throw createIcesiException(
-                    "Invalid balance",
+                    "BALANCED INVALID",
                     HttpStatus.BAD_REQUEST,
-                    new DetailBuilder(ErrorCode.ERR_400, "At least one account", "transaction", "Is deposit only")
+                    new DetailBuilder(ErrorCode.ERR_400, " ", " ", " ")
             ).get();
         }
     }
@@ -62,9 +62,9 @@ public class AccountService {
 
         if (accountRepository.findByAccountNumber(accountCreateDTO.getAccountNumber()).isPresent()) {
             throw createIcesiException(
-                    "Duplicated account",
+                    "ACCOUNT DUPLICATED",
                     HttpStatus.CONFLICT,
-                    new DetailBuilder(ErrorCode.ERR_DUPLICATED, "account", "accountNumber", accountCreateDTO.getAccountNumber())
+                    new DetailBuilder(ErrorCode.ERR_DUPLICATED, "ACCOUNT", "ACCOUNT NUMBER", accountCreateDTO.getAccountNumber())
             ).get();
 
         }
@@ -140,9 +140,9 @@ public class AccountService {
         if (accountToTransaction.getBalance() < moneyToTransaction || moneyToTransaction <= 0) {
 
             throw createIcesiException(
-                    "Insufficient money",
+                    "INSUFFICIENT MONEY",
                     HttpStatus.BAD_REQUEST,
-                    new DetailBuilder(ErrorCode.ERR_400, "value " + moneyToTransaction, "transaction", "Insufficient money")
+                    new DetailBuilder(ErrorCode.ERR_400, "VALUE " + moneyToTransaction, "", "")
             ).get();
 
 
@@ -189,7 +189,7 @@ public class AccountService {
         icesiTransactionDTO.setFinalBalanceSourceAccount(sourceAccountToTransfer.getBalance());
         icesiTransactionDTO.setFinalBalanceDestinationAccount(destinationAccountToTransfer.getBalance());
 
-        icesiTransactionDTO.setResult("Successful transfer");
+        icesiTransactionDTO.setResult("SUCCESSFUL TRANSFER");
 
         return icesiTransactionDTO;
     }
@@ -198,9 +198,9 @@ public class AccountService {
 
         if (sourceAccount.getType().equals("Deposit only") || destinationAccount.getType().equals("Deposit only")) {
             throw createIcesiException(
-                    "Invalid account",
+                    "INVALID ACCOUNT",
                     HttpStatus.BAD_REQUEST,
-                    new DetailBuilder(ErrorCode.ERR_400, "At least one account", "transaction", "Is deposit only")
+                    new DetailBuilder(ErrorCode.ERR_400, "", "", "")
             ).get();
 
 
@@ -226,16 +226,40 @@ public class AccountService {
     public void validateStatusOfAccount(IcesiAccountDTO accountCreateDTO, boolean state) {
         if (accountCreateDTO.isActive() == state) {
             throw createIcesiException(
-                    "Invalid change",
+                    "INVALID CHANGE",
                     HttpStatus.BAD_REQUEST,
-                    new DetailBuilder(ErrorCode.ERR_400, "account " + accountCreateDTO.getAccountNumber(), "change status", "Is already in that status")
+                    new DetailBuilder(ErrorCode.ERR_400, "ACCOUNT " + accountCreateDTO.getAccountNumber(), "", "")
             ).get();
 
 
         }
 
     }
+    private void verifyUserRole(String roleActualUser) {
 
+        if (roleActualUser.equalsIgnoreCase(String.valueOf(Scopes.BANK))) {
+            throw createIcesiException(
+                    "UNAUTHORIZED",
+                    HttpStatus.UNAUTHORIZED,
+                    new DetailBuilder(ErrorCode.ERR_401, "UNAUTHORIZED " +"", "", "")
+            ).get();
+
+
+        }
+    }
+    public void validateBalanceForDisableAccount(long balance) {
+        if (balance != 0) {
+
+            throw createIcesiException(
+
+                    "INVALID VALUES",
+                    HttpStatus.BAD_REQUEST,
+                    new DetailBuilder(ErrorCode.ERR_400, "VALUES " + balance, "", "")
+            ).get();
+
+
+        }
+    }
     public IcesiAccountDTO setToDisableState(String accountNumber) {
 
         IcesiAccountDTO accountToDisable = findByAccountNumber(accountNumber);
@@ -259,9 +283,9 @@ public class AccountService {
 
         if (roleActualUser.equalsIgnoreCase(String.valueOf(Scopes.USER)) && !idActualUser.equalsIgnoreCase(String.valueOf(idUserOfAccount))) {
             throw createIcesiException(
-                    "User unauthorized",
+                    "UNAUTHORIZED",
                     HttpStatus.UNAUTHORIZED,
-                    new DetailBuilder(ErrorCode.ERR_401)
+                    new DetailBuilder(ErrorCode.ERR_401, "UNAUTHORIZED " +"", "", "")
             ).get();
 
 
@@ -270,17 +294,8 @@ public class AccountService {
         verifyUserRole(roleActualUser);
     }
 
-    private void verifyUserRole(String roleActualUser) {
-
-        if (roleActualUser.equalsIgnoreCase(String.valueOf(Scopes.BANK))) {
-            throw createIcesiException(
-                    "User unauthorized",
-                    HttpStatus.UNAUTHORIZED,
-                    new DetailBuilder(ErrorCode.ERR_401)
-            ).get();
-
-
-        }
+    public List<IcesiAccountGetDTO> findByAccounts(UUID idUser) {
+        return accountRepository.findByAccounts(idUser).stream().map(accountMapper::fromIcesiAccountGet).collect(Collectors.toList());
     }
 
     public void searchUserById(String id) {
@@ -288,30 +303,16 @@ public class AccountService {
         if (userRepository.findById(UUID.fromString(id)).isEmpty()) {
 
             throw createIcesiException(
-                    "User not found",
+                    "USER NOT FOUND",
                     HttpStatus.NOT_FOUND,
-                    new DetailBuilder(ErrorCode.ERR_404, "User ", "id", id)
+                    new DetailBuilder(ErrorCode.ERR_404, "USER ", "", "")
             ).get();
 
 
         }
     }
 
-    public void validateBalanceForDisableAccount(long balance) {
-        if (balance != 0) {
-
-            throw createIcesiException(
-
-                    "Invalid value",
-                    HttpStatus.BAD_REQUEST,
-                    new DetailBuilder(ErrorCode.ERR_400, "value " + balance, "disable account", "The account balance is not zero")
-            ).get();
 
 
-        }
-    }
 
-    public List<IcesiAccountGetDTO> findByAccounts(UUID idUser) {
-        return accountRepository.findByAccounts(idUser).stream().map(accountMapper::fromIcesiAccountGet).collect(Collectors.toList());
-    }
 }

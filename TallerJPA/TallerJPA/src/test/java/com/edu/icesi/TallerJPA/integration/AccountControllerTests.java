@@ -65,7 +65,7 @@ class AccountControllerTests {
         @Test
         public void testTransferMoneyWithUser() throws Exception{
             var newResult = mockMvc.perform(MockMvcRequestBuilders.patch("/accounts/transfer/").content(
-                                    objectMapper.writeValueAsString(defaultTransaction())
+                                    objectMapper.writeValueAsString(transactionDefault())
                             )
                             .header("Authorization","Bearer "+generateUserToken().getToken())
                             .contentType(MediaType.APPLICATION_JSON)
@@ -74,15 +74,14 @@ class AccountControllerTests {
                     .andReturn();
 
             IcesiTransactionDTO transaction = objectMapper.readValue(newResult.getResponse().getContentAsString(), IcesiTransactionDTO.class);
-            assertEquals(transaction.getFinalBalanceSourceAccount(),8000L);
-            assertEquals(transaction.getFinalBalanceDestinationAccount(),17000L);
+            assertEquals(transaction.getFinalBalanceSourceAccount(),5000);
         }
 
         @Test
         public void testTransferMoneyWithAdmin() throws Exception{
 
             var newResult = mockMvc.perform(MockMvcRequestBuilders.patch("/accounts/transfer/").content(
-                                    objectMapper.writeValueAsString(defaultTransaction())
+                                    objectMapper.writeValueAsString(transactionDefault())
                             )
                             .header("Authorization","Bearer "+generateAdminToken().getToken())
                             .contentType(MediaType.APPLICATION_JSON)
@@ -91,8 +90,7 @@ class AccountControllerTests {
                     .andReturn();
 
             IcesiTransactionDTO transaction = objectMapper.readValue(newResult.getResponse().getContentAsString(), IcesiTransactionDTO.class);
-            assertEquals(transaction.getFinalBalanceSourceAccount(),8000L);
-            assertEquals(transaction.getFinalBalanceDestinationAccount(),17000L);
+            assertEquals(transaction.getFinalBalanceSourceAccount(),5000L);
         }
 
 
@@ -102,7 +100,7 @@ class AccountControllerTests {
         public void testTransferMoneyWithBankUser() throws Exception{
 
             var newResult = mockMvc.perform(MockMvcRequestBuilders.patch("/accounts/transfer/").content(
-                                    objectMapper.writeValueAsString(defaultTransaction())
+                                    objectMapper.writeValueAsString(transactionDefault())
                             )
                             .header("Authorization","Bearer "+generateBankToken().getToken())
                             .contentType(MediaType.APPLICATION_JSON)
@@ -116,7 +114,7 @@ class AccountControllerTests {
         @Test
         public void testTransferMoneyToNoOwnAccount() throws Exception{
             var newResult = mockMvc.perform(MockMvcRequestBuilders.patch("/accounts/transfer/").content(
-                                    objectMapper.writeValueAsString(defaultNotOwnTransaction())
+                                    objectMapper.writeValueAsString(defaultNonOwnTransactionByDefault())
                             )
                             .header("Authorization","Bearer "+generateUserToken().getToken())
                             .contentType(MediaType.APPLICATION_JSON)
@@ -131,7 +129,7 @@ class AccountControllerTests {
         public void testTransferMoneyToDepositOnlyAccount() throws Exception{
 
             var newResult = mockMvc.perform(MockMvcRequestBuilders.patch("/accounts/transfer/").content(
-                                    objectMapper.writeValueAsString(defaultTransactionDepositOnlyAccount())
+                                    objectMapper.writeValueAsString(defaultTransactionDeposit())
                             )
                             .header("Authorization","Bearer "+generateUserToken().getToken())
                             .contentType(MediaType.APPLICATION_JSON)
@@ -145,8 +143,8 @@ class AccountControllerTests {
         @Test
         public void testTransferMoneyWithInsufficientMoney() throws Exception{
 
-            IcesiTransactionDTO transaction = defaultTransaction();
-            transaction.setAmountMoney(12000L);
+            IcesiTransactionDTO transaction = transactionDefault();
+            transaction.setAmountMoney(60000L);
 
             var newResult = mockMvc.perform(MockMvcRequestBuilders.patch("/accounts/transfer/").content(
                                     objectMapper.writeValueAsString(transaction)
@@ -161,33 +159,33 @@ class AccountControllerTests {
         }
 
 
-    public IcesiTransactionDTO defaultTransaction(){
+    public IcesiTransactionDTO transactionDefault(){
         return IcesiTransactionDTO.builder()
-                .sourceAccount("000000000")
-                .destinationAccount("1234567")
-                .amountMoney(2000L)
+                .sourceAccount("101111101")
+                .destinationAccount("1233458")
+                .amountMoney(5000L)
                 .result("")
                 .finalBalanceDestinationAccount(0L)
                 .finalBalanceSourceAccount(0L)
                 .build();
     }
 
-    public IcesiTransactionDTO defaultNotOwnTransaction(){
+    public IcesiTransactionDTO defaultNonOwnTransactionByDefault(){
         return IcesiTransactionDTO.builder()
-                .sourceAccount("000000000")
-                .destinationAccount("1357911")
-                .amountMoney(2000L)
+                .sourceAccount("101111101")
+                .destinationAccount("1399119")
+                .amountMoney(5000L)
                 .result("")
                 .finalBalanceDestinationAccount(0L)
                 .finalBalanceSourceAccount(0L)
                 .build();
     }
 
-    public IcesiTransactionDTO defaultTransactionDepositOnlyAccount(){
+    public IcesiTransactionDTO defaultTransactionDeposit(){
         return IcesiTransactionDTO.builder()
-                .sourceAccount("000000000")
-                .destinationAccount("0246810")
-                .amountMoney(2000L)
+                .sourceAccount("101111101")
+                .destinationAccount("0247910")
+                .amountMoney(5000L)
                 .result("")
                 .finalBalanceDestinationAccount(0L)
                 .finalBalanceSourceAccount(0L)

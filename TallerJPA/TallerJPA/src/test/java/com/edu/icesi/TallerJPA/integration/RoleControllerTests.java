@@ -66,7 +66,7 @@ class RoleControllerTests {
 
 
         @Test
-        public void testCreateRoleFromAdmin() throws Exception{
+        public void testCreateRoleAdmin() throws Exception{
 
             var newResult = mockMvc.perform(MockMvcRequestBuilders.post("/roles/create/").content(
                                     objectMapper.writeValueAsString(defaultRole())
@@ -81,13 +81,26 @@ class RoleControllerTests {
             assertEquals(role.getName(),"Example");
         }
 
+    @Test
+    public void testCreateRoleBank() throws Exception{
 
+        var newResult = mockMvc.perform(MockMvcRequestBuilders.post("/roles/create/").content(
+                                objectMapper.writeValueAsString(defaultRole())
+                        )
+                        .header("Authorization","Bearer "+generateBankToken().getToken())
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .accept(MediaType.APPLICATION_JSON))
+                .andExpect(status().isForbidden())
+                .andReturn();
+
+        assertEquals(403, newResult.getResponse().getStatus());
+    }
 
 
 
 
         @Test
-        public void testCreateRoleFromUser() throws Exception{
+        public void testCreateRoleUser() throws Exception{
             var newResult = mockMvc.perform(MockMvcRequestBuilders.post("/roles/create/").content(
                                     objectMapper.writeValueAsString(defaultRole())
                             )
@@ -100,22 +113,9 @@ class RoleControllerTests {
             assertEquals(403, newResult.getResponse().getStatus());
         }
 
-        @Test
-        public void testCreateRoleFromBank() throws Exception{
 
-            var newResult = mockMvc.perform(MockMvcRequestBuilders.post("/roles/create/").content(
-                                    objectMapper.writeValueAsString(defaultRole())
-                            )
-                            .header("Authorization","Bearer "+generateBankToken().getToken())
-                            .contentType(MediaType.APPLICATION_JSON)
-                            .accept(MediaType.APPLICATION_JSON))
-                    .andExpect(status().isForbidden())
-                    .andReturn();
-
-            assertEquals(403, newResult.getResponse().getStatus());
-        }
     @Test
-    public void testCreateRoleThatAlreadyExists() throws Exception{
+    public void testCreateRoleAlreadyExists() throws Exception{
 
         IcesiRoleDTO role = defaultRole();
         role.setName("ADMIN");
