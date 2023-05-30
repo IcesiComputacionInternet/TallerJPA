@@ -58,10 +58,21 @@ public class UserService {
     private void definePermissions(IcesiUserDTO userCreateDTO){
 
         String roleName = userCreateDTO.getIcesiRole();
-
+        verifyRole(roleName);
         switch (roleName) {
             case "ADMIN" -> verifyUserRoleForAdmin(IcesiSecurityContext.getCurrentRol());
             case "BANK" -> verifyUserRoleForBank(IcesiSecurityContext.getCurrentRol());
+        }
+    }
+
+    private void verifyRole(String role) {
+        if (role == null) {
+
+            throw createIcesiException(
+                    "Role null",
+                    HttpStatus.UNAUTHORIZED,
+                    new DetailBuilder(ErrorCode.ERR_401)
+            ).get();
         }
     }
 

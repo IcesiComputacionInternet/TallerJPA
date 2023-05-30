@@ -6,11 +6,16 @@ import com.edu.icesi.TallerJPA.mapper.RoleMapperImpl;
 import com.edu.icesi.TallerJPA.model.IcesiRole;
 import com.edu.icesi.TallerJPA.repository.RoleRepository;
 import com.edu.icesi.TallerJPA.service.RoleService;
+import com.edu.icesi.TallerJPA.unit.CustomJwtAuthenticationToken;
 import com.edu.icesi.TallerJPA.unit.matcher.IcesiRoleMatcher;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
+import org.springframework.security.core.context.SecurityContextHolder;
+import org.springframework.security.oauth2.jwt.Jwt;
+import org.springframework.security.oauth2.server.resource.authentication.JwtAuthenticationToken;
 
 import java.util.Optional;
+import java.util.UUID;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.fail;
@@ -29,6 +34,15 @@ public class RoleServiceTest {
         roleRepository = mock(RoleRepository.class);
         roleMapper = spy(RoleMapperImpl.class);
         roleService = new RoleService(roleRepository, roleMapper);
+        setJwtMock();
+    }
+
+    private void setJwtMock() {
+        Jwt jwt = mock(Jwt.class);
+        when(jwt.getClaimAsString("scope")).thenReturn("ADMIN");
+        when(jwt.getClaimAsString("userId")).thenReturn(UUID.randomUUID().toString());
+        JwtAuthenticationToken jwtAuthenticationToken = new CustomJwtAuthenticationToken(jwt);
+        SecurityContextHolder.getContext().setAuthentication(jwtAuthenticationToken);
     }
 
     @Test
@@ -52,7 +66,7 @@ public class RoleServiceTest {
 
         }catch (RuntimeException exception){
             String messageOfException = exception.getMessage();
-            assertEquals("The role "+role.getName()+" already exists", messageOfException);
+            assertEquals("Role name already exists", messageOfException);
         }
     }
 

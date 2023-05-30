@@ -41,30 +41,39 @@ public class AccountService {
         accountCreateDTO.setAccountNumber(sendToGenerateAccountNumbers());
 
         accountCreateDTO = verifyDuplicatedAccount(accountCreateDTO);
-
+        validateBalanceCreate(accountCreateDTO.getBalance());
         IcesiAccount icesiAccount = accountMapper.fromIcesiAccountDTO(accountCreateDTO);
         icesiAccount.setAccountId(UUID.randomUUID());
 
         return accountMapper.fromIcesiAccount(accountRepository.save(icesiAccount));
     }
 
-    public IcesiAccountDTO verifyDuplicatedAccount(IcesiAccountDTO accountCreateDTO){
+    public void validateBalanceCreate(long balance) {
+        if (balance < 0) {
+            throw createIcesiException(
+                    "Invalid balance",
+                    HttpStatus.BAD_REQUEST,
+                    new DetailBuilder(ErrorCode.ERR_400, "At least one account", "transaction", "Is deposit only")
+            ).get();
+        }
+    }
+
+    public IcesiAccountDTO verifyDuplicatedAccount(IcesiAccountDTO accountCreateDTO) {
 
         if (accountRepository.findByAccountNumber(accountCreateDTO.getAccountNumber()).isPresent()) {
-           throw createIcesiException(
+            throw createIcesiException(
                     "Duplicated account",
                     HttpStatus.CONFLICT,
-                    new DetailBuilder(ErrorCode.ERR_DUPLICATED, "account","accountNumber", accountCreateDTO.getAccountNumber())
+                    new DetailBuilder(ErrorCode.ERR_DUPLICATED, "account", "accountNumber", accountCreateDTO.getAccountNumber())
             ).get();
 
         }
 
 
-
         return accountCreateDTO;
     }
 
-    public String sendToGenerateAccountNumbers(){
+    public String sendToGenerateAccountNumbers() {
 
         String accountNumber = "";
         accountNumber += generateAccountNumber(3).get();
@@ -111,15 +120,14 @@ public class AccountService {
         return icesiTransactionDTO;
     }
 
-    public IcesiAccountDTO findByAccountNumber(String accountNumber){
+    public IcesiAccountDTO findByAccountNumber(String accountNumber) {
 
-        if (accountRepository.findByAccountNumber(accountNumber).isEmpty()){
+        if (accountRepository.findByAccountNumber(accountNumber).isEmpty()) {
             throw createIcesiException(
                     "ACCOUNT NOT FOUND",
                     HttpStatus.NOT_FOUND,
                     new DetailBuilder(ErrorCode.ERR_404, "Account", "accountNumber", accountNumber)
             ).get();
-
 
 
         }
@@ -129,12 +137,12 @@ public class AccountService {
 
     public void validateTransactionBalance(IcesiAccountDTO accountToTransaction, long moneyToTransaction) {
 
-        if (accountToTransaction.getBalance() < moneyToTransaction){
+        if (accountToTransaction.getBalance() < moneyToTransaction || moneyToTransaction <= 0) {
 
             throw createIcesiException(
                     "Insufficient money",
                     HttpStatus.BAD_REQUEST,
-                    new DetailBuilder(ErrorCode.ERR_400, "value "+moneyToTransaction,"transaction", "Insufficient money")
+                    new DetailBuilder(ErrorCode.ERR_400, "value " + moneyToTransaction, "transaction", "Insufficient money")
             ).get();
 
 
@@ -148,7 +156,7 @@ public class AccountService {
         verifyUserRole(IcesiSecurityContext.getCurrentUserId(), IcesiSecurityContext.getCurrentRol(), accountToDeposit.getIcesiUser().getUserId());
 
         long moneyToDeposit = icesiTransactionDTO.getAmountMoney();
-
+        validateTransactionBalance(accountToDeposit, moneyToDeposit);
         accountToDeposit.setBalance(accountToDeposit.getBalance() + moneyToDeposit);
 
         accountRepository.save(accountMapper.fromIcesiAccountDTO(accountToDeposit));
@@ -186,13 +194,13 @@ public class AccountService {
         return icesiTransactionDTO;
     }
 
-    public void validateAccountType(IcesiAccountDTO sourceAccount, IcesiAccountDTO destinationAccount){
+    public void validateAccountType(IcesiAccountDTO sourceAccount, IcesiAccountDTO destinationAccount) {
 
-        if (sourceAccount.getType().equals("Deposit only") || destinationAccount.getType().equals("Deposit only")){
+        if (sourceAccount.getType().equals("Deposit only") || destinationAccount.getType().equals("Deposit only")) {
             throw createIcesiException(
                     "Invalid account",
                     HttpStatus.BAD_REQUEST,
-                    new DetailBuilder(ErrorCode.ERR_400, "At least one account","transaction", "Is deposit only")
+                    new DetailBuilder(ErrorCode.ERR_400, "At least one account", "transaction", "Is deposit only")
             ).get();
 
 
@@ -215,14 +223,13 @@ public class AccountService {
         return accountToEnable;
     }
 
-    public void validateStatusOfAccount(IcesiAccountDTO accountCreateDTO, boolean state){
-        if (accountCreateDTO.isActive() == state){
+    public void validateStatusOfAccount(IcesiAccountDTO accountCreateDTO, boolean state) {
+        if (accountCreateDTO.isActive() == state) {
             throw createIcesiException(
                     "Invalid change",
                     HttpStatus.BAD_REQUEST,
-                    new DetailBuilder(ErrorCode.ERR_400, "account "+accountCreateDTO.getAccountNumber(),"change status", "Is already in that status")
+                    new DetailBuilder(ErrorCode.ERR_400, "account " + accountCreateDTO.getAccountNumber(), "change status", "Is already in that status")
             ).get();
-
 
 
         }
@@ -246,11 +253,11 @@ public class AccountService {
         return accountToDisable;
     }
 
-    public void verifyUserRole(String idActualUser, String roleActualUser,UUID idUserOfAccount){
+    public void verifyUserRole(String idActualUser, String roleActualUser, UUID idUserOfAccount) {
 
         searchUserById(idActualUser);
 
-        if (roleActualUser.equalsIgnoreCase(String.valueOf(Scopes.USER)) && !idActualUser.equalsIgnoreCase(String.valueOf(idUserOfAccount))){
+        if (roleActualUser.equalsIgnoreCase(String.valueOf(Scopes.USER)) && !idActualUser.equalsIgnoreCase(String.valueOf(idUserOfAccount))) {
             throw createIcesiException(
                     "User unauthorized",
                     HttpStatus.UNAUTHORIZED,
@@ -258,29 +265,27 @@ public class AccountService {
             ).get();
 
 
-
         }
 
         verifyUserRole(roleActualUser);
     }
 
-    private void verifyUserRole(String roleActualUser){
+    private void verifyUserRole(String roleActualUser) {
 
-        if (roleActualUser.equalsIgnoreCase(String.valueOf(Scopes.BANK))){
-           throw createIcesiException(
+        if (roleActualUser.equalsIgnoreCase(String.valueOf(Scopes.BANK))) {
+            throw createIcesiException(
                     "User unauthorized",
                     HttpStatus.UNAUTHORIZED,
                     new DetailBuilder(ErrorCode.ERR_401)
             ).get();
 
 
-
         }
     }
 
-    public void searchUserById(String id){
+    public void searchUserById(String id) {
 
-        if (userRepository.findById(UUID.fromString(id)).isEmpty()){
+        if (userRepository.findById(UUID.fromString(id)).isEmpty()) {
 
             throw createIcesiException(
                     "User not found",
@@ -292,14 +297,14 @@ public class AccountService {
         }
     }
 
-    public void validateBalanceForDisableAccount(long balance){
-        if (balance != 0){
+    public void validateBalanceForDisableAccount(long balance) {
+        if (balance != 0) {
 
             throw createIcesiException(
 
                     "Invalid value",
                     HttpStatus.BAD_REQUEST,
-                    new DetailBuilder(ErrorCode.ERR_400, "value "+balance, "disable account", "The account balance is not zero")
+                    new DetailBuilder(ErrorCode.ERR_400, "value " + balance, "disable account", "The account balance is not zero")
             ).get();
 
 

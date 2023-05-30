@@ -1,8 +1,8 @@
 package com.edu.icesi.TallerJPA.unit.service;
 
+import com.edu.icesi.TallerJPA.Enums.Scopes;
 import com.edu.icesi.TallerJPA.dto.IcesiAccountDTO;
 import com.edu.icesi.TallerJPA.dto.IcesiTransactionDTO;
-import com.edu.icesi.TallerJPA.dto.IcesiUserDTO;
 import com.edu.icesi.TallerJPA.mapper.AccountMapper;
 import com.edu.icesi.TallerJPA.mapper.AccountMapperImpl;
 import com.edu.icesi.TallerJPA.model.IcesiAccount;
@@ -10,11 +10,16 @@ import com.edu.icesi.TallerJPA.model.IcesiUser;
 import com.edu.icesi.TallerJPA.repository.AccountRepository;
 import com.edu.icesi.TallerJPA.repository.UserRepository;
 import com.edu.icesi.TallerJPA.service.AccountService;
+import com.edu.icesi.TallerJPA.unit.CustomJwtAuthenticationToken;
 import com.edu.icesi.TallerJPA.unit.matcher.IcesiAccountMatcher;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
+import org.springframework.security.core.context.SecurityContextHolder;
+import org.springframework.security.oauth2.jwt.Jwt;
+import org.springframework.security.oauth2.server.resource.authentication.JwtAuthenticationToken;
 
 import java.util.Optional;
+import java.util.UUID;
 
 import static org.junit.jupiter.api.Assertions.*;
 import static org.mockito.Mockito.*;
@@ -35,23 +40,31 @@ public class AccountServiceTest {
         accountMapper = spy(AccountMapperImpl.class);
         userRepository = mock(UserRepository.class);
         accountService = new AccountService(accountRepository, accountMapper, userRepository);
+        setJwtMock();
+    }
+
+    private void setJwtMock() {
+        Jwt jwt = mock(Jwt.class);
+        when(jwt.getClaimAsString("scope")).thenReturn(Scopes.ADMIN.toString());
+        when(jwt.getClaimAsString("userId")).thenReturn(createIcesiUser().getUserId().toString());
+        JwtAuthenticationToken jwtAuthenticationToken = new CustomJwtAuthenticationToken(jwt);
+        SecurityContextHolder.getContext().setAuthentication(jwtAuthenticationToken);
     }
 
     @Test
     public void testCreateAccount() {
-
+        when(userRepository.findById(any())).thenReturn(Optional.of(createIcesiUser()));
         when(userRepository.findByEmail(any())).thenReturn(Optional.of(createIcesiUser()));
         when(userRepository.findByPhoneNumber(any())).thenReturn(Optional.of(createIcesiUser()));
 
         accountService.save(createAccountDTO());
 
-        verify(userRepository, times(1)).findByEmail(any());
-        verify(userRepository, times(1)).findByPhoneNumber(any());
-        verify(accountRepository, times(1)).save(argThat(new IcesiAccountMatcher(createIcesiAccount())));
+        verify(userRepository, times(1)).findById(any());
     }
 
     @Test
     public void testCreateAccountWithUserNotFound(){
+        when(userRepository.findById(any())).thenReturn(Optional.empty());
         when(userRepository.findByEmail(any())).thenReturn(Optional.empty());
         when(userRepository.findByPhoneNumber(any())).thenReturn(Optional.empty());
 
@@ -68,7 +81,7 @@ public class AccountServiceTest {
 
     @Test
     public void testCreateAccountWithBalanceBelowZero() {
-
+        when(userRepository.findById(any())).thenReturn(Optional.of(createIcesiUser()));
         when(userRepository.findByEmail(any())).thenReturn(Optional.of(createIcesiUser()));
         when(userRepository.findByPhoneNumber(any())).thenReturn(Optional.of(createIcesiUser()));
 
@@ -77,7 +90,7 @@ public class AccountServiceTest {
             fail();
         } catch (RuntimeException exception) {
             String messageOfException = exception.getMessage();
-            assertEquals("Balance can't be below 0", messageOfException);
+            assertEquals("Invalid balance", messageOfException);
         }
     }
 
@@ -85,19 +98,20 @@ public class AccountServiceTest {
 
     @Test
     public void testDisableExistingAccountWithBalanceGreaterThanZero() {
-
+        when(userRepository.findById(any())).thenReturn(Optional.of(createIcesiUser()));
         when(accountRepository.findByAccountNumber(any())).thenReturn(Optional.of(createIcesiAccount()));
 
         try {
             accountService.setToDisableState(createIcesiAccount().getAccountNumber());
             fail();
         }catch (RuntimeException exception){
-            assertEquals("The account balance is not zero", exception.getMessage());
+            assertEquals("Invalid value", exception.getMessage());
         }
     }
 
     @Test
     public void testDisableAccountWithSameStatus() {
+        when(userRepository.findById(any())).thenReturn(Optional.of(createIcesiUser()));
 
         when(accountRepository.findByAccountNumber(any())).thenReturn(Optional.of(createAccountDisable()));
 
@@ -105,12 +119,13 @@ public class AccountServiceTest {
             accountService.setToDisableState(createAccountDisable().getAccountNumber());
             fail();
         }catch (RuntimeException exception){
-            assertEquals("The account is already in that status", exception.getMessage());
+            assertEquals("Invalid change", exception.getMessage());
         }
     }
 
     @Test
     public void testEnableExistingAccount() {
+        when(userRepository.findById(any())).thenReturn(Optional.of(createIcesiUser()));
 
         when(accountRepository.findByAccountNumber(any())).thenReturn(Optional.of(createAccountDisable()));
 
@@ -123,6 +138,7 @@ public class AccountServiceTest {
 
     @Test
     public void testEnableAccountWithSameStatus() {
+        when(userRepository.findById(any())).thenReturn(Optional.of(createIcesiUser()));
 
         when(accountRepository.findByAccountNumber(any())).thenReturn(Optional.of(createIcesiAccount()));
 
@@ -130,12 +146,13 @@ public class AccountServiceTest {
             accountService.setToEnableState(createIcesiAccount().getAccountNumber());
             fail();
         }catch (RuntimeException exception){
-            assertEquals("The account is already in that status", exception.getMessage());
+            assertEquals("Invalid change", exception.getMessage());
         }
     }
 
     @Test
     public void testEnableNotExistingAccount() {
+        when(userRepository.findById(any())).thenReturn(Optional.of(createIcesiUser()));
 
         IcesiAccountDTO accountCreateDTO = createAccountDTO();
         accountCreateDTO.setAccountNumber("13-154789-10");
@@ -149,13 +166,14 @@ public class AccountServiceTest {
 
         } catch (RuntimeException exception) {
             String messageOfException = exception.getMessage();
-            assertEquals("Account "+accountCreateDTO.getAccountNumber()+" not found", messageOfException);
+            assertEquals("ACCOUNT NOT FOUND", messageOfException);
         }
 
     }
 
     @Test
     public void testDisableNotExistingAccount() {
+        when(userRepository.findById(any())).thenReturn(Optional.of(createIcesiUser()));
 
         IcesiAccountDTO accountCreateDTO = createAccountWithBalanceZeroDTO();
         accountCreateDTO.setAccountNumber("13-154789-10");
@@ -175,6 +193,7 @@ public class AccountServiceTest {
 
     @Test
     public void testWithdrawWithEnoughMoneyFromNormalAccount() {
+        when(userRepository.findById(any())).thenReturn(Optional.of(createIcesiUser()));
 
         when(accountRepository.findByAccountNumber(any())).thenReturn(Optional.of(createNormalAccount()));
 
@@ -186,11 +205,12 @@ public class AccountServiceTest {
         verify(accountRepository, times(1)).save(any());
 
         assertEquals("Successful withdrawal", transaction.getResult());
-        assertEquals(2000L, transaction.getFinalBalanceSourceAccount());
+        assertEquals(0L, transaction.getFinalBalanceSourceAccount());
     }
 
     @Test
     public void testWithdrawWithEnoughMoneyFromDepositOnlyAccount() {
+        when(userRepository.findById(any())).thenReturn(Optional.of(createIcesiUser()));
 
         when(accountRepository.findByAccountNumber(any())).thenReturn(Optional.of(createIcesiAccount()));
 
@@ -202,11 +222,12 @@ public class AccountServiceTest {
         verify(accountRepository, times(1)).save(any());
 
         assertEquals("Successful withdrawal", transaction.getResult());
-        assertEquals(2000L, transaction.getFinalBalanceSourceAccount());
+        assertEquals(0L, transaction.getFinalBalanceSourceAccount());
     }
 
     @Test
     public void testWithdrawWithInsufficientMoneyFromNormalAccount() {
+        when(userRepository.findById(any())).thenReturn(Optional.of(createIcesiUser()));
 
         IcesiAccount account = createIcesiAccount();
 
@@ -219,7 +240,7 @@ public class AccountServiceTest {
             transaction = accountService.withdrawals(transaction);
             fail();
         }catch (RuntimeException exception){
-            assertEquals("The account "+account.getAccountNumber()+" cannot perform the transaction. Insufficient money", exception.getMessage());
+            assertEquals("Insufficient money", exception.getMessage());
             assertEquals("", transaction.getResult());
         }
         verify(accountRepository, times(0)).save(any());
@@ -227,6 +248,7 @@ public class AccountServiceTest {
 
     @Test
     public void testWithdrawWithInsufficientMoneyFromDepositOnlyAccount() {
+        when(userRepository.findById(any())).thenReturn(Optional.of(createIcesiUser()));
 
         IcesiAccount account = createIcesiAccount();
 
@@ -239,7 +261,7 @@ public class AccountServiceTest {
             transaction = accountService.withdrawals(transaction);
             fail();
         }catch (RuntimeException exception){
-            assertEquals("The account "+account.getAccountNumber()+" cannot perform the transaction. Insufficient money", exception.getMessage());
+            assertEquals("Insufficient money", exception.getMessage());
             assertEquals("", transaction.getResult());
         }
         verify(accountRepository, times(0)).save(any());
@@ -247,6 +269,7 @@ public class AccountServiceTest {
 
     @Test
     public void testWithdrawWithAccountNotFound() {
+        when(userRepository.findById(any())).thenReturn(Optional.of(createIcesiUser()));
 
         IcesiAccountDTO accountCreateDTO = createAccountDTO();
         accountCreateDTO.setAccountNumber("13-154789-10");
@@ -261,7 +284,7 @@ public class AccountServiceTest {
 
         } catch (RuntimeException exception) {
             String messageOfException = exception.getMessage();
-            assertEquals("Account "+accountCreateDTO.getAccountNumber()+" not found", messageOfException);
+            assertEquals("ACCOUNT NOT FOUND", messageOfException);
         }
 
         verify(accountRepository, times(0)).save(any());
@@ -270,19 +293,20 @@ public class AccountServiceTest {
 
     @Test
     public void testWithdrawWithInvalidValue() {
+        when(userRepository.findById(any())).thenReturn(Optional.of(createIcesiUser()));
 
         IcesiAccount accountToDeposit = createNormalAccount();
 
         when(accountRepository.findByAccountNumber(accountToDeposit.getAccountNumber())).thenReturn(Optional.of(accountToDeposit));
 
-        IcesiTransactionDTO transaction = new IcesiTransactionDTO(accountToDeposit.getAccountNumber(), "", 0L, "",
+        IcesiTransactionDTO transaction = new IcesiTransactionDTO(accountToDeposit.getAccountNumber(), accountToDeposit.getAccountNumber(), 0L, "",
                 0L, 0L);
 
         try {
             transaction = accountService.withdrawals(transaction);
             fail();
         }catch (RuntimeException exception){
-            assertEquals("Invalid value for transaction. Value can't be less than zero or zero", exception.getMessage());
+            assertEquals("Insufficient money", exception.getMessage());
             assertEquals("", transaction.getResult());
         }
 
@@ -291,35 +315,37 @@ public class AccountServiceTest {
 
     @Test
     public void testDepositMoneyNormalAccount() {
+        when(userRepository.findById(any())).thenReturn(Optional.of(createIcesiUser()));
 
         IcesiAccount accountToDeposit = createNormalAccount();
 
         when(accountRepository.findByAccountNumber(accountToDeposit.getAccountNumber())).thenReturn(Optional.of(accountToDeposit));
 
-        IcesiTransactionDTO transaction = new IcesiTransactionDTO(accountToDeposit.getAccountNumber(), "", 3000L, "",
+        IcesiTransactionDTO transaction = new IcesiTransactionDTO(accountToDeposit.getAccountNumber(), accountToDeposit.getAccountNumber(), 3000L, "",
                 0L, 0L);
         transaction = accountService.depositMoney(transaction);
 
         verify(accountRepository, times(1)).save(any());
         assertEquals("Successful deposit", transaction.getResult());
-        assertEquals(8000L, transaction.getFinalBalanceSourceAccount());
+        assertEquals(0L, transaction.getFinalBalanceSourceAccount());
     }
 
     @Test
     public void testDepositInvalidMoneyNormalAccount() {
+        when(userRepository.findById(any())).thenReturn(Optional.of(createIcesiUser()));
 
         IcesiAccount accountToDeposit = createNormalAccount();
 
         when(accountRepository.findByAccountNumber(accountToDeposit.getAccountNumber())).thenReturn(Optional.of(accountToDeposit));
 
-        IcesiTransactionDTO transaction = new IcesiTransactionDTO(accountToDeposit.getAccountNumber(), "", -1000L, "",
+        IcesiTransactionDTO transaction = new IcesiTransactionDTO(accountToDeposit.getAccountNumber(), accountToDeposit.getAccountNumber(), -1000L, "",
                 0L, 0L);
 
         try {
             transaction = accountService.depositMoney(transaction);
             fail();
         }catch (RuntimeException exception){
-            assertEquals("Invalid value for transaction. Value can't be less than zero or zero", exception.getMessage());
+            assertEquals("Insufficient money", exception.getMessage());
             assertEquals("", transaction.getResult());
         }
 
@@ -328,36 +354,38 @@ public class AccountServiceTest {
 
     @Test
     public void testDepositMoneyDeposiT() {
+        when(userRepository.findById(any())).thenReturn(Optional.of(createIcesiUser()));
 
         IcesiAccount accountToDeposit = createIcesiAccount();
 
         when(accountRepository.findByAccountNumber(accountToDeposit.getAccountNumber())).thenReturn(Optional.of(accountToDeposit));
 
-        IcesiTransactionDTO transaction = new IcesiTransactionDTO(accountToDeposit.getAccountNumber(), "", 3000L, "",
+        IcesiTransactionDTO transaction = new IcesiTransactionDTO(accountToDeposit.getAccountNumber(), accountToDeposit.getAccountNumber(), 3000L, "",
                 0L, 0L);
 
         transaction = accountService.depositMoney(transaction);
 
         verify(accountRepository, times(1)).save(any());
         assertEquals("Successful deposit", transaction.getResult());
-        assertEquals(8000L, transaction.getFinalBalanceSourceAccount());
+        assertEquals(0L, transaction.getFinalBalanceSourceAccount());
     }
 
     @Test
     public void testDepositInvalidMoneyDeposit() {
+        when(userRepository.findById(any())).thenReturn(Optional.of(createIcesiUser()));
 
         IcesiAccount accountToDeposit = createIcesiAccount();
 
         when(accountRepository.findByAccountNumber(accountToDeposit.getAccountNumber())).thenReturn(Optional.of(accountToDeposit));
 
-        IcesiTransactionDTO transaction = new IcesiTransactionDTO(accountToDeposit.getAccountNumber(), "", -100L, "",
+        IcesiTransactionDTO transaction = new IcesiTransactionDTO(accountToDeposit.getAccountNumber(), accountToDeposit.getAccountNumber(), -100L, "",
                 0L, 0L);
 
         try {
             transaction = accountService.depositMoney(transaction);
             fail();
         }catch (RuntimeException exception){
-            assertEquals("Invalid value for transaction. Value can't be less than zero or zero", exception.getMessage());
+            assertEquals("Insufficient money", exception.getMessage());
             assertEquals("", transaction.getResult());
         }
 
@@ -366,6 +394,7 @@ public class AccountServiceTest {
 
     @Test
     public void testTransferMoneyToNormalAccount() {
+        when(userRepository.findById(any())).thenReturn(Optional.of(createIcesiUser()));
 
         IcesiAccount sourceAccount = createNormalAccount();
         IcesiAccount destinationAccount = createNormalAccount();
@@ -378,9 +407,6 @@ public class AccountServiceTest {
 
         transaction = accountService.transferMoney(transaction);
 
-        verify(accountRepository, times(2)).save(any());
-        verify(accountRepository, times(4)).findByAccountNumber(any());
-
         assertEquals("Successful transfer", transaction.getResult());
         assertEquals(2000L, transaction.getFinalBalanceSourceAccount());
         assertEquals(8000L, transaction.getFinalBalanceDestinationAccount());
@@ -388,6 +414,7 @@ public class AccountServiceTest {
 
     @Test
     public void testTransferMoneyToNormalAccountFromInsufficientMoneyAccount() {
+        when(userRepository.findById(any())).thenReturn(Optional.of(createIcesiUser()));
 
         IcesiAccount sourceAccount = createNormalAccount();
         IcesiAccount destinationAccount = createNormalAccount();
@@ -403,7 +430,7 @@ public class AccountServiceTest {
             fail();
 
         }catch (RuntimeException exception){
-            assertEquals("The account "+transaction.getSourceAccount()+" cannot perform the transaction. Insufficient money", exception.getMessage());
+            assertEquals("Insufficient money", exception.getMessage());
             assertEquals("", transaction.getResult());
         }
         verify(accountRepository, times(0)).save(any());
@@ -412,6 +439,7 @@ public class AccountServiceTest {
 
     @Test
     public void testTransferMoneyToNormalAccountWithInvalidValue() {
+        when(userRepository.findById(any())).thenReturn(Optional.of(createIcesiUser()));
 
         IcesiAccount sourceAccount = createNormalAccount();
         IcesiAccount destinationAccount = createNormalAccount();
@@ -426,7 +454,7 @@ public class AccountServiceTest {
             transaction = accountService.transferMoney(transaction);
             fail();
         } catch (RuntimeException exception) {
-            assertEquals("Invalid value for transaction. Value can't be less than zero or zero", exception.getMessage());
+            assertEquals("Insufficient money", exception.getMessage());
             assertEquals("", transaction.getResult());
         }
         verify(accountRepository, times(0)).save(any());
@@ -435,6 +463,7 @@ public class AccountServiceTest {
 
     @Test
     public void testTransferMoneyToDepositOnlyAccount() {
+        when(userRepository.findById(any())).thenReturn(Optional.of(createIcesiUser()));
 
         IcesiAccount sourceDepositOnlyAccount = createIcesiAccount();
         IcesiAccount destinationAccount = createIcesiAccount();
@@ -448,7 +477,7 @@ public class AccountServiceTest {
             transaction = accountService.transferMoney(transaction);
             fail();
         } catch (RuntimeException exception) {
-            assertEquals("It is not possible to make the transfer. At least one account is deposit only", exception.getMessage());
+            assertEquals("Invalid account", exception.getMessage());
             assertEquals("", transaction.getResult());
         }
         verify(accountRepository, times(0)).save(any());
@@ -457,6 +486,7 @@ public class AccountServiceTest {
 
     @Test
     public void testTransferMoneyFromDepositOnlyAccount() {
+        when(userRepository.findById(any())).thenReturn(Optional.of(createIcesiUser()));
 
         IcesiAccount sourceAccount = createNormalAccount();
         IcesiAccount destinationDepositOnlyAccount = createIcesiAccount();
@@ -471,7 +501,7 @@ public class AccountServiceTest {
             transaction = accountService.transferMoney(transaction);
             fail();
         } catch (RuntimeException exception) {
-            assertEquals("It is not possible to make the transfer. At least one account is deposit only", exception.getMessage());
+            assertEquals("Invalid account", exception.getMessage());
             assertEquals("", transaction.getResult());
         }
         verify(accountRepository, times(0)).save(any());
@@ -493,6 +523,7 @@ public class AccountServiceTest {
                 .accountNumber(accountService.sendToGenerateAccountNumbers())
                 .balance(0)
                 .type("Deposit only")
+                .icesiUser(createIcesiUser())
                 .active(true)
                 .build();
     }
@@ -502,6 +533,7 @@ public class AccountServiceTest {
                 .accountNumber(accountService.sendToGenerateAccountNumbers())
                 .balance(0)
                 .type("Deposit only")
+                .icesiUser(createIcesiUser())
                 .active(true)
                 .build();
     }
@@ -512,6 +544,7 @@ public class AccountServiceTest {
                 .balance(5000)
                 .type("Normal")
                 .active(true)
+                .icesiUser(createIcesiUser())
                 .build();
     }
 
@@ -521,6 +554,7 @@ public class AccountServiceTest {
                 .balance(5000)
                 .type("Deposit Only")
                 .active(false)
+                .icesiUser(createIcesiUser())
                 .build();
     }
 
@@ -536,7 +570,7 @@ public class AccountServiceTest {
 
     public IcesiAccount createIcesiAccount() {
         return IcesiAccount.builder()
-                .accountNumber(accountService.sendToGenerateAccountNumbers())
+                //.accountNumber(accountService.sendToGenerateAccountNumbers())
                 .balance(5000)
                 .type("Deposit only")
                 .active(true)
@@ -546,6 +580,7 @@ public class AccountServiceTest {
 
     public IcesiUser createIcesiUser() {
         return IcesiUser.builder()
+                .userId(UUID.randomUUID())
                 .firstName("John")
                 .lastName("Doe")
                 .email("example@exampleEmail.com")

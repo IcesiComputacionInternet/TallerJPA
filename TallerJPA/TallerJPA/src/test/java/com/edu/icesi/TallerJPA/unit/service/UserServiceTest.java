@@ -1,11 +1,14 @@
 package com.edu.icesi.TallerJPA.unit.service;
 
+import com.edu.icesi.TallerJPA.dto.IcesiUserDTO;
+import com.edu.icesi.TallerJPA.mapper.RoleMapper;
 import com.edu.icesi.TallerJPA.mapper.UserMapper;
 import com.edu.icesi.TallerJPA.mapper.UserMapperImpl;
 import com.edu.icesi.TallerJPA.model.IcesiRole;
 import com.edu.icesi.TallerJPA.model.IcesiUser;
 import com.edu.icesi.TallerJPA.repository.RoleRepository;
 import com.edu.icesi.TallerJPA.repository.UserRepository;
+import com.edu.icesi.TallerJPA.service.RoleService;
 import com.edu.icesi.TallerJPA.service.UserService;
 import com.edu.icesi.TallerJPA.unit.matcher.IcesiUserMatcher;
 import org.junit.jupiter.api.BeforeEach;
@@ -18,21 +21,23 @@ import static org.junit.jupiter.api.Assertions.fail;
 import static org.mockito.Mockito.*;
 
 public class UserServiceTest {
-/*
     private UserService userService;
 
     private UserRepository userRepository;
 
     private UserMapper userMapper;
-
+    private RoleMapper roleMapper;
     private RoleRepository roleRepository;
-
+    private RoleService roleService;
     @BeforeEach
     private void init() {
         userRepository = mock(UserRepository.class);
         userMapper = spy(UserMapperImpl.class);
+        roleMapper = spy(RoleMapper.class);
         roleRepository = mock(RoleRepository.class);
-        userService = new UserService(userRepository, userMapper, roleRepository);
+        roleService = mock(RoleService.class);
+
+        userService = new UserService(userRepository, userMapper, roleMapper,roleRepository,roleService);
     }
 
     @Test
@@ -63,7 +68,7 @@ public class UserServiceTest {
             fail();
         } catch (RuntimeException exception) {
             String messageOfException = exception.getMessage();
-            assertEquals("User with email "+user.getEmail()+" already exists", messageOfException);
+            assertEquals("Duplicated email", messageOfException);
         }
         verify(userRepository, times(0)).save(any());
     }
@@ -79,7 +84,7 @@ public class UserServiceTest {
             fail();
         } catch (RuntimeException exception) {
             String messageOfException = exception.getMessage();
-            assertEquals("User with phone number "+user.getPhoneNumber()+" already exists", messageOfException);
+            assertEquals("Duplicated phoneNumber", messageOfException);
         }
         verify(userRepository, times(0)).save(any());
     }
@@ -95,7 +100,7 @@ public class UserServiceTest {
             fail();
         } catch (RuntimeException exception) {
             String messageOfException = exception.getMessage();
-            assertEquals("User with this email and phone number already exists", messageOfException);
+            assertEquals("Invalid values", messageOfException);
         }
 
         verify(userRepository, times(0)).save(any());
@@ -109,7 +114,7 @@ public class UserServiceTest {
         } catch (RuntimeException exception) {
 
             String messageOfException = exception.getMessage();
-            assertEquals("Role can't be null", messageOfException);
+            assertEquals("Role null", messageOfException);
         }
         verify(userRepository, times(0)).save(any());
     }
@@ -121,7 +126,7 @@ public class UserServiceTest {
                 .email("example@exampleEmail.com")
                 .phoneNumber("1234567")
                 .password("1234")
-                .icesiRole(createRole())
+                .icesiRole(createRole().getName())
                 .build();
     }
 
@@ -152,7 +157,4 @@ public class UserServiceTest {
                 .description("Is a student at Icesi")
                 .build();
     }
-
- */
-
 }
