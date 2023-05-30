@@ -20,7 +20,7 @@ public class JpaProjectApplication {
 		SpringApplication.run(JpaProjectApplication.class, args);
 	}
 
-	//@Bean
+	@Bean
 	CommandLineRunner commandLineRunner(UserRepository users, RoleRepository roleRepository, PasswordEncoder encoder) {
 		IcesiRole icesiRole = IcesiRole.builder()
 				.roleId(UUID.randomUUID())

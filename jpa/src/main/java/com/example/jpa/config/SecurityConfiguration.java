@@ -46,8 +46,8 @@ public class SecurityConfiguration {
 
     @Bean
     public SecurityFilterChain securityFilterChain(HttpSecurity http, AuthorizationManager<RequestAuthorizationContext> access) throws Exception{
-        return http
-                .cors(AbstractHttpConfigurer::disable)
+        return http.cors()
+                .and()
                 .csrf(AbstractHttpConfigurer::disable)
                 .authorizeHttpRequests(auth -> auth
                         .anyRequest().access(access)) //permitAll() allows to anybody make a request
