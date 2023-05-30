@@ -9,7 +9,7 @@ public class ValidationException extends RuntimeException {
     private IcesiError icesiError;
 
     public ValidationException(IcesiError icesiError) {
-        super(icesiError.toString());
+        super();
         this.icesiError = icesiError;
     }
 
