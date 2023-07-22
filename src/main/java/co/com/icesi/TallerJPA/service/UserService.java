@@ -1,6 +1,5 @@
 package co.com.icesi.TallerJPA.service;
 
-import co.com.icesi.TallerJPA.config.PasswordEncoderConfiguration;
 import co.com.icesi.TallerJPA.dto.UserCreateDTO;
 import co.com.icesi.TallerJPA.dto.response.UserResponseDTO;
 import co.com.icesi.TallerJPA.error.util.DetailBuilder;
